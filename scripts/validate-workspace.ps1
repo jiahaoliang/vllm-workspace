@@ -72,7 +72,8 @@ if (Test-Path -LiteralPath $featuresRoot) {
         $snapshotRoot = Join-Path $feature.FullName "references/snapshots"
         if (Test-Path -LiteralPath $snapshotRoot) {
             foreach ($snapshot in Get-ChildItem -LiteralPath $snapshotRoot -Filter "*.md") {
-                $relativeSnapshot = [System.IO.Path]::GetRelativePath($Root, $snapshot.FullName).Replace("\", "/")
+                $rootPrefix = $Root.TrimEnd("\") + "\"
+                $relativeSnapshot = $snapshot.FullName.Substring($rootPrefix.Length).Replace("\", "/")
                 Require-Text $relativeSnapshot "(?m)^Source:" "snapshot source header"
                 Require-Text $relativeSnapshot "(?m)^Captured At:" "snapshot captured-at header"
                 Require-Text $relativeSnapshot "(?m)^Notes:" "snapshot notes header"
