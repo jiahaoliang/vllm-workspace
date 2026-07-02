@@ -1,37 +1,37 @@
 ﻿{
-    "version":  1,
-    "updated_at":  "2026-07-02T17:55:28+08:00",
-    "repos":  {
-                  "vllm":  {
-                               "path":  "repos/vllm",
-                               "remotes":  {
-                                               "origin":  "https://github.com/jiahaoliang/vllm.git",
-                                               "upstream":  "https://github.com/vllm-project/vllm.git",
-                                               "collaborator":  "https://github.com/zhangsicheng5/vllm.git"
-                                           },
-                               "branch":  "kv_offload",
-                               "commit":  "80f12c51f43e3a9d7d7cb9a2f2fa9a4dbcd85980",
-                               "purpose":  "kv_offload feature development"
-                           },
-                  "vllm-ascend":  {
-                                      "path":  "repos/vllm-ascend",
-                                      "remotes":  {
-                                                      "origin":  "https://github.com/jiahaoliang/vllm-ascend.git",
-                                                      "upstream":  "https://github.com/vllm-project/vllm-ascend.git",
-                                                      "collaborator":  "https://github.com/zhangsicheng5/vllm-ascend.git"
-                                                  },
-                                      "branch":  "kv_offload",
-                                      "commit":  "0714227382ffe3ec35c07fd25a2233e84befc45c",
-                                      "purpose":  "kv_offload feature development"
-                                  },
-                  "Mooncake":  {
-                                   "path":  "repos/Mooncake",
-                                   "remotes":  {
-                                                   "origin":  "https://github.com/kvcache-ai/Mooncake.git"
-                                               },
-                                   "branch":  "main",
-                                   "commit":  "b1d30f2e62675610c1fe7a805b6a27b518a48979",
-                                   "purpose":  "dependency reading and validation"
-                               }
-              }
+  "version": 1,
+  "updated_at": "2026-07-02T18:10:21+08:00",
+  "repos": {
+    "vllm": {
+      "path": "repos/vllm",
+      "remotes": {
+        "origin": "https://github.com/jiahaoliang/vllm.git",
+        "upstream": "https://github.com/vllm-project/vllm.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm.git"
+      },
+      "branch": "kv_offload",
+      "commit": "80f12c51f43e3a9d7d7cb9a2f2fa9a4dbcd85980",
+      "purpose": "kv_offload feature development"
+    },
+    "vllm-ascend": {
+      "path": "repos/vllm-ascend",
+      "remotes": {
+        "origin": "https://github.com/jiahaoliang/vllm-ascend.git",
+        "upstream": "https://github.com/vllm-project/vllm-ascend.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm-ascend.git"
+      },
+      "branch": "kv_offload",
+      "commit": "0714227382ffe3ec35c07fd25a2233e84befc45c",
+      "purpose": "kv_offload feature development"
+    },
+    "Mooncake": {
+      "path": "repos/Mooncake",
+      "remotes": {
+        "origin": "https://github.com/kvcache-ai/Mooncake.git"
+      },
+      "branch": "main",
+      "commit": "b1d30f2e62675610c1fe7a805b6a27b518a48979",
+      "purpose": "dependency reading and validation"
+    }
+  }
 }
