@@ -127,3 +127,58 @@ function Get-RepoDefinitions {
         }
     }
 }
+
+function ConvertTo-WorkspaceJson {
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        $Value,
+        [int]$Indent = 0
+    )
+
+    $space = " " * $Indent
+    $childSpace = " " * ($Indent + 2)
+
+    if ($null -eq $Value) {
+        return "null"
+    }
+
+    if ($Value -is [string]) {
+        return ($Value | ConvertTo-Json -Compress)
+    }
+
+    if ($Value -is [bool]) {
+        return $Value.ToString().ToLowerInvariant()
+    }
+
+    if ($Value -is [int] -or $Value -is [long] -or $Value -is [double] -or $Value -is [decimal]) {
+        return [string]$Value
+    }
+
+    if ($Value -is [array]) {
+        if ($Value.Count -eq 0) {
+            return "[]"
+        }
+
+        $items = foreach ($item in $Value) {
+            "$childSpace$(ConvertTo-WorkspaceJson -Value $item -Indent ($Indent + 2))"
+        }
+        return "[`n$($items -join ",`n")`n$space]"
+    }
+
+    $properties = $Value.PSObject.Properties | Where-Object {
+        $_.MemberType -eq "NoteProperty" -or $_.MemberType -eq "Property"
+    }
+
+    if (-not $properties) {
+        return ($Value | ConvertTo-Json -Compress)
+    }
+
+    $lines = foreach ($property in $properties) {
+        $name = $property.Name | ConvertTo-Json -Compress
+        $propertyValue = ConvertTo-WorkspaceJson -Value $property.Value -Indent ($Indent + 2)
+        "$childSpace${name}: $propertyValue"
+    }
+
+    return "{`n$($lines -join ",`n")`n$space}"
+}

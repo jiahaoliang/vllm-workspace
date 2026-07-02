@@ -35,7 +35,7 @@ foreach ($repoDef in Get-RepoDefinitions -Lock $Lock) {
     $stateLines += "| $name | ``$($spec.path)`` | ``$branch`` | ``$head`` | $dirty | $($spec.purpose) |"
 }
 
-$Lock | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 -LiteralPath $LockPath
+ConvertTo-WorkspaceJson -Value $Lock | Set-Content -Encoding UTF8 -LiteralPath $LockPath
 $statePath = Join-Path $Root "features/kv_offload/repo-state.md"
 $stateLines -join "`n" | Set-Content -Encoding UTF8 -LiteralPath $statePath
 

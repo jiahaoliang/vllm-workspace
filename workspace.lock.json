@@ -1,33 +1,33 @@
 ﻿{
-    "version":  1,
-    "updated_at":  "2026-07-02T18:01:32+08:00",
-    "repos":  {
-                  "vllm":  {
-                               "path":  "repos/vllm",
-                               "remotes":  {
-                                               "origin":  "https://github.com/vllm-project/vllm.git"
-                                           },
-                               "branch":  "main",
-                               "commit":  "25fcb65d51deef0026aa34e6067703da4a91f956",
-                               "purpose":  "upstream vLLM baseline"
-                           },
-                  "vllm-ascend":  {
-                                      "path":  "repos/vllm-ascend",
-                                      "remotes":  {
-                                                      "origin":  "https://github.com/vllm-project/vllm-ascend.git"
-                                                  },
-                                      "branch":  "main",
-                                      "commit":  "4839937339b704fbabb6b92514a7be06672c73cc",
-                                      "purpose":  "upstream vLLM Ascend baseline"
-                                  },
-                  "Mooncake":  {
-                                   "path":  "repos/Mooncake",
-                                   "remotes":  {
-                                                   "origin":  "https://github.com/kvcache-ai/Mooncake.git"
-                                               },
-                                   "branch":  "main",
-                                   "commit":  "b1d30f2e62675610c1fe7a805b6a27b518a48979",
-                                   "purpose":  "dependency reading and validation"
-                               }
-              }
+  "version": 1,
+  "updated_at": "2026-07-02T18:01:32+08:00",
+  "repos": {
+    "vllm": {
+      "path": "repos/vllm",
+      "remotes": {
+        "origin": "https://github.com/vllm-project/vllm.git"
+      },
+      "branch": "main",
+      "commit": "25fcb65d51deef0026aa34e6067703da4a91f956",
+      "purpose": "upstream vLLM baseline"
+    },
+    "vllm-ascend": {
+      "path": "repos/vllm-ascend",
+      "remotes": {
+        "origin": "https://github.com/vllm-project/vllm-ascend.git"
+      },
+      "branch": "main",
+      "commit": "4839937339b704fbabb6b92514a7be06672c73cc",
+      "purpose": "upstream vLLM Ascend baseline"
+    },
+    "Mooncake": {
+      "path": "repos/Mooncake",
+      "remotes": {
+        "origin": "https://github.com/kvcache-ai/Mooncake.git"
+      },
+      "branch": "main",
+      "commit": "b1d30f2e62675610c1fe7a805b6a27b518a48979",
+      "purpose": "dependency reading and validation"
+    }
+  }
 }
