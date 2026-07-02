@@ -1,0 +1,8 @@
+repos/*
+!repos/.gitkeep
+
+.cache/
+*.log
+*.tmp
+*.bak
+__pycache__/
