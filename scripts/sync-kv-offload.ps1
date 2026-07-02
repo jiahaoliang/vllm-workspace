@@ -7,6 +7,16 @@ param(
 $ErrorActionPreference = "Stop"
 $Root = Get-WorkspaceRoot
 $repos = @("vllm", "vllm-ascend")
+$featureRoot = Join-Path $Root "features/kv_offload"
+
+if (-not (Test-Path -LiteralPath $featureRoot)) {
+    throw "features/kv_offload is missing. Switch to the kv_offload workspace branch before running this script."
+}
+
+$workspaceBranch = (& git -C $Root branch --show-current | Out-String).Trim()
+if ($workspaceBranch -ne "kv_offload") {
+    throw "Current workspace branch is $workspaceBranch. Switch to kv_offload before running this script."
+}
 
 foreach ($name in $repos) {
     $repoPath = Join-Path $Root "repos/$name"

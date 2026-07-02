@@ -1,28 +1,24 @@
 ﻿{
     "version":  1,
-    "updated_at":  "2026-07-02T17:55:28+08:00",
+    "updated_at":  "2026-07-02T18:01:32+08:00",
     "repos":  {
                   "vllm":  {
                                "path":  "repos/vllm",
                                "remotes":  {
-                                               "origin":  "https://github.com/jiahaoliang/vllm.git",
-                                               "upstream":  "https://github.com/vllm-project/vllm.git",
-                                               "collaborator":  "https://github.com/zhangsicheng5/vllm.git"
+                                               "origin":  "https://github.com/vllm-project/vllm.git"
                                            },
-                               "branch":  "kv_offload",
-                               "commit":  "80f12c51f43e3a9d7d7cb9a2f2fa9a4dbcd85980",
-                               "purpose":  "kv_offload feature development"
+                               "branch":  "main",
+                               "commit":  "25fcb65d51deef0026aa34e6067703da4a91f956",
+                               "purpose":  "upstream vLLM baseline"
                            },
                   "vllm-ascend":  {
                                       "path":  "repos/vllm-ascend",
                                       "remotes":  {
-                                                      "origin":  "https://github.com/jiahaoliang/vllm-ascend.git",
-                                                      "upstream":  "https://github.com/vllm-project/vllm-ascend.git",
-                                                      "collaborator":  "https://github.com/zhangsicheng5/vllm-ascend.git"
+                                                      "origin":  "https://github.com/vllm-project/vllm-ascend.git"
                                                   },
-                                      "branch":  "kv_offload",
-                                      "commit":  "0714227382ffe3ec35c07fd25a2233e84befc45c",
-                                      "purpose":  "kv_offload feature development"
+                                      "branch":  "main",
+                                      "commit":  "4839937339b704fbabb6b92514a7be06672c73cc",
+                                      "purpose":  "upstream vLLM Ascend baseline"
                                   },
                   "Mooncake":  {
                                    "path":  "repos/Mooncake",

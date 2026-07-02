@@ -1,6 +1,24 @@
 # Git Workflow
 
-## Remote 命名
+## main 分支 Remote 命名
+
+`main` 记录上游社区基线：
+
+`repos/vllm`:
+
+- `origin`: `https://github.com/vllm-project/vllm.git`
+
+`repos/vllm-ascend`:
+
+- `origin`: `https://github.com/vllm-project/vllm-ascend.git`
+
+`repos/Mooncake`:
+
+- `origin`: `https://github.com/kvcache-ai/Mooncake.git`
+
+## Feature 分支 Remote 命名示例
+
+以 `kv_offload` 为例，feature branch 可以把 `origin` 指向个人 fork，并额外添加 `upstream` 和 `collaborator`：
 
 `repos/vllm`:
 
@@ -14,15 +32,11 @@
 - `upstream`: `https://github.com/vllm-project/vllm-ascend.git`
 - `collaborator`: `https://github.com/zhangsicheng5/vllm-ascend.git`
 
-`repos/Mooncake`:
+## Feature 分支同步
 
-- `origin`: `https://github.com/kvcache-ai/Mooncake.git`
+特性分支初始基线可以来自合作者分支，本地开发提交推送到个人 fork。
 
-## kv_offload 分支
-
-`vllm` 和 `vllm-ascend` 使用 `kv_offload` 分支。初始基线优先来自 `collaborator/kv_offload`，本地开发提交推送到 `origin/kv_offload`。
-
-推荐同步流程：
+示例：
 
 ```powershell
 cd repos\vllm-ascend
@@ -34,4 +48,4 @@ cd ..\..
 .\scripts\lock-repos.ps1
 ```
 
-如果分支已经多人共享并且不适合改写历史，可以改用 merge；同步原因和冲突处理必须写入 `features/kv_offload/sync-log.md`。
+如果分支已经多人共享并且不适合改写历史，可以改用 merge；同步原因和冲突处理必须写入对应 feature branch 的 `features/<feature>/sync-log.md`。

@@ -2,11 +2,11 @@
 
 ## repos/vllm
 
-主 vLLM 仓库。`kv_offload` 开发中用于跟踪上游 RFC、KV cache 管理、scheduler、attention metadata 和 connector 框架相关改动。
+主 vLLM 仓库。`main` 记录上游基线；具体特性分支记录该特性需要的 fork、合作者 remote 和开发分支。
 
 ## repos/vllm-ascend
 
-Ascend 后端仓库。`kv_offload` 当前主要开发仓库，用于 Mooncake PD、SFA offload、Ascend attention backend 和 GLM sparse 路径相关实现。
+Ascend 后端仓库。`main` 记录上游基线；具体特性分支记录该特性需要的后端开发分支和资料。
 
 ## repos/Mooncake
 
