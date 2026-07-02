@@ -28,6 +28,14 @@
 - 从合作者分支同步时，必须记录到对应 `features/<feature>/sync-log.md`。
 - 每个有意义的开发节点应按顺序完成：源码仓库 commit 并 push 到个人 fork，刷新 `workspace.lock.json`，更新 `features/<feature>/repo-state.md`，最后提交根仓库状态记录。
 
+## 公共内容更新流程
+
+- 修改公共内容时，必须先切到 `main`，在 `main` 上完成修改、验证、提交并推送。
+- 公共内容包括 `AGENTS.md`、`README.md`、`docs/`、通用 `scripts/`、根 `.gitignore`、通用 workspace 规范和上游基线 lock。
+- `main` 推送完成后，再切到每个受影响的 feature branch，例如 `kv_offload`，执行 `git merge main`，解决冲突后验证、提交并推送该 feature branch。
+- 不要直接只在 feature branch 修改公共规则；如果确实先在 feature branch 发现公共问题，也要把公共改动移回 `main`，再 merge 回 feature branch。
+- 本流程本身也属于公共规则；修改本流程时必须遵守同样的 `main -> feature branch` 同步顺序。
+
 ## 可追溯与恢复
 
 - 不要依赖未提交 WIP 作为可恢复进度。
