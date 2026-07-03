@@ -1,33 +1,37 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-02T18:01:32+08:00",
+  "updated_at": "2026-07-03T11:55:56+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
       "remotes": {
-        "origin": "https://github.com/vllm-project/vllm.git"
+        "origin": "https://github.com/jiahaoliang/vllm.git",
+        "upstream": "https://github.com/vllm-project/vllm.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm.git"
       },
-      "branch": "main",
-      "commit": "25fcb65d51deef0026aa34e6067703da4a91f956",
-      "purpose": "upstream vLLM baseline"
+      "branch": "kv-pool-layerwise-reuse",
+      "commit": "bc150f50299199599673614f80d12a196f377655",
+      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.20.2"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
       "remotes": {
-        "origin": "https://github.com/vllm-project/vllm-ascend.git"
+        "origin": "https://github.com/jiahaoliang/vllm-ascend.git",
+        "upstream": "https://github.com/vllm-project/vllm-ascend.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm-ascend.git"
       },
-      "branch": "main",
-      "commit": "4839937339b704fbabb6b92514a7be06672c73cc",
-      "purpose": "upstream vLLM Ascend baseline"
+      "branch": "kv-pool-layerwise-reuse",
+      "commit": "367b8e62da799870a7476ce34f5f7658589a8aad",
+      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.20.2rc1"
     },
     "Mooncake": {
       "path": "repos/Mooncake",
       "remotes": {
         "origin": "https://github.com/kvcache-ai/Mooncake.git"
       },
-      "branch": "main",
-      "commit": "b1d30f2e62675610c1fe7a805b6a27b518a48979",
-      "purpose": "dependency reading and validation"
+      "branch": "tag:v0.3.8.post1",
+      "commit": "5738f80752d889123a6cfb44a9444da837210b00",
+      "purpose": "bundled Mooncake dependency reading and validation; baseline v0.3.8.post1"
     }
   }
 }
