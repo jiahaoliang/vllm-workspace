@@ -5,9 +5,10 @@ $Root = Get-WorkspaceRoot
 $LockPath = Join-Path $Root "workspace.lock.json"
 $Lock = Get-WorkspaceLock -Root $Root
 $Lock.updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssK")
+$WorkspaceBranch = Get-GitOutput -RepoPath $Root -GitArgs @("branch", "--show-current")
 
 $stateLines = @(
-    "# kv_offload Repo State",
+    "# $WorkspaceBranch Repo State",
     "",
     "Captured At: $($Lock.updated_at)",
     "",
@@ -36,7 +37,15 @@ foreach ($repoDef in Get-RepoDefinitions -Lock $Lock) {
 }
 
 ConvertTo-WorkspaceJson -Value $Lock | Set-Content -Encoding UTF8 -LiteralPath $LockPath
-$statePath = Join-Path $Root "features/kv_offload/repo-state.md"
-$stateLines -join "`n" | Set-Content -Encoding UTF8 -LiteralPath $statePath
 
-Write-Host "Updated workspace.lock.json and features/kv_offload/repo-state.md"
+if ($WorkspaceBranch -ne "main") {
+    $statePath = Join-Path $Root "features/$WorkspaceBranch/repo-state.md"
+    if (-not (Test-Path -LiteralPath (Split-Path -Parent $statePath))) {
+        throw "Missing feature directory for branch $WorkspaceBranch"
+    }
+    $stateLines -join "`n" | Set-Content -Encoding UTF8 -LiteralPath $statePath
+    Write-Host "Updated workspace.lock.json and features/$WorkspaceBranch/repo-state.md"
+}
+else {
+    Write-Host "Updated workspace.lock.json"
+}
