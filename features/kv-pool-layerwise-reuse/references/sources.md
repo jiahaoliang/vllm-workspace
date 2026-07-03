@@ -9,7 +9,7 @@
 ## Reference Code
 
 - ader47 vLLM Ascend commit: <https://github.com/ader47/vllm-ascend/commit/674594c51d6f22c12136e5130ce4c677c9f913ec>
-- Discovered branch: <https://github.com/ader47/vllm-ascend/tree/kv-pool-layerwise-reuse>
+- Collaborator branch: `collaborator/kv-pool-layerwise-reuse` from <https://github.com/ader47/vllm-ascend/tree/kv-pool-layerwise-reuse>
 
 ## RFC
 

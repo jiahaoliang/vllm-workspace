@@ -18,7 +18,7 @@
       "remotes": {
         "origin": "https://github.com/jiahaoliang/vllm-ascend.git",
         "upstream": "https://github.com/vllm-project/vllm-ascend.git",
-        "collaborator": "https://github.com/zhangsicheng5/vllm-ascend.git"
+        "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "kv-pool-layerwise-reuse",
       "commit": "367b8e62da799870a7476ce34f5f7658589a8aad",
