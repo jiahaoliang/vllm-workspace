@@ -46,6 +46,23 @@ function Get-GitOutput {
     }
 }
 
+function Get-GitRefName {
+    param([string]$RepoPath)
+
+    $branch = Get-GitOutput -RepoPath $RepoPath -GitArgs @("branch", "--show-current")
+    if ($branch) {
+        return $branch
+    }
+
+    $tag = Get-GitOutput -RepoPath $RepoPath -GitArgs @("describe", "--tags", "--exact-match", "HEAD")
+    if ($tag) {
+        return "tag:$tag"
+    }
+
+    $head = Get-GitOutput -RepoPath $RepoPath -GitArgs @("rev-parse", "--short", "HEAD")
+    return "detached:$head"
+}
+
 function Assert-NoUncommittedChanges {
     param([string]$RepoPath)
     $status = Get-GitOutput -RepoPath $RepoPath -GitArgs @("status", "--porcelain")

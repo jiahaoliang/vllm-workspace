@@ -16,7 +16,7 @@ foreach ($repoDef in Get-RepoDefinitions -Lock $Lock) {
         continue
     }
 
-    $branch = Get-GitOutput -RepoPath $repoPath -GitArgs @("branch", "--show-current")
+    $branch = Get-GitRefName -RepoPath $repoPath
     $head = Get-GitOutput -RepoPath $repoPath -GitArgs @("rev-parse", "HEAD")
     $dirty = Get-GitOutput -RepoPath $repoPath -GitArgs @("status", "--porcelain")
     $lockCommit = $spec.commit
