@@ -10,14 +10,29 @@
 
 - ader47 vLLM Ascend commit: <https://github.com/ader47/vllm-ascend/commit/674594c51d6f22c12136e5130ce4c677c9f913ec>
 - Collaborator branch: `collaborator/kv-pool-layerwise-reuse` from <https://github.com/ader47/vllm-ascend/tree/kv-pool-layerwise-reuse>
+- vLLM Ascend PR #11444, memcache layerwise KV pooling reference: <https://github.com/vllm-project/vllm-ascend/pull/11444>
+- vLLM Ascend PR #10733, layerwise KV pool reuse coordination target: <https://github.com/vllm-project/vllm-ascend/pull/10733>
 
 ## RFC
 
 - vLLM issue #33398: <https://github.com/vllm-project/vllm/issues/33398>
 - vLLM issue #33980: <https://github.com/vllm-project/vllm/issues/33980>
 
+## Design Notes
+
+- User-provided Mooncake layerwise KVPool put design: `features/kv-pool-layerwise-reuse/references/snapshots/design-mooncake-layerwise-gva-put.md`
+
 ## Local Snapshots
 
 - `snapshots/rfc-33398-layerwise-kv-offload.md`
 - `snapshots/rfc-33980-sparse-attention-kv-offload.md`
 - `snapshots/ader47-vllm-ascend-674594c5-kv-pool-layerwise-reuse.md`
+- `snapshots/design-mooncake-layerwise-gva-put.md`
+- `snapshots/pr-11444-layerwise-kv-pooling-memcache.md`
+- `snapshots/pr-10733-layerwise-kv-pool-reuse.md`
+
+## Local Patch Archives
+
+- `patches/pr-11444-layerwise-kv-pooling-memcache.patch`
+- `patches/pr-10733-layerwise-kv-pool-reuse.patch`
+
