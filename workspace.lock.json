@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-14T10:38:52+08:00",
+  "updated_at": "2026-07-14T20:24:53+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -27,11 +27,12 @@
     "Mooncake": {
       "path": "repos/Mooncake",
       "remotes": {
-        "origin": "https://github.com/kvcache-ai/Mooncake.git"
+        "origin": "https://github.com/kvcache-ai/Mooncake.git",
+        "collaborator": "https://github.com/ascend-direct-dev/Mooncake.git"
       },
-      "branch": "tag:v0.3.8.post1",
-      "commit": "5738f80752d889123a6cfb44a9444da837210b00",
-      "purpose": "bundled Mooncake dependency reading and validation; baseline v0.3.8.post1"
+      "branch": "feature/layerwise-kv-session",
+      "commit": "c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8",
+      "purpose": "Mooncake PR #2881 WIP integration; collaborator branch feature/layerwise-kv-session"
     }
   }
 }

@@ -1,0 +1,2608 @@
+From 5020b99bb6c000b2111ab26be1f2f85ebdfdb6b9 Mon Sep 17 00:00:00 2001
+From: youyx <youxiao@huawei.com>
+Date: Tue, 14 Jul 2026 10:26:04 +0800
+Subject: [PATCH 1/5] [WIP][Store] Add put/get session APIs for ranged
+ multi-buffer transfers
+
+Expose batch_put/get_start/end and multi_buffer_ranges so callers can
+reserve objects once, transfer object-byte ranges with cached lease/
+replica metadata, and finalize without re-querying Master on each range.
+
+Also add abnormal-session UTs (including lease expiry dropping get
+sessions) and a real TcpTransport e2e under mooncake-store/tests/e2e.
+---
+ mooncake-integration/store/store_py.cpp       | 104 +++++
+ mooncake-store/include/client_service.h       |  18 +
+ mooncake-store/include/pyclient.h             |  50 ++
+ mooncake-store/include/real_client.h          |  42 ++
+ mooncake-store/include/transfer_task.h        |   8 +
+ mooncake-store/src/client_service.cpp         |  53 +++
+ mooncake-store/src/real_client.cpp            | 429 ++++++++++++++++++
+ mooncake-store/src/transfer_task.cpp          |  54 +++
+ .../tests/e2e/run_session_ranges_tcp_e2e.sh   |  77 ++++
+ .../tests/e2e/session_ranges_tcp_e2e.py       | 152 +++++++
+ mooncake-store/tests/pybind_client_test.cpp   | 314 +++++++++++++
+ 11 files changed, 1301 insertions(+)
+ create mode 100755 mooncake-store/tests/e2e/run_session_ranges_tcp_e2e.sh
+ create mode 100644 mooncake-store/tests/e2e/session_ranges_tcp_e2e.py
+
+diff --git a/mooncake-integration/store/store_py.cpp b/mooncake-integration/store/store_py.cpp
+index cf03539601..9fc32a9dce 100644
+--- a/mooncake-integration/store/store_py.cpp
++++ b/mooncake-integration/store/store_py.cpp
+@@ -2924,6 +2924,110 @@ PYBIND11_MODULE(store, m) {
+             "Get object data directly into multiple pre-allocated buffers for "
+             "multiple "
+             "keys")
++        .def(
++            "batch_get_start",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_get_start(keys);
++            },
++            py::arg("keys"),
++            "Start a get session: query replicas once and cache them")
++        .def(
++            "batch_get_into_multi_buffer_ranges",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys,
++               const std::vector<std::vector<uintptr_t>> &all_buffer_ptrs,
++               const std::vector<std::vector<size_t>> &all_sizes,
++               const std::vector<std::vector<size_t>> &all_src_offsets) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_get_into_multi_buffer_ranges(
++                    keys, CastAddrs2Ptrs(all_buffer_ptrs), all_sizes,
++                    all_src_offsets);
++            },
++            py::arg("keys"), py::arg("all_buffer_ptrs"), py::arg("all_sizes"),
++            py::arg("all_src_offsets"),
++            "Ranged get into multiple buffers using a get session")
++        .def(
++            "batch_get_end",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return -1;
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_get_end(keys);
++            },
++            py::arg("keys"),
++            "End a get session and drop cached replica metadata")
++        .def(
++            "batch_put_start",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys,
++               const std::vector<size_t> &sizes,
++               const ReplicateConfig &config = ReplicateConfig{}) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_put_start(keys, sizes, config);
++            },
++            py::arg("keys"), py::arg("sizes"),
++            py::arg("config") = ReplicateConfig{},
++            "Start a put session: reserve objects without transfer")
++        .def(
++            "batch_put_from_multi_buffer_ranges",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys,
++               const std::vector<std::vector<uintptr_t>> &all_buffer_ptrs,
++               const std::vector<std::vector<size_t>> &all_sizes,
++               const std::vector<std::vector<size_t>> &all_dst_offsets) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_put_from_multi_buffer_ranges(
++                    keys, CastAddrs2Ptrs(all_buffer_ptrs), all_sizes,
++                    all_dst_offsets);
++            },
++            py::arg("keys"), py::arg("all_buffer_ptrs"), py::arg("all_sizes"),
++            py::arg("all_dst_offsets"),
++            "Ranged put from multiple buffers using a put session")
++        .def(
++            "batch_put_end",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_put_end(keys);
++            },
++            py::arg("keys"), "Complete a put session and make objects readable")
++        .def(
++            "batch_put_revoke",
++            [](MooncakeStorePyWrapper &self,
++               const std::vector<std::string> &keys) {
++                if (!self.is_client_initialized()) {
++                    LOG(ERROR) << "Client is not initialized";
++                    return std::vector<int>{};
++                }
++                py::gil_scoped_release release;
++                return self.store_->batch_put_revoke(keys);
++            },
++            py::arg("keys"), "Revoke an incomplete put session")
+         .def(
+             "get_replica_desc",
+             [](MooncakeStorePyWrapper &self, const std::string &key) {
+diff --git a/mooncake-store/include/client_service.h b/mooncake-store/include/client_service.h
+index 621b4edd70..90f6548502 100644
+--- a/mooncake-store/include/client_service.h
++++ b/mooncake-store/include/client_service.h
+@@ -31,6 +31,7 @@
+ namespace mooncake {
+ 
+ class PutOperation;
++class RealClient;
+ 
+ /**
+  * @brief Result of a query operation containing replica information and lease
+@@ -215,6 +216,13 @@ class Client {
+         std::vector<std::vector<Slice>>& batched_slices,
+         const ReplicateConfig& config);
+ 
++    /**
++     * @brief Write slices into a memory replica at an object-byte offset.
++     */
++    ErrorCode TransferWriteRange(const Replica::Descriptor& replica_descriptor,
++                                 std::vector<Slice>& slices,
++                                 uint64_t dst_offset);
++
+     /**
+      * @brief Upserts data: inserts if key doesn't exist, updates if it does
+      * @param key Object key
+@@ -660,6 +668,10 @@ class Client {
+            const std::string& tenant_id = "default");
+ 
+    private:
++    // RealClient put sessions use StartBatchPut /
++    // master_client_.BatchPutEnd|Revoke — same path as BatchPut.
++    friend class RealClient;
++
+     /**
+      * @brief Internal helper functions for initialization and data transfer
+      */
+@@ -761,6 +773,12 @@ class Client {
+         const std::vector<std::vector<Slice>>& batched_slices);
+     void StartBatchPut(std::vector<PutOperation>& ops,
+                        const ReplicateConfig& config);
++    // First half of BatchPut only (size-only slices → StartBatchPut).
++    // Used by RealClient put sessions; not a Master API facade.
++    std::vector<tl::expected<std::vector<Replica::Descriptor>, ErrorCode>>
++    StartBatchPutForSizes(const std::vector<std::string>& keys,
++                          const std::vector<uint64_t>& object_sizes,
++                          const ReplicateConfig& config);
+     void SubmitTransfers(std::vector<PutOperation>& ops);
+     void WaitForTransfers(std::vector<PutOperation>& ops);
+     void FinalizeBatchPut(std::vector<PutOperation>& ops);
+diff --git a/mooncake-store/include/pyclient.h b/mooncake-store/include/pyclient.h
+index b24b5bcebe..7143cc4d80 100644
+--- a/mooncake-store/include/pyclient.h
++++ b/mooncake-store/include/pyclient.h
+@@ -293,6 +293,56 @@ class PyClient {
+         const std::vector<std::vector<size_t>> &all_sizes,
+         const ReplicateConfig &config = ReplicateConfig{}) = 0;
+ 
++    // Put/get sessions. Default stubs keep DummyClient unchanged; RealClient
++    // overrides with the real implementations.
++    virtual std::vector<int> batch_get_start(
++        const std::vector<std::string> &keys) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    virtual std::vector<int> batch_get_into_multi_buffer_ranges(
++        const std::vector<std::string> &keys,
++        const std::vector<std::vector<void *>> & /*all_buffers*/,
++        const std::vector<std::vector<size_t>> & /*all_sizes*/,
++        const std::vector<std::vector<size_t>> & /*all_src_offsets*/) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    virtual int batch_get_end(const std::vector<std::string> & /*keys*/) {
++        return static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++    }
++
++    virtual std::vector<int> batch_put_start(
++        const std::vector<std::string> &keys,
++        const std::vector<size_t> & /*sizes*/,
++        const ReplicateConfig & /*config*/ = ReplicateConfig{}) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    virtual std::vector<int> batch_put_from_multi_buffer_ranges(
++        const std::vector<std::string> &keys,
++        const std::vector<std::vector<void *>> & /*all_buffers*/,
++        const std::vector<std::vector<size_t>> & /*all_sizes*/,
++        const std::vector<std::vector<size_t>> & /*all_dst_offsets*/) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    virtual std::vector<int> batch_put_end(
++        const std::vector<std::string> &keys) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    virtual std::vector<int> batch_put_revoke(
++        const std::vector<std::string> &keys) {
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
+     virtual std::shared_ptr<BufferHandle> get_buffer(
+         const std::string &key) = 0;
+ 
+diff --git a/mooncake-store/include/real_client.h b/mooncake-store/include/real_client.h
+index 6b3382b3b6..6df90c7ac8 100644
+--- a/mooncake-store/include/real_client.h
++++ b/mooncake-store/include/real_client.h
+@@ -2,6 +2,7 @@
+ 
+ #include <atomic>
+ #include <boost/lockfree/queue.hpp>
++#include <chrono>
+ #include <csignal>
+ #include <map>
+ #include <memory>
+@@ -242,6 +243,33 @@ class RealClient : public PyClient {
+         const std::vector<std::vector<size_t>> &all_sizes,
+         const ReplicateConfig &config = ReplicateConfig{});
+ 
++    std::vector<int> batch_get_start(
++        const std::vector<std::string> &keys) override;
++
++    std::vector<int> batch_get_into_multi_buffer_ranges(
++        const std::vector<std::string> &keys,
++        const std::vector<std::vector<void *>> &all_buffers,
++        const std::vector<std::vector<size_t>> &all_sizes,
++        const std::vector<std::vector<size_t>> &all_src_offsets) override;
++
++    int batch_get_end(const std::vector<std::string> &keys) override;
++
++    std::vector<int> batch_put_start(
++        const std::vector<std::string> &keys, const std::vector<size_t> &sizes,
++        const ReplicateConfig &config = ReplicateConfig{}) override;
++
++    std::vector<int> batch_put_from_multi_buffer_ranges(
++        const std::vector<std::string> &keys,
++        const std::vector<std::vector<void *>> &all_buffers,
++        const std::vector<std::vector<size_t>> &all_sizes,
++        const std::vector<std::vector<size_t>> &all_dst_offsets) override;
++
++    std::vector<int> batch_put_end(
++        const std::vector<std::string> &keys) override;
++
++    std::vector<int> batch_put_revoke(
++        const std::vector<std::string> &keys) override;
++
+     int put_parts(const std::string &key,
+                   std::vector<std::span<const char>> values,
+                   const ReplicateConfig &config = ReplicateConfig{});
+@@ -855,6 +883,20 @@ class RealClient : public PyClient {
+     std::unordered_map<void *, size_t> registered_buffer_sizes_;
+     std::optional<WritableBufferRegion> local_buffer_region_;
+ 
++    // KV transfer sessions (process-local; not shared with DummyClient).
++    // lease_deadline is cached at batch_get_start; ranges only compare locally.
++    struct GetSessionEntry {
++        Replica::Descriptor replica;
++        std::chrono::steady_clock::time_point lease_deadline{};
++    };
++    struct PutSessionEntry {
++        std::vector<Replica::Descriptor> replicas;
++        uint64_t object_size{0};
++    };
++    mutable std::mutex session_mutex_;
++    std::unordered_map<std::string, GetSessionEntry> get_sessions_;
++    std::unordered_map<std::string, PutSessionEntry> put_sessions_;
++
+     // Dummy VA -> real VA using mapped_shms; last_hit_shm caches locality.
+     bool map_dummy_range_in_shm(const MappedShm &shm, uint64_t dummy_addr,
+                                 size_t offset, size_t size,
+diff --git a/mooncake-store/include/transfer_task.h b/mooncake-store/include/transfer_task.h
+index 63b061914d..07e5ef7243 100644
+--- a/mooncake-store/include/transfer_task.h
++++ b/mooncake-store/include/transfer_task.h
+@@ -560,6 +560,10 @@ class TransferSubmitter {
+         const Replica::Descriptor& replica, std::vector<Slice>& slices,
+         uint64_t src_offset);
+ 
++    std::optional<TransferFuture> submitRangeWrite(
++        const Replica::Descriptor& replica, std::vector<Slice>& slices,
++        uint64_t dst_offset);
++
+     std::optional<TransferFuture> submit_batch(
+         const std::vector<Replica::Descriptor>& replicas,
+         std::vector<std::vector<Slice>>& all_slices,
+@@ -646,6 +650,10 @@ class TransferSubmitter {
+         const AllocatedBuffer::Descriptor& handle,
+         const std::vector<Slice>& slices, uint64_t src_offset);
+ 
++    std::optional<TransferFuture> submitMemoryWriteOperation(
++        const AllocatedBuffer::Descriptor& handle,
++        const std::vector<Slice>& slices, uint64_t dst_offset);
++
+     std::optional<TransferFuture> submitFileReadOperation(
+         const Replica::Descriptor& replica, std::vector<Slice>& slices,
+         TransferRequest::OpCode op_code);
+diff --git a/mooncake-store/src/client_service.cpp b/mooncake-store/src/client_service.cpp
+index 446503c91a..e7887515f1 100644
+--- a/mooncake-store/src/client_service.cpp
++++ b/mooncake-store/src/client_service.cpp
+@@ -2606,6 +2606,40 @@ std::vector<tl::expected<void, ErrorCode>> Client::BatchPut(
+     return CollectResults(ops);
+ }
+ 
++std::vector<tl::expected<std::vector<Replica::Descriptor>, ErrorCode>>
++Client::StartBatchPutForSizes(const std::vector<std::string>& keys,
++                              const std::vector<uint64_t>& object_sizes,
++                              const ReplicateConfig& config) {
++    std::vector<tl::expected<std::vector<Replica::Descriptor>, ErrorCode>>
++        results(keys.size(), tl::unexpected(ErrorCode::INVALID_PARAMS));
++    if (keys.size() != object_sizes.size()) {
++        LOG(ERROR) << "StartBatchPutForSizes size mismatch: keys="
++                   << keys.size() << ", sizes=" << object_sizes.size();
++        return results;
++    }
++
++    ReplicateConfig client_cfg = AttachHostId(config);
++    if (protocol_ == "cxl") {
++        client_cfg.preferred_segment = local_hostname_;
++    }
++
++    std::vector<std::vector<Slice>> batched_slices(keys.size());
++    for (size_t i = 0; i < keys.size(); ++i) {
++        batched_slices[i] = {Slice{nullptr, object_sizes[i]}};
++    }
++    std::vector<PutOperation> ops = CreatePutOperations(keys, batched_slices);
++    StartBatchPut(ops, client_cfg);
++
++    for (size_t i = 0; i < ops.size(); ++i) {
++        if (ops[i].IsResolved()) {
++            results[i] = tl::unexpected(ops[i].result.error());
++            continue;
++        }
++        results[i] = std::move(ops[i].replicas);
++    }
++    return results;
++}
++
+ tl::expected<void, ErrorCode> Client::Remove(const ObjectKey& key, bool force) {
+     if (hot_cache_) {
+         hot_cache_->BumpKeyGeneration(key);
+@@ -3503,6 +3537,25 @@ ErrorCode Client::TransferWrite(const Replica::Descriptor& replica_descriptor,
+     return TransferData(replica_descriptor, slices, TransferRequest::WRITE);
+ }
+ 
++ErrorCode Client::TransferWriteRange(
++    const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
++    uint64_t dst_offset) {
++    if (!transfer_submitter_) {
++        LOG(ERROR) << "TransferSubmitter not initialized";
++        return ErrorCode::INVALID_PARAMS;
++    }
++
++    auto future = transfer_submitter_->submitRangeWrite(replica_descriptor,
++                                                        slices, dst_offset);
++    if (!future) {
++        LOG(ERROR) << "Failed to submit range write operation";
++        return ErrorCode::TRANSFER_FAIL;
++    }
++
++    VLOG(1) << "Using transfer strategy: " << future->strategy();
++    return future->get();
++}
++
+ ErrorCode Client::TransferRead(const Replica::Descriptor& replica_descriptor,
+                                std::vector<Slice>& slices) {
+     size_t total_size = 0;
+diff --git a/mooncake-store/src/real_client.cpp b/mooncake-store/src/real_client.cpp
+index c55cb5db46..998eb4f672 100644
+--- a/mooncake-store/src/real_client.cpp
++++ b/mooncake-store/src/real_client.cpp
+@@ -326,6 +326,35 @@ inline QueryResult FilterQueryResult(const QueryResult &qr,
+                                      const Replica::Descriptor &replica) {
+     return QueryResult({replica}, qr.lease_timeout);
+ }
++
++inline const Replica::Descriptor *SelectCompleteMemoryReplica(
++    const std::vector<Replica::Descriptor> &replicas,
++    const std::unordered_set<std::string> &local_endpoints) {
++    const Replica::Descriptor *first_memory = nullptr;
++    for (const auto &r : replicas) {
++        if (r.status != ReplicaStatus::COMPLETE || !r.is_memory_replica()) {
++            continue;
++        }
++        if (local_endpoints.count(r.get_memory_descriptor()
++                                      .buffer_descriptor.transport_endpoint_)) {
++            return &r;
++        }
++        if (!first_memory) {
++            first_memory = &r;
++        }
++    }
++    return first_memory;
++}
++
++inline bool HasMemoryReplica(const std::vector<Replica::Descriptor> &replicas) {
++    for (const auto &r : replicas) {
++        if (r.is_memory_replica()) {
++            return true;
++        }
++    }
++    return false;
++}
++
+ }  // namespace
+ 
+ PyClient::~PyClient() {}
+@@ -4857,7 +4886,407 @@ std::vector<int> RealClient::batch_put_from_multi_buffers(
+     for (const auto &result : internal_results) {
+         results.push_back(to_py_ret(result));
+     }
++    return results;
++}
++
++std::vector<int> RealClient::batch_get_start(
++    const std::vector<std::string> &keys) {
++    std::vector<int> results(
++        keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    if (!client_) {
++        LOG(ERROR) << "Client is not initialized";
++        return results;
++    }
++    if (keys.empty()) {
++        return {};
++    }
++
++    // Master interaction only here: query replicas + lease.
++    const auto query_results = client_->BatchQuery(keys);
++    auto local_endpoints = client_->GetLocalEndpoints();
++
++    std::lock_guard<std::mutex> lock(session_mutex_);
++    for (size_t i = 0; i < keys.size(); ++i) {
++        if (!query_results[i]) {
++            results[i] = static_cast<int>(toInt(query_results[i].error()));
++            get_sessions_.erase(keys[i]);
++            continue;
++        }
++
++        auto query_result = query_results[i].value();
++        if (query_result.IsLeaseExpired()) {
++            results[i] = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++            get_sessions_.erase(keys[i]);
++            continue;
++        }
++
++        const auto *replica =
++            SelectCompleteMemoryReplica(query_result.replicas, local_endpoints);
++        if (!replica) {
++            LOG(ERROR) << "No complete memory replica for key: " << keys[i];
++            results[i] = static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
++            get_sessions_.erase(keys[i]);
++            continue;
++        }
++
++        get_sessions_[keys[i]] = GetSessionEntry{
++            .replica = *replica,
++            .lease_deadline = query_result.lease_timeout,
++        };
++        results[i] = 0;
++    }
++    return results;
++}
++
++std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
++    const std::vector<std::string> &keys,
++    const std::vector<std::vector<void *>> &all_buffers,
++    const std::vector<std::vector<size_t>> &all_sizes,
++    const std::vector<std::vector<size_t>> &all_src_offsets) {
++    std::vector<int> results(
++        keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    if (!client_ || keys.size() != all_buffers.size() ||
++        keys.size() != all_sizes.size() ||
++        keys.size() != all_src_offsets.size()) {
++        LOG(ERROR) << "Invalid get ranges args";
++        return results;
++    }
++    if (!client_->transfer_submitter_) {
++        LOG(ERROR) << "TransferSubmitter not initialized";
++        return results;
++    }
++
++    // No Master RPC here: use cached replica + lease_deadline from start.
++    std::vector<std::tuple<size_t, TransferFuture>> pending_transfers;
++    std::vector<std::chrono::steady_clock::time_point> lease_deadlines(
++        keys.size());
++
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        const auto now = std::chrono::steady_clock::now();
++        for (size_t i = 0; i < keys.size(); ++i) {
++            const auto &buffers = all_buffers[i];
++            const auto &sizes = all_sizes[i];
++            const auto &src_offsets = all_src_offsets[i];
++            if (buffers.size() != sizes.size() ||
++                buffers.size() != src_offsets.size()) {
++                continue;
++            }
++            auto it = get_sessions_.find(keys[i]);
++            if (it == get_sessions_.end()) {
++                continue;
++            }
++            if (now >= it->second.lease_deadline) {
++                get_sessions_.erase(it);
++                results[i] = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++                continue;
++            }
++
++            lease_deadlines[i] = it->second.lease_deadline;
++            const auto &replica = it->second.replica;
++            int64_t transferred = 0;
++            bool submit_failed = false;
++            for (size_t j = 0; j < buffers.size(); ++j) {
++                std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
++                auto future = client_->transfer_submitter_->submitRangeRead(
++                    replica, slices, src_offsets[j]);
++                if (!future) {
++                    LOG(ERROR)
++                        << "Failed to submit range read for key: " << keys[i];
++                    results[i] =
++                        static_cast<int>(toInt(ErrorCode::TRANSFER_FAIL));
++                    submit_failed = true;
++                    break;
++                }
++                pending_transfers.emplace_back(i, std::move(*future));
++                transferred += static_cast<int64_t>(sizes[j]);
++            }
++            if (!submit_failed) {
++                results[i] = static_cast<int>(transferred);
++            }
++        }
++    }
++
++    for (auto &[index, future] : pending_transfers) {
++        if (results[index] < 0) {
++            (void)future.get();
++            continue;
++        }
++        ErrorCode err = future.get();
++        if (err != ErrorCode::OK) {
++            LOG(ERROR) << "Range read failed for key: " << keys[index]
++                       << " with error: " << static_cast<int>(err);
++            results[index] = static_cast<int>(toInt(err));
++        } else if (std::chrono::steady_clock::now() >= lease_deadlines[index]) {
++            results[index] = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++        }
++    }
++
++    // Drop sessions that hit LEASE_EXPIRED (pre-submit or post-wait).
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        const int lease_expired = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++        for (size_t i = 0; i < keys.size(); ++i) {
++            if (results[i] == lease_expired) {
++                get_sessions_.erase(keys[i]);
++            }
++        }
++    }
++    return results;
++}
++
++int RealClient::batch_get_end(const std::vector<std::string> &keys) {
++    std::lock_guard<std::mutex> lock(session_mutex_);
++    for (const auto &key : keys) {
++        get_sessions_.erase(key);
++    }
++    return 0;
++}
++
++std::vector<int> RealClient::batch_put_start(
++    const std::vector<std::string> &keys, const std::vector<size_t> &sizes,
++    const ReplicateConfig &config) {
++    std::vector<int> results(keys.size(), 0);
++    if (!client_ || keys.size() != sizes.size()) {
++        LOG(ERROR) << "Invalid batch_put_start args";
++        return std::vector<int>(
++            keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    }
++
++    std::vector<std::string> start_keys;
++    std::vector<uint64_t> start_sizes;
++    std::vector<size_t> start_indices;
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        for (size_t i = 0; i < keys.size(); ++i) {
++            if (put_sessions_.count(keys[i]) != 0) {
++                LOG(ERROR) << "Put session already exists for key: " << keys[i];
++                results[i] = static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++                continue;
++            }
++            start_keys.push_back(keys[i]);
++            start_sizes.push_back(static_cast<uint64_t>(sizes[i]));
++            start_indices.push_back(i);
++        }
++    }
++    if (start_keys.empty()) {
++        return results;
++    }
++
++    // Same first half as Client::BatchPut (StartBatchPut → master
++    // BatchPutStart).
++    auto start_responses =
++        client_->StartBatchPutForSizes(start_keys, start_sizes, config);
++    std::lock_guard<std::mutex> lock(session_mutex_);
++    for (size_t j = 0; j < start_keys.size(); ++j) {
++        const size_t i = start_indices[j];
++        if (!start_responses[j]) {
++            results[i] = static_cast<int>(toInt(start_responses[j].error()));
++            continue;
++        }
++        auto replicas = std::move(start_responses[j].value());
++        if (!HasMemoryReplica(replicas)) {
++            if (client_->hot_cache_) {
++                client_->hot_cache_->RemoveHotKeys({keys[i]});
++            }
++            (void)client_->master_client_.BatchPutRevoke({keys[i]});
++            results[i] = static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
++            continue;
++        }
++        put_sessions_[keys[i]] = PutSessionEntry{
++            .replicas = std::move(replicas),
++            .object_size = static_cast<uint64_t>(sizes[i]),
++        };
++    }
++    return results;
++}
++
++std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
++    const std::vector<std::string> &keys,
++    const std::vector<std::vector<void *>> &all_buffers,
++    const std::vector<std::vector<size_t>> &all_sizes,
++    const std::vector<std::vector<size_t>> &all_dst_offsets) {
++    std::vector<int> results(
++        keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    if (!client_ || keys.size() != all_buffers.size() ||
++        keys.size() != all_sizes.size() ||
++        keys.size() != all_dst_offsets.size()) {
++        LOG(ERROR) << "Invalid put ranges args";
++        return results;
++    }
++    if (!client_->transfer_submitter_) {
++        LOG(ERROR) << "TransferSubmitter not initialized";
++        return results;
++    }
++
++    // Same pattern as Client::SubmitTransfers: submit per key/replica, then
++    // wait.
++    std::vector<std::tuple<size_t, TransferFuture>> pending_transfers;
++
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        for (size_t i = 0; i < keys.size(); ++i) {
++            const auto &buffers = all_buffers[i];
++            const auto &sizes = all_sizes[i];
++            const auto &dst_offsets = all_dst_offsets[i];
++            if (buffers.size() != sizes.size() ||
++                buffers.size() != dst_offsets.size()) {
++                continue;
++            }
++            auto it = put_sessions_.find(keys[i]);
++            if (it == put_sessions_.end()) {
++                continue;
++            }
++
++            bool overflow = false;
++            int64_t transferred = 0;
++            for (size_t j = 0; j < buffers.size(); ++j) {
++                if (dst_offsets[j] > it->second.object_size ||
++                    sizes[j] > it->second.object_size - dst_offsets[j]) {
++                    overflow = true;
++                    break;
++                }
++                transferred += static_cast<int64_t>(sizes[j]);
++            }
++            if (overflow) {
++                continue;
++            }
++
++            bool submitted = false;
++            bool submit_failed = false;
++            for (const auto &replica : it->second.replicas) {
++                if (!replica.is_memory_replica()) {
++                    continue;
++                }
++                for (size_t j = 0; j < buffers.size(); ++j) {
++                    std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
++                    auto future =
++                        client_->transfer_submitter_->submitRangeWrite(
++                            replica, slices, dst_offsets[j]);
++                    if (!future) {
++                        LOG(ERROR) << "Failed to submit range write for key: "
++                                   << keys[i];
++                        results[i] =
++                            static_cast<int>(toInt(ErrorCode::TRANSFER_FAIL));
++                        submit_failed = true;
++                        break;
++                    }
++                    pending_transfers.emplace_back(i, std::move(*future));
++                    submitted = true;
++                }
++                if (submit_failed) {
++                    break;
++                }
++            }
++            if (submit_failed) {
++                continue;
++            }
++            if (!submitted) {
++                results[i] =
++                    static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
++                continue;
++            }
++            results[i] = static_cast<int>(transferred);
++        }
++    }
++
++    for (auto &[index, future] : pending_transfers) {
++        if (results[index] < 0) {
++            (void)future.get();
++            continue;
++        }
++        ErrorCode err = future.get();
++        if (err != ErrorCode::OK) {
++            LOG(ERROR) << "Range write failed for key: " << keys[index]
++                       << " with error: " << static_cast<int>(err);
++            results[index] = static_cast<int>(toInt(err));
++        }
++    }
++    return results;
++}
++
++std::vector<int> RealClient::batch_put_end(
++    const std::vector<std::string> &keys) {
++    std::vector<int> results(
++        keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    if (!client_) {
++        LOG(ERROR) << "Client is not initialized";
++        return results;
++    }
++
++    std::vector<std::string> end_keys;
++    std::vector<size_t> end_indices;
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        for (size_t i = 0; i < keys.size(); ++i) {
++            if (put_sessions_.count(keys[i]) == 0) {
++                results[i] = static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++                continue;
++            }
++            end_keys.push_back(keys[i]);
++            end_indices.push_back(i);
++        }
++    }
++    if (end_keys.empty()) {
++        return results;
++    }
+ 
++    // Same RPC FinalizeBatchPut uses after successful transfers.
++    auto end_responses = client_->master_client_.BatchPutEnd(end_keys);
++    std::lock_guard<std::mutex> lock(session_mutex_);
++    for (size_t j = 0; j < end_keys.size(); ++j) {
++        const size_t i = end_indices[j];
++        put_sessions_.erase(end_keys[j]);
++        if (!end_responses[j]) {
++            results[i] = static_cast<int>(toInt(end_responses[j].error()));
++        } else {
++            results[i] = 0;
++        }
++    }
++    return results;
++}
++
++std::vector<int> RealClient::batch_put_revoke(
++    const std::vector<std::string> &keys) {
++    std::vector<int> results(
++        keys.size(), static_cast<int>(toInt(ErrorCode::INVALID_PARAMS)));
++    if (!client_) {
++        LOG(ERROR) << "Client is not initialized";
++        return results;
++    }
++
++    std::vector<std::string> revoke_keys;
++    std::vector<size_t> revoke_indices;
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        for (size_t i = 0; i < keys.size(); ++i) {
++            if (put_sessions_.count(keys[i]) == 0) {
++                results[i] = static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++                continue;
++            }
++            revoke_keys.push_back(keys[i]);
++            revoke_indices.push_back(i);
++        }
++    }
++    if (revoke_keys.empty()) {
++        return results;
++    }
++
++    // Same path FinalizeBatchPut uses on transfer failure.
++    if (client_->hot_cache_ && !revoke_keys.empty()) {
++        client_->hot_cache_->RemoveHotKeys(revoke_keys);
++    }
++    auto revoke_responses = client_->master_client_.BatchPutRevoke(revoke_keys);
++    std::lock_guard<std::mutex> lock(session_mutex_);
++    for (size_t j = 0; j < revoke_keys.size(); ++j) {
++        const size_t i = revoke_indices[j];
++        put_sessions_.erase(revoke_keys[j]);
++        if (!revoke_responses[j]) {
++            results[i] = static_cast<int>(toInt(revoke_responses[j].error()));
++        } else {
++            results[i] = 0;
++        }
++    }
+     return results;
+ }
+ 
+diff --git a/mooncake-store/src/transfer_task.cpp b/mooncake-store/src/transfer_task.cpp
+index 4d0028b0ec..9e593d7ec8 100644
+--- a/mooncake-store/src/transfer_task.cpp
++++ b/mooncake-store/src/transfer_task.cpp
+@@ -1253,6 +1253,25 @@ std::optional<TransferFuture> TransferSubmitter::submitMemoryReadOperation(
+     return std::nullopt;
+ }
+ 
++std::optional<TransferFuture> TransferSubmitter::submitMemoryWriteOperation(
++    const AllocatedBuffer::Descriptor& handle, const std::vector<Slice>& slices,
++    uint64_t dst_offset) {
++    TransferStrategy strategy = selectStrategy(handle, slices);
++
++    if (strategy == TransferStrategy::LOCAL_MEMCPY) {
++        return submitMemcpyOperation(handle, slices, TransferRequest::WRITE,
++                                     dst_offset);
++    }
++    if (strategy == TransferStrategy::TRANSFER_ENGINE) {
++        return submitTransferEngineOperation(
++            handle, slices, TransferRequest::WRITE, dst_offset);
++    }
++
++    LOG(ERROR) << "Write only supports LOCAL_MEMCPY or TRANSFER_ENGINE, got: "
++               << strategy;
++    return std::nullopt;
++}
++
+ std::optional<TransferFuture> TransferSubmitter::submitRangeRead(
+     const Replica::Descriptor& replica, std::vector<Slice>& slices,
+     uint64_t src_offset) {
+@@ -1288,6 +1307,41 @@ std::optional<TransferFuture> TransferSubmitter::submitRangeRead(
+     return future;
+ }
+ 
++std::optional<TransferFuture> TransferSubmitter::submitRangeWrite(
++    const Replica::Descriptor& replica, std::vector<Slice>& slices,
++    uint64_t dst_offset) {
++    std::optional<TransferFuture> future;
++
++    if (replica.is_memory_replica()) {
++        auto& mem_desc = replica.get_memory_descriptor();
++        auto& handle = mem_desc.buffer_descriptor;
++
++        size_t slices_size = 0;
++        for (const auto& s : slices) slices_size += s.size;
++        if (dst_offset + slices_size > handle.size_) {
++            LOG(ERROR) << "Range write overflow: dst_offset=" << dst_offset
++                       << " + slices_size=" << slices_size
++                       << " > handle.size_=" << handle.size_;
++            return std::nullopt;
++        }
++
++        future = submitMemoryWriteOperation(handle, slices, dst_offset);
++    } else if (replica.is_nof_replica()) {
++        LOG(ERROR) << "Range write not supported for NoF replicas";
++        return std::nullopt;
++    } else if (replica.is_disk_replica() || replica.is_local_disk_replica()) {
++        LOG(ERROR)
++            << "Range write not supported for disk replicas (use full write)";
++        return std::nullopt;
++    }
++
++    if (future.has_value()) {
++        updateTransferMetrics(slices, TransferRequest::WRITE);
++    }
++
++    return future;
++}
++
+ #ifdef USE_NOF
+ std::optional<TransferFuture> TransferSubmitter::submitSpdkNofOperation(
+     const AllocatedBuffer::Descriptor& handle, void* ptr, size_t size,
+diff --git a/mooncake-store/tests/e2e/run_session_ranges_tcp_e2e.sh b/mooncake-store/tests/e2e/run_session_ranges_tcp_e2e.sh
+new file mode 100755
+index 0000000000..5d4d5b0809
+--- /dev/null
++++ b/mooncake-store/tests/e2e/run_session_ranges_tcp_e2e.sh
+@@ -0,0 +1,77 @@
++#!/usr/bin/env bash
++# Real TCP transport e2e for put/get session ranged multi-buffer APIs.
++set -euo pipefail
++
++SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
++REPO_ROOT=$(cd -- "$SCRIPT_DIR/../../.." && pwd)
++BUILD_DIR=${BUILD_DIR:-"$REPO_ROOT/build"}
++LOG_DIR=${LOG_DIR:-/tmp/mooncake_session_ranges_tcp_e2e}
++MASTER_RPC=${MASTER_RPC:-127.0.0.1:50051}
++MASTER_HOST=${MASTER_RPC%:*}
++MASTER_PORT=${MASTER_RPC##*:}
++LEASE_TTL_MS=${LEASE_TTL_MS:-60000}
++
++MASTER_BIN="$BUILD_DIR/mooncake-store/src/mooncake_master"
++STORE_SO=$(ls "$BUILD_DIR"/mooncake-integration/store.cpython-*.so 2>/dev/null | head -1 || true)
++
++MASTER_PID=""
++
++cleanup() {
++  if [[ -n "${MASTER_PID}" ]]; then
++    kill "${MASTER_PID}" >/dev/null 2>&1 || true
++    wait "${MASTER_PID}" 2>/dev/null || true
++  fi
++}
++trap cleanup EXIT
++
++rm -rf "$LOG_DIR"
++mkdir -p "$LOG_DIR"
++
++if [[ ! -x "$MASTER_BIN" ]]; then
++  echo "missing mooncake_master at $MASTER_BIN; build target mooncake_master first" >&2
++  exit 2
++fi
++if [[ -z "$STORE_SO" ]]; then
++  echo "missing store python module under $BUILD_DIR/mooncake-integration" >&2
++  exit 3
++fi
++
++pkill -f "$MASTER_BIN" >/dev/null 2>&1 || true
++sleep 1
++
++echo "starting mooncake_master protocol=tcp rpc=$MASTER_RPC"
++"$MASTER_BIN" \
++  --rpc_address="$MASTER_HOST" \
++  --rpc_port="$MASTER_PORT" \
++  --default_kv_lease_ttl="$LEASE_TTL_MS" \
++  --enable_http_metadata_server=false \
++  --logtostderr=true \
++  >"$LOG_DIR/master.log" 2>&1 &
++MASTER_PID=$!
++sleep 2
++
++if ! kill -0 "$MASTER_PID" >/dev/null 2>&1; then
++  echo "mooncake_master failed to start; see $LOG_DIR/master.log" >&2
++  exit 4
++fi
++
++export PYTHONPATH="$BUILD_DIR/mooncake-integration${PYTHONPATH:+:$PYTHONPATH}"
++export LD_LIBRARY_PATH="$BUILD_DIR/mooncake-common${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
++export MOONCAKE_PROTOCOL=tcp
++export MOONCAKE_DEVICE=
++export MOONCAKE_MASTER="$MASTER_RPC"
++export MOONCAKE_TE_META_DATA_SERVER=P2PHANDSHAKE
++export MOONCAKE_LOCAL_HOSTNAME=localhost:17814
++
++set +e
++python3 "$SCRIPT_DIR/session_ranges_tcp_e2e.py" | tee "$LOG_DIR/client.log"
++RC=${PIPESTATUS[0]}
++set -e
++
++if [[ "$RC" -eq 0 ]]; then
++  echo "PASSED: session ranges TCP e2e (logs: $LOG_DIR)"
++else
++  echo "FAILED: session ranges TCP e2e rc=$RC (logs: $LOG_DIR)" >&2
++  tail -n 80 "$LOG_DIR/master.log" >&2 || true
++fi
++exit "$RC"
+diff --git a/mooncake-store/tests/e2e/session_ranges_tcp_e2e.py b/mooncake-store/tests/e2e/session_ranges_tcp_e2e.py
+new file mode 100644
+index 0000000000..548e708db0
+--- /dev/null
++++ b/mooncake-store/tests/e2e/session_ranges_tcp_e2e.py
+@@ -0,0 +1,152 @@
++#!/usr/bin/env python3
++"""TCP e2e for put/get session ranged multi-buffer APIs.
++
++Requires a running mooncake_master and built store Python module.
++
++Example:
++  PYTHONPATH=build/mooncake-integration \\
++  MOONCAKE_PROTOCOL=tcp \\
++  MOONCAKE_MASTER=127.0.0.1:50051 \\
++  MOONCAKE_TE_META_DATA_SERVER=P2PHANDSHAKE \\
++  python3 mooncake-store/tests/e2e/session_ranges_tcp_e2e.py
++"""
++
++from __future__ import annotations
++
++import ctypes
++import os
++import sys
++import time
++
++
++def _require_store():
++    try:
++        import store  # type: ignore
++    except Exception as exc:  # pragma: no cover
++        print(f"import_fail {exc}", flush=True)
++        raise SystemExit(10)
++    return store
++
++
++def _ptr(buf: ctypes.Array) -> int:
++    return ctypes.addressof(buf)
++
++
++def run() -> int:
++    store = _require_store()
++
++    master = os.getenv("MOONCAKE_MASTER", "127.0.0.1:50051")
++    metadata = os.getenv("MOONCAKE_TE_META_DATA_SERVER", "P2PHANDSHAKE")
++    protocol = os.getenv("MOONCAKE_PROTOCOL", "tcp")
++    device = os.getenv("MOONCAKE_DEVICE", "")
++    hostname = os.getenv("MOONCAKE_LOCAL_HOSTNAME", "localhost:17814")
++    segment = int(os.getenv("MOONCAKE_GLOBAL_SEGMENT_SIZE", str(64 * 1024 * 1024)))
++    local_buf = int(os.getenv("MOONCAKE_LOCAL_BUFFER_SIZE", str(64 * 1024 * 1024)))
++
++    num_layers = int(os.getenv("E2E_NUM_LAYERS", "4"))
++    page_size = int(os.getenv("E2E_PAGE_SIZE", "4096"))
++    num_keys = int(os.getenv("E2E_NUM_KEYS", "3"))
++    object_size = page_size * num_layers
++
++    print(
++        f"e2e_session_ranges protocol={protocol} master={master} "
++        f"keys={num_keys} layers={num_layers} page={page_size}",
++        flush=True,
++    )
++
++    mc = store.MooncakeDistributedStore()
++    setup_ret = mc.setup(
++        hostname, metadata, segment, local_buf, protocol, device, master
++    )
++    print(f"setup_ret {setup_ret}", flush=True)
++    if setup_ret != 0:
++        return setup_ret
++
++    src = (ctypes.c_char * (object_size * num_keys))()
++    dst = (ctypes.c_char * (object_size * num_keys))()
++    for i in range(len(src)):
++        src[i] = ord("a") + (i % 26)
++        dst[i] = ord("B")
++
++    assert mc.register_buffer(_ptr(src), len(src)) == 0
++    assert mc.register_buffer(_ptr(dst), len(dst)) == 0
++
++    keys = [f"session_e2e_key_{i}_{int(time.time())}" for i in range(num_keys)]
++    sizes = [object_size] * num_keys
++
++    put_start = mc.batch_put_start(keys, sizes)
++    print(f"batch_put_start {put_start}", flush=True)
++    if any(rc != 0 for rc in put_start):
++        return 20
++
++    for layer in range(num_layers):
++        all_buffers = []
++        all_sizes = []
++        all_dst_offsets = []
++        for i in range(num_keys):
++            offset = i * object_size + layer * page_size
++            all_buffers.append([_ptr(src) + offset])
++            all_sizes.append([page_size])
++            all_dst_offsets.append([layer * page_size])
++        put_rcs = mc.batch_put_from_multi_buffer_ranges(
++            keys, all_buffers, all_sizes, all_dst_offsets
++        )
++        print(f"batch_put_ranges layer={layer} rcs={put_rcs}", flush=True)
++        if any(rc != page_size for rc in put_rcs):
++            mc.batch_put_revoke(keys)
++            return 21
++
++    put_end = mc.batch_put_end(keys)
++    print(f"batch_put_end {put_end}", flush=True)
++    if any(rc != 0 for rc in put_end):
++        return 22
++
++    get_start = mc.batch_get_start(keys)
++    print(f"batch_get_start {get_start}", flush=True)
++    if any(rc != 0 for rc in get_start):
++        return 30
++
++    for layer in range(num_layers):
++        all_buffers = []
++        all_sizes = []
++        all_src_offsets = []
++        for i in range(num_keys):
++            offset = i * object_size + layer * page_size
++            all_buffers.append([_ptr(dst) + offset])
++            all_sizes.append([page_size])
++            all_src_offsets.append([layer * page_size])
++        get_rcs = mc.batch_get_into_multi_buffer_ranges(
++            keys, all_buffers, all_sizes, all_src_offsets
++        )
++        print(f"batch_get_ranges layer={layer} rcs={get_rcs}", flush=True)
++        if any(rc != page_size for rc in get_rcs):
++            mc.batch_get_end(keys)
++            return 31
++
++    get_end = mc.batch_get_end(keys)
++    print(f"batch_get_end {get_end}", flush=True)
++    if get_end != 0:
++        return 32
++
++    if bytes(src) != bytes(dst):
++        print("data_mismatch", flush=True)
++        return 40
++
++    # Revoke path: start put then revoke before end.
++    revoke_keys = [f"session_e2e_revoke_{int(time.time())}"]
++    revoke_start = mc.batch_put_start(revoke_keys, [page_size])
++    print(f"batch_put_start_revoke {revoke_start}", flush=True)
++    if any(rc != 0 for rc in revoke_start):
++        return 50
++    revoke_rcs = mc.batch_put_revoke(revoke_keys)
++    print(f"batch_put_revoke {revoke_rcs}", flush=True)
++    if any(rc != 0 for rc in revoke_rcs):
++        return 51
++
++    print("session_ranges_tcp_e2e PASSED", flush=True)
++    mc.close()
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(run())
+diff --git a/mooncake-store/tests/pybind_client_test.cpp b/mooncake-store/tests/pybind_client_test.cpp
+index c08a48a8e7..fb1e1e0dd0 100644
+--- a/mooncake-store/tests/pybind_client_test.cpp
++++ b/mooncake-store/tests/pybind_client_test.cpp
+@@ -805,6 +805,320 @@ TEST_F(RealClientTest, TestBatchPutAndGetMultiBuffers) {
+         << "Dst data buffer unregistration should succeed";
+ }
+ 
++TEST_F(RealClientTest, TestPutGetSessionRanges) {
++    ASSERT_TRUE(master_.Start(InProcMasterConfigBuilder().build()))
++        << "Failed to start in-proc master";
++    master_address_ = master_.master_address();
++
++    const std::string rdma_devices = (FLAGS_protocol == std::string("rdma"))
++                                         ? FLAGS_device_name
++                                         : std::string("");
++    ASSERT_EQ(
++        py_client_->setup_real("localhost:17814", "P2PHANDSHAKE",
++                               16 * 1024 * 1024, 16 * 1024 * 1024,
++                               FLAGS_protocol, rdma_devices, master_address_),
++        0);
++
++    constexpr size_t kNumLayers = 4;
++    constexpr size_t kPageSize = 64;
++    constexpr size_t kObjectSize = kPageSize * kNumLayers;
++    constexpr size_t kNumKeys = 3;
++
++    std::string src_data(kObjectSize * kNumKeys, 'A');
++    std::string dst_data(kObjectSize * kNumKeys, 'B');
++    for (size_t i = 0; i < src_data.size(); ++i) {
++        src_data[i] = static_cast<char>('a' + (i % 26));
++    }
++
++    ASSERT_EQ(py_client_->register_buffer(src_data.data(), src_data.size()), 0);
++    ASSERT_EQ(py_client_->register_buffer(dst_data.data(), dst_data.size()), 0);
++
++    std::vector<std::string> keys;
++    std::vector<size_t> object_sizes;
++    keys.reserve(kNumKeys);
++    object_sizes.reserve(kNumKeys);
++    for (size_t i = 0; i < kNumKeys; ++i) {
++        keys.push_back("session_key_" + std::to_string(i));
++        object_sizes.push_back(kObjectSize);
++    }
++
++    auto put_start_rcs = py_client_->batch_put_start(keys, object_sizes);
++    ASSERT_EQ(put_start_rcs.size(), kNumKeys);
++    for (auto rc : put_start_rcs) {
++        EXPECT_EQ(rc, 0) << "batch_put_start should succeed";
++    }
++
++    for (size_t layer = 0; layer < kNumLayers; ++layer) {
++        std::vector<std::vector<void*>> all_buffers(kNumKeys);
++        std::vector<std::vector<size_t>> all_sizes(kNumKeys);
++        std::vector<std::vector<size_t>> all_dst_offsets(kNumKeys);
++        for (size_t i = 0; i < kNumKeys; ++i) {
++            char* layer_ptr =
++                src_data.data() + i * kObjectSize + layer * kPageSize;
++            all_buffers[i] = {layer_ptr};
++            all_sizes[i] = {kPageSize};
++            all_dst_offsets[i] = {layer * kPageSize};
++        }
++        auto put_rcs = py_client_->batch_put_from_multi_buffer_ranges(
++            keys, all_buffers, all_sizes, all_dst_offsets);
++        ASSERT_EQ(put_rcs.size(), kNumKeys);
++        for (auto rc : put_rcs) {
++            EXPECT_EQ(rc, static_cast<int>(kPageSize));
++        }
++    }
++
++    auto put_end_rcs = py_client_->batch_put_end(keys);
++    ASSERT_EQ(put_end_rcs.size(), kNumKeys);
++    for (auto rc : put_end_rcs) {
++        EXPECT_EQ(rc, 0) << "batch_put_end should succeed";
++    }
++
++    auto get_start_rcs = py_client_->batch_get_start(keys);
++    ASSERT_EQ(get_start_rcs.size(), kNumKeys);
++    for (auto rc : get_start_rcs) {
++        EXPECT_EQ(rc, 0) << "batch_get_start should succeed";
++    }
++
++    for (size_t layer = 0; layer < kNumLayers; ++layer) {
++        std::vector<std::vector<void*>> all_buffers(kNumKeys);
++        std::vector<std::vector<size_t>> all_sizes(kNumKeys);
++        std::vector<std::vector<size_t>> all_src_offsets(kNumKeys);
++        for (size_t i = 0; i < kNumKeys; ++i) {
++            char* layer_ptr =
++                dst_data.data() + i * kObjectSize + layer * kPageSize;
++            all_buffers[i] = {layer_ptr};
++            all_sizes[i] = {kPageSize};
++            all_src_offsets[i] = {layer * kPageSize};
++        }
++        auto get_rcs = py_client_->batch_get_into_multi_buffer_ranges(
++            keys, all_buffers, all_sizes, all_src_offsets);
++        ASSERT_EQ(get_rcs.size(), kNumKeys);
++        for (auto rc : get_rcs) {
++            EXPECT_EQ(rc, static_cast<int>(kPageSize));
++        }
++    }
++
++    EXPECT_EQ(py_client_->batch_get_end(keys), 0);
++    EXPECT_EQ(dst_data, src_data);
++
++    // Revoke path: start then revoke without end.
++    std::vector<std::string> revoke_keys = {"session_revoke_0"};
++    std::vector<size_t> revoke_sizes = {kObjectSize};
++    auto revoke_start = py_client_->batch_put_start(revoke_keys, revoke_sizes);
++    ASSERT_EQ(revoke_start.size(), 1);
++    EXPECT_EQ(revoke_start[0], 0);
++    auto revoke_rcs = py_client_->batch_put_revoke(revoke_keys);
++    ASSERT_EQ(revoke_rcs.size(), 1);
++    EXPECT_EQ(revoke_rcs[0], 0);
++    auto missing = py_client_->batch_get_start(revoke_keys);
++    ASSERT_EQ(missing.size(), 1);
++    EXPECT_LT(missing[0], 0);
++
++    ASSERT_EQ(py_client_->unregister_buffer(src_data.data()), 0);
++    ASSERT_EQ(py_client_->unregister_buffer(dst_data.data()), 0);
++}
++
++// Abnormal put/get session cases. See check table in PR / review notes.
++TEST_F(RealClientTest, TestPutGetSessionAbnormal) {
++    ASSERT_TRUE(master_.Start(InProcMasterConfigBuilder().build()))
++        << "Failed to start in-proc master";
++    master_address_ = master_.master_address();
++
++    const std::string rdma_devices = (FLAGS_protocol == std::string("rdma"))
++                                         ? FLAGS_device_name
++                                         : std::string("");
++    ASSERT_EQ(
++        py_client_->setup_real("localhost:17815", "P2PHANDSHAKE",
++                               16 * 1024 * 1024, 16 * 1024 * 1024,
++                               FLAGS_protocol, rdma_devices, master_address_),
++        0);
++
++    constexpr size_t kPage = 64;
++    constexpr size_t kObjectSize = kPage * 2;
++    const int kInvalidParams =
++        static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++
++    std::string buf(kObjectSize, 'x');
++    ASSERT_EQ(py_client_->register_buffer(buf.data(), buf.size()), 0);
++
++    // --- Put: ranges/end/revoke without start ---
++    {
++        std::vector<std::string> keys = {"no_put_session"};
++        auto ranges = py_client_->batch_put_from_multi_buffer_ranges(
++            keys, {{buf.data()}}, {{kPage}}, {{0}});
++        ASSERT_EQ(ranges.size(), 1);
++        EXPECT_EQ(ranges[0], kInvalidParams);
++
++        auto end_rcs = py_client_->batch_put_end(keys);
++        ASSERT_EQ(end_rcs.size(), 1);
++        EXPECT_EQ(end_rcs[0], kInvalidParams);
++
++        auto revoke_rcs = py_client_->batch_put_revoke(keys);
++        ASSERT_EQ(revoke_rcs.size(), 1);
++        EXPECT_EQ(revoke_rcs[0], kInvalidParams);
++    }
++
++    // --- Put: keys/sizes mismatch ---
++    {
++        auto rcs = py_client_->batch_put_start({"a", "b"}, {kObjectSize});
++        ASSERT_EQ(rcs.size(), 2);
++        EXPECT_EQ(rcs[0], kInvalidParams);
++        EXPECT_EQ(rcs[1], kInvalidParams);
++    }
++
++    // --- Put: duplicate start ---
++    {
++        std::vector<std::string> keys = {"dup_put"};
++        auto first = py_client_->batch_put_start(keys, {kObjectSize});
++        ASSERT_EQ(first.size(), 1);
++        EXPECT_EQ(first[0], 0);
++        auto second = py_client_->batch_put_start(keys, {kObjectSize});
++        ASSERT_EQ(second.size(), 1);
++        EXPECT_EQ(second[0], kInvalidParams);
++        EXPECT_EQ(py_client_->batch_put_revoke(keys)[0], 0);
++    }
++
++    // --- Put: range overflow past object_size ---
++    {
++        std::vector<std::string> keys = {"overflow_put"};
++        ASSERT_EQ(py_client_->batch_put_start(keys, {kObjectSize})[0], 0);
++        auto overflow = py_client_->batch_put_from_multi_buffer_ranges(
++            keys, {{buf.data()}}, {{kPage}}, {{kObjectSize}});  // offset == size
++        ASSERT_EQ(overflow.size(), 1);
++        EXPECT_EQ(overflow[0], kInvalidParams);
++        EXPECT_EQ(py_client_->batch_put_revoke(keys)[0], 0);
++    }
++
++    // --- Put: buffer/size/offset arity mismatch ---
++    {
++        std::vector<std::string> keys = {"arity_put"};
++        ASSERT_EQ(py_client_->batch_put_start(keys, {kObjectSize})[0], 0);
++        auto bad = py_client_->batch_put_from_multi_buffer_ranges(
++            keys, {{buf.data(), buf.data() + kPage}}, {{kPage}}, {{0}});
++        ASSERT_EQ(bad.size(), 1);
++        EXPECT_EQ(bad[0], kInvalidParams);
++        EXPECT_EQ(py_client_->batch_put_revoke(keys)[0], 0);
++    }
++
++    // --- Put: end clears session; second end fails ---
++    {
++        std::vector<std::string> keys = {"put_end_once"};
++        ASSERT_EQ(py_client_->batch_put_start(keys, {kObjectSize})[0], 0);
++        ASSERT_EQ(py_client_->batch_put_from_multi_buffer_ranges(
++                      keys, {{buf.data()}}, {{kObjectSize}}, {{0}})[0],
++                  static_cast<int>(kObjectSize));
++        EXPECT_EQ(py_client_->batch_put_end(keys)[0], 0);
++        EXPECT_EQ(py_client_->batch_put_end(keys)[0], kInvalidParams);
++        // ranges after end also fail
++        EXPECT_EQ(py_client_->batch_put_from_multi_buffer_ranges(
++                      keys, {{buf.data()}}, {{kPage}}, {{0}})[0],
++                  kInvalidParams);
++    }
++
++    // --- Get: ranges without start ---
++    {
++        std::vector<std::string> keys = {"no_get_session"};
++        auto ranges = py_client_->batch_get_into_multi_buffer_ranges(
++            keys, {{buf.data()}}, {{kPage}}, {{0}});
++        ASSERT_EQ(ranges.size(), 1);
++        EXPECT_EQ(ranges[0], kInvalidParams);
++    }
++
++    // --- Get: start on missing object ---
++    {
++        auto rcs = py_client_->batch_get_start({"missing_obj"});
++        ASSERT_EQ(rcs.size(), 1);
++        EXPECT_LT(rcs[0], 0);
++    }
++
++    // --- Get: end clears session; ranges after end fail ---
++    {
++        std::vector<std::string> keys = {"put_end_once"};  // exists from above
++        auto start = py_client_->batch_get_start(keys);
++        ASSERT_EQ(start.size(), 1);
++        EXPECT_EQ(start[0], 0);
++        EXPECT_EQ(py_client_->batch_get_end(keys), 0);
++        auto after_end = py_client_->batch_get_into_multi_buffer_ranges(
++            keys, {{buf.data()}}, {{kPage}}, {{0}});
++        ASSERT_EQ(after_end.size(), 1);
++        EXPECT_EQ(after_end[0], kInvalidParams);
++    }
++
++    // --- Get: arity mismatch while session exists ---
++    {
++        std::vector<std::string> keys = {"put_end_once"};
++        ASSERT_EQ(py_client_->batch_get_start(keys)[0], 0);
++        auto bad = py_client_->batch_get_into_multi_buffer_ranges(
++            keys, {{buf.data()}}, {{kPage, kPage}}, {{0}});
++        ASSERT_EQ(bad.size(), 1);
++        EXPECT_EQ(bad[0], kInvalidParams);
++        EXPECT_EQ(py_client_->batch_get_end(keys), 0);
++    }
++
++    ASSERT_EQ(py_client_->unregister_buffer(buf.data()), 0);
++}
++
++// Lease expire on get ranges must drop the cached get session.
++TEST_F(RealClientTest, TestGetSessionLeaseExpiredDropsSession) {
++    constexpr uint64_t kLeaseTtlMs = 50;
++    ASSERT_TRUE(master_.Start(InProcMasterConfigBuilder()
++                                  .set_default_kv_lease_ttl(kLeaseTtlMs)
++                                  .build()))
++        << "Failed to start in-proc master";
++    master_address_ = master_.master_address();
++
++    const std::string rdma_devices = (FLAGS_protocol == std::string("rdma"))
++                                         ? FLAGS_device_name
++                                         : std::string("");
++    ASSERT_EQ(
++        py_client_->setup_real("localhost:17816", "P2PHANDSHAKE",
++                               16 * 1024 * 1024, 16 * 1024 * 1024,
++                               FLAGS_protocol, rdma_devices, master_address_),
++        0);
++
++    constexpr size_t kSize = 128;
++    const int kLeaseExpired =
++        static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++    const int kInvalidParams =
++        static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++
++    std::string src(kSize, 'S');
++    std::string dst(kSize, 'D');
++    ASSERT_EQ(py_client_->register_buffer(src.data(), src.size()), 0);
++    ASSERT_EQ(py_client_->register_buffer(dst.data(), dst.size()), 0);
++
++    std::vector<std::string> keys = {"lease_session_key"};
++    ASSERT_EQ(py_client_->batch_put_start(keys, {kSize})[0], 0);
++    ASSERT_EQ(py_client_->batch_put_from_multi_buffer_ranges(
++                  keys, {{src.data()}}, {{kSize}}, {{0}})[0],
++              static_cast<int>(kSize));
++    ASSERT_EQ(py_client_->batch_put_end(keys)[0], 0);
++
++    ASSERT_EQ(py_client_->batch_get_start(keys)[0], 0);
++
++    // Wait past cached lease_deadline (client-local check; no Master query).
++    std::this_thread::sleep_for(std::chrono::milliseconds(kLeaseTtlMs + 50));
++
++    auto expired = py_client_->batch_get_into_multi_buffer_ranges(
++        keys, {{dst.data()}}, {{kSize}}, {{0}});
++    ASSERT_EQ(expired.size(), 1);
++    EXPECT_EQ(expired[0], kLeaseExpired)
++        << "get ranges after lease ttl should return LEASE_EXPIRED";
++
++    // Session must have been erased: next ranges sees no session.
++    auto again = py_client_->batch_get_into_multi_buffer_ranges(
++        keys, {{dst.data()}}, {{kSize}}, {{0}});
++    ASSERT_EQ(again.size(), 1);
++    EXPECT_EQ(again[0], kInvalidParams)
++        << "get session should be dropped after LEASE_EXPIRED";
++
++    // get_end is still safe (idempotent erase).
++    EXPECT_EQ(py_client_->batch_get_end(keys), 0);
++
++    ASSERT_EQ(py_client_->unregister_buffer(src.data()), 0);
++    ASSERT_EQ(py_client_->unregister_buffer(dst.data()), 0);
++}
++
+ TEST_F(RealClientTest, TestBatchAndNormalGetReplicaDesc) {
+     // Start in-proc master
+     ASSERT_TRUE(master_.Start(InProcMasterConfigBuilder().build()))
+
+From 72403142379aeb68da2f0cc9965b891eb3fed34d Mon Sep 17 00:00:00 2001
+From: youyx <youxiao@huawei.com>
+Date: Tue, 14 Jul 2026 11:44:37 +0800
+Subject: [PATCH 2/5] [Store] Address review: overflow guards, lock-scope RPC,
+ response size checks
+
+- transfer_task: guard src/dst_offset + slices_size against uint64 wrap in
+  submitRangeRead/Write before the boundary check.
+- real_client: move BatchPutRevoke + hot-cache removal out of session_mutex_
+  in batch_put_start (collect keys under lock, RPC outside).
+- real_client: defensive overflow check for src_offsets/sizes vs replica
+  buffer size in batch_get_into_multi_buffer_ranges.
+- real_client: validate end/revoke RPC response size; return RPC_FAIL and
+  drop sessions on mismatch (mirrors Client::BatchPut finalize path).
+- code_format: ran scripts/code_format.sh.
+---
+ mooncake-store/src/real_client.cpp          | 80 +++++++++++++++------
+ mooncake-store/src/transfer_task.cpp        |  7 +-
+ mooncake-store/tests/pybind_client_test.cpp |  6 +-
+ 3 files changed, 68 insertions(+), 25 deletions(-)
+
+diff --git a/mooncake-store/src/real_client.cpp b/mooncake-store/src/real_client.cpp
+index 998eb4f672..5e89df7a2c 100644
+--- a/mooncake-store/src/real_client.cpp
++++ b/mooncake-store/src/real_client.cpp
+@@ -4984,9 +4984,19 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+ 
+             lease_deadlines[i] = it->second.lease_deadline;
+             const auto &replica = it->second.replica;
++            const size_t replica_limit =
++                replica.is_memory_replica()
++                    ? replica.get_memory_descriptor().buffer_descriptor.size_
++                    : 0;
+             int64_t transferred = 0;
+             bool submit_failed = false;
++            bool overflow = false;
+             for (size_t j = 0; j < buffers.size(); ++j) {
++                if (replica_limit == 0 || src_offsets[j] > replica_limit ||
++                    sizes[j] > replica_limit - src_offsets[j]) {
++                    overflow = true;
++                    break;
++                }
+                 std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+                 auto future = client_->transfer_submitter_->submitRangeRead(
+                     replica, slices, src_offsets[j]);
+@@ -5001,7 +5011,9 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+                 pending_transfers.emplace_back(i, std::move(*future));
+                 transferred += static_cast<int64_t>(sizes[j]);
+             }
+-            if (!submit_failed) {
++            if (overflow) {
++                results[i] = static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
++            } else if (!submit_failed) {
+                 results[i] = static_cast<int>(transferred);
+             }
+         }
+@@ -5025,7 +5037,8 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+     // Drop sessions that hit LEASE_EXPIRED (pre-submit or post-wait).
+     {
+         std::lock_guard<std::mutex> lock(session_mutex_);
+-        const int lease_expired = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++        const int lease_expired =
++            static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
+         for (size_t i = 0; i < keys.size(); ++i) {
+             if (results[i] == lease_expired) {
+                 get_sessions_.erase(keys[i]);
+@@ -5077,26 +5090,37 @@ std::vector<int> RealClient::batch_put_start(
+     // BatchPutStart).
+     auto start_responses =
+         client_->StartBatchPutForSizes(start_keys, start_sizes, config);
+-    std::lock_guard<std::mutex> lock(session_mutex_);
+-    for (size_t j = 0; j < start_keys.size(); ++j) {
+-        const size_t i = start_indices[j];
+-        if (!start_responses[j]) {
+-            results[i] = static_cast<int>(toInt(start_responses[j].error()));
+-            continue;
+-        }
+-        auto replicas = std::move(start_responses[j].value());
+-        if (!HasMemoryReplica(replicas)) {
+-            if (client_->hot_cache_) {
+-                client_->hot_cache_->RemoveHotKeys({keys[i]});
++    std::vector<std::string> keys_to_revoke;
++    std::vector<std::string> hot_keys_to_remove;
++    {
++        std::lock_guard<std::mutex> lock(session_mutex_);
++        for (size_t j = 0; j < start_keys.size(); ++j) {
++            const size_t i = start_indices[j];
++            if (!start_responses[j]) {
++                results[i] =
++                    static_cast<int>(toInt(start_responses[j].error()));
++                continue;
+             }
+-            (void)client_->master_client_.BatchPutRevoke({keys[i]});
+-            results[i] = static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
+-            continue;
++            auto replicas = std::move(start_responses[j].value());
++            if (!HasMemoryReplica(replicas)) {
++                hot_keys_to_remove.push_back(keys[i]);
++                keys_to_revoke.push_back(keys[i]);
++                results[i] =
++                    static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
++                continue;
++            }
++            put_sessions_[keys[i]] = PutSessionEntry{
++                .replicas = std::move(replicas),
++                .object_size = static_cast<uint64_t>(sizes[i]),
++            };
+         }
+-        put_sessions_[keys[i]] = PutSessionEntry{
+-            .replicas = std::move(replicas),
+-            .object_size = static_cast<uint64_t>(sizes[i]),
+-        };
++    }
++    // Master RPCs and hot-cache updates run outside session_mutex_.
++    if (client_->hot_cache_ && !hot_keys_to_remove.empty()) {
++        client_->hot_cache_->RemoveHotKeys(hot_keys_to_remove);
++    }
++    if (!keys_to_revoke.empty()) {
++        (void)client_->master_client_.BatchPutRevoke(keys_to_revoke);
+     }
+     return results;
+ }
+@@ -5234,6 +5258,14 @@ std::vector<int> RealClient::batch_put_end(
+     // Same RPC FinalizeBatchPut uses after successful transfers.
+     auto end_responses = client_->master_client_.BatchPutEnd(end_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
++    if (end_responses.size() != end_keys.size()) {
++        for (size_t j = 0; j < end_keys.size(); ++j) {
++            const size_t i = end_indices[j];
++            put_sessions_.erase(end_keys[j]);
++            results[i] = static_cast<int>(toInt(ErrorCode::RPC_FAIL));
++        }
++        return results;
++    }
+     for (size_t j = 0; j < end_keys.size(); ++j) {
+         const size_t i = end_indices[j];
+         put_sessions_.erase(end_keys[j]);
+@@ -5278,6 +5310,14 @@ std::vector<int> RealClient::batch_put_revoke(
+     }
+     auto revoke_responses = client_->master_client_.BatchPutRevoke(revoke_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
++    if (revoke_responses.size() != revoke_keys.size()) {
++        for (size_t j = 0; j < revoke_keys.size(); ++j) {
++            const size_t i = revoke_indices[j];
++            put_sessions_.erase(revoke_keys[j]);
++            results[i] = static_cast<int>(toInt(ErrorCode::RPC_FAIL));
++        }
++        return results;
++    }
+     for (size_t j = 0; j < revoke_keys.size(); ++j) {
+         const size_t i = revoke_indices[j];
+         put_sessions_.erase(revoke_keys[j]);
+diff --git a/mooncake-store/src/transfer_task.cpp b/mooncake-store/src/transfer_task.cpp
+index 9e593d7ec8..7f36b02f19 100644
+--- a/mooncake-store/src/transfer_task.cpp
++++ b/mooncake-store/src/transfer_task.cpp
+@@ -8,6 +8,7 @@
+ #include <cerrno>
+ #include <cstring>
+ #include <cstdlib>
++#include <limits>
+ #include <sstream>
+ #include <string>
+ #include <vector>
+@@ -1283,7 +1284,8 @@ std::optional<TransferFuture> TransferSubmitter::submitRangeRead(
+ 
+         size_t slices_size = 0;
+         for (const auto& s : slices) slices_size += s.size;
+-        if (src_offset + slices_size > handle.size_) {
++        if (src_offset > std::numeric_limits<uint64_t>::max() - slices_size ||
++            src_offset + slices_size > handle.size_) {
+             LOG(ERROR) << "Range read overflow: src_offset=" << src_offset
+                        << " + slices_size=" << slices_size
+                        << " > handle.size_=" << handle.size_;
+@@ -1318,7 +1320,8 @@ std::optional<TransferFuture> TransferSubmitter::submitRangeWrite(
+ 
+         size_t slices_size = 0;
+         for (const auto& s : slices) slices_size += s.size;
+-        if (dst_offset + slices_size > handle.size_) {
++        if (dst_offset > std::numeric_limits<uint64_t>::max() - slices_size ||
++            dst_offset + slices_size > handle.size_) {
+             LOG(ERROR) << "Range write overflow: dst_offset=" << dst_offset
+                        << " + slices_size=" << slices_size
+                        << " > handle.size_=" << handle.size_;
+diff --git a/mooncake-store/tests/pybind_client_test.cpp b/mooncake-store/tests/pybind_client_test.cpp
+index fb1e1e0dd0..e1c3566b15 100644
+--- a/mooncake-store/tests/pybind_client_test.cpp
++++ b/mooncake-store/tests/pybind_client_test.cpp
+@@ -983,7 +983,8 @@ TEST_F(RealClientTest, TestPutGetSessionAbnormal) {
+         std::vector<std::string> keys = {"overflow_put"};
+         ASSERT_EQ(py_client_->batch_put_start(keys, {kObjectSize})[0], 0);
+         auto overflow = py_client_->batch_put_from_multi_buffer_ranges(
+-            keys, {{buf.data()}}, {{kPage}}, {{kObjectSize}});  // offset == size
++            keys, {{buf.data()}}, {{kPage}},
++            {{kObjectSize}});  // offset == size
+         ASSERT_EQ(overflow.size(), 1);
+         EXPECT_EQ(overflow[0], kInvalidParams);
+         EXPECT_EQ(py_client_->batch_put_revoke(keys)[0], 0);
+@@ -1077,8 +1078,7 @@ TEST_F(RealClientTest, TestGetSessionLeaseExpiredDropsSession) {
+         0);
+ 
+     constexpr size_t kSize = 128;
+-    const int kLeaseExpired =
+-        static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++    const int kLeaseExpired = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
+     const int kInvalidParams =
+         static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
+ 
+
+From 36b807921972f657b65cb3d840a754789dce2f7b Mon Sep 17 00:00:00 2001
+From: youyx <youxiao@huawei.com>
+Date: Tue, 14 Jul 2026 12:35:37 +0800
+Subject: [PATCH 3/5] [Store] Drop friend class RealClient in favor of public
+ accessors
+
+Replace the friend declaration with public Client accessors matching the
+existing GetHotCache() style:
+- GetTransferSubmitter() for direct range read/write submission
+- GetMasterClient() for BatchPutEnd/BatchPutRevoke (session finalize)
+- StartBatchPutForSizes moved to public (used by RealClient put sessions)
+
+RealClient now calls client_->GetTransferSubmitter()/GetMasterClient()/
+GetHotCache() instead of touching Client private members. Session UTs
+(TestPutGetSessionRanges, TestPutGetSessionAbnormal,
+TestGetSessionLeaseExpiredDropsSession) still pass.
+---
+ mooncake-store/include/client_service.h | 33 +++++++++++++++++--------
+ mooncake-store/src/real_client.cpp      | 23 ++++++++---------
+ 2 files changed, 35 insertions(+), 21 deletions(-)
+
+diff --git a/mooncake-store/include/client_service.h b/mooncake-store/include/client_service.h
+index 90f6548502..045ee73d7e 100644
+--- a/mooncake-store/include/client_service.h
++++ b/mooncake-store/include/client_service.h
+@@ -617,6 +617,22 @@ class Client {
+      */
+     std::shared_ptr<LocalHotCache> GetHotCache() const { return hot_cache_; }
+ 
++    /**
++     * @brief Get the transfer submitter for direct range read/write
++     * submission. Used by RealClient session APIs that cache replica
++     * metadata and submit ranged transfers without re-querying Master.
++     * @return Pointer to the TransferSubmitter, or nullptr if not init.
++     */
++    TransferSubmitter* GetTransferSubmitter() const {
++        return transfer_submitter_.get();
++    }
++
++    /**
++     * @brief Get the master client. Used by RealClient session APIs for
++     * BatchPutEnd/BatchPutRevoke (same finalize path as BatchPut).
++     */
++    MasterClient& GetMasterClient() { return master_client_; }
++
+     /**
+      * @brief Get the number of cache blocks in local hot cache
+      * @return Number of cache blocks if hot cache is enabled, 0 otherwise
+@@ -657,6 +673,13 @@ class Client {
+ 
+     bool IsReplicaOnLocalMemory(const Replica::Descriptor& replica);
+ 
++    // First half of BatchPut only (size-only slices → StartBatchPut).
++    // Used by RealClient put sessions; not a Master API facade.
++    std::vector<tl::expected<std::vector<Replica::Descriptor>, ErrorCode>>
++    StartBatchPutForSizes(const std::vector<std::string>& keys,
++                          const std::vector<uint64_t>& object_sizes,
++                          const ReplicateConfig& config);
++
+    protected:
+     /**
+      * @brief Constructor exposed to subclasses for testing only; production
+@@ -668,10 +691,6 @@ class Client {
+            const std::string& tenant_id = "default");
+ 
+    private:
+-    // RealClient put sessions use StartBatchPut /
+-    // master_client_.BatchPutEnd|Revoke — same path as BatchPut.
+-    friend class RealClient;
+-
+     /**
+      * @brief Internal helper functions for initialization and data transfer
+      */
+@@ -773,12 +792,6 @@ class Client {
+         const std::vector<std::vector<Slice>>& batched_slices);
+     void StartBatchPut(std::vector<PutOperation>& ops,
+                        const ReplicateConfig& config);
+-    // First half of BatchPut only (size-only slices → StartBatchPut).
+-    // Used by RealClient put sessions; not a Master API facade.
+-    std::vector<tl::expected<std::vector<Replica::Descriptor>, ErrorCode>>
+-    StartBatchPutForSizes(const std::vector<std::string>& keys,
+-                          const std::vector<uint64_t>& object_sizes,
+-                          const ReplicateConfig& config);
+     void SubmitTransfers(std::vector<PutOperation>& ops);
+     void WaitForTransfers(std::vector<PutOperation>& ops);
+     void FinalizeBatchPut(std::vector<PutOperation>& ops);
+diff --git a/mooncake-store/src/real_client.cpp b/mooncake-store/src/real_client.cpp
+index 5e89df7a2c..ca7b1a9096 100644
+--- a/mooncake-store/src/real_client.cpp
++++ b/mooncake-store/src/real_client.cpp
+@@ -4951,7 +4951,7 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+         LOG(ERROR) << "Invalid get ranges args";
+         return results;
+     }
+-    if (!client_->transfer_submitter_) {
++    if (!client_->GetTransferSubmitter()) {
+         LOG(ERROR) << "TransferSubmitter not initialized";
+         return results;
+     }
+@@ -4998,7 +4998,7 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+                     break;
+                 }
+                 std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+-                auto future = client_->transfer_submitter_->submitRangeRead(
++                auto future = client_->GetTransferSubmitter()->submitRangeRead(
+                     replica, slices, src_offsets[j]);
+                 if (!future) {
+                     LOG(ERROR)
+@@ -5116,11 +5116,11 @@ std::vector<int> RealClient::batch_put_start(
+         }
+     }
+     // Master RPCs and hot-cache updates run outside session_mutex_.
+-    if (client_->hot_cache_ && !hot_keys_to_remove.empty()) {
+-        client_->hot_cache_->RemoveHotKeys(hot_keys_to_remove);
++    if (client_->GetHotCache() && !hot_keys_to_remove.empty()) {
++        client_->GetHotCache()->RemoveHotKeys(hot_keys_to_remove);
+     }
+     if (!keys_to_revoke.empty()) {
+-        (void)client_->master_client_.BatchPutRevoke(keys_to_revoke);
++        (void)client_->GetMasterClient().BatchPutRevoke(keys_to_revoke);
+     }
+     return results;
+ }
+@@ -5138,7 +5138,7 @@ std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
+         LOG(ERROR) << "Invalid put ranges args";
+         return results;
+     }
+-    if (!client_->transfer_submitter_) {
++    if (!client_->GetTransferSubmitter()) {
+         LOG(ERROR) << "TransferSubmitter not initialized";
+         return results;
+     }
+@@ -5185,7 +5185,7 @@ std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
+                 for (size_t j = 0; j < buffers.size(); ++j) {
+                     std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+                     auto future =
+-                        client_->transfer_submitter_->submitRangeWrite(
++                        client_->GetTransferSubmitter()->submitRangeWrite(
+                             replica, slices, dst_offsets[j]);
+                     if (!future) {
+                         LOG(ERROR) << "Failed to submit range write for key: "
+@@ -5256,7 +5256,7 @@ std::vector<int> RealClient::batch_put_end(
+     }
+ 
+     // Same RPC FinalizeBatchPut uses after successful transfers.
+-    auto end_responses = client_->master_client_.BatchPutEnd(end_keys);
++    auto end_responses = client_->GetMasterClient().BatchPutEnd(end_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
+     if (end_responses.size() != end_keys.size()) {
+         for (size_t j = 0; j < end_keys.size(); ++j) {
+@@ -5305,10 +5305,11 @@ std::vector<int> RealClient::batch_put_revoke(
+     }
+ 
+     // Same path FinalizeBatchPut uses on transfer failure.
+-    if (client_->hot_cache_ && !revoke_keys.empty()) {
+-        client_->hot_cache_->RemoveHotKeys(revoke_keys);
++    if (client_->GetHotCache() && !revoke_keys.empty()) {
++        client_->GetHotCache()->RemoveHotKeys(revoke_keys);
+     }
+-    auto revoke_responses = client_->master_client_.BatchPutRevoke(revoke_keys);
++    auto revoke_responses =
++        client_->GetMasterClient().BatchPutRevoke(revoke_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
+     if (revoke_responses.size() != revoke_keys.size()) {
+         for (size_t j = 0; j < revoke_keys.size(); ++j) {
+
+From 6f70893bcc158f565cefb7ec0454f1705e3a0a49 Mon Sep 17 00:00:00 2001
+From: youyx <youxiao@huawei.com>
+Date: Tue, 14 Jul 2026 12:56:50 +0800
+Subject: [PATCH 4/5] [Store] Replace raw member accessors with named Client
+ operations
+
+GetMasterClient()/GetTransferSubmitter() exposed Client internals; drop
+them and provide proper named Client operations instead, following the
+existing TransferWriteRange()/GetHotCache() style:
+
+- Client::SubmitRangeRead/Write: async range submission returning
+  TransferFuture (the existing TransferReadRange/TransferWriteRange stay
+  synchronous and now delegate to these).
+- Client::BatchPutEnd/Revoke: thin wrappers over the master client, same
+  RPC path as FinalizeBatchPut, so RealClient put sessions finalize
+  without touching master_client_ directly.
+
+RealClient now calls client_->SubmitRangeRead/Write() and
+client_->BatchPutEnd/Revoke() instead of GetTransferSubmitter()/
+GetMasterClient(). No friend declaration, no internal member exposure.
+Session + transfer/put/get UTs pass (19 tests).
+---
+ mooncake-store/include/client_service.h | 45 ++++++++++++++++---------
+ mooncake-store/src/client_service.cpp   | 42 +++++++++++++++++------
+ mooncake-store/src/real_client.cpp      | 24 ++++---------
+ 3 files changed, 67 insertions(+), 44 deletions(-)
+
+diff --git a/mooncake-store/include/client_service.h b/mooncake-store/include/client_service.h
+index 045ee73d7e..35439ef6e6 100644
+--- a/mooncake-store/include/client_service.h
++++ b/mooncake-store/include/client_service.h
+@@ -223,6 +223,25 @@ class Client {
+                                  std::vector<Slice>& slices,
+                                  uint64_t dst_offset);
+ 
++    /**
++     * @brief Asynchronously submit a ranged read against a memory replica
++     * at an object-byte offset. Returns a TransferFuture the caller must
++     * await, or nullopt on submission failure / uninitialized submitter.
++     * Used by RealClient session APIs that cache replica metadata and
++     * submit many ranges in parallel before awaiting.
++     */
++    std::optional<TransferFuture> SubmitRangeRead(
++        const Replica::Descriptor& replica_descriptor,
++        std::vector<Slice>& slices, uint64_t src_offset);
++
++    /**
++     * @brief Asynchronously submit a ranged write into a memory replica
++     * at an object-byte offset. Async counterpart of TransferWriteRange.
++     */
++    std::optional<TransferFuture> SubmitRangeWrite(
++        const Replica::Descriptor& replica_descriptor,
++        std::vector<Slice>& slices, uint64_t dst_offset);
++
+     /**
+      * @brief Upserts data: inserts if key doesn't exist, updates if it does
+      * @param key Object key
+@@ -617,22 +636,6 @@ class Client {
+      */
+     std::shared_ptr<LocalHotCache> GetHotCache() const { return hot_cache_; }
+ 
+-    /**
+-     * @brief Get the transfer submitter for direct range read/write
+-     * submission. Used by RealClient session APIs that cache replica
+-     * metadata and submit ranged transfers without re-querying Master.
+-     * @return Pointer to the TransferSubmitter, or nullptr if not init.
+-     */
+-    TransferSubmitter* GetTransferSubmitter() const {
+-        return transfer_submitter_.get();
+-    }
+-
+-    /**
+-     * @brief Get the master client. Used by RealClient session APIs for
+-     * BatchPutEnd/BatchPutRevoke (same finalize path as BatchPut).
+-     */
+-    MasterClient& GetMasterClient() { return master_client_; }
+-
+     /**
+      * @brief Get the number of cache blocks in local hot cache
+      * @return Number of cache blocks if hot cache is enabled, 0 otherwise
+@@ -680,6 +683,16 @@ class Client {
+                           const std::vector<uint64_t>& object_sizes,
+                           const ReplicateConfig& config);
+ 
++    // Finalize/revoke a put session for a batch of keys. Thin wrappers over
++    // the master client, exposed so RealClient put sessions can end/revoke
++    // without touching Client internals. Same RPC path as FinalizeBatchPut.
++    std::vector<tl::expected<void, ErrorCode>> BatchPutEnd(
++        const std::vector<std::string>& keys,
++        ReplicaType replica_type = ReplicaType::ALL);
++    std::vector<tl::expected<void, ErrorCode>> BatchPutRevoke(
++        const std::vector<std::string>& keys,
++        ReplicaType replica_type = ReplicaType::ALL);
++
+    protected:
+     /**
+      * @brief Constructor exposed to subclasses for testing only; production
+diff --git a/mooncake-store/src/client_service.cpp b/mooncake-store/src/client_service.cpp
+index e7887515f1..be6efc60f8 100644
+--- a/mooncake-store/src/client_service.cpp
++++ b/mooncake-store/src/client_service.cpp
+@@ -2640,6 +2640,16 @@ Client::StartBatchPutForSizes(const std::vector<std::string>& keys,
+     return results;
+ }
+ 
++std::vector<tl::expected<void, ErrorCode>> Client::BatchPutEnd(
++    const std::vector<std::string>& keys, ReplicaType replica_type) {
++    return master_client_.BatchPutEnd(keys, replica_type);
++}
++
++std::vector<tl::expected<void, ErrorCode>> Client::BatchPutRevoke(
++    const std::vector<std::string>& keys, ReplicaType replica_type) {
++    return master_client_.BatchPutRevoke(keys, replica_type);
++}
++
+ tl::expected<void, ErrorCode> Client::Remove(const ObjectKey& key, bool force) {
+     if (hot_cache_) {
+         hot_cache_->BumpKeyGeneration(key);
+@@ -3512,16 +3522,32 @@ ErrorCode Client::TransferData(const Replica::Descriptor& replica_descriptor,
+     return future->get();
+ }
+ 
+-ErrorCode Client::TransferReadInternal(
++std::optional<TransferFuture> Client::SubmitRangeRead(
+     const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
+     uint64_t src_offset) {
+     if (!transfer_submitter_) {
+         LOG(ERROR) << "TransferSubmitter not initialized";
+-        return ErrorCode::INVALID_PARAMS;
++        return std::nullopt;
++    }
++    return transfer_submitter_->submitRangeRead(replica_descriptor, slices,
++                                                src_offset);
++}
++
++std::optional<TransferFuture> Client::SubmitRangeWrite(
++    const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
++    uint64_t dst_offset) {
++    if (!transfer_submitter_) {
++        LOG(ERROR) << "TransferSubmitter not initialized";
++        return std::nullopt;
+     }
++    return transfer_submitter_->submitRangeWrite(replica_descriptor, slices,
++                                                 dst_offset);
++}
+ 
+-    auto future = transfer_submitter_->submitRangeRead(replica_descriptor,
+-                                                       slices, src_offset);
++ErrorCode Client::TransferReadInternal(
++    const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
++    uint64_t src_offset) {
++    auto future = SubmitRangeRead(replica_descriptor, slices, src_offset);
+     if (!future) {
+         LOG(ERROR) << "Failed to submit range read operation";
+         return ErrorCode::TRANSFER_FAIL;
+@@ -3540,13 +3566,7 @@ ErrorCode Client::TransferWrite(const Replica::Descriptor& replica_descriptor,
+ ErrorCode Client::TransferWriteRange(
+     const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
+     uint64_t dst_offset) {
+-    if (!transfer_submitter_) {
+-        LOG(ERROR) << "TransferSubmitter not initialized";
+-        return ErrorCode::INVALID_PARAMS;
+-    }
+-
+-    auto future = transfer_submitter_->submitRangeWrite(replica_descriptor,
+-                                                        slices, dst_offset);
++    auto future = SubmitRangeWrite(replica_descriptor, slices, dst_offset);
+     if (!future) {
+         LOG(ERROR) << "Failed to submit range write operation";
+         return ErrorCode::TRANSFER_FAIL;
+diff --git a/mooncake-store/src/real_client.cpp b/mooncake-store/src/real_client.cpp
+index ca7b1a9096..bfee4b40fc 100644
+--- a/mooncake-store/src/real_client.cpp
++++ b/mooncake-store/src/real_client.cpp
+@@ -4951,10 +4951,6 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+         LOG(ERROR) << "Invalid get ranges args";
+         return results;
+     }
+-    if (!client_->GetTransferSubmitter()) {
+-        LOG(ERROR) << "TransferSubmitter not initialized";
+-        return results;
+-    }
+ 
+     // No Master RPC here: use cached replica + lease_deadline from start.
+     std::vector<std::tuple<size_t, TransferFuture>> pending_transfers;
+@@ -4998,8 +4994,8 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+                     break;
+                 }
+                 std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+-                auto future = client_->GetTransferSubmitter()->submitRangeRead(
+-                    replica, slices, src_offsets[j]);
++                auto future =
++                    client_->SubmitRangeRead(replica, slices, src_offsets[j]);
+                 if (!future) {
+                     LOG(ERROR)
+                         << "Failed to submit range read for key: " << keys[i];
+@@ -5120,7 +5116,7 @@ std::vector<int> RealClient::batch_put_start(
+         client_->GetHotCache()->RemoveHotKeys(hot_keys_to_remove);
+     }
+     if (!keys_to_revoke.empty()) {
+-        (void)client_->GetMasterClient().BatchPutRevoke(keys_to_revoke);
++        (void)client_->BatchPutRevoke(keys_to_revoke);
+     }
+     return results;
+ }
+@@ -5138,10 +5134,6 @@ std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
+         LOG(ERROR) << "Invalid put ranges args";
+         return results;
+     }
+-    if (!client_->GetTransferSubmitter()) {
+-        LOG(ERROR) << "TransferSubmitter not initialized";
+-        return results;
+-    }
+ 
+     // Same pattern as Client::SubmitTransfers: submit per key/replica, then
+     // wait.
+@@ -5184,9 +5176,8 @@ std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
+                 }
+                 for (size_t j = 0; j < buffers.size(); ++j) {
+                     std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+-                    auto future =
+-                        client_->GetTransferSubmitter()->submitRangeWrite(
+-                            replica, slices, dst_offsets[j]);
++                    auto future = client_->SubmitRangeWrite(replica, slices,
++                                                            dst_offsets[j]);
+                     if (!future) {
+                         LOG(ERROR) << "Failed to submit range write for key: "
+                                    << keys[i];
+@@ -5256,7 +5247,7 @@ std::vector<int> RealClient::batch_put_end(
+     }
+ 
+     // Same RPC FinalizeBatchPut uses after successful transfers.
+-    auto end_responses = client_->GetMasterClient().BatchPutEnd(end_keys);
++    auto end_responses = client_->BatchPutEnd(end_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
+     if (end_responses.size() != end_keys.size()) {
+         for (size_t j = 0; j < end_keys.size(); ++j) {
+@@ -5308,8 +5299,7 @@ std::vector<int> RealClient::batch_put_revoke(
+     if (client_->GetHotCache() && !revoke_keys.empty()) {
+         client_->GetHotCache()->RemoveHotKeys(revoke_keys);
+     }
+-    auto revoke_responses =
+-        client_->GetMasterClient().BatchPutRevoke(revoke_keys);
++    auto revoke_responses = client_->BatchPutRevoke(revoke_keys);
+     std::lock_guard<std::mutex> lock(session_mutex_);
+     if (revoke_responses.size() != revoke_keys.size()) {
+         for (size_t j = 0; j < revoke_keys.size(); ++j) {
+
+From c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8 Mon Sep 17 00:00:00 2001
+From: youyx <youxiao@huawei.com>
+Date: Tue, 14 Jul 2026 15:00:20 +0800
+Subject: [PATCH 5/5] [Store] Encapsulate session range transfers in Client
+ batch methods
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+SubmitRangeRead/Write leaked TransferFuture through the Client API, which
+is still exposing transfer internals—just one level above transfer_submitter_.
+Match the existing Client::BatchGet style instead: Client owns the whole
+transfer (submit-all + await-all) and returns per-entry final results.
+
+- Client::BatchTransferReadRanges / BatchTransferWriteRanges (public): take
+  cached replicas + per-entry slices/offsets, submit every fragment in
+  parallel and await all, return per-entry bytes-or-ErrorCode. Write variant
+  fans out to every memory replica (replication) and counts logical bytes
+  once. TransferFuture stays internal to Client.
+- SubmitRangeRead/Write demoted to private helpers (used by the sync
+  TransferReadRange/WriteRange and the new batch methods).
+- RealClient::batch_get/put_into_multi_buffer_ranges now only own session
+  state (lease check, overflow check, replica lookup, result merge) and
+  delegate the parallel transfer to the Client batch methods. No
+  TransferFuture / transfer_submitter_ / master_client_ references remain in
+  RealClient.
+
+Session + transfer/put/get/range UTs pass (19 tests).
+---
+ mooncake-store/include/client_service.h |  39 ++++--
+ mooncake-store/src/client_service.cpp   | 119 ++++++++++++++++
+ mooncake-store/src/real_client.cpp      | 177 ++++++++++--------------
+ 3 files changed, 221 insertions(+), 114 deletions(-)
+
+diff --git a/mooncake-store/include/client_service.h b/mooncake-store/include/client_service.h
+index 35439ef6e6..84743f580c 100644
+--- a/mooncake-store/include/client_service.h
++++ b/mooncake-store/include/client_service.h
+@@ -224,23 +224,27 @@ class Client {
+                                  uint64_t dst_offset);
+ 
+     /**
+-     * @brief Asynchronously submit a ranged read against a memory replica
+-     * at an object-byte offset. Returns a TransferFuture the caller must
+-     * await, or nullopt on submission failure / uninitialized submitter.
+-     * Used by RealClient session APIs that cache replica metadata and
+-     * submit many ranges in parallel before awaiting.
++     * @brief Batch ranged read against cached replicas. For each entry,
++     * submits every (slice, src_offset) fragment against its replica, then
++     * awaits all in parallel. Returns per-entry total bytes transferred or
++     * an ErrorCode. Used by RealClient get sessions; TransferFuture stays
++     * internal. No Master RPC.
+      */
+-    std::optional<TransferFuture> SubmitRangeRead(
+-        const Replica::Descriptor& replica_descriptor,
+-        std::vector<Slice>& slices, uint64_t src_offset);
++    std::vector<tl::expected<int64_t, ErrorCode>> BatchTransferReadRanges(
++        const std::vector<Replica::Descriptor>& replicas,
++        const std::vector<std::vector<Slice>>& slices,
++        const std::vector<std::vector<uint64_t>>& src_offsets);
+ 
+     /**
+-     * @brief Asynchronously submit a ranged write into a memory replica
+-     * at an object-byte offset. Async counterpart of TransferWriteRange.
++     * @brief Batch ranged write into cached replicas (replication). For each
++     * entry, submits every fragment to every memory replica, then awaits all.
++     * Returns per-entry logical bytes transferred (counted once, not per
++     * replica) or an ErrorCode. Used by RealClient put sessions.
+      */
+-    std::optional<TransferFuture> SubmitRangeWrite(
+-        const Replica::Descriptor& replica_descriptor,
+-        std::vector<Slice>& slices, uint64_t dst_offset);
++    std::vector<tl::expected<int64_t, ErrorCode>> BatchTransferWriteRanges(
++        const std::vector<std::vector<Replica::Descriptor>>& replicas_per_entry,
++        const std::vector<std::vector<Slice>>& slices,
++        const std::vector<std::vector<uint64_t>>& dst_offsets);
+ 
+     /**
+      * @brief Upserts data: inserts if key doesn't exist, updates if it does
+@@ -719,6 +723,15 @@ class Client {
+     ErrorCode TransferReadInternal(
+         const Replica::Descriptor& replica_descriptor,
+         std::vector<Slice>& slices, uint64_t src_offset);
++    // Internal async range submission helpers (return the transfer future).
++    // Used by the synchronous TransferReadRange/WriteRange and the batch
++    // range transfer methods; not part of the public API.
++    std::optional<TransferFuture> SubmitRangeRead(
++        const Replica::Descriptor& replica_descriptor,
++        std::vector<Slice>& slices, uint64_t src_offset);
++    std::optional<TransferFuture> SubmitRangeWrite(
++        const Replica::Descriptor& replica_descriptor,
++        std::vector<Slice>& slices, uint64_t dst_offset);
+     ErrorCode TransferWrite(const Replica::Descriptor& replica_descriptor,
+                             std::vector<Slice>& slices);
+     ErrorCode TransferRead(const Replica::Descriptor& replica_descriptor,
+diff --git a/mooncake-store/src/client_service.cpp b/mooncake-store/src/client_service.cpp
+index be6efc60f8..677ac2cacc 100644
+--- a/mooncake-store/src/client_service.cpp
++++ b/mooncake-store/src/client_service.cpp
+@@ -3544,6 +3544,125 @@ std::optional<TransferFuture> Client::SubmitRangeWrite(
+                                                  dst_offset);
+ }
+ 
++std::vector<tl::expected<int64_t, ErrorCode>> Client::BatchTransferReadRanges(
++    const std::vector<Replica::Descriptor>& replicas,
++    const std::vector<std::vector<Slice>>& slices,
++    const std::vector<std::vector<uint64_t>>& src_offsets) {
++    std::vector<tl::expected<int64_t, ErrorCode>> results(
++        replicas.size(), tl::unexpected(ErrorCode::INVALID_PARAMS));
++    if (replicas.size() != slices.size() ||
++        replicas.size() != src_offsets.size()) {
++        LOG(ERROR) << "BatchTransferReadRanges size mismatch: replicas="
++                   << replicas.size() << ", slices=" << slices.size()
++                   << ", offsets=" << src_offsets.size();
++        return results;
++    }
++
++    // Submit every fragment of every entry, then await all in parallel.
++    std::vector<std::tuple<size_t, TransferFuture>> pending;
++    for (size_t i = 0; i < replicas.size(); ++i) {
++        int64_t transferred = 0;
++        bool submit_failed = false;
++        for (size_t j = 0; j < slices[i].size(); ++j) {
++            std::vector<Slice> one{slices[i][j]};
++            auto future = SubmitRangeRead(replicas[i], one, src_offsets[i][j]);
++            if (!future) {
++                LOG(ERROR) << "Failed to submit range read, entry=" << i;
++                results[i] = tl::unexpected(ErrorCode::TRANSFER_FAIL);
++                submit_failed = true;
++                break;
++            }
++            pending.emplace_back(i, std::move(*future));
++            transferred += static_cast<int64_t>(slices[i][j].size);
++        }
++        if (!submit_failed) {
++            results[i] = transferred;  // optimistic; corrected on await
++        }
++    }
++
++    for (auto& [index, future] : pending) {
++        if (!results[index].has_value()) {
++            (void)future.get();  // drain already-failed entries
++            continue;
++        }
++        ErrorCode err = future.get();
++        if (err != ErrorCode::OK) {
++            LOG(ERROR) << "Range read failed, entry=" << index
++                       << ", error=" << static_cast<int>(err);
++            results[index] = tl::unexpected(err);
++        }
++    }
++    return results;
++}
++
++std::vector<tl::expected<int64_t, ErrorCode>> Client::BatchTransferWriteRanges(
++    const std::vector<std::vector<Replica::Descriptor>>& replicas_per_entry,
++    const std::vector<std::vector<Slice>>& slices,
++    const std::vector<std::vector<uint64_t>>& dst_offsets) {
++    std::vector<tl::expected<int64_t, ErrorCode>> results(
++        replicas_per_entry.size(), tl::unexpected(ErrorCode::INVALID_PARAMS));
++    if (replicas_per_entry.size() != slices.size() ||
++        replicas_per_entry.size() != dst_offsets.size()) {
++        LOG(ERROR) << "BatchTransferWriteRanges size mismatch: entries="
++                   << replicas_per_entry.size() << ", slices=" << slices.size()
++                   << ", offsets=" << dst_offsets.size();
++        return results;
++    }
++
++    std::vector<std::tuple<size_t, TransferFuture>> pending;
++    for (size_t i = 0; i < replicas_per_entry.size(); ++i) {
++        // Logical bytes: counted once per fragment, not per replica.
++        int64_t transferred = 0;
++        for (size_t j = 0; j < slices[i].size(); ++j) {
++            transferred += static_cast<int64_t>(slices[i][j].size);
++        }
++        bool submitted = false;
++        bool submit_failed = false;
++        for (const auto& replica : replicas_per_entry[i]) {
++            if (!replica.is_memory_replica()) {
++                continue;
++            }
++            for (size_t j = 0; j < slices[i].size(); ++j) {
++                std::vector<Slice> one{slices[i][j]};
++                auto future = SubmitRangeWrite(replica, one, dst_offsets[i][j]);
++                if (!future) {
++                    LOG(ERROR) << "Failed to submit range write, entry=" << i;
++                    results[i] = tl::unexpected(ErrorCode::TRANSFER_FAIL);
++                    submit_failed = true;
++                    break;
++                }
++                pending.emplace_back(i, std::move(*future));
++                submitted = true;
++            }
++            if (submit_failed) {
++                break;
++            }
++        }
++        if (submit_failed) {
++            continue;
++        }
++        if (!submitted) {
++            results[i] = tl::unexpected(ErrorCode::INVALID_REPLICA);
++            continue;
++        }
++        results[i] = transferred;  // optimistic; corrected on await
++    }
++
++    for (auto& [index, future] : pending) {
++        if (!results[index].has_value()) {
++            (void)future.get();
++            continue;
++        }
++        ErrorCode err = future.get();
++        if (err != ErrorCode::OK) {
++            LOG(ERROR) << "Range write failed, entry=" << index
++                       << ", error=" << static_cast<int>(err);
++            results[index] = tl::unexpected(err);
++        }
++    }
++    return results;
++}
++
+ ErrorCode Client::TransferReadInternal(
+     const Replica::Descriptor& replica_descriptor, std::vector<Slice>& slices,
+     uint64_t src_offset) {
+diff --git a/mooncake-store/src/real_client.cpp b/mooncake-store/src/real_client.cpp
+index bfee4b40fc..d360fd674d 100644
+--- a/mooncake-store/src/real_client.cpp
++++ b/mooncake-store/src/real_client.cpp
+@@ -4953,9 +4953,13 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+     }
+ 
+     // No Master RPC here: use cached replica + lease_deadline from start.
+-    std::vector<std::tuple<size_t, TransferFuture>> pending_transfers;
+-    std::vector<std::chrono::steady_clock::time_point> lease_deadlines(
+-        keys.size());
++    // RealClient owns session state (lease/overflow checks, replica lookup);
++    // the actual parallel transfer is delegated to Client.
++    std::vector<Replica::Descriptor> replicas;
++    std::vector<std::vector<Slice>> slices;
++    std::vector<std::vector<uint64_t>> src_offsets;
++    std::vector<size_t> idx_map;  // batch entry -> original key index
++    std::vector<std::chrono::steady_clock::time_point> lease_deadlines;
+ 
+     {
+         std::lock_guard<std::mutex> lock(session_mutex_);
+@@ -4963,9 +4967,9 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+         for (size_t i = 0; i < keys.size(); ++i) {
+             const auto &buffers = all_buffers[i];
+             const auto &sizes = all_sizes[i];
+-            const auto &src_offsets = all_src_offsets[i];
++            const auto &offsets = all_src_offsets[i];
+             if (buffers.size() != sizes.size() ||
+-                buffers.size() != src_offsets.size()) {
++                buffers.size() != offsets.size()) {
+                 continue;
+             }
+             auto it = get_sessions_.find(keys[i]);
+@@ -4977,67 +4981,60 @@ std::vector<int> RealClient::batch_get_into_multi_buffer_ranges(
+                 results[i] = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
+                 continue;
+             }
+-
+-            lease_deadlines[i] = it->second.lease_deadline;
+             const auto &replica = it->second.replica;
+             const size_t replica_limit =
+                 replica.is_memory_replica()
+                     ? replica.get_memory_descriptor().buffer_descriptor.size_
+                     : 0;
+-            int64_t transferred = 0;
+-            bool submit_failed = false;
+             bool overflow = false;
++            std::vector<Slice> entry_slices;
++            std::vector<uint64_t> entry_offsets;
++            entry_slices.reserve(buffers.size());
++            entry_offsets.reserve(buffers.size());
+             for (size_t j = 0; j < buffers.size(); ++j) {
+-                if (replica_limit == 0 || src_offsets[j] > replica_limit ||
+-                    sizes[j] > replica_limit - src_offsets[j]) {
++                if (replica_limit == 0 || offsets[j] > replica_limit ||
++                    sizes[j] > replica_limit - offsets[j]) {
+                     overflow = true;
+                     break;
+                 }
+-                std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+-                auto future =
+-                    client_->SubmitRangeRead(replica, slices, src_offsets[j]);
+-                if (!future) {
+-                    LOG(ERROR)
+-                        << "Failed to submit range read for key: " << keys[i];
+-                    results[i] =
+-                        static_cast<int>(toInt(ErrorCode::TRANSFER_FAIL));
+-                    submit_failed = true;
+-                    break;
+-                }
+-                pending_transfers.emplace_back(i, std::move(*future));
+-                transferred += static_cast<int64_t>(sizes[j]);
++                entry_slices.emplace_back(Slice{buffers[j], sizes[j]});
++                entry_offsets.push_back(static_cast<uint64_t>(offsets[j]));
+             }
+             if (overflow) {
+                 results[i] = static_cast<int>(toInt(ErrorCode::INVALID_PARAMS));
+-            } else if (!submit_failed) {
+-                results[i] = static_cast<int>(transferred);
++                continue;
+             }
++            replicas.push_back(replica);
++            slices.push_back(std::move(entry_slices));
++            src_offsets.push_back(std::move(entry_offsets));
++            idx_map.push_back(i);
++            lease_deadlines.push_back(it->second.lease_deadline);
+         }
+     }
+ 
+-    for (auto &[index, future] : pending_transfers) {
+-        if (results[index] < 0) {
+-            (void)future.get();
+-            continue;
+-        }
+-        ErrorCode err = future.get();
+-        if (err != ErrorCode::OK) {
+-            LOG(ERROR) << "Range read failed for key: " << keys[index]
+-                       << " with error: " << static_cast<int>(err);
+-            results[index] = static_cast<int>(toInt(err));
+-        } else if (std::chrono::steady_clock::now() >= lease_deadlines[index]) {
+-            results[index] = static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
+-        }
++    if (replicas.empty()) {
++        return results;
+     }
+ 
+-    // Drop sessions that hit LEASE_EXPIRED (pre-submit or post-wait).
++    auto transfer =
++        client_->BatchTransferReadRanges(replicas, slices, src_offsets);
++
++    // Merge results; drop sessions whose lease expired during the wait.
+     {
+         std::lock_guard<std::mutex> lock(session_mutex_);
+-        const int lease_expired =
+-            static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
+-        for (size_t i = 0; i < keys.size(); ++i) {
+-            if (results[i] == lease_expired) {
+-                get_sessions_.erase(keys[i]);
++        const auto now = std::chrono::steady_clock::now();
++        for (size_t k = 0; k < transfer.size(); ++k) {
++            const size_t i = idx_map[k];
++            if (transfer[k]) {
++                if (now >= lease_deadlines[k]) {
++                    results[i] =
++                        static_cast<int>(toInt(ErrorCode::LEASE_EXPIRED));
++                    get_sessions_.erase(keys[i]);
++                } else {
++                    results[i] = static_cast<int>(transfer[k].value());
++                }
++            } else {
++                results[i] = static_cast<int>(toInt(transfer[k].error()));
+             }
+         }
+     }
+@@ -5135,86 +5132,64 @@ std::vector<int> RealClient::batch_put_from_multi_buffer_ranges(
+         return results;
+     }
+ 
+-    // Same pattern as Client::SubmitTransfers: submit per key/replica, then
+-    // wait.
+-    std::vector<std::tuple<size_t, TransferFuture>> pending_transfers;
++    // RealClient owns session state (overflow check vs object_size, replica
++    // lookup); the parallel replicated transfer is delegated to Client.
++    std::vector<std::vector<Replica::Descriptor>> replicas_per_entry;
++    std::vector<std::vector<Slice>> slices;
++    std::vector<std::vector<uint64_t>> dst_offsets;
++    std::vector<size_t> idx_map;  // batch entry -> original key index
+ 
+     {
+         std::lock_guard<std::mutex> lock(session_mutex_);
+         for (size_t i = 0; i < keys.size(); ++i) {
+             const auto &buffers = all_buffers[i];
+             const auto &sizes = all_sizes[i];
+-            const auto &dst_offsets = all_dst_offsets[i];
++            const auto &offsets = all_dst_offsets[i];
+             if (buffers.size() != sizes.size() ||
+-                buffers.size() != dst_offsets.size()) {
++                buffers.size() != offsets.size()) {
+                 continue;
+             }
+             auto it = put_sessions_.find(keys[i]);
+             if (it == put_sessions_.end()) {
+                 continue;
+             }
+-
+             bool overflow = false;
+-            int64_t transferred = 0;
++            std::vector<Slice> entry_slices;
++            std::vector<uint64_t> entry_offsets;
++            entry_slices.reserve(buffers.size());
++            entry_offsets.reserve(buffers.size());
+             for (size_t j = 0; j < buffers.size(); ++j) {
+-                if (dst_offsets[j] > it->second.object_size ||
+-                    sizes[j] > it->second.object_size - dst_offsets[j]) {
++                if (offsets[j] > it->second.object_size ||
++                    sizes[j] > it->second.object_size - offsets[j]) {
+                     overflow = true;
+                     break;
+                 }
+-                transferred += static_cast<int64_t>(sizes[j]);
++                entry_slices.emplace_back(Slice{buffers[j], sizes[j]});
++                entry_offsets.push_back(static_cast<uint64_t>(offsets[j]));
+             }
+             if (overflow) {
+-                continue;
++                continue;  // results[i] stays INVALID_PARAMS
+             }
+-
+-            bool submitted = false;
+-            bool submit_failed = false;
+-            for (const auto &replica : it->second.replicas) {
+-                if (!replica.is_memory_replica()) {
+-                    continue;
+-                }
+-                for (size_t j = 0; j < buffers.size(); ++j) {
+-                    std::vector<Slice> slices{Slice{buffers[j], sizes[j]}};
+-                    auto future = client_->SubmitRangeWrite(replica, slices,
+-                                                            dst_offsets[j]);
+-                    if (!future) {
+-                        LOG(ERROR) << "Failed to submit range write for key: "
+-                                   << keys[i];
+-                        results[i] =
+-                            static_cast<int>(toInt(ErrorCode::TRANSFER_FAIL));
+-                        submit_failed = true;
+-                        break;
+-                    }
+-                    pending_transfers.emplace_back(i, std::move(*future));
+-                    submitted = true;
+-                }
+-                if (submit_failed) {
+-                    break;
+-                }
+-            }
+-            if (submit_failed) {
+-                continue;
+-            }
+-            if (!submitted) {
+-                results[i] =
+-                    static_cast<int>(toInt(ErrorCode::INVALID_REPLICA));
+-                continue;
+-            }
+-            results[i] = static_cast<int>(transferred);
++            replicas_per_entry.push_back(it->second.replicas);
++            slices.push_back(std::move(entry_slices));
++            dst_offsets.push_back(std::move(entry_offsets));
++            idx_map.push_back(i);
+         }
+     }
+ 
+-    for (auto &[index, future] : pending_transfers) {
+-        if (results[index] < 0) {
+-            (void)future.get();
+-            continue;
+-        }
+-        ErrorCode err = future.get();
+-        if (err != ErrorCode::OK) {
+-            LOG(ERROR) << "Range write failed for key: " << keys[index]
+-                       << " with error: " << static_cast<int>(err);
+-            results[index] = static_cast<int>(toInt(err));
++    if (replicas_per_entry.empty()) {
++        return results;
++    }
++
++    auto transfer = client_->BatchTransferWriteRanges(replicas_per_entry,
++                                                      slices, dst_offsets);
++
++    for (size_t k = 0; k < transfer.size(); ++k) {
++        const size_t i = idx_map[k];
++        if (transfer[k]) {
++            results[i] = static_cast<int>(transfer[k].value());
++        } else {
++            results[i] = static_cast<int>(toInt(transfer[k].error()));
+         }
+     }
+     return results;
