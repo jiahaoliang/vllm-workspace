@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-14T20:24:53+08:00",
+  "updated_at": "2026-07-14T21:17:21+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -9,8 +9,8 @@
         "upstream": "https://github.com/vllm-project/vllm.git",
         "collaborator": "https://github.com/zhangsicheng5/vllm.git"
       },
-      "branch": "kv-pool-layerwise-reuse",
-      "commit": "bc150f50299199599673614f80d12a196f377655",
+      "branch": "tag:v0.23.0",
+      "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
       "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.20.2"
     },
     "vllm-ascend": {
@@ -20,7 +20,7 @@
         "upstream": "https://github.com/vllm-project/vllm-ascend.git",
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
-      "branch": "feature/new-memcache-layerwise",
+      "branch": "feature/mooncake-layerwise-kv-pool",
       "commit": "b792c37d7fcf2db05111c3ce84358b1fcde6ad0f",
       "purpose": "kv-pool-layerwise-reuse feature development; collaborator branch feature/new-memcache-layerwise"
     },
