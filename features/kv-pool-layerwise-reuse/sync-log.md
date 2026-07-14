@@ -17,6 +17,9 @@
 
 ## 2026-07-14
 
+- Documented the Mooncake layerwise configuration and TP-only/session/range/SSD constraints as `c8a977e6d1a0fc17c457b4a0b69dfb1fa1b85366` on `origin/feature/mooncake-layerwise-kv-pool`.
+- Re-ran the isolated CPU AscendStore suite: `327 passed`; the focused ruff check and `git diff --check` passed. `format.sh ci` initialized its hook environments but did not finish on this Windows host during the available run.
+- The required Mooncake wheel contract and NPU E2E gates remain pending: the CPU venv has no `mooncake` wheel or `torch_npu`, and this host exposes no NPU deployment. The recorded read-only Mooncake source remains PR #2881 head `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`; integrate a wheel built from that commit (or an approved successor) on the target Linux/NPU environment before marking integration validated.
 - Implemented and pushed Mooncake block-key scheduling, key-major range metadata, and per-key session orchestration as `631b893e91821f32f0613a7aeb7e169de4b9203e` on `origin/feature/mooncake-layerwise-kv-pool`.
 - The implementation uses canonical `model@block@rank` keys, rejects Mooncake PP/PCP/DCP topologies above one, and keeps memcache GVA allocation/lease paths separate from Mooncake ranged session calls.
 - Verified on the isolated CPU environment with `pytest --confcutdir=tests/ut/distributed/ascend_store -q tests/ut/distributed/ascend_store`: `327 passed`; `ruff check` and `git diff --check` passed. Mooncake wheel contract and NPU E2E gates remain pending.
