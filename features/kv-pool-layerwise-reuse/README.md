@@ -5,7 +5,7 @@
 ## Repositories
 
 - `repos/vllm`: `kv-pool-layerwise-reuse`, based on `v0.20.2`
-- `repos/vllm-ascend`: `kv-pool-layerwise-reuse`, based on `v0.20.2rc1`
+- `repos/vllm-ascend`: `feature/new-memcache-layerwise`, tracking the personal fork mirror of the ader47 collaborator branch
 - `repos/Mooncake`: `tag:v0.3.8.post1`, read-only by default
 
 ## Goal
