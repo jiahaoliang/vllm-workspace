@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: implementation baseline
+Current Phase: backend contract implemented
 
 ## Baseline
 
@@ -11,4 +11,4 @@ Current Phase: implementation baseline
 
 ## Next Steps
 
-- Implement the Mooncake layerwise Backend contract.
+- Generalize block-key scheduling for Mooncake.
