@@ -17,6 +17,9 @@
 
 ## 2026-07-14
 
+- Implemented and pushed Mooncake block-key scheduling, key-major range metadata, and per-key session orchestration as `631b893e91821f32f0613a7aeb7e169de4b9203e` on `origin/feature/mooncake-layerwise-kv-pool`.
+- The implementation uses canonical `model@block@rank` keys, rejects Mooncake PP/PCP/DCP topologies above one, and keeps memcache GVA allocation/lease paths separate from Mooncake ranged session calls.
+- Verified on the isolated CPU environment with `pytest --confcutdir=tests/ut/distributed/ascend_store -q tests/ut/distributed/ascend_store`: `327 passed`; `ruff check` and `git diff --check` passed. Mooncake wheel contract and NPU E2E gates remain pending.
 - Implemented and pushed the Mooncake layerwise Backend contract as `f2af65e0c51a7597dfec131edd7b8e26dd9afc41` on `origin/feature/mooncake-layerwise-kv-pool`. Frozen Client APIs: `batch_put_start`, `batch_put_from_multi_buffer_ranges`, `batch_put_end`, `batch_put_revoke`, `batch_get_start`, `batch_get_into_multi_buffer_ranges`, and `batch_get_end`.
 - Established the implementation baseline: `repos/vllm` is detached at `v0.23.0` (`0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665`), and `repos/vllm-ascend` is on `feature/mooncake-layerwise-kv-pool` at `b792c37d7fcf2db05111c3ce84358b1fcde6ad0f`.
 - Replaced the local collaborator reference with `reference/ader47-new-memcache-layerwise`, tracking `ader47/vllm-ascend` branch `feature/new-memcache-layerwise` at `b792c37d7fcf2db05111c3ce84358b1fcde6ad0f`.
