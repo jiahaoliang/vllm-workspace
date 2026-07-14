@@ -9,7 +9,9 @@
 ## Reference Code
 
 - ader47 vLLM Ascend commit: <https://github.com/ader47/vllm-ascend/commit/674594c51d6f22c12136e5130ce4c677c9f913ec>
-- Collaborator branch: `collaborator/kv-pool-layerwise-reuse` from <https://github.com/ader47/vllm-ascend/tree/kv-pool-layerwise-reuse>
+- Collaborator branch: `collaborator/feature/new-memcache-layerwise` from <https://github.com/ader47/vllm-ascend/tree/feature/new-memcache-layerwise>
+  - Local reference: `reference/ader47-new-memcache-layerwise`
+  - Personal fork mirror: `origin/feature/new-memcache-layerwise`
 - vLLM Ascend PR #11444, memcache layerwise KV pooling reference: <https://github.com/vllm-project/vllm-ascend/pull/11444>
 - vLLM Ascend PR #10733, layerwise KV pool reuse coordination target: <https://github.com/vllm-project/vllm-ascend/pull/10733>
 
