@@ -22,7 +22,7 @@
 
 ## Design Notes
 
-- Layerwise KV Pool optimization and Mooncake adaptation design: <https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/rJDGRCpXGg>
+- Mooncake Layerwise KVPool Put design: <https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/HJGESQG4ze>
   - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/design-mooncake-layerwise-gva-put.md`
 
 ## Local Snapshots

@@ -1,358 +1,335 @@
-Source: https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/rJDGRCpXGg
-Captured At: 2026-07-14T09:52:57+08:00
-Notes: Updated authoritative design snapshot covering Layerwise KV Pool principles and Mooncake session-based ranged read/write adaptation.
+Source: https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/HJGESQG4ze
+Captured At: 2026-07-14T14:40:15+08:00
+Notes: Latest authoritative Mooncake layerwise KVPool put design covering Client sessions, ranged transfers, Backend ABC integration, lifecycle handling, tests, and risks.
 
-# Mooncake + HIXL 支持 Layerwise KV Cache 池化
----
+# Mooncake Layerwise KVPool Put 设计文档
 
-## 0. 一句话结论
+## 1. 背景与动机
 
-Layerwise 的核心不是 GVA，而是三件事：
+### 1.1 现状
 
-1. **一块一个 key、跨层连续存放**（`base + layer_offset` 定位某一层）
-2. **地址只解析一次**，之后按层搬运，不再每次走 key → 元数据
-3. **按层传输与 Attention 计算重叠**（fence / 预取控制并发）
+[vLLM Issue #33398](https://github.com/vllm-project/vllm/issues/33398) 提出 layerwise KV cache onload/offload：推理按层推进，KV 在 HBM 与外接 KVPool 之间异步搬运，以降低 Prefill 阶段 HBM 占用并支撑 prefix cache。实现 PR 为 [vLLM-Ascend PR #10733](https://github.com/vllm-project/vllm-ascend/pull/10733)。
 
-memcache 用 GVA + `batch_copy` 实现了「地址化按层搬运」；Mooncake 的 `batch_put` / `batch_get` 本身就会在 store 侧申请/定位内存，每个 rank 拿到自己的对象地址后往里写就行。**跨 rank 对称的全局虚址（GVA）不是 layerwise 的前提。**
+该编排与 KVPool 后端解耦。**memcache** 已支持 layerwise 所需的分配、按址传输与提交语义（见 [PR #11444](https://github.com/vllm-project/vllm-ascend/pull/11444)）。**Mooncake** 在 layerwise 场景尚缺对应的元数据与生命周期接口，无法直接复用该路径。
 
----
+### 1.2 动机
 
-## 1. 背景：为什么要 Layerwise
+早期 AscendStore layerwise（KeyLayer）以 **logical block × layer** 为粒度分配 pool key。随着模型层数增加，key 规模与 Master 元数据查询开销按 `blocks × layers` 增长；prefix 命中判定亦需确认各层 key 均已就绪，进一步放大控制面成本。
 
-非 layerwise 路径：整段 KV（所有层）攒齐再一次性 put/get。长序列下，传输堵在 Attention 前面，TTFT 被拉长。
+为此，存储模型调整为 **每个 logical block 对应一个 key**（与 PR #11444 一致）：一次 put 会话预留覆盖全部层的连续空间，各层仅向对应 object-byte offset 写入，写满后对该 key 执行一次 `batch_put_end`。本方案旨在使 Mooncake 复用同一套 layerwise 编排。
 
-Layerwise：算完 / 要用某一层，就立刻传那一层，传输与下一层计算重叠。#11444 在 32k 输入、90% 命中下，TTFT 从 ~149s 降到 ~64s（接近 HBM 命中）。
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam defaultTextAlignment left
 
----
+rectangle "**旧：每个 block 的每一层一个 key**" as old {
+  rectangle "block0" as ob0 {
+    card "key = hash0@layer0"
+    card "key = hash0@layer1"
+    card "key = hash0@layerN"
+  }
+  rectangle "block1" as ob1 {
+    card "key = hash1@layer0"
+    card "key = hash1@layer1"
+    card "key = hash1@layerN"
+  }
+  rectangle "block2" as ob2 {
+    card "key = hash2@layer0"
+    card "key = hash2@layer1"
+    card "key = hash2@layerN"
+  }
+}
 
-## 2. Memcache Layerwise 机制（完整说明）
+rectangle "**新：每个 block 一个 key**" as new {
+  rectangle "block0\nkey = hash0" as nb0 {
+    card "offset layer0"
+    card "offset layer1"
+    card "offset layerN"
+  }
+  rectangle "block1\nkey = hash1" as nb1 {
+    card "offset layer0"
+    card "offset layer1"
+    card "offset layerN"
+  }
+  rectangle "block2\nkey = hash2" as nb2 {
+    card "offset layer0"
+    card "offset layer1"
+    card "offset layerN"
+  }
+}
 
-下面按「数据怎么放 → 怎么申请 → 怎么传 → 怎么和计算重叠 → 正确性约束」把 memcache 路径说清楚。先不谈 Mooncake。
-
-### 2.1 对象布局与 Key
-
-把 KV 想成一张表：**行 = layer，列 = block**。
-
-**旧设计**：每个格子一把 key（每层每块各存一次）→ key 数 ≈ `num_layers × num_blocks`。
-
-```text
-              block0        block1        block2
-            ┌────────┐    ┌────────┐    ┌────────┐
-  layer0    │ key₀₀  │    │ key₀₁  │    │ key₀₂  │
-            └────────┘    └────────┘    └────────┘
-            ┌────────┐    ┌────────┐    ┌────────┐
-  layer1    │ key₁₀  │    │ key₁₁  │    │ key₁₂  │
-            └────────┘    └────────┘    └────────┘
-            ┌────────┐    ┌────────┐    ┌────────┐
-  layer2    │ key₂₀  │    │ key₂₁  │    │ key₂₂  │
-            └────────┘    └────────┘    └────────┘
-                 ·              ·              ·
+old -[hidden]down-> new
+@enduml
 ```
 
-**Layerwise**：同一列（同一个 block 的所有层）合成**一把 key、一块连续 object**；层不再进 key，只用偏移切。
+### 1.3 目标与非目标
 
-```text
-              block0              block1              block2
-         ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-  layer0 │  K|V            │ │  K|V            │ │  K|V            │
-  layer1 │  K|V            │ │  K|V            │ │  K|V            │
-  layer2 │  K|V            │ │  K|V            │ │  K|V            │
-    ·    │  ·              │ │  ·              │ │  ·              │
-  layerN │  K|V            │ │  K|V            │ │  K|V            │
-         └────────┬────────┘ └────────┬────────┘ └────────┬────────┘
-                  │                   │                   │
-             一把 key            一把 key            一把 key
-         model@hash0@g        model@hash1@g        model@hash2@g
-         连续存放，size =     连续存放               连续存放
-         page × num_layers
-```
+**目标**：为 Mooncake 补齐 layerwise 所需的会话式生命周期与按 offset 批量传输接口，使 vLLM-Ascend 在 `backend=mooncake` 时复用现有 layerwise 编排（per-block key），仅扩展 backend 适配层。
 
-池内这一列的物理排布（按层紧挨着）：
+**非目标**：
 
-```text
-  base ──► ┌──────────────┐
-           │ layer0  K|V  │  page_size
-           ├──────────────┤
-           │ layer1  K|V  │  base + 1·page
-           ├──────────────┤
-           │ layer2  K|V  │  base + 2·page
-           ├──────────────┤
-           │     ...      │
-           ├──────────────┤
-           │ layerN  K|V  │  base + N·page
-           └──────────────┘
-  传第 i 层：只搬 [base + i·page, page_size]，不改 key
-```
+- 不改变 vLLM attention 层 hook（`wait_for_layer_load` / `save_kv_layer`）契约。
+- 不替代 `MooncakeLayerwiseConnector`（PD P2P 逐层推送）；本方案针对 **AscendStoreConnector + KVPool prefix cache**。
+- 不要求跨 rank 对称 GVA；对象基址由各 Worker 本进程 Mooncake Client 解析并缓存即可。
 
-Key 公式：
+### 1.4 设计原则
 
-```text
-key   = f"{model}@{block_hash}@{tp_rank // put_step}"
-size  = page_size_bytes * num_layers
-addr(layer i) = base + i * page_size_bytes
-```
-
-#### Key 里的 `tp_rank // put_step` 是什么
-
-上面「一列 = 一把 key」是对**单个 rank 视角**说的。多卡时还要决定：几张 TP 卡共享这一列。
-
-`put_step` = 多少张卡共享**同一份** KV；`tp_rank // put_step` 得到组号，写进 key 后缀：
-
-```text
-MLA（put_step=8）：8 卡同一份 latent
-  rank0 ─┐
-  rank1 ─┤
-  ...    ├─► tp_rank//8 = 0 ─► 同一把 key ...@0
-  rank7 ─┘                      只有 rank0 写池（tp_rank % 8 == 0）
-                                其余卡读同一列
-
-GQA（put_step=1）：每卡一份
-  rank0 ─► ...@0   各自一列、各自一把 key
-  rank1 ─► ...@1
-  rank7 ─► ...@7
-```
-
-| 场景 | put_step | `tp_rank // put_step` | 谁写池 | 池里几份 |
-| :--- | :---: | :--- | :--- | :---: |
-| MLA TP=8 | 8 | 全是 `0` → 同一把 key | 仅 rank0 | 1 |
-| GQA | 1 | 等于 `tp_rank` → 每卡一把 key | 每卡各自 | TP 份 |
-
-### 2.2 地址面：GVA 在 memcache 里扮演什么角色
-
-memcache 建在 FabricMem / 对称内存之上，对外暴露 **GVA（Global Virtual Address）**：
-
-- `batch_alloc(keys, sizes)`：为 key 在池里申请一块连续内存，返回起始 GVA。
-- `batch_get_key_info(keys)`：对象写完后，返回可读的起始 GVA（未写完则无效，避免假命中）。
-- `batch_copy(gva, local, size, dir)`：按地址在本地 HBM 与池之间拷贝，**不再解析 key**。
-
-```mermaid
-sequenceDiagram
-    participant W as Worker
-    participant MC as Memcache
-    participant Pool as 池内 object
-
-    Note over W,Pool: Save
-    W->>MC: batch_alloc(keys, sizes)
-    MC-->>W: base_gva
-    loop 每一层 i
-        W->>W: Attention(i) 完成
-        W->>MC: batch_copy(L2G, base+i·page, local_i)
-        MC->>Pool: 写入 layer i
-    end
-    Note over Pool: 写满 → 可读
-
-    Note over W,Pool: Load
-    W->>MC: batch_get_key_info(keys)
-    MC-->>W: base_gva（仅 ready）
-    W->>MC: batch_add_lease
-    loop 每一层 i
-        W->>MC: batch_copy(G2L, base+i·page, local_i)
-        MC->>W: layer i → HBM
-        W->>W: Attention(i)（可与传 i+1 重叠）
-    end
-    W->>MC: batch_remove_lease
-```
-
-**GVA 的本质**：超节点内各 rank 看到的是同一套对称虚址空间，任意卡可以用同一个数字当指针去 `batch_copy`。这是 memcache 传输底座的实现选择，不是 layerwise 语义本身。
-
-对 layerwise 真正有用的，是「**拿到对象基址后，用偏移切层**」——基址是不是跨 rank 对称的 GVA，还是本 rank 解析出来的本地 VA / segment+offset，都可以。
-
-#### 没有 `put_end`：按层填 hole，洞清零才 READABLE
-
-Mooncake 用显式 `PutEnd` 宣布可读；memcache **没有**对应 API。可读性靠：
-
-```text
-batch_alloc          → blob = ALLOCATED，整段登记为一个大 hole
-batch_copy(L2G, 一段) → 拷数据 + ConsumePendingHole（挖掉这段）
-                     → holes 仍非空：继续可写，对外仍不可读
-                     → holes 空了：NotifyUpdate(MMC_WRITE_OK) → READABLE
-```
-
-跨层一个大 blob（`size = page × num_layers`）时，**第一次** `batch_copy` 只填一层，不会整对象变可读：
-
-```text
-batch_alloc 之后（ALLOCATED，整段都是 hole）
-
-  base ──► ┌──────────────────────────────────────┐
-           │████████████  hole（未写）  ████████████│  [base, base+N·page)
-           └──────────────────────────────────────┘
-  meta / get_key_info：无有效可读 GVA（或非 READABLE）
-
-
-Attention(0) 完 → batch_copy(L2G, base+0·page, page)
-  ConsumePendingHole 挖掉 layer0
-
-  base ──► ┌────────┬─────────────────────────────┐
-           │ layer0 │████████  hole 仍在  ████████│
-           │  已写  │                             │
-           └────────┴─────────────────────────────┘
-  状态仍是 ALLOCATED（holes ≠ ∅）→ 别人不能当 hit 来读
-
-
-Attention(1) 完 → batch_copy(L2G, base+1·page, page)
-  …
-
-  base ──► ┌────────┬────────┬────────────────────┐
-           │ layer0 │ layer1 │████ hole █████████│
-           └────────┴────────┴────────────────────┘
-
-
-… 写到最后一层，holes 清零
-
-  base ──► ┌────────┬────────┬─────┬────────┐
-           │ layer0 │ layer1 │ ... │ layerN │
-           └────────┴────────┴─────┴────────┘
-  MarkWriteSuccess + meta：ALLOCATED + WRITE_OK → READABLE
-  此后 batch_get_key_info 才返回有效 base_gva
-```
-
-实现落点（client 本地 tracker + meta）：
-
-```text
-RegisterFromBatchAlloc
-  holes = { [blob.gva, blob.gva + size) }     // 一整段未写
-
-每次 batch_copy 写成功
-  ConsumePendingHole(gva, size)               // 从 holes 里抠掉本次区间
-  if remainingHoleCount == 0:
-      NotifyUpdateBlobByGva(MMC_WRITE_OK)     // ≈ Mooncake PutEnd
-      MarkWriteSuccess → READABLE
-  else:
-      保持 ALLOCATED，继续等后续层
-```
-
-所以 #11444 要求 **整对象按层写满、禁止只写一部分就当完成**：少写一层会永远留 hole，读侧要么拿不到有效 GVA，要么踩 `ConsumePendingHole` / 假命中（`batch_is_exist` 在 alloc 后就为真，必须用 `batch_get_key_info`）。
-
-### 2.3 为什么 alloc 必须在 worker 进程
-
-memcache 的 `gvaBlobTracker` 是 **per-process** 的：`batch_alloc` 登记的 blob，只有同一进程里的 `batch_copy` 认。所以 #11444 把 GVA 分配从 scheduler 挪到 worker，在真正拷贝前由本进程 `batch_alloc`，并缓存到 `_allocated_gvas`（只缓存成功项，`gva > 0`）。
-
-```mermaid
-flowchart LR
-    SCH["Scheduler 进程"] -.->|不能跨进程用 GVA| X["✗"]
-    WK["Worker 进程"] --> T["gvaBlobTracker"]
-    T --> A["batch_alloc"]
-    T --> C["batch_copy"]
-    A --> C
-```
-
-### 2.4 按层传输与计算重叠
-
-框架侧（与后端无关的编排）：
-
-| 机制 | 作用 |
-| :--- | :--- |
-| 按层 save/load 线程 | 算完 layer i 立刻 save；load 时 layer i+1 传输与 layer i 计算重叠 |
-| `AttentionComputeStartGate` | 用 NPU event 对齐「计算流真正到 attention 边界」再放行传输，避免只按 Python 调用点抢占 |
-| 预取 / 批量上限 / 错峰 | `layerwise_prefetch_layers`、`layerwise_max_transfer_*`、`h2d_stagger_us` |
-
-```mermaid
-sequenceDiagram
-    participant ATT as Attention 计算流
-    participant GATE as AttentionComputeStartGate
-    participant XFER as 按层传输线程
-    participant STORE as Memcache / Store
-
-    Note over XFER: 可预取若干层
-    XFER->>STORE: copy / transfer layer i
-    ATT->>GATE: record（进入 layer i attention 前打 NPU event）
-    GATE-->>XFER: event 完成 → 放行 layer i+1 传输
-    ATT->>ATT: wait_for_layer_load(i)
-    ATT->>ATT: 计算 layer i（与 layer i+1 传输重叠）
-    XFER->>STORE: copy layer i+1
-```
-
-### 2.5 #11444 五项优化分别落在哪
-
-| # | 优化 | 实质 |
-| :-- | :-- | :-- |
-| 1 | 统一 Key | 块级 key + 层偏移（框架侧） |
-| 2 | 一次性地址解析 | alloc / get_key_info 一次，之后 `base+offset` |
-| 3 | 地址化 `batch_copy` | 跳过每次 key 解析 |
-| 4 | NumPy 算本地 HBM 地址 | 框架侧，与后端无关 |
-| 5 | comm fence / 预取 | 框架侧，与后端无关 |
-
-1/4/5 与后端无关；2/3 是「先拿到基址，再按地址切层传」——memcache 用 GVA 实现，其它后端可以用自己的地址表示实现同样语义。
+- **推理优先**：KVPool offload **不得阻塞** HBM forward 热路径；put/get ranges 与 `batch_put_end` / `batch_put_revoke` 在传输线程执行（onload 仍通过 `wait_for_layer_load` 与计算对齐）。
+- **Prefix 一致**：未 `batch_put_end` 的对象不参与 prefix hit。
+- **会话式地址解析**：Master 交互集中在 `batch_get_start` / `batch_put_start`；按层传输零次 Master，只碰 Client 内缓存。
+- **接口批量**：形状对齐现有 multi_buffers（key-major `List[List[int]]`）。
+- **最大复用**：沿用 PR #11444 的 layerwise 编排（Scheduler 判 hit + Worker 开会话并按层传输）。
 
 ---
 
-## 3. GVA 到底重不重要？
+## 2. 架构总览
 
-### 3.1 你的理解（本文采纳）
+### 2.1 组件职责
 
-1. **Layerwise 要的是「对象基址 + 层偏移」**，不是「全机统一的同一个数字」。
-2. memcache 的 `batch_alloc` 本质是 **在池里申请一块跨层连续内存并返回可写基址**；Mooncake 的 `batch_put` / PutStart 路径里，store 侧本来就会为 object 分配 slice / buffer——申请内存这一步并不稀缺。
-3. 传输时，每个 worker 只需要能对自己拿到的远端地址（或 segment+offset）发起 HIXL 一侧读写；**不要求** rank0 和 rank7 看到同一个虚址字面量。
+沿用 PR #11444：Scheduler 与各 Worker 各自持有 Mooncake Backend（底层各绑一个 Mooncake Client）。
 
-因此：文档和实现里不应把「必须上 GVA / FabricMem 对称编址」写成 layerwise 的硬门槛。
+整体划分为 **控制面（元数据）** 与 **数据面（TE）**：
 
-```mermaid
-flowchart TB
-    subgraph NEED["Layerwise 真正需要的"]
-        BASE["对象基址（一次解析）"]
-        OFF["+ layer_offset"]
-        XFER["按层传输"]
-        BASE --> OFF --> XFER
-    end
-    R0["rank0 自己的 base"] --> NEED
-    R7["rank7 自己的 base"] --> NEED
+- **控制面**：Scheduler `batch_is_exist`；Worker `batch_get_start` / `batch_put_start` / `batch_put_end` / `batch_put_revoke`；走 Mooncake Master RPC。
+- **数据面**：按层 `batch_put_from_multi_buffer_ranges` / `batch_get_into_multi_buffer_ranges`；只走 TransferEngine，**不访问 Master**；Descriptor 查表与 lease 校验在 **Mooncake Client**。
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+rectangle "vLLM Scheduler 进程" {
+  component "KVPoolScheduler" as sched
+  component "store_scheduler\n(MooncakeBackend,\ncontribute_memory=False)" as sched_be
+}
+
+cloud "Mooncake Master" as master {
+  component "对象元数据\nPutStart / PutEnd / PutRevoke\nBatchGetReplicaList / ExistKey" as meta
+}
+
+rectangle "vLLM Worker 进程 (per rank)" {
+  component "kv_transfer\nSending / Recving 线程" as kvt
+  component "m_store\n(MooncakeBackend)" as worker_be
+  component "Mooncake Client\nget_sessions_ / put_sessions_" as mc
+  component "TransferEngine (TE)" as te
+  collections "HBM KV Cache" as hbm
+}
+
+storage "KVPool Segment\n(DRAM)" as kvpool
+
+sched --> sched_be
+sched_be --> meta : batch_is_exist
+sched ..> kvt : ReqMeta
+kvt --> worker_be : put_start / get_start\n/ ranges / put_end / revoke
+worker_be --> mc
+mc --> meta : get_start / put_start\n/ put_end / put_revoke
+mc --> te : TransferReadRange\n/ TransferWriteRange
+te <--> hbm
+te <--> kvpool
+@enduml
+```
+
+| 组件 | 进程 | 职责 |
+|------|------|------|
+| `store_scheduler` | Scheduler | `batch_is_exist` → hit 长度；分配 HBM 逻辑 block |
+| Mooncake Master | 独立服务 | 对象生命周期、prefix 可见性、读租约 GrantLease |
+| `kv_transfer` | Worker | 按层编排 save/load |
+| `m_store`（MooncakeBackend） | Worker | 委托 Mooncake Client 会话 API |
+| Mooncake Client | Worker | `get_sessions_` / `put_sessions_`：缓存 Replica Descriptor + lease_deadline；ranges 内校验 |
+| TE | Worker | HBM ↔ KVPool 按 offset 搬运 |
+
+### 2.2 与现有 put 路径的关系（`backend=mooncake`）
+
+| `use_layerwise` | 路径 | Mooncake API |
+|-----------------|------|-----|
+| `false` | 整 key put/get | 现网 `put` / `get` / multi_buffers |
+| `true`（本方案默认） | 会话 + 按层 ranges | `batch_put_start` + `batch_put_from_multi_buffer_ranges` + `batch_put_end`；load 侧 `batch_get_start` + `batch_get_into_multi_buffer_ranges` + `batch_get_end` |
+
+### 2.3 Block key 对象模型
+
+§2.1 元数据平面管理的对象即 **block key**。对齐 [PR #11444](https://github.com/vllm-project/vllm-ascend/pull/11444) 的 **per-rank / per-put_step-group key**：
+
+| 场景 | key 形态 | 谁 save |
+|------|----------|---------|
+| MLA（`put_step = tp_size`） | `{model}@{block_hash}@{head_or_tp_rank}`，组内共享 `@0` | 仅 `tp_rank % put_step == 0`（通常 rank0） |
+| GQA（`put_step = 1`） | 每 rank 独立 `@{tp_rank}` | 每个 rank 写自己的 key |
+| 尾块 | `{model}@{req_id}_lastblock@{head_or_tp_rank}` | 同上 |
+
+每个 key 对应一整块 object（`size = page_size_bytes × num_layers`）；saving rank 按层 ranges 写满后对本 key `batch_put_end`。非每层独立 key。
+
+### 2.4 Backend ABC 统一与后端差异
+
+编排层调 **Backend ABC**。初版原则：**契约一致的同名统一；有硬差异的拆成两个接口**，由 `pool_worker` / `kv_transfer` 按 `backend` 分支调用。
+
+memcache 读路径：`batch_add_lease` / `batch_remove_lease`。Mooncake 读路径：`batch_get_start` / `batch_get_end`（descriptor 与 lease 由 Client 在会话内维护，§4）。
+
+#### 能统一（同名 override）
+
+| ABC 方法 | memcache | MooncakeBackend → Client | 说明 |
+|----------|----------|--------------------------|------|
+| `batch_commit(keys)`（新增） | 空实现（holes 挖空即可读） | `batch_put_end` | 写侧发布 COMPLETE |
+| `batch_revoke(keys)`（新增） | 空实现（初版） | `batch_put_revoke` | `batch_copy_put` 失败的 key 放弃写会话 |
+| `batch_is_exist` / `exists` | 已有 | 已有 | 元数据查询 |
+
+#### 初版拆开
+
+| 差异点 | memcache 侧 ABC | Mooncake 侧 ABC | 原因 |
+|--------|-----------------|-----------------|------|
+| 写预留 | `batch_alloc(keys, sizes) -> list[int]`（返回 **GVA**） | `batch_put_start(keys, sizes) -> list[int]`（返回 **状态码**） | 返回值语义不同 |
+| 按层写 | `batch_copy(..., direction=TO_POOL)`（GVA 寻址） | `batch_copy_put(keys, buffers, sizes, dst_offsets)` | 入参形状不同 |
+| 按层读 | `batch_copy(..., direction=FROM_POOL)` | `batch_copy_get(keys, buffers, sizes, src_offsets)` | 入参形状不同 |
+| 读开会话 | `batch_add_lease`（+ 可选 `batch_get_key_info`） | `batch_get_start` | memcache 显式租约；Mooncake 开会话（§4） |
+| 读收尾 | `batch_remove_lease` | `batch_get_end` | 两端收尾语义不同 |
+| Scheduler hit | `batch_get_key_info` | `batch_is_exist` | 是否需要 GVA |
+
+ABC / `MooncakeBackend` 用短名；Client 长名只在 Backend 内委托：`batch_copy_put` → `batch_put_from_multi_buffer_ranges`，`batch_copy_get` → `batch_get_into_multi_buffer_ranges`。
+
+```text
+kv_transfer / pool_worker
+  ├─ 统一：batch_commit / batch_revoke / batch_is_exist
+  └─ 按 backend 分支：
+       memcache  → batch_alloc / batch_copy / batch_get_key_info
+                   / batch_add_lease / batch_remove_lease
+       mooncake  → batch_put_start / batch_copy_put / batch_copy_get
+                   / batch_get_start / batch_get_end
 ```
 
 ---
 
-## 4. Mooncake Layerwise 方案
+## 3. 端到端时序
 
+```plantuml
+@startuml
+skinparam shadowing false
 
-### 4.1 设计原则
+participant Scheduler
+participant "Worker 主线程" as Main
+participant RecvingThread as RT
+participant SendingThread as ST
+participant "Mooncake Client" as MC
+participant MooncakeMaster as Master
+participant HBM
 
-1. **会话式**：`start` 时 Store/Client 内部 cache replica；`end` 时删除。Python 只碰 key、已 register 的本地 ptr、object-byte offset。
-2. **按层传输用独立 API，不复用 `get_into_ranges`**：后者是 Engram 多 fragment stitch（3D、单次临时 cache），与「跨多层异步会话」不是一类问题。底层可共用 `TransferReadRange` / 新增 `TransferWriteRange`。
-3. **形状对齐现有 multi_buffers**：`List[List[int]]`，key-major，与 `batch_get_into_multi_buffers` / `batch_put_from_multi_buffers` 一致，再加 `*_offsets`。
-4. **Master 尽量不改**：复用 `BatchGetReplicaList`（带 lease）、`BatchPutStart` / `BatchPutEnd`。
+== 准备 ==
+Scheduler -> Master: batch_is_exist\n(miss / hit 长度)
+Scheduler -> Main: ReqMeta
+Main -> MC: batch_get_start(load keys)
+MC -> Master: BatchGetReplicaList\n(+ GrantLease)
+MC -> MC: get_sessions_[key]\n= {replica, lease_deadline}
+Main -> MC: batch_put_start(save keys, sizes)\n(saving rank)
+MC -> Master: BatchPutStart
+MC -> MC: put_sessions_[key] = replica
+Main -> RT: wait_for_layer_load(0)\n+ prefetch
+
+== 稳态 step L：三路重叠 ==
+par offload L-1
+  ST -> HBM: sync_save_events(L-1)
+  ST -> MC: batch_put_from_multi_buffer_ranges\n(dst_offset = (L-1)·page)
+  MC -> MC: 查 put_sessions_
+  opt TE / 会话失败
+    ST -> MC: batch_put_revoke(失败 keys)
+    MC -> Master: BatchPutRevoke
+    ST -> ST: 更新本批 active_keys/mask\n后续层只传 active 子集
+  end
+  ST -> ST: set layer_save_finished(L-1)
+else compute L
+  Main -> Main: wait_for_layer_load(L) 返回
+  HBM -> HBM: Attention(L)
+  Main -> ST: save_kv_layer(L) 入队\n(中间层不阻塞)
+else onload L+1
+  Main -> RT: prefetch 提交 L+1
+  RT -> MC: batch_get_into_multi_buffer_ranges\n(src_offset = (L+1)·page)
+  MC -> MC: 查 get_sessions_\n校验 lease_deadline
+  opt lease 过期
+    MC --> RT: 返回错误
+  else
+    MC -> HBM: TransferReadRange
+  end
+end
+
+... step L+1 同理：offload L / compute L+1 / onload L+2 ...
+
+== 末层 ==
+Main -> Main: 末层 save_kv_layer\n等待 layer_save_finished
+ST -> MC: batch_put_end(本批 active_keys)
+MC -> Master: BatchPutEnd
+Main -> MC: batch_get_end(本批 load_keys)
+@enduml
+```
+
+#### Save 收尾（commit / revoke）
+
+两层集合，职责分开（对齐现网 load 按本批 `req_meta.load_keys` 放租约，而非全局表）：
+
+| 集合 | 生命周期 | 用途 |
+|------|----------|------|
+| `_put_started_keys`（`pool_worker`，进程级） | 跨 step 累积 | **仅** `put_start` 幂等；`end`/`revoke` 后移除 |
+| `active_keys`（SendingThread，**本批任务**） | 随本批 `SharedBlockData.block_keys` 初始化 | 本批 ranges；末层只 commit 这里面还剩的 |
+
+现网 `_build_shared_save_data` 把**同一份**只读 `SharedBlockData` 挂到全部 `layer_save_tasks`，不能靠改 shared 跳过失败 key。层失败过滤落在 SendingThread 的可变 `active_keys`（或与 `block_ids_arr` 对齐的 `active_mask`）。写预留失败过滤在 `pool_worker` 写预留之后、`build_shared` 之前（两端共用；相对现网 memcache「alloc 失败仍带坏 GVA 进 copy」的改进）。
+
+| 事件 | 调用方 | 动作 |
+|------|--------|------|
+| 预留成功 | `pool_worker` | memcache 记 GVA / Mooncake 记 `_put_started_keys`；纳入本批 shared |
+| 预留失败 | `pool_worker` | 跳过该 key（`gva <= 0` / `put_start` 非 0 → 不进 shared / 不进 copy） |
+| 本批 save 开传 | SendingThread | `active_keys = shared.block_keys`（可变；shared 本身不改） |
+| 每层传输 | SendingThread | 仅 active 子集 `build_addrs` + copy_put |
+| 某层 copy_put 失败 | SendingThread | 立即 `batch_revoke`；更新 `active_keys`；移出 `_put_started_keys` |
+| 末层收尾 | SendingThread | `batch_commit(active_keys)`；未收尾 PROCESSING 靠超时 |
+
+memcache 侧 `commit`/`revoke` 为空实现；若某层 `batch_copy` 部分失败，可用同一 `active_mask` 跳过后续层（可选，与 Mooncake 同构）。
 
 ---
 
-### 4.2 已有 vs 新增
+## 4. Mooncake 改动
 
-| | 已有 | 本方案 |
-| :--- | :--- | :--- |
-| 整对象读写 | `batch_get_into_multi_buffers` / `batch_put_from_multi_buffers` | 非 layerwise 继续用 |
-| 多 fragment stitch | `get_into_ranges`（C++ 可带临时 cache） | **不动**；Engram 继续用 |
-| 按 offset 读 | `TransferReadRange` | get 会话每跳调用 |
-| 按 offset 写 | 缺对称 range write | **新增** `TransferWriteRange` |
-| Put 预留 / 提交 | Master `BatchPutStart/End` | Client/Python **暴露**为 put 会话 |
-| 读元数据 + 租约 | `BatchQuery` / `GetReplicaList` | 收进 **`batch_get_start`**，不给 Python 玩 cache |
+本节描述 **mooncake-wheel / Client** 需新增与扩展的能力。Master 尽量不改：复用 `BatchGetReplicaList`（带 lease）、`BatchPutStart` / `BatchPutEnd` / `BatchPutRevoke`。底层 get 复用 `TransferReadRange`；put 新增对称的 `TransferWriteRange`。
 
----
+### 4.1 改动总览
 
-### 4.3 Store 接口定义（完整）
+| 模块 | 改动 |
+|------|------|
+| `mooncake-wheel` / PyClient | 暴露 §4.3 会话 API |
+| Mooncake Client（C++） | `get_sessions_` / `put_sessions_` hashmap；lease 截止时刻校验 |
+| `MasterClient` | 复用现网 BatchPut* / BatchGetReplicaList |
+| Transfer | 新增 `TransferWriteRange`；get 用现有 `TransferReadRange` |
 
-以下为 Python / `PyClient` 对外签名。C++ `Client` / `RealClient` 同语义。
+对象生命周期与会话隔离见 §4.2 / §4.3；读租约见 §4.4。
+
+### 4.2 Client 内部会话
+
+```text
+get_sessions_: map<key, {replica_descriptor, lease_deadline, ...}>
+put_sessions_: map<key, {replica_descriptor, ...}>
+```
+
+- 会话仅对本 Client 进程有效（与 memcache per-process tracker 同理）。
+- ranges API：**禁止**在 miss / expired 时内部再 Query Master。
+- 整 key `put` / `get` / `get_into_ranges`（Engram）与会话 map **分离**，互不复用。
+
+### 4.3 Store 接口定义
 
 约定：
 
-- `keys[i]` 与 `all_buffers[i]` / `all_sizes[i]` / `all_*_offsets[i]` **一一对应**（与现有 multi_buffers 相同）。
-- `all_buffers[i]`：该 key 本跳要传的一组已 `register_buffer` 的本地指针（典型：该层 K、V 各一块，或 TP 切分后的多段）。
-- `all_sizes[i][j]` / `all_*_offsets[i][j]`：与 `all_buffers[i][j]` 对齐。
-- **offset = 对象内字节偏移**，不是 layer id。layerwise 由 Backend 计算。
-- 返回值：与 keys 对齐的 `List[int]`；`0` 或正数表示成功（ranges 接口为正表示写入/读出的总字节，或按现有 multi_buffers 约定），负数为错误码。
+- `keys[i]` 与 `all_buffers[i]` / `all_sizes[i]` / `all_src_offsets[i]` / `all_dst_offsets[i]` **一一对应**（与现有 multi_buffers 相同）。
+- `all_buffers[i]`：该 key 本跳要传的一组已 `register_buffer` 的本地指针。
+- **offset = 对象内字节偏移**，不是 layer id；layerwise 由 Backend / `LayerBatchBuilder` 计算 `layer_id * page_size`（及 K/V 内偏移）。
+- 返回值：与 keys 对齐的 `List[int]`；成功为 `0` 或正字节数（按现有 multi_buffers 约定），负为错误码。
 
 #### 4.3.1 Load 会话
 
 ```python
 def batch_get_start(
     keys: List[str],
-    lease_ttl_ms: int = 0,
 ) -> List[int]:
     """
-    一次 Master：BatchGetReplicaList（带读租约）。
-    Client 按 key 缓存 memory-backed Replica::Descriptor。
+    一次 Master：BatchGetReplicaList（带读租约，TTL 为 Client / Master 默认 `default_kv_lease_ttl`）。
+    Client 按 key 缓存 memory-backed Replica::Descriptor，
+    并记录 lease_deadline = now + default_kv_lease_ttl。
 
     Args:
-      keys: 对象 key 列表（与非 layerwise 相同的 block key）。
-      lease_ttl_ms:
-        0 → 使用 Client 默认 default_kv_lease_ttl；
-        vllm layerwise 传 LAYERWISE_READ_LEASE_TTL_MS = 300_000（5 min）。
+      keys: 对象 key 列表。
 
     Returns:
       与 keys 等长。0 = 已缓存可 ranged 读；负 = 不存在 / 未 complete / 无 memory replica 等。
@@ -369,13 +346,13 @@ def batch_get_into_multi_buffer_ranges(
 
     语义（对每个 key i、每个 buffer j）:
       读  object[ all_src_offsets[i][j] : + all_sizes[i][j] ]
-      写入 all_buffers[i][j]（本地已 register 的目的 ptr）
+      写入 all_buffers[i][j]
 
     约束:
-      - 每个 key 必须已成功 batch_get_start 且会话未 end、租约未过期；
-      - miss / expired → 失败，禁止内部再 Query Master；
-      - 对象须 memory-backed（与现 TransferReadRange 限制一致）；
-      - 同一 Client 进程内有效。
+      - 每个 key 必须已成功 batch_get_start 且会话未 end；
+      - now > lease_deadline → 该 key 失败（租约过期），禁止再 Query Master；
+      - miss → 失败，禁止再 Query Master；
+      - 对象须 memory-backed。
 
     Returns:
       与 keys 等长；成功为读出字节数（或约定成功码），失败为负错误码。
@@ -404,9 +381,7 @@ def batch_put_start(
 
     Args:
       keys: 对象 key。
-      sizes: 与 keys 对齐的对象总字节数。
-            layerwise 通常为 page_size * num_layers
-            （page_size = 单层 K+V 在池化布局下的字节数）。
+      sizes: 与 keys 对齐；layerwise 通常为 page_size * num_layers。
 
     Returns:
       与 keys 等长；0 = 已预留并可 ranged 写；负 = 失败。
@@ -424,12 +399,12 @@ def batch_put_from_multi_buffer_ranges(
 
     语义（对每个 key i、每个 buffer j）:
       写  object[ all_dst_offsets[i][j] : + all_sizes[i][j] ]
-      ←   all_buffers[i][j]（本地已 register 的源 ptr）
+      ←   all_buffers[i][j]
 
     约束:
       - 每个 key 必须已成功 batch_put_start 且未 put_end；
       - miss → 失败，禁止内部再 PutStart；
-      - 底层走新增 TransferWriteRange（对称于 TransferReadRange）。
+      - 底层走 TransferWriteRange。
 
     Returns:
       与 keys 等长；成功为写入字节数（或约定成功码），失败为负错误码。
@@ -437,198 +412,202 @@ def batch_put_from_multi_buffer_ranges(
 
 def batch_put_end(keys: List[str]) -> List[int]:
     """
-    一次 Master：BatchPutEnd → 对象 complete、可读。
+    一次 Master：BatchPutEnd → 对象 COMPLETE、可读。
     删除内部 put-session cache。
 
     Returns:
       与 keys 等长；0 成功，负失败。
     """
-```
 
-#### 4.3.3 失败 / 取消（建议一并暴露）
-
-```python
 def batch_put_revoke(keys: List[str]) -> List[int]:
     """
-    取消未 complete 的 put（若 Master 已有 PutRevoke 则绑定）。
-    必须清理 Client put-session，避免泄漏。
-    Save 中途失败、请求取消时调用；不要对已 put_end 的 key 调用。
+    取消未 complete 的 put（BatchPutRevoke），并清理 Client put-session。
+    用于 batch_copy_put / ranged 写失败后的 key；不对已 put_end 的 key 调用。
+    未 revoke、未 put_end 的 PROCESSING 由 Master 超时清理。
     """
 ```
----
 
-### 4.4 内部实现要点
+### 4.4 Lease 语义
 
-```text
-Client 内:
-
-get_sessions_: map<key, {replica, lease_deadline, ...}>
-put_sessions_: map<key, {replica, ...}>
-
-batch_get_start(keys, lease_ttl_ms):
-  BatchGetReplicaList(keys, lease_ttl=...)
-  选 memory replica → get_sessions_[key] = ...
-
-batch_get_into_multi_buffer_ranges(...):
-  meta = get_sessions_[key]   # miss/expired → 失败，不 Query
-  for each (buf, size, src_off): TransferReadRange(...)
-
-batch_get_end(keys):
-  可选：通知 Master 放租约
-  erase get_sessions_[keys]
-
-batch_put_start(keys, sizes):
-  BatchPutStart → put_sessions_[key] = descriptor
-
-batch_put_from_multi_buffer_ranges(...):
-  meta = put_sessions_[key]
-  for each (buf, size, dst_off): TransferWriteRange(...)  # 新增
-
-batch_put_end(keys):
-  BatchPutEnd → erase put_sessions_
-```
-
-`get_into_ranges` 保持现状，与会话 map **分离**，互不复用。
+| 点 | 说明 |
+|----|------|
+| 何时与 Master 交互设 lease | `batch_get_start`（底层 `BatchGetReplicaList` → `GrantLease`） |
+| Client 本地 | 记录 `lease_deadline`；ranges 用 `now` 与之比较，过期返回错误 |
+| Scheduler `batch_is_exist` | 仅用于 hit 长度判定 |
+| TTL | Client / Master 默认 `default_kv_lease_ttl`；须能覆盖分层 onload，不足则调 Master 配置 |
+| 会话收尾 | `batch_get_end` 清理 `get_sessions_`（并可在 Master 支持时提前放租约） |
 
 ---
 
-### 4.5 调用例子
+## 5. vLLM-Ascend 改动
 
-以下假设：
+ABC 契约见 **§2.4**；Mooncake Client 见 **§4**。
 
-- `num_layers = L`，单层池化页 `page = k_bytes + v_bytes`（与 Backend 布局一致）。
-- 本地仍是每层独立 tensor：`k_ptr[layer][block]`、`v_ptr[layer][block]`。
-- 本跳要传的 block keys：`keys = ["b0", "b1", ...]`，长度 `N`。
-- 指针均已 `register_buffer`。
+### 5.1 开关
 
-#### 4.5.1 Mooncake Save（layerwise）
+沿用 `use_layerwise` + `backend`。门控 `use_gva_layerwise` 改名为 `use_block_key_layerwise`：仅表示 **per-block-key** 编排，不暗示 GVA。connector / scheduler / worker 三处同步改名。
+
+| `use_layerwise` | `backend` | 路径 |
+|-----------------|-----------|------|
+| `false` | 任意 | 现网整 key put/get |
+| `true` | `memcache` | per-block-key + GVA + `batch_copy`（`Layer*Thread`） |
+| `true` | `mooncake` | 本方案：per-block-key + 会话 ranges（`Layer*Thread`） |
+| `true` | `yuanrong` 等 | **仍走** `KVCacheStoreKeyLayer*Thread`（每层一 key）；本方案不升级 |
+
+### 5.2 `backend/backend.py`（ABC）
+
+方法集合与语义见 **§2.4**。落点：
+
+- 新增 `batch_commit` / `batch_revoke`：默认成功空实现（`[0] * len(keys)`）
+- 新增 Mooncake 专用：`batch_put_start` / `batch_get_start` / `batch_get_end` / `batch_copy_put` / `batch_copy_get`；ABC 默认 `NotImplementedError`
+
+### 5.3 `memcache_backend.py`
+
+- `batch_commit` / `batch_revoke` → `[0] * len(keys)`
+- 既有 alloc / copy / lease / `batch_get_key_info` 保持现状
+
+### 5.4 `mooncake_backend.py`
+
+薄封装：按 §2.4 委托现有 `store`（Client）；会话状态在 Client（§4.2）。各方法先 `_ensure_initialized()`；负错误码透传；整 key `put`/`get` 与 ranges 会话路径分离。
 
 ```python
-PAGE = page_size
-OBJ = PAGE * num_layers
-N = len(keys)
-
-# 1) 一次：预留跨层 object（仅 put_step 命中的 rank 执行）
-rcs = store.batch_put_start(keys, [OBJ] * N)
-# 过滤 rcs[i] == 0 的 key；失败的不要进会话
-
-# 2) 每层：把该层本地 K/V 写入 object 对应 offset
-for layer in range(num_layers):
-    base = layer * PAGE
-    all_buffers = [
-        [k_ptr[layer][i], v_ptr[layer][i]] for i in range(N)
-    ]
-    all_sizes = [
-        [k_bytes, v_bytes] for _ in range(N)
-    ]
-    all_dst_offsets = [
-        [base, base + k_bytes] for _ in range(N)
-    ]
-    store.batch_put_from_multi_buffer_ranges(
+def batch_copy_put(self, keys, all_buffers, all_sizes, all_dst_offsets) -> list[int]:
+    self._ensure_initialized()
+    assert self.store is not None
+    return self.store.batch_put_from_multi_buffer_ranges(
         keys, all_buffers, all_sizes, all_dst_offsets
     )
-
-# 3) 提交：对象可读
-store.batch_put_end(keys)
-
-# 失败路径：store.batch_put_revoke(keys)
 ```
 
-若某层 K/V 在本地已是连续 `page` 字节，可简化为每 key 一个 buffer：
+### 5.5 编排层（`pool_worker.py` + `kv_transfer.py`）
+
+Save 收尾 / `active_keys` 语义见 **§3**；Backend 分支见 **§2.4**。此处只写本文件落点。
+
+| 文件 | 负责 |
+|------|------|
+| `pool_worker` | 按 `use_block_key_layerwise` 选用 `Layer*Thread`；写预留 / 读开会话、`build_shared`；load 末层 `get_end` / `remove_lease` |
+| `kv_transfer` | 按层 copy（memcache：`batch_copy`；Mooncake：`batch_copy_put` / `batch_copy_get`）；Mooncake `active_keys` 过滤；末层 `batch_commit`；失败 `batch_revoke` |
+
+```text
+process_layer_data:
+  memcache: batch_alloc / add_lease(+get_key_info)
+  mooncake: batch_put_start / batch_get_start
+  → build_shared → 逐层 copy → 末层 commit / get_end|remove_lease
+```
+
+`_put_started_keys` 对齐 `_allocated_gvas`：**只做** `put_start` 幂等；成功才进本批 `block_keys`；end/revoke 后移除。
+
+#### Save 侧 key 元数据管线
+
+现网 `_alloc_gvas_for_save`：Worker **现场**拼 key → `batch_alloc` → 只把 **GVA** 写入 `ReqMeta.block_gvas_np`；`build_shared` 只读 GVA。Mooncake 无 GVA，`build_shared` 必须拿到与 `block_ids` **对齐**的 key。
+
+定案（key 形态见 §2.3）：
+
+1. **`ReqMeta` 增加**与 save 范围对齐的 `save_block_keys`（可与 `block_gvas_np` 同 offset 语义）。`put_start` **成功**的 key 写入该字段；失败的跳过（见 §3）。
+2. **`build_shared`（Mooncake）**从 `ReqMeta.save_block_keys`（+ load 侧对应字段）填 `SharedBlockData.block_keys`，与 `block_ids_arr` 一一对应。
+3. **不要用** Scheduler `generate_keys` 做 put/ranges：其产出无 `@head_or_tp_rank`，与 Worker 真实 object key 不一致；save 路径以 Worker 为准。
+
+**传输限流**：memcache 走 `_batch_copy_with_limits`。Mooncake **初版不分片**（风险见 §7）；后续可按同一 split 语义切 key。
+
+#### `SharedBlockData` / `LayerBatchBuilder`
+
+对照现网（11444）：`build_shared` 预计算跨层不变的 `block_ids_arr` + `block_gvas_arr`；`build_addrs(layer_id)` 再算  
+`gvas = base_gva + layer_id * page_size + inner_offsets`，以及本地 `addr`/`size`（按 `_caches_per_layer` 展开 K/V 等多段），供 `batch_copy`。
+
+初版双轨：memcache 保持 flat GVA；Mooncake 走 key-major。
 
 ```python
-all_buffers = [[layer_page_ptr[layer][i]] for i in range(N)]
-all_sizes = [[PAGE] for _ in range(N)]
-all_dst_offsets = [[layer * PAGE] for _ in range(N)]
+@dataclass
+class SharedBlockData:
+    block_ids_arr: np.ndarray
+    # memcache:
+    block_gvas_arr: np.ndarray | None
+    # mooncake：与 block_ids_arr 对齐的 object key（每 logical block 一个）
+    block_keys: list[str] | None
+    req_ids: list[str]
+    is_last_chunks: list[bool | None]
+    load_keys: list[str]  # 读收尾用
+
+# Mooncake build_addrs(layer_id) → 供 batch_copy_put / batch_copy_get
+# keys[i]              = shared.block_keys[i]
+# all_buffers[i][j]    = layer 本地 ptr：base_addr[j] + block_id * stride[j]
+# all_sizes[i][j]      = layer_block_len[j]
+# all_*_offsets[i][j]  = layer_id * page_size_bytes + layer_inner_offsets[j]
+#   j ∈ [0, caches_per_layer)  （与现网 _build_transfer_arrays 的 K/V 多段一致）
+# save → all_dst_offsets；load → all_src_offsets
 ```
 
-#### 4.5.2 Mooncake Load（layerwise）
+### 5.6 `pool_scheduler.py`
 
-```python
-LEASE_MS = 300_000  # LAYERWISE_READ_LEASE_TTL_MS
+门控见 **§5.1**；key / `alloc_size` 见 **§2.3**。本文件仅改 Scheduler 侧：
 
-# 1) 一次：解析 replica + 读租约；内部 cache
-rcs = store.batch_get_start(keys, lease_ttl_ms=LEASE_MS)
-
-# 2) 每层：从 object offset 读到该层本地 K/V（与 Attention 重叠）
-for layer in range(num_layers):
-    base = layer * PAGE
-    all_buffers = [
-        [k_ptr[layer][i], v_ptr[layer][i]] for i in range(N)
-    ]
-    all_sizes = [
-        [k_bytes, v_bytes] for _ in range(N)
-    ]
-    all_src_offsets = [
-        [base, base + k_bytes] for _ in range(N)
-    ]
-    store.batch_get_into_multi_buffer_ranges(
-        keys, all_buffers, all_sizes, all_src_offsets
-    )
-
-# 3) 结束会话（尽早放租约）
-store.batch_get_end(keys)
-```
-
-#### 4.5.3 对照：memcache 同等语义（#11444）
-
-本地布局同样是每层 tensor；池化侧用 GVA + `batch_copy`。
-
-```python
-# Save
-gvas = store.batch_alloc(keys, [OBJ] * N)          # 返回每 key 的 GVA base
-for layer in range(num_layers):
-    base = layer * PAGE
-    # 伪代码：对每个 block 填 src=本地层 ptr，dst=gva+base(+k/v 内偏移)
-    store.batch_copy(
-        src_ptrs, dst_gvas, sizes,
-        direction=L2G,
-    )
-
-# Load
-infos = store.batch_get_key_info(keys)             # 解析地址
-store.batch_add_lease(keys, LEASE_MS)
-for layer in range(num_layers):
-    store.batch_copy(
-        src_gvas, dst_local_ptrs, sizes,
-        direction=G2L,
-    )
-store.batch_remove_lease(keys)
-```
-
-| 步骤 | memcache | Mooncake（本方案） |
-| :--- | :--- | :--- |
-| 申请 / 打开写 | `batch_alloc` → GVA | `batch_put_start`（内部 cache，不回地址） |
-| 按层写 | `batch_copy(L2G, gva+off)` | `batch_put_from_multi_buffer_ranges(..., dst_offset)` |
-| 解析 + 租约 | `get_key_info` + `add_lease(300s)` | `batch_get_start(..., lease_ttl_ms=300_000)` |
-| 按层读 | `batch_copy(G2L, ...)` | `batch_get_into_multi_buffer_ranges(..., src_offset)` |
-| 结束 | `remove_lease` | `batch_get_end` / `batch_put_end` |
+1. `use_gva_layerwise` → `use_block_key_layerwise`（与 connector / worker 同名）。
+2. hit：memcache 仍走 `batch_get_key_info`；Mooncake 走 `batch_is_exist`（PROCESSING 不可见，无需 GVA）。
+3. hit 查询的 key 须带 `@head_or_tp_rank`（与 Worker 一致）；**不要**用无 rank 后缀的 `generate_keys` 结果做 Mooncake layerwise hit。
 
 ---
 
-### 4.6 vllm-ascend Backend 怎么接
+## 6. 测试计划
 
-框架仍用 #11444：统一 key、`put_step`、按层线程、Gate、prefetch。Backend 不再假装 GVA：
+### 6.1 Mooncake
 
-```python
-# Save（仅 put_step 命中的 rank）
-store.batch_put_start(keys, [page * num_layers] * n)
-for layer in range(num_layers):
-    store.batch_put_from_multi_buffer_ranges(
-        keys, layer_buffers, layer_sizes, layer_dst_offsets
-    )
-store.batch_put_end(keys)
+仓库：`Mooncake-upstream`。
 
-# Load
-store.batch_get_start(keys, lease_ttl_ms=300_000)
-for layer in range(num_layers):
-    store.batch_get_into_multi_buffer_ranges(
-        keys, layer_buffers, layer_sizes, layer_src_offsets
-    )
-store.batch_get_end(keys)
-```
+| 落点 | 内容 |
+|------|------|
+| Client 集成测试 | `batch_put_start`：成功进 `put_sessions_`；PROCESSING 期间 Exist/GetReplica 不可见；冲突错误码 |
+| Client 集成测试 | `batch_put_end`：COMPLETE 后可被 get_start 命中；幂等；清 put_sessions_ |
+| Client 集成测试 | `batch_put_revoke`：PROCESSING 释放后可再 start；已 COMPLETE 不可 revoke |
+| Client 集成测试 | `batch_get_start` + ranges：缓存 descriptor；按默认 TTL 写入 deadline；过期后 ranges 失败且不二次 Query |
+| Client 集成测试 | `batch_get_end`：清 get_sessions_ |
+| Transfer 测试 | `TransferWriteRange` / ranged 写：`size < object_size` 多段写入；与整 key put 的 `validateTransferParams` 隔离 |
+| `mooncake-wheel` | Python：`batch_put_start` → 多层 `batch_put_from_multi_buffer_ranges` → `batch_put_end` → `batch_get_start` → `batch_get_into_multi_buffer_ranges` → `batch_get_end`；失败 `batch_put_revoke` |
 
-若 Backend 抽象仍叫 `batch_add_lease` / `batch_remove_lease`：
+### 6.2 vLLM-Ascend
 
-- `add_lease(keys, ttl)` → `batch_get_start(keys, ttl)`
-- `remove_lease(keys)` → `batch_get_end(keys)`
+沿 PR #11444 的 `tests/ut/distributed/ascend_store/` 范围扩展。
+
+| 文件 | 本方案需补充 |
+|------|-------------|
+| `test_pool_scheduler.py` | `backend=mooncake` 走 `batch_is_exist` 判 hit |
+| `test_pool_worker.py` | `batch_get_start` / `batch_put_start`；结束 `batch_get_end` / `batch_put_revoke` |
+| `test_kv_transfer.py` | `batch_copy_put` / `batch_copy_get`；末层 `batch_put_end`；写失败 `batch_put_revoke`；lease 过期记失败块 |
+| `test_backend.py` | `MooncakeBackend`：`batch_get_start` / `batch_copy_*` / `batch_get_end` 委托 Client；`MemcacheBackend`：`batch_commit` / `batch_revoke` 为空实现 |
+| `_mock_deps.py` | mock Client 会话 API |
+
+#### 联调与 E2E
+
+NPU + Mooncake：prefix hit 与 accuracy；长 load 场景验证默认 `default_kv_lease_ttl` 是否足够、以及过期后的失败降级。
+
+---
+
+## 7. 风险与开放问题
+
+- **Mooncake 初版不分片**：大 batch 时 TE 压力高于 memcache 限流路径；若成瓶颈，再复用 `max_transfer_*` 语义按 key 分片。
+- **SSD 与 layerwise**：本方案假定 layerwise 对象落在 memory replica；ranges 要求 memory-backed；是否与 SSD offload 并用由 vLLM 配置约束。
+- **lease 覆盖时长**：Worker `batch_get_start` 按 Master / Client 默认 `default_kv_lease_ttl` 申请租约并记入 `lease_deadline`。该默认值须覆盖整段分层 onload；过期后 ranges 失败，由 vLLM fallback 重算。
+- **单 writer 时延**：MLA 下 pool 写由 saving rank 承担，可能拉长 SendingThread 上 ranges 耗时；不阻塞中间层 forward，但末层 `batch_put_end` 前的排队仍需观察。
+- **`batch_put_end` / `batch_put_revoke` 占用 SendingThread**：同步 Master RPC，初版在 SendingThread 内调用，可能拖住后续 TE；若成为瓶颈，再拆独立控制面线程或队列。
+- **双端查询窗口**：Scheduler `batch_is_exist` 与 Worker `batch_get_start` 之间对象可能被 eviction；get_start miss 或随后 lease 过期均按 load 失败处理。
+
+---
+
+## 8. 备选方案与选型
+
+layerwise 要求在 PutStart 之后、PutEnd 之前，对同一 object 多次写入不足整块的数据。现网整 key `put` 经 `validateTransferParams` 校验，要求单次传输写满整块，无法直接复用。
+
+### 8.1 放宽 `validateTransferParams`
+
+在现网 `put` 路径上允许单次传输写不满整块。
+
+**不采用。** 整 key `put` 的语义是一次写满对象；放宽校验会破坏该契约。
+
+### 8.2 会话 + ranged 传输（本方案）
+
+`batch_put_start` / `batch_get_start` 缓存 Descriptor 于 Mooncake Client；按层 `TransferWriteRange` / `TransferReadRange`。
+
+**采用。** 与 memcache「一次解析地址、按层搬运」同构；Master 改动最小；Python 不接触远端地址；lease 与查表留在 Client，编排层只碰 key / 本地 ptr / object offset。
+
+### 8.3 vLLM 直连 `global_te`
+
+**不采用。** 段管理、错误码与会话生命周期应留在 Mooncake Client / store 域。
