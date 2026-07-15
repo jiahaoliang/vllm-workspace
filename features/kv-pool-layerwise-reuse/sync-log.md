@@ -32,3 +32,10 @@
 - Added `ascend-direct-dev/Mooncake` as the Mooncake `collaborator` remote and checked out local branch `feature/layerwise-kv-session`, tracking `collaborator/feature/layerwise-kv-session` at PR #2881 head `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`.
 - Archived Mooncake PR #2881 as a WIP implementation source, including a Markdown summary and raw patch fixed to the captured head.
 - Confirmed that the PR exposes all seven session/range API names and includes abnormal-session, lease-expiry, and TCP E2E coverage. Recorded the current put-end idempotency and ranged-put `config` signature mismatches as blockers for the real-wheel contract gate.
+
+## 2026-07-15
+
+- Fetched `ader47/vllm-ascend` `feature/new-memcache-layerwise` at `5875ff0b366690c64324d71b47f9409f8cd762da` and rebased `feature/mooncake-layerwise-kv-pool` from `c8a977e6d1a0fc17c457b4a0b69dfb1fa1b85366` onto that head.
+- Retained the collaborator's rebased layerwise KV-pool implementation (`b0e0eacc8`) instead of replaying its older duplicate (`d6a835d22`), then merged the TP-mismatch helpers and Mooncake session tests without dropping either behavior.
+- Added `89b87ee2a1be466939579c165cba9df6b3824643` (`fix(kv_pool): initialize TP mismatch config`) to restore the extracted worker helper's access to `self._extra_config` and correct the TP-mismatch test calls to `use_layerwise`.
+- Ran the isolated CPU AscendStore suite after the rebase: `347 passed`; focused `ruff check` and `git diff --check` passed. Pushed the rewritten source history to `origin/feature/mooncake-layerwise-kv-pool` with `--force-with-lease`.
