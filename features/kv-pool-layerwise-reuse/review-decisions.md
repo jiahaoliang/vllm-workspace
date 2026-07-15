@@ -58,3 +58,27 @@
      当前的 `--confcutdir`。
 - 目标提交：`ffd266831 feat(kv_pool): define Mooncake layerwise backend contract`。
 - 当前状态：仅记录建议，尚未修改源码、创建 fixup 或执行 rebase。
+
+## 2026-07-15: `ffd266831` 的 commit/revoke 默认伪成功
+
+- 检视结论：采纳（P2），等待统一修改。
+- 问题：`Backend.batch_commit()` 和 `Backend.batch_revoke()` 对所有 backend
+  默认返回与 key 数量对齐的全零结果，相当于宣告操作成功。Yuanrong 等不支持
+  Mooncake session 的 backend 也会继承该行为，可能掩盖错误路由。
+- 设计来源：implementation plan 为保持旧 backend 行为不变，明确要求 no-op
+  默认实现；`0` 来自 control API 的成功码约定。但该兼容策略使 session contract
+  不闭合：`batch_put_start()` 默认抛出 `NotImplementedError`，commit/revoke 却
+  默认成功。
+- 冗余实现：`MemcacheBackend.batch_commit()` 和 `batch_revoke()` 与基类完全
+  相同，没有新增行为。Memcache 实际使用 `batch_alloc`、GVA `batch_copy`、
+  `batch_add_lease` 和 `batch_remove_lease`，不会进入 Mooncake session 路径。
+- 统一修改方案：
+  1. 将 `Backend.batch_commit()` 和 `Backend.batch_revoke()` 改为抛出
+     `NotImplementedError`，与其他不受支持的 session API 保持一致。
+  2. 删除 `MemcacheBackend` 中重复的 commit/revoke no-op override。
+  3. 仅由 `MooncakeBackend` 实现真实的 `batch_put_end` /
+     `batch_put_revoke` 委托。
+  4. 补充或调整测试，确认不支持 session 的 backend 会显式失败，而 Mooncake
+     仍返回与 key 对齐的 Client 结果。
+- 目标提交：`ffd266831 feat(kv_pool): define Mooncake layerwise backend contract`。
+- 当前状态：仅记录建议，尚未修改源码、创建 fixup 或执行 rebase。
