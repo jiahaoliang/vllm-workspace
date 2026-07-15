@@ -35,3 +35,26 @@
 - 验证：先前该回归测试在合成模块上失败；修复后运行
   `pytest --confcutdir=tests/ut/distributed/ascend_store -q tests/ut/distributed/ascend_store`
   为 `348 passed`，并通过针对修改文件的 `ruff check` 与 `git diff --check`。
+
+## 2026-07-15: `ffd266831` 的测试基建改动超出 Backend contract 范围
+
+- 检视结论：采纳（P2），等待统一修改。
+- 问题：`test_mock_deps.py` 只验证 `_mock_deps.py` 能从 fake
+  `vllm_ascend` package 导入真实 `memcache_comm_fence.py`，没有验证
+  Mooncake Backend contract 或跨测试污染场景。与之配套的
+  `_vllm_ascend_real_path` 和 fake package 搜索路径改动也不是功能需求。
+- 根因：本地 review 命令使用
+  `--confcutdir=tests/ut/distributed/ascend_store`，因此跳过原本负责加载真实
+  `vllm_ascend` 并提供 scoped patch 的 `tests/ut/conftest.py`。路径改动和
+  `test_mock_deps.py` 是为了补偿这条隔离命令，而不是为了支持
+  `MooncakeBackend`。
+- 统一修改方案：
+  1. 删除 `tests/ut/distributed/ascend_store/test_mock_deps.py`。
+  2. 撤销 `_mock_deps.py` 中 `_vllm_ascend_real_path`、fake
+     `vllm_ascend.__path__` 和相关路径重构。
+  3. 保留 `vllm_ascend.distributed.parallel_state.get_global_rank` mock；这是
+     `MooncakeBackend` 新增 import 的必要测试依赖。
+  4. 将本地 review 测试命令改为加载项目原有 `tests/ut/conftest.py`，不再使用
+     当前的 `--confcutdir`。
+- 目标提交：`ffd266831 feat(kv_pool): define Mooncake layerwise backend contract`。
+- 当前状态：仅记录建议，尚未修改源码、创建 fixup 或执行 rebase。
