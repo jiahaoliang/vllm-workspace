@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-15T15:34:48+08:00",
+  "updated_at": "2026-07-15T15:48:59+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,7 +21,7 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool",
-      "commit": "33af8c15dc684ffebd596a1d1a558bfbce8ffd35",
+      "commit": "6b7ae2a5fc6992b116888536c45342750b5c8dda",
       "purpose": "kv-pool-layerwise-reuse feature development; collaborator branch feature/new-memcache-layerwise"
     },
     "Mooncake": {

@@ -2,6 +2,15 @@
 
 本文记录已采纳的检视建议、对应修复，以及可复现的验证证据。后续检视发现继续追加到此文件。
 
+## 检视处理规则
+
+- 检视过程中只把检视建议及采纳结论记录到本文，不逐条修改源码。
+- 只有收到用户明确的“统一修改”命令后，才集中实现已采纳的检视建议。
+- 每项修改按其所属原提交分别创建 fixup 提交，提交标题严格使用
+  `#fixup <原 commit message>`（GitExtensions style）。
+- fixup 提交创建后保持独立；只有收到用户明确的“统一 rebase”命令后，才将
+  fixup 折叠到对应原提交。
+
 ## 2026-07-15: `ce51636e5` 的 `memcache_comm_fence` 测试隔离
 
 - 检视结论：采纳（P2）。
@@ -21,8 +30,8 @@
 - 回归测试：新增 `test_mock_deps_does_not_replace_memcache_comm_fence`，确认
   导入的模块来自真实 `memcache_comm_fence.py`，并暴露
   `record_attention_compute_start`。
-- 修复提交：`33af8c15dc684ffebd596a1d1a558bfbce8ffd35`
-  (`fix(kv_pool): preserve memcache test isolation`)。
+- Rebase：`#fixup feat(kv_pool): define Mooncake layerwise backend contract`
+  已折叠到 `ffd266831`（`feat(kv_pool): define Mooncake layerwise backend contract`）。
 - 验证：先前该回归测试在合成模块上失败；修复后运行
   `pytest --confcutdir=tests/ut/distributed/ascend_store -q tests/ut/distributed/ascend_store`
   为 `348 passed`，并通过针对修改文件的 `ruff check` 与 `git diff --check`。
