@@ -1,11 +1,14 @@
 # Mooncake Layerwise Metadata 检视记录
 
-本文只记录对以下提交已明确采纳的检视建议：
+本文记录对以下提交已明确采纳并完成实施的检视建议：
 
 ```text
-a0f00eec47a28c393d629c4c2122595726f058b6
+6cff8ea86158c69ee32715815af833572922e214
 feat(kv_pool): add Mooncake layerwise metadata
 ```
+
+该提交由检视时的 `a0f00eec47a28c393d629c4c2122595726f058b6`
+经 fixup rebase 重写而来。
 
 ## 检视依据与优先级
 
@@ -34,6 +37,16 @@ feat(kv_pool): add Mooncake layerwise metadata
   原提交。
 - 未采纳、仍有争议或仅用于讨论的建议不写入本文。
 
+## 执行状态
+
+- 2026-07-15：本文三项建议均已实施。
+- metadata 兼容性调整已折叠到 `6cff8ea86`。
+- scheduler/worker 同步激活及错误状态处理已折叠到 `0a9b787f5`。
+- 最终源码 HEAD 为 `1143c6470624e8e7d820a841c88117f9df36aebc`，已使用
+  `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
+- 最终 HEAD 验证：AscendStore CPU 单测 `353 passed`；Ruff、整段
+  `git diff --check` 以及六个提交的 `git show --check` 均通过。
+
 ## 检视范围
 
 - `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py`
@@ -56,7 +69,7 @@ feat(kv_pool): add Mooncake layerwise metadata
 
 ### P1：保持 `SharedBlockData` 对现有 memcache 构造点兼容
 
-- 检视结论：采纳。
+- 检视结论：已采纳并实施。
 - 问题：`a0f00eec4` 为 `SharedBlockData` 新增无默认值的必填字段
   `block_keys`，但同一提交中 `LayerBatchBuilder.build_shared()` 的既有 memcache
   构造点没有传入该字段。该提交单独运行时会抛出：
@@ -81,7 +94,7 @@ feat(kv_pool): add Mooncake layerwise metadata
 
 ### P2：区分 Mooncake `batch_is_exist` 的 miss 与错误状态
 
-- 检视结论：采纳。
+- 检视结论：已采纳并实施。
 - 问题：`_get_block_key_layerwise_hit_tokens()` 只判断结果是否为 `1`，并把其他所有
   状态都作为 prefix miss 截断。Mooncake Python API 的 contract 是
   `1=exists`、`0=not exists`、`-1=error`，因此 `-1` 会被静默吞成普通 miss。
@@ -101,7 +114,7 @@ feat(kv_pool): add Mooncake layerwise metadata
 
 ### P1：Mooncake block-key 路径必须在 scheduler 与 worker 同步激活
 
-- 检视结论：采纳。
+- 检视结论：已采纳并实施。
 - 问题：`a0f00eec4` 已让 connector 和 scheduler 将 Mooncake 识别为
   `use_block_key_layerwise`，scheduler 因而改用带 rank 后缀的 per-block key 查询；
   但该提交没有修改 `pool_worker.py`。同一历史点的 worker 仍只在 memcache 下设置
