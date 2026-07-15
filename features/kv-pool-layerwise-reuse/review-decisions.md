@@ -7,6 +7,21 @@ a0f00eec47a28c393d629c4c2122595726f058b6
 feat(kv_pool): add Mooncake layerwise metadata
 ```
 
+## 检视依据与优先级
+
+每一项代码检视必须按以下顺序查证：
+
+1. 首先参考
+   `features/kv-pool-layerwise-reuse/references/snapshots/design-mooncake-layerwise-gva-put.md`。
+   该设计文档是功能语义、架构边界和生命周期要求的最高优先级依据。
+2. 其次参考
+   `features/kv-pool-layerwise-reuse/implementation-plan.md`，用于核对实施步骤、
+   测试要求和已记录的落地决策。
+3. 当设计文档与 implementation plan 存在冲突时，以设计文档为准。不得仅因实现
+   符合 implementation plan，就忽略它与设计文档的偏差。
+4. 记录已采纳建议时，应注明对应的设计文档依据；如果涉及冲突，还应同时注明
+   implementation plan 中的冲突内容及最终采用设计文档的原因。
+
 ## 检视处理规则
 
 - 检视过程中先分析代码和验证事实；只有用户明确表示“采纳”或“纳入”后，才把
