@@ -30,8 +30,8 @@
 - 测试基建：曾新增 `test_mock_deps_does_not_replace_memcache_comm_fence`；后续
   检视确认该测试只覆盖 helper 实现细节，因此已由 fixup 删除。隔离 CPU 测试
   仍通过完整 AscendStore suite 间接覆盖真实 `memcache_comm_fence.py` 的导入。
-- Rebase：`#fixup feat(kv_pool): define Mooncake layerwise backend contract`
-  已折叠到 `ffd266831`（`feat(kv_pool): define Mooncake layerwise backend contract`）。
+- Rebase：两轮 `#fixup feat(kv_pool): define Mooncake layerwise backend contract`
+  均已折叠，当前 Backend contract 提交为 `90b16390031c5d9778bc77aafc1774f3064403e6`。
 - 验证：先前该回归测试在合成模块上失败；修复后运行
   `pytest --confcutdir=tests/ut/distributed/ascend_store -q tests/ut/distributed/ascend_store`
   为 `348 passed`，并通过针对修改文件的 `ruff check` 与 `git diff --check`。
@@ -57,8 +57,9 @@
   3. 已保留 `vllm_ascend.distributed.parallel_state.get_global_rank` mock；这是
      `MooncakeBackend` 新增 import 的必要测试依赖。
 - 目标提交：`ffd266831 feat(kv_pool): define Mooncake layerwise backend contract`。
-- Fixup：`299b873cc81dd7d713f9cb57e97637b1752cd539`
-  (`#fixup feat(kv_pool): define Mooncake layerwise backend contract`)；尚未 rebase。
+- Rebase：`299b873cc81dd7d713f9cb57e97637b1752cd539` 已折叠到
+  `90b16390031c5d9778bc77aafc1774f3064403e6`
+  (`feat(kv_pool): define Mooncake layerwise backend contract`)。
 
 ## 2026-07-15: `ffd266831` 的 commit/revoke 默认伪成功
 
@@ -82,8 +83,9 @@
   4. 补充或调整测试，确认不支持 session 的 backend 会显式失败，而 Mooncake
      仍返回与 key 对齐的 Client 结果。
 - 目标提交：`ffd266831 feat(kv_pool): define Mooncake layerwise backend contract`。
-- Fixup：`299b873cc81dd7d713f9cb57e97637b1752cd539`
-  (`#fixup feat(kv_pool): define Mooncake layerwise backend contract`)；尚未 rebase。
+- Rebase：`299b873cc81dd7d713f9cb57e97637b1752cd539` 已折叠到
+  `90b16390031c5d9778bc77aafc1774f3064403e6`
+  (`feat(kv_pool): define Mooncake layerwise backend contract`)。
 - 验证：两个新增 lifecycle 测试先因 no-op 未抛异常而失败；修改后 focused test
   通过，完整隔离 AscendStore CPU suite 为 `349 passed`，Ruff 与
   `git diff --check` 通过。
