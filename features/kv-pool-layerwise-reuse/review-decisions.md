@@ -98,3 +98,35 @@ feat(kv_pool): add Mooncake layerwise metadata
   `-1` 回归测试。
 - 验证证据：Mooncake 本地 Python API 文档明确声明
   `List[int]` 返回值为 `1=exists, 0=not exists, -1=error`。
+
+### P1：Mooncake block-key 路径必须在 scheduler 与 worker 同步激活
+
+- 检视结论：采纳。
+- 问题：`a0f00eec4` 已让 connector 和 scheduler 将 Mooncake 识别为
+  `use_block_key_layerwise`，scheduler 因而改用带 rank 后缀的 per-block key 查询；
+  但该提交没有修改 `pool_worker.py`。同一历史点的 worker 仍只在 memcache 下设置
+  `use_gva_layerwise`，Mooncake 继续选择旧的 `KVCacheStoreKeyLayer*Thread`。
+- 影响：scheduler 按每个 logical block 一个 key 判定命中，worker 却按每个 block 的
+  每一层一个 key 传输，双方使用不同对象模型。后续 `532fbc76a` 已补齐 worker 和
+  session 编排，但不能使 `a0f00eec4` 成为可独立运行的提交。
+- 设计依据：设计文档 §5.1 明确要求 connector、scheduler、worker 三处同步使用
+  `use_block_key_layerwise`；§2.3 要求 scheduler 与 saving worker 使用相同的
+  `head_or_tp_rank` key schema。
+- implementation plan：Task 2 将 `pool_worker.py` 列入修改范围，并要求
+  `make_layerwise_block_key` 与 `use_block_key_layerwise` 贯穿 connector、scheduler、
+  worker。实际拆分遗漏了 worker，属于实施偏离计划；与设计文档不存在冲突。
+- 统一修改方案：`a0f00eec4` 只保留规范 key helper 和纯 metadata 定义；将 Mooncake
+  block-key scheduler 分支、topology gate 的实际激活及其行为测试移动到 worker 的
+  session/range 路径已经同时可用的原提交。不要仅把 thread 选择提前，因为缺少 session
+  preparation 和 ranged transfer 时仍不可运行。
+- fixup 归属：移出 `a0f00eec4` 的部分使用
+  `#fixup feat(kv_pool): add Mooncake layerwise metadata`；移入 worker 编排提交的部分使用
+  `#fixup feat(kv_pool): orchestrate Mooncake layerwise sessions`。两者保持独立，等待用户
+  明确要求 rebase 后再分别折叠。
+- 测试要求：新增同一配置下 scheduler/worker gate 一致性测试，并覆盖
+  Mooncake MLA、Mooncake GQA、memcache、Yuanrong 和 `use_layerwise=false` 的 thread
+  family/path matrix。
+- 验证证据：在 `a0f00eec4` detached worktree 上，三个直接相关测试文件为
+  `143 passed`，额外 key/gate/topology/MLA 矩阵通过；静态调用链仍确认 Mooncake
+  scheduler 使用 block-key，而 worker 使用 KeyLayer thread，现有测试未覆盖该跨组件
+  不一致。
