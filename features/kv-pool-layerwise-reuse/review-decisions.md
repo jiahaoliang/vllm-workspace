@@ -4,12 +4,12 @@
 “执行状态”为准：
 
 ```text
-bd9179ae591f0b45974e0c4bc34b2bd69ba2d6cf
+59f4b2076d190da15493e76abd8d398b8eb089c2
 feat(kv_pool): add Mooncake layerwise metadata
 ```
 
 该提交由检视时的 `a0f00eec47a28c393d629c4c2122595726f058b6` 经多次
-fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572922e214`。
+fixup/rebase 重写而来；上一版 SHA 为 `bd9179ae591f0b45974e0c4bc34b2bd69ba2d6cf`。
 
 ## 检视依据与优先级
 
@@ -41,11 +41,12 @@ fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572
 ## 执行状态
 
 - 2026-07-15：本文三项建议均已实施。
-- metadata 兼容性调整已折叠到 `bd9179ae5`。
-- scheduler/worker 同步激活及错误状态处理已折叠到 `0315e79bf`。
-- 当前源码 HEAD 为 `bfe69745025c732a03dc46e81d2729a6696d2e6e`，已使用
+- 2026-07-16：Memcache block-key layerwise TP-only 建议已实施并完成 rebase。
+- metadata 兼容性和 backend-neutral topology gate 已折叠到 `59f4b2076`。
+- scheduler/worker 同步激活、错误状态处理和 Memcache gate 已折叠到 `916410252`。
+- 当前源码 HEAD 为 `7ba9937d77189e9bb5703d0bc86727f63d0fd9a9`，已使用
   `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
-- 当前 HEAD 验证：AscendStore CPU 单测 `354 passed`；Ruff、整段
+- 当前 HEAD 验证：AscendStore CPU 单测 `360 passed`；Ruff、整段
   `git diff --check` 以及五个提交的 `git show --check` 均通过。
 
 ## 检视范围
@@ -147,7 +148,7 @@ fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572
 
 ### P1：Memcache block-key layerwise 同样限制为 TP-only
 
-- 检视结论：已采纳，等待统一修改。
+- 检视结论：已采纳并实施。
 - 决策：保留 TP-only 限制，并把相同限制应用到 Memcache block-key layerwise。
   Mooncake 和 Memcache 在该路径下都必须拒绝 PP、PCP 或 DCP 大于 1；TP 大于 1
   继续受支持。未经设计和验证的拓扑不得仅以“未验证”提示后继续运行。
@@ -184,7 +185,7 @@ fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572
 - 复核基线：`repos/vllm` `v0.24.0` tag
   `ee0da84ab9e04ac7610e28580af62c365e898389`；`repos/vllm-ascend`
   `bfe69745025c732a03dc46e81d2729a6696d2e6e`。
-- 复核结论：修改方向适配最新代码，继续保持“已采纳，等待统一修改”。vLLM v0.24.0
+- 复核结论：修改方向适配最新代码，并已完成统一修改。vLLM v0.24.0
   的 `ParallelConfig` 仍提供 `pipeline_parallel_size`、
   `prefill_context_parallel_size`、`decode_context_parallel_size` 和
   `tensor_parallel_size`；这些字段均由配置模型约束为 `int >= 1`。
@@ -197,10 +198,11 @@ fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572
   Task 2 步骤 5 已扩展为 Mooncake + Memcache block-key layerwise。校验 helper 应直接
   读取 v0.24.0 的三个 size 字段；删除 `getattr(..., 1)` 和 `isinstance(size, int)` 的
   宽松路径，避免缺失或异常类型被静默当作受支持配置。
-- 仍需实施：将 helper 改为 backend-neutral 名称并在三个调用点同步替换；错误消息包含
-  backend 和全部违规维度；注释解释 key schema 缺少 PP/PCP/DCP 坐标；同步更新用户
-  文档及 Mooncake/Memcache/TP/非 block-key 测试矩阵。fixup 归属保持上文方案不变。
+- 实施结果：helper 已改为 backend-neutral 名称并在三个调用点同步替换；错误消息包含
+  backend 和全部违规维度；注释解释 key schema 缺少 PP/PCP/DCP 坐标；用户文档及
+  Mooncake/Memcache/TP/非 block-key 测试矩阵已同步。三个 fixup 已分别折叠到
+  metadata `59f4b2076`、orchestration `916410252` 和 docs `7ba9937d7`。
 - 验证边界：当前 Windows CPU venv 缺少 `vllm._C_stable_libtorch`，无法导入真实
   vLLM v0.24.0 `ParallelConfig`；上述字段和类型约束由 tag 源码静态核对。现有
-  AscendStore suite 使用 mock vLLM dependencies；切换 checkout 后重跑为
-  `354 passed`，但不能替代真实跨仓库集成测试。
+  AscendStore suite 使用 mock vLLM dependencies；实施并 rebase 后重跑为
+  `360 passed`，但不能替代真实跨仓库集成测试。

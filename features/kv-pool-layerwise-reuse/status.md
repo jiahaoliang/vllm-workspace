@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`bfe69745025c732a03dc46e81d2729a6696d2e6e`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`7ba9937d77189e9bb5703d0bc86727f63d0fd9a9`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` (WIP)
 
@@ -23,3 +23,5 @@ Current Phase: source implementation complete
 - Updated `repos/vllm` to the official v0.24.0 tag `ee0da84ab9e04ac7610e28580af62c365e898389` and re-reviewed the pending Memcache TP-only plan against that source plus vLLM Ascend `bfe697450`. The plan remains applicable with a stricter direct-field validation and Mooncake/Memcache documentation alignment.
 - The Windows CPU venv cannot import the real vLLM v0.24.0 package because `vllm._C_stable_libtorch` is unavailable. The baseline review is source-backed, while real cross-repo integration remains pending.
 - After switching the checkout, the isolated mock-based AscendStore suite still passed `354` tests.
+- Implemented the accepted Memcache TP-only decision and folded the metadata, orchestration, and documentation fixups into the five review commits. Mooncake and Memcache block-key layerwise now reject PP/PCP/DCP greater than one, while TP and non-block-key paths retain their prior behavior.
+- On final rewritten HEAD `7ba9937d77189e9bb5703d0bc86727f63d0fd9a9`, the isolated AscendStore suite passed `360` tests; focused Ruff, full-range `git diff --check`, and `git show --check` for all five commits passed.
