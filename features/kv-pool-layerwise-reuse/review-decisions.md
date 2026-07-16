@@ -1,14 +1,15 @@
 # Mooncake Layerwise Metadata 检视记录
 
-本文记录对以下提交已明确采纳并完成实施的检视建议：
+本文记录对以下提交已明确采纳的检视建议；各项是否已实施以对应的检视结论和
+“执行状态”为准：
 
 ```text
-6cff8ea86158c69ee32715815af833572922e214
+bd9179ae591f0b45974e0c4bc34b2bd69ba2d6cf
 feat(kv_pool): add Mooncake layerwise metadata
 ```
 
-该提交由检视时的 `a0f00eec47a28c393d629c4c2122595726f058b6`
-经 fixup rebase 重写而来。
+该提交由检视时的 `a0f00eec47a28c393d629c4c2122595726f058b6` 经多次
+fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572922e214`。
 
 ## 检视依据与优先级
 
@@ -40,12 +41,12 @@ feat(kv_pool): add Mooncake layerwise metadata
 ## 执行状态
 
 - 2026-07-15：本文三项建议均已实施。
-- metadata 兼容性调整已折叠到 `6cff8ea86`。
-- scheduler/worker 同步激活及错误状态处理已折叠到 `0a9b787f5`。
-- 最终源码 HEAD 为 `1143c6470624e8e7d820a841c88117f9df36aebc`，已使用
+- metadata 兼容性调整已折叠到 `bd9179ae5`。
+- scheduler/worker 同步激活及错误状态处理已折叠到 `0315e79bf`。
+- 当前源码 HEAD 为 `bfe69745025c732a03dc46e81d2729a6696d2e6e`，已使用
   `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
-- 最终 HEAD 验证：AscendStore CPU 单测 `353 passed`；Ruff、整段
-  `git diff --check` 以及六个提交的 `git show --check` 均通过。
+- 当前 HEAD 验证：AscendStore CPU 单测 `354 passed`；Ruff、整段
+  `git diff --check` 以及五个提交的 `git show --check` 均通过。
 
 ## 检视范围
 
@@ -143,3 +144,37 @@ feat(kv_pool): add Mooncake layerwise metadata
   `143 passed`，额外 key/gate/topology/MLA 矩阵通过；静态调用链仍确认 Mooncake
   scheduler 使用 block-key，而 worker 使用 KeyLayer thread，现有测试未覆盖该跨组件
   不一致。
+
+### P1：Memcache block-key layerwise 同样限制为 TP-only
+
+- 检视结论：已采纳，等待统一修改。
+- 决策：保留 TP-only 限制，并把相同限制应用到 Memcache block-key layerwise。
+  Mooncake 和 Memcache 在该路径下都必须拒绝 PP、PCP 或 DCP 大于 1；TP 大于 1
+  继续受支持。未经设计和验证的拓扑不得仅以“未验证”提示后继续运行。
+- 背景：两种 backend 的 block-key layerwise 都使用
+  `make_layerwise_block_key()`，当前规范 key 只有
+  `model@block_hash_or_tail@head_or_tp_rank`，没有 `pp_rank`、`pcp_rank` 或
+  `dcp_rank`。通用 `PoolKey` 虽然包含这些并行坐标，但该简化 block-key 路径没有
+  使用 `PoolKey.to_string()`，因此不能依赖通用 key schema 避免冲突。
+- 风险：PP stage 可能用相同 key 表示不同 layer 范围；PCP/DCP rank 可能用相同 key
+  表示不同 context/KV 分片。继续启动可能导致对象冲突、错误 COMPLETE 判定或错误
+  prefix 命中，因此应在 connector、scheduler 和 worker 初始化阶段快速失败。
+- 设计与计划依据：最高优先级设计文档 §2.3 定义了不含 PP/PCP/DCP 坐标的 block-key
+  schema，但没有明确规定 TP-only。implementation plan D04 和 Task 2 步骤 5 明确记录
+  了 TP-only fail-fast，但原范围仅写 Mooncake；本决定将该安全边界扩展到使用同一 key
+  schema 的 Memcache，属于用户明确批准的范围扩展。
+- 统一修改方案：将 `validate_mooncake_block_key_layerwise_topology()` 重命名为 backend
+  中立的 `validate_block_key_layerwise_topology()`，对 Mooncake 和 Memcache 的
+  block-key layerwise 生效。代码注释必须说明限制来自规范 key 未编码 PP/PCP/DCP
+  坐标，不能只复述条件本身；错误消息应包含 backend 名和全部不支持的维度。
+- 兼容边界：不影响 `use_layerwise=false`、Yuanrong、其他 backend 和 TP 大于 1；不把
+  此限制扩展到非 block-key 路径。
+- fixup 归属：helper 重命名、校验逻辑和直接单测归入
+  `#fixup feat(kv_pool): add Mooncake layerwise metadata`；connector、scheduler、worker
+  调用点及路径测试归入
+  `#fixup feat(kv_pool): orchestrate Mooncake layerwise sessions`；用户文档中的拓扑限制
+  同步归入 `#fixup docs(kv_pool): document Mooncake layerwise backend`。保持独立，等待
+  用户明确要求统一修改和 rebase。
+- 测试要求：分别覆盖 Mooncake 和 Memcache 的 PP、PCP、DCP 拒绝；覆盖 TP 大于 1
+  允许；覆盖非 layerwise 与 Yuanrong 不受影响；确认 connector、scheduler、worker
+  使用一致的 gate。
