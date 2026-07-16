@@ -178,3 +178,29 @@ fixup/rebase 重写而来；上一版 SHA 为 `6cff8ea86158c69ee32715815af833572
 - 测试要求：分别覆盖 Mooncake 和 Memcache 的 PP、PCP、DCP 拒绝；覆盖 TP 大于 1
   允许；覆盖非 layerwise 与 Yuanrong 不受影响；确认 connector、scheduler、worker
   使用一致的 gate。
+
+#### vLLM v0.24.0 基线复核
+
+- 复核基线：`repos/vllm` `v0.24.0` tag
+  `ee0da84ab9e04ac7610e28580af62c365e898389`；`repos/vllm-ascend`
+  `bfe69745025c732a03dc46e81d2729a6696d2e6e`。
+- 复核结论：修改方向适配最新代码，继续保持“已采纳，等待统一修改”。vLLM v0.24.0
+  的 `ParallelConfig` 仍提供 `pipeline_parallel_size`、
+  `prefill_context_parallel_size`、`decode_context_parallel_size` 和
+  `tensor_parallel_size`；这些字段均由配置模型约束为 `int >= 1`。
+- 当前实现核对：`_BLOCK_KEY_LAYERWISE_BACKENDS` 仍为
+  `{"memcache", "mooncake"}`；scheduler 与 worker 仍使用只包含
+  `model@block_hash_or_tail@head_or_tp_rank` 的 `make_layerwise_block_key()`；通用
+  `PoolKey` 中的 PP/PCP/DCP 坐标仍未进入这条简化路径。因此 Memcache 与 Mooncake
+  使用同一 TP-only gate 的依据没有变化。
+- 计划调整：基线已从 vLLM v0.23.0 更新为 v0.24.0，implementation plan D04 和
+  Task 2 步骤 5 已扩展为 Mooncake + Memcache block-key layerwise。校验 helper 应直接
+  读取 v0.24.0 的三个 size 字段；删除 `getattr(..., 1)` 和 `isinstance(size, int)` 的
+  宽松路径，避免缺失或异常类型被静默当作受支持配置。
+- 仍需实施：将 helper 改为 backend-neutral 名称并在三个调用点同步替换；错误消息包含
+  backend 和全部违规维度；注释解释 key schema 缺少 PP/PCP/DCP 坐标；同步更新用户
+  文档及 Mooncake/Memcache/TP/非 block-key 测试矩阵。fixup 归属保持上文方案不变。
+- 验证边界：当前 Windows CPU venv 缺少 `vllm._C_stable_libtorch`，无法导入真实
+  vLLM v0.24.0 `ParallelConfig`；上述字段和类型约束由 tag 源码静态核对。现有
+  AscendStore suite 使用 mock vLLM dependencies；切换 checkout 后重跑为
+  `354 passed`，但不能替代真实跨仓库集成测试。

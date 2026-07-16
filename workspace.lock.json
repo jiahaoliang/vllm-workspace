@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-16T11:17:53+08:00",
+  "updated_at": "2026-07-16T11:59:26+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -9,9 +9,9 @@
         "upstream": "https://github.com/vllm-project/vllm.git",
         "collaborator": "https://github.com/zhangsicheng5/vllm.git"
       },
-      "branch": "tag:v0.23.0",
-      "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
-      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.20.2"
+      "branch": "tag:v0.24.0",
+      "commit": "ee0da84ab9e04ac7610e28580af62c365e898389",
+      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.24.0"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
