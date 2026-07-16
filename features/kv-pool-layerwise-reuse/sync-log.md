@@ -49,6 +49,9 @@
 
 ## 2026-07-16
 
+- Replaced monolithic range-transfer commit `87c31d1e8` with four review-sized commits: `2b2ae920e` (key-major range batches), `29f2a8e69` (exception-safe LayerThread finalization), `ff2557f74` (ranged save), and `89b1a88ea` (ranged load). The accepted request-accounting and save-key deduplication fixes were implemented test-first and folded into their owning commits.
+- Replayed orchestration as `552541f94` and documentation as `6a825ca54`; force-pushed final source HEAD `6a825ca54761131c9b73c8871a886381c49513d8` with an exact lease against prior remote `a018212f32b057f1bdd75b4cbaccd2b132d2e30b`.
+- Verified the rewritten source with `361 passed`; focused Ruff, full-range `git diff --check`, and all 8 feature commit checks passed.
 - Fetched the force-updated `ader47/vllm-ascend` `feature/new-memcache-layerwise` branch at `6d0b2b70c33f70ca8d708870668514afafd1cb7e`; its history is not a fast-forward from the previous captured head `5875ff0b366690c64324d71b47f9409f8cd762da` and includes a refreshed layerwise base plus current main.
 - Rebased the Mooncake work with `--onto`, replaying only the local review commits above the prior collaborator head. Git dropped `1143c6470 fix(kv_pool): initialize TP mismatch config` because collaborator commit `d7affe61e` already provides the patch.
 - Adapted the Mooncake Backend contract to the new public `ensure_initialized()` method and folded the compatibility fix into rewritten Backend commit `a60c62a58`. The resulting five review commits end at `bfe69745025c732a03dc46e81d2729a6696d2e6e` and were pushed with `--force-with-lease` against prior remote HEAD `1143c6470624e8e7d820a841c88117f9df36aebc`.

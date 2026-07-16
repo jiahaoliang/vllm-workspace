@@ -1,10 +1,20 @@
 # Mooncake Layer Range Transfer 检视记录
 
-本文只记录对以下提交已明确采纳的检视建议：
+本文只记录原 range transfer 提交及其拆分提交中已明确采纳的检视建议。
+原提交：
 
 ```text
 87c31d1e8926911ea8dae92d8e0ba5f6b47ef9f1
 feat(kv_pool): add Mooncake layer range transfer
+```
+
+该提交已按职责拆分并重写为：
+
+```text
+2b2ae920e feat(kv_pool): build Mooncake layer range batches
+29f2a8e69 refactor(kv_pool): make layer transfer completion exception-safe
+ff2557f74 feat(kv_pool): add Mooncake ranged layer save
+89b1a88ea feat(kv_pool): add Mooncake ranged layer load
 ```
 
 ## 检视依据与优先级
@@ -28,19 +38,19 @@ feat(kv_pool): add Mooncake layer range transfer
   对应建议记录到本文。
 - 检视期间只记录已采纳建议，不逐条修改源码。
 - 只有收到用户明确的“统一修改”或“执行”命令后，才集中实现本文中的建议。
-- 修改创建独立 fixup commit，提交标题严格使用
-  `#fixup feat(kv_pool): add Mooncake layer range transfer`（GitExtensions style）。
+- 修改按所属拆分提交创建独立 fixup commit，提交标题严格使用
+  `#fixup + 原 commit message`（GitExtensions style）。
 - fixup commit 创建后保持独立；只有收到用户明确的 rebase 命令后，才将其折叠到
   原提交。
 - 未采纳、仍有争议或仅用于讨论的建议不写入本文。
 
 ## 执行状态
 
-- 2026-07-16：两项建议已采纳，尚未实施；等待用户统一修改命令。
-- 当前源码 HEAD 为 `a018212f32b057f1bdd75b4cbaccd2b132d2e30b`，已推送到
+- 2026-07-16：两项建议均已实施，并折叠到对应拆分提交。
+- 当前源码 HEAD 为 `6a825ca54761131c9b73c8871a886381c49513d8`，已推送到
   `origin/feature/mooncake-layerwise-kv-pool`。
-- 采纳前验证：`test_kv_transfer.py` 为 `36 passed`；Ruff 和
-  `git show --check 87c31d1e8` 通过。
+- 实施后验证：AscendStore CPU suite 为 `361 passed`；相关 Ruff、整段
+  `git diff --check` 和 8 个 feature commit 的 `git show --check` 均通过。
 - Mooncake wheel contract 与 NPU E2E 尚未验证；CPU 单测不能替代真实 ranged
   transfer 集成测试。
 
@@ -62,7 +72,7 @@ feat(kv_pool): add Mooncake layer range transfer
 
 ### P1：range save 异常路径必须平衡 request 完成计数
 
-- 检视结论：已采纳，尚未实施。
+- 检视结论：已采纳并实施。
 - 问题：`KVCacheStoreLayerSendingThread._handle_range_request()` 只在正常路径调用
   `dec_stored_request()` 和 `try_finish_and_delete_stored_request()`。当
   `build_addrs()`、同步 event、`batch_copy_put()` 或 batch result shape validation
@@ -81,6 +91,8 @@ feat(kv_pool): add Mooncake layer range transfer
   原始 `LayerTransferTask.block_ranges` 获取 request ID，确保 probe 尚未生成
   `LayerRangeReqMeta` 时也能收尾。每次 `add_stored_request()` 必须恰好对应一次
   decrement；失败只表示传输工作结束，不得因此发布成功的 `BlockStored` 事件。
+- 实施归属：通用 finalization 与异常测试折叠到 `29f2a8e69`；ranged save 的 malformed
+  result、revoke 和 tracker 测试折叠到 `ff2557f74`。
 - 新增测试：分别注入 `build_addrs` exception、`batch_copy_put` exception、过短、过长和
   非整数 result；断言 `task_done()` 与 layer event 各完成一次、`stored_requests` 不残留、
   request 进入 transfer-finished 集合，并确认没有发布成功的 `BlockStored` 事件。
@@ -89,7 +101,7 @@ feat(kv_pool): add Mooncake layer range transfer
 
 ### P2：save key-major batch 必须按 object key 稳定去重
 
-- 检视结论：已采纳，尚未实施。
+- 检视结论：已采纳并实施。
 - 问题：`LayerBatchBuilder._build_key_major_shared()` 会直接累计同一 batch 内所有
   request 的 save key；SendingThread 虽用 `set` 跟踪 active key，随后仍按原始
   `req_meta.keys` 构造 `active_indices`，因此重复 key 会继续进入 ranged write 和最终
@@ -107,6 +119,9 @@ feat(kv_pool): add Mooncake layer range transfer
 - 统一修改方案：仅对 save shared batch 按 object key 保持首次出现顺序去重，并保留与
   所选 key 对应的 block ID。load 侧不得按 key 简单去重，因为同一远端 object 可能需要
   复制到多个不同的本地 block ID。
+- 实施归属：key-major builder 基础折叠到 `2b2ae920e`；save-only stable dedupe 与
+  write/commit 测试折叠到 `ff2557f74`；重复 remote key 的 load 对照测试折叠到
+  `89b1a88ea`。
 - 新增测试：构造两个 request 共享同一 full-block key，断言 save 的
   `SharedBlockData`、`batch_copy_put` 和 `batch_commit` 均只包含一次该 key；另加 load
   对照测试，确认相同远端 key 仍能复制到两个本地 block，避免误把 save 去重扩展到 load。
