@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`7ba9937d77189e9bb5703d0bc86727f63d0fd9a9`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`a018212f32b057f1bdd75b4cbaccd2b132d2e30b`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` (WIP)
 
@@ -25,3 +25,5 @@ Current Phase: source implementation complete
 - After switching the checkout, the isolated mock-based AscendStore suite still passed `354` tests.
 - Implemented the accepted Memcache TP-only decision and folded the metadata, orchestration, and documentation fixups into the five review commits. Mooncake and Memcache block-key layerwise now reject PP/PCP/DCP greater than one, while TP and non-block-key paths retain their prior behavior.
 - On final rewritten HEAD `7ba9937d77189e9bb5703d0bc86727f63d0fd9a9`, the isolated AscendStore suite passed `360` tests; focused Ruff, full-range `git diff --check`, and `git show --check` for all five commits passed.
+- Replaced the topology error labels `PP`/`PCP`/`DCP` with the full `ParallelConfig` field names, folded the test and implementation fixups into the metadata and orchestration commits, and rebased onto the latest fetched collaborator head `6d0b2b70c33f70ca8d708870668514afafd1cb7e`.
+- On final rewritten HEAD `a018212f32b057f1bdd75b4cbaccd2b132d2e30b`, the isolated AscendStore suite passed `360` tests; focused Ruff, full-range `git diff --check`, and `git show --check` for all five commits passed.
