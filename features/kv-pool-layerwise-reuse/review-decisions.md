@@ -72,7 +72,7 @@ refactor(kv_pool): make layer transfer completion exception-safe
 
 ### P1：将异常失败块连接到 `KVPoolWorker` 的共享 invalid-block 状态
 
-- 检视结论：已采纳，尚未修改源码。
+- 检视结论：已采纳并实施，fixup commit 保持独立，尚未 rebase。
 - 问题：`KVCacheStoreLayerRecvingThread` 在 load exception 时会把相关本地 block
   写入 `_invalid_block_ids`，但其 constructor 允许不传 `invalid_block_ids` 和 lock，
   并静默创建 receiver 私有 set/lock。本提交时点的生产 `KVPoolWorker` 构造调用没有
@@ -98,10 +98,14 @@ refactor(kv_pool): make layer transfer completion exception-safe
      应从后续提交移到本提交，rebase 时避免重复添加或改变后续提交的职责边界。
 - 实施归属：
   `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
+- 实施结果：`c2c817574 #fixup refactor(kv_pool): make layer transfer completion
+  exception-safe` 将 Worker 的共享 invalid-block set/lock 作为 Layer receiver 的必需
+  keyword-only 依赖接入生产构造路径，并新增真实 Worker thread-construction 测试，验证
+  receiver 与 Worker 共享同一状态且 Worker API 能读取 receiver 报告的失败 block。
 
 ### P2：保留原有传输语义注释，并为异常收尾补充必要注释
 
-- 检视结论：已采纳，尚未修改源码。
+- 检视结论：已采纳并实施，fixup commit 保持独立，尚未 rebase。
 - 问题：本提交将 save/load handler 包入 `try/except/finally` 时，删除了原代码中
   关于 `put_step` 保存 rank、完整 K/V blob、所有 rank 完整读取，以及最终 layer
   释放 read lease 的注释；新增的 exception finalization helper 和 invalid-block
@@ -126,3 +130,18 @@ refactor(kv_pool): make layer transfer completion exception-safe
      执行，以避免错误命中、`queue.join()` 或 layer wait 永久阻塞。
 - 实施归属：
   `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
+- 实施结果：同一 fixup 恢复了 save rank、完整 K/V blob、所有 rank 完整读取和最终
+  layer lease release 的原有语义注释，将硬编码 “27 layers” 改为 “all layers”，并补充
+  exception finalization 与 invalid-block 发布顺序的原因。
+
+## 实施验证
+
+- TDD RED：新增生产 wiring 测试最初以
+  `recv_thread._invalid_block_ids is not worker._invalid_block_ids` 失败。
+- TDD GREEN：修复后新增测试通过；整个 `test_kv_transfer.py` 加该生产 wiring 测试共
+  `32 passed`。
+- AscendStore CPU suite：精确排除已确认的既有
+  `TestKVPoolWorkerRegisterAndTransfer.test_wait_for_save` 后，其余 `339 passed`；该既有测试
+  在修改前后均因 CPU PyTorch 没有 `torch.npu` 而失败，不属于本 fixup。
+- Ruff check 和 `git diff --check` 通过。目标 commit 的现有文件不完全符合当前全文件
+  Ruff formatter，因此只对改动区间检查并避免引入无关的大面积格式化。
