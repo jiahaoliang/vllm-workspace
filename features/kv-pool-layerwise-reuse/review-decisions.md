@@ -68,4 +68,30 @@ refactor(kv_pool): make layer transfer completion exception-safe
 
 ## 已采纳建议
 
-暂无。等待用户明确采纳本轮检视发现后记录。
+### P2：保留原有传输语义注释，并为异常收尾补充必要注释
+
+- 检视结论：已采纳，尚未修改源码。
+- 问题：本提交将 save/load handler 包入 `try/except/finally` 时，删除了原代码中
+  关于 `put_step` 保存 rank、完整 K/V blob、所有 rank 完整读取，以及最终 layer
+  释放 read lease 的注释；新增的 exception finalization helper 和 invalid-block
+  标记顺序也没有注释说明。
+- 影响：重构后的控制流明显变长，但关键的 rank 读写职责和 lease 生命周期依据反而
+  消失。后续维护者难以判断 full K/V copy 是有意设计还是遗漏切片，也可能把
+  invalid-block 标记、layer event、`task_done()` 的顺序当作普通清理代码调整，重新引入
+  错误命中或等待死锁。
+- 设计依据：设计文档 §5.5 将 `kv_transfer` 定义为按层执行 copy、在最终 layer 完成
+  write/read 生命周期，并要求各层传输保持正确的本地 buffer 语义；§7 要求 load 失败
+  由 vLLM fallback 重算。implementation plan D02 和 Task 4 步骤 6 进一步明确：发生
+  load exception 时必须先标记失败 block，并且无论异常与否都必须设置 layer event、
+  恰好调用一次 `request_queue.task_done()`。
+- 统一修改方案：
+  1. 在 save copy 前恢复 `tp_rank % put_step == 0` 的保存职责，以及保存 rank 写入完整
+     K/V blob 的说明。
+  2. 在 load copy 前恢复所有 rank 读取完整 K/V blob、不做 rank slicing 的说明。
+  3. 在最终 layer 的 lease release 前保留 lease 覆盖整个 layerwise load 生命周期的
+     说明，但将原注释中硬编码的 “27 layers” 改为与模型无关的 “all layers”。
+  4. 在异常路径或 finalization helper 附近添加简短注释，说明 load 必须在释放 layer
+     event 前标记 invalid block，且 `task_done()` 与 finished event 必须在所有退出路径
+     执行，以避免错误命中、`queue.join()` 或 layer wait 永久阻塞。
+- 实施归属：
+  `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
