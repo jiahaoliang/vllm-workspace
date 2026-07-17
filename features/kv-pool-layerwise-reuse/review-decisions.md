@@ -3,7 +3,7 @@
 本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-bfdc0984544b27a79d26fb3f84e0f181f02b2424
+e0bec4ca4184f9f12d5682de355cabad62e7f9a5
 refactor(kv_pool): make layer transfer completion exception-safe
 ```
 
@@ -72,7 +72,7 @@ refactor(kv_pool): make layer transfer completion exception-safe
 
 ### P1：将异常失败块连接到 `KVPoolWorker` 的共享 invalid-block 状态
 
-- 检视结论：已采纳并实施，fixup commit 保持独立，尚未 rebase。
+- 检视结论：已采纳并实施，fixup 已折叠到原提交。
 - 问题：`KVCacheStoreLayerRecvingThread` 在 load exception 时会把相关本地 block
   写入 `_invalid_block_ids`，但其 constructor 允许不传 `invalid_block_ids` 和 lock，
   并静默创建 receiver 私有 set/lock。本提交时点的生产 `KVPoolWorker` 构造调用没有
@@ -97,15 +97,16 @@ refactor(kv_pool): make layer transfer completion exception-safe
   4. 后续 `feat(kv_pool): orchestrate Mooncake layerwise sessions` 中已有的同类 wiring
      应从后续提交移到本提交，rebase 时避免重复添加或改变后续提交的职责边界。
 - 实施归属：
-  `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
-- 实施结果：`c2c817574 #fixup refactor(kv_pool): make layer transfer completion
-  exception-safe` 将 Worker 的共享 invalid-block set/lock 作为 Layer receiver 的必需
+  `e0bec4ca4 refactor(kv_pool): make layer transfer completion exception-safe`。
+- 实施结果：原 fixup `c2c817574 #fixup refactor(kv_pool): make layer transfer
+  completion exception-safe` 已折叠到 `e0bec4ca4`。该提交将 Worker 的共享
+  invalid-block set/lock 作为 Layer receiver 的必需
   keyword-only 依赖接入生产构造路径，并新增真实 Worker thread-construction 测试，验证
   receiver 与 Worker 共享同一状态且 Worker API 能读取 receiver 报告的失败 block。
 
 ### P2：保留原有传输语义注释，并为异常收尾补充必要注释
 
-- 检视结论：已采纳并实施，fixup commit 保持独立，尚未 rebase。
+- 检视结论：已采纳并实施，fixup 已折叠到原提交。
 - 问题：本提交将 save/load handler 包入 `try/except/finally` 时，删除了原代码中
   关于 `put_step` 保存 rank、完整 K/V blob、所有 rank 完整读取，以及最终 layer
   释放 read lease 的注释；新增的 exception finalization helper 和 invalid-block
@@ -129,7 +130,7 @@ refactor(kv_pool): make layer transfer completion exception-safe
      event 前标记 invalid block，且 `task_done()` 与 finished event 必须在所有退出路径
      执行，以避免错误命中、`queue.join()` 或 layer wait 永久阻塞。
 - 实施归属：
-  `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
+  `e0bec4ca4 refactor(kv_pool): make layer transfer completion exception-safe`。
 - 实施结果：同一 fixup 恢复了 save rank、完整 K/V blob、所有 rank 完整读取和最终
   layer lease release 的原有语义注释，将硬编码 “27 layers” 改为 “all layers”，并补充
   exception finalization 与 invalid-block 发布顺序的原因。
@@ -145,3 +146,15 @@ refactor(kv_pool): make layer transfer completion exception-safe
   在修改前后均因 CPU PyTorch 没有 `torch.npu` 而失败，不属于本 fixup。
 - Ruff check 和 `git diff --check` 通过。目标 commit 的现有文件不完全符合当前全文件
   Ruff formatter，因此只对改动区间检查并避免引入无关的大面积格式化。
+- rebase 结果：ranged save、ranged load、orchestration 和 docs 已依次重放为
+  `e9893579a`、`ff4c810b6`、`9af376c37` 和 `1d56db71e`。ranged-load 冲突同时保留
+  key-major load/abort 状态和原 flat-GVA 注释；orchestration 仅新增
+  `load_abort_event`，invalid-block wiring 的归属已前移到 `e0bec4ca4`。临时 review
+  分支已删除。
+- rebase 后验证：完整 AscendStore CPU suite 为 `363 passed`；Ruff check、整段
+  `git diff --check`、全部 5 个重写 commit 的 `git show --check` 和 range-diff 均通过。
+  同一 Ruff formatter 对旧远端 HEAD 的三个相关文件也返回非零，因此未将既有的全文件
+  format 差异扩大为本次 rebase 的无关改动。
+- 推送结果：最终 HEAD `1d56db71e19130ddb4c22e23f21f76756c3d6295` 已使用针对旧
+  远端 `8cfd1e22f92ee1a40139ea40b487fa5001d1c81f` 的精确
+  `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
