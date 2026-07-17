@@ -1,11 +1,26 @@
-# `build Mooncake layer range batches` 检视记录
+# `make layer transfer completion exception-safe` 检视记录
 
 本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-21bd87100c925eab72ab95bf8ac1fb14a0bb7b2d
-feat(kv_pool): build Mooncake layer range batches
+bfdc0984544b27a79d26fb3f84e0f181f02b2424
+refactor(kv_pool): make layer transfer completion exception-safe
 ```
+
+## 新 commit 检视准备流程
+
+每次开始检视一个新的 commit，必须先依次完成：
+
+1. 将本文还原为只保留通用规则、当前 commit 信息、当前检视范围和空白
+   “已采纳建议”的干净状态，移除上一 commit 的范围、结论和实施记录。
+2. 在源码仓库中，从当前 feature branch 的目标 commit 建立并切换到独立的临时
+   review 分支；分支名使用 `review/<commit-topic>`，便于隔离和定位本轮检视。
+3. 依据下述优先级自行完成第一轮代码检视，逐部分向用户详细说明每个变更的作用、
+   行为影响及其设计来源，并单独列出发现；只有用户明确表示“采纳”或“纳入”后，
+   才将对应建议写入本文。
+
+临时 review 分支只用于检视和后续显式要求的 fixup，不更新
+`workspace.lock.json`；结束本轮检视或切换到下一 commit 时，按用户指令清理。
 
 ## 检视依据与优先级
 
@@ -29,7 +44,8 @@ feat(kv_pool): build Mooncake layer range batches
 - 检视期间只记录已采纳建议，不逐条修改源码。
 - 只有收到用户明确的“统一修改”或“执行”命令后，才集中实现本文中的建议。
 - 修改创建独立 fixup commit，提交标题严格使用
-  `#fixup feat(kv_pool): build Mooncake layer range batches`（GitExtensions style）。
+  `#fixup refactor(kv_pool): make layer transfer completion exception-safe`
+  （GitExtensions style）。
 - fixup commit 创建后保持独立；只有收到用户明确的 rebase 命令后，才将其折叠到
   原提交。
 - 未采纳、仍有争议或仅用于讨论的建议不写入本文。
@@ -41,46 +57,15 @@ feat(kv_pool): build Mooncake layer range batches
 
 重点检视：
 
-1. `SharedBlockData` 是否明确区分 Memcache flat-GVA metadata 与 Mooncake
-   key-major metadata，并保持原有 Memcache 路径行为。
-2. `LayerBatchBuilder` 是否始终保持 object key、local block ID、buffer address、
-   transfer size 和 object offset 对齐。
-3. `None` key 的过滤是否同步作用于所有对齐字段，不会造成 key 与 block 错配。
-4. K/V 等多段 cache buffer 是否使用正确的本地 stride、layer 内偏移和
-   `layer_id * page_size` 对象偏移。
-5. save batch 与 load batch 是否保留各自需要的重复 key 语义，不会错误丢失目标
-   local block。
-6. 新增测试是否覆盖 key-major batch 的结构、跨 layer offset、过滤与多 buffer
-   对齐，而不是只验证理想的单 key、单 buffer 路径。
+1. transfer completion 是否在成功、返回失败码和抛出异常三条路径上都完成统一的
+   状态收敛。
+2. 异常清理是否保留原始异常，不因 cleanup/finalization 的次生异常改变根因。
+3. save 与 load 的完成语义是否保持对称，并保持 Memcache、Yuanrong 和非
+   layerwise 路径的既有行为。
+4. completion hook 的调用次数、调用顺序及 batch 对齐约束是否明确且可测试。
+5. 新增测试是否覆盖同步异常、异步结果异常、失败结果和正常完成，而不只覆盖理想
+   路径。
 
 ## 已采纳建议
 
-### P2：补充同一 shared metadata 的跨层 range-batch 测试
-
-- 检视结论：已采纳并实施，fixup commit 已折叠到原提交。
-- 问题：implementation plan 要求 key-major metadata 与 offset 测试“至少覆盖
-  两层”，但提交中的 `_build()` 将 `LayerTransferTask.layer_id` 固定为 `2`，新增的
-  key-major 正常路径与 `None` key 过滤测试均只验证 layer 2。
-- 影响：现有测试验证了非零 object offset，却没有证明同一份跨层不变的
-  `SharedBlockData` 能在不同 `layer_id` 下生成对应层的 local buffer address、size 和
-  object offset。若后续改动错误地复用某一层的 base address、stride 或 offset，当前
-  测试不一定能发现。
-- 设计依据：设计文档 §5.5 规定 `build_shared` 预计算跨层不变的 block metadata，
-  `build_addrs(layer_id)` 再按层计算本地 address/size；Mooncake object offset 必须为
-  `layer_id * page_size_bytes + layer_inner_offset[j]`。
-- implementation plan：Task 3 步骤 1 明确要求两个 block、每层两个 cache segment，
-  并至少覆盖两层；当前测试只覆盖其中的 layer 2，未完整满足该测试要求。
-- 统一修改方案：构造一次 key-major `SharedBlockData`，至少分别调用
-  `build_addrs(shared, 0)` 与 `build_addrs(shared, 2)`；断言两层保持相同的 key/block
-  对齐和 `[2][2]` 嵌套 shape，同时分别得到各层正确的 local buffer address 和
-  object offset（layer 0 为 `[0, 64]`，layer 2 为 `[192, 256]`）。保留现有
-  `None` key 同步过滤测试。
-- 实施归属：`21bd87100 feat(kv_pool): build Mooncake layer range batches`。
-- 实施结果：原 fixup `6bb780019` 已折叠；新增同一份 `SharedBlockData` 分别构建
-  layer 0 与 layer 2 range batch 的测试，验证两层 key/block/size 对齐，以及各自的
-  local buffer address 和 object offset。
-- rebase 结果：后续提交已重放，feature 分支最终 HEAD 为 `8cfd1e22f`，并已用精确
-  `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
-- 验证结果：完整 AscendStore CPU suite 为 `362 passed`；相关 Ruff check、Ruff
-  format check、整段 `git diff --check` 和全部 6 个重写 commit 的
-  `git show --check` 均通过；range-diff 证明后续 5 个 commit 内容未漂移。
+暂无。等待用户明确采纳本轮检视发现后记录。
