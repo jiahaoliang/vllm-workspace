@@ -53,7 +53,9 @@ refactor(kv_pool): make layer transfer completion exception-safe
 ## 检视范围
 
 - `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py`
+- `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py`
 - `tests/ut/distributed/ascend_store/test_kv_transfer.py`
+- `tests/ut/distributed/ascend_store/test_pool_worker.py`
 
 重点检视：
 
@@ -67,6 +69,35 @@ refactor(kv_pool): make layer transfer completion exception-safe
    路径。
 
 ## 已采纳建议
+
+### P1：将异常失败块连接到 `KVPoolWorker` 的共享 invalid-block 状态
+
+- 检视结论：已采纳，尚未修改源码。
+- 问题：`KVCacheStoreLayerRecvingThread` 在 load exception 时会把相关本地 block
+  写入 `_invalid_block_ids`，但其 constructor 允许不传 `invalid_block_ids` 和 lock，
+  并静默创建 receiver 私有 set/lock。本提交时点的生产 `KVPoolWorker` 构造调用没有
+  传入 Worker 已有的共享 `_invalid_block_ids` 和 `_invalid_block_ids_lock`；新增单测却
+  显式传入测试 set，因此没有覆盖生产 wiring 缺失。
+- 影响：load exception 后 layer event 和 queue accounting 会正常收尾，不再死锁，但
+  `KVPoolWorker.get_block_ids_with_load_errors()` 读不到 receiver 私有 set 中的失败 block。
+  vLLM 因而无法按既有 `kv_load_failure_policy` 对这些 block 执行重计算，可能把未成功
+  加载的 KV block 当作可用数据。
+- 设计依据：设计文档 §7 规定 get-start miss、lease 过期及 ranged load 失败必须按
+  load failure 处理，并由 vLLM fallback 重算。implementation plan D02 要求复用标准
+  vLLM load-failure policy；Task 4 步骤 5、6 明确要求 RecvingThread 向 Worker 报告
+  invalid block，并在异常时先标记剩余 active block，再释放 layer event。
+- 统一修改方案：
+  1. 在 `KVPoolWorker` 创建 `KVCacheStoreLayerRecvingThread` 时传入
+     `self._invalid_block_ids` 和 `self._invalid_block_ids_lock`。
+  2. 取消 Layer receiver 对这两个依赖的静默私有 fallback，将它们改为必需依赖或在
+     缺失时明确失败，防止未来再次产生“thread 内已记录、Worker 不可见”的状态分叉。
+  3. 增加生产构造路径测试，验证 receiver 与 Worker 持有同一个 set 和同一把 lock；
+     注入 layer load exception 后，通过 `get_block_ids_with_load_errors()` 断言 Worker
+     能取得准确 block ID，而不只直接检查传给 receiver 的测试 set。
+  4. 后续 `feat(kv_pool): orchestrate Mooncake layerwise sessions` 中已有的同类 wiring
+     应从后续提交移到本提交，rebase 时避免重复添加或改变后续提交的职责边界。
+- 实施归属：
+  `bfdc09845 refactor(kv_pool): make layer transfer completion exception-safe`。
 
 ### P2：保留原有传输语义注释，并为异常收尾补充必要注释
 
