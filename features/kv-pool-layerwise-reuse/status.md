@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`6a825ca54761131c9b73c8871a886381c49513d8`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`8cfd1e22f92ee1a40139ea40b487fa5001d1c81f`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` (WIP)
 
@@ -15,6 +15,9 @@ Current Phase: source implementation complete
 
 ## Latest Validation
 
+- Folded the accepted cross-layer range-batch test fixup into rewritten builder commit `21bd87100`, then replayed the five later commits without conflicts. Range-diff showed all five later patches unchanged.
+- Force-pushed final source HEAD `8cfd1e22f92ee1a40139ea40b487fa5001d1c81f` with an exact `--force-with-lease` against prior remote `6a825ca54761131c9b73c8871a886381c49513d8`.
+- On the rewritten HEAD, the complete isolated AscendStore CPU suite passed `362` tests; focused Ruff, format check, full-range `git diff --check`, and all six rewritten commit checks passed.
 - Split the former `87c31d1e8` range-transfer commit into four review-sized commits: range batch builder `2b2ae920e`, exception-safe finalization `29f2a8e69`, ranged save `ff2557f74`, and ranged load `89b1a88ea`. The accepted request-accounting and save-key deduplication findings are folded into those commits.
 - Replayed session orchestration as `552541f94` and documentation as `6a825ca54`, then force-pushed the rewritten source history with an exact `--force-with-lease` against `a018212f3`.
 - On final HEAD `6a825ca54761131c9b73c8871a886381c49513d8`, the isolated AscendStore suite passed `361` tests; focused Ruff, full-range `git diff --check`, and `git show --check` for all 8 feature commits passed.

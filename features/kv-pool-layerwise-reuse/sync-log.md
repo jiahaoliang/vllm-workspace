@@ -67,3 +67,9 @@
 - Replaced abbreviated topology error labels with `pipeline_parallel_size`, `prefill_context_parallel_size`, and `decode_context_parallel_size`, then folded the GitExtensions-style fixups into rewritten metadata commit `e629ef6b6` and orchestration commit `d05a32570`.
 - Rebased the five review commits onto the latest fetched `ader47/feature/new-memcache-layerwise` head `6d0b2b70c33f70ca8d708870668514afafd1cb7e` and force-pushed final HEAD `a018212f32b057f1bdd75b4cbaccd2b132d2e30b` with `--force-with-lease`.
 - Verified the rewritten source with `360 passed`; focused Ruff, full-range `git diff --check`, and `git show --check` for all five commits passed.
+
+## 2026-07-17
+
+- Folded `6bb780019 #fixup feat(kv_pool): build Mooncake layer range batches` into rewritten range-batch builder commit `21bd87100`, adding a test that reuses one `SharedBlockData` across layer 0 and layer 2.
+- Replayed the next five review commits without conflicts and force-pushed final source HEAD `8cfd1e22f92ee1a40139ea40b487fa5001d1c81f` with an exact `--force-with-lease` against prior remote `6a825ca54761131c9b73c8871a886381c49513d8`.
+- Verified `362 passed`; focused Ruff and format checks, full-range `git diff --check`, all six rewritten commit checks, and range-diff passed. The temporary `review/mooncake-layer-range-batches` branch was deleted.

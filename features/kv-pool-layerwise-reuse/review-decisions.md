@@ -1,20 +1,10 @@
-# Mooncake Layer Range Transfer 检视记录
+# `build Mooncake layer range batches` 检视记录
 
-本文只记录原 range transfer 提交及其拆分提交中已明确采纳的检视建议。
-原提交：
-
-```text
-87c31d1e8926911ea8dae92d8e0ba5f6b47ef9f1
-feat(kv_pool): add Mooncake layer range transfer
-```
-
-该提交已按职责拆分并重写为：
+本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-2b2ae920e feat(kv_pool): build Mooncake layer range batches
-29f2a8e69 refactor(kv_pool): make layer transfer completion exception-safe
-ff2557f74 feat(kv_pool): add Mooncake ranged layer save
-89b1a88ea feat(kv_pool): add Mooncake ranged layer load
+21bd87100c925eab72ab95bf8ac1fb14a0bb7b2d
+feat(kv_pool): build Mooncake layer range batches
 ```
 
 ## 检视依据与优先级
@@ -38,21 +28,11 @@ ff2557f74 feat(kv_pool): add Mooncake ranged layer save
   对应建议记录到本文。
 - 检视期间只记录已采纳建议，不逐条修改源码。
 - 只有收到用户明确的“统一修改”或“执行”命令后，才集中实现本文中的建议。
-- 修改按所属拆分提交创建独立 fixup commit，提交标题严格使用
-  `#fixup + 原 commit message`（GitExtensions style）。
+- 修改创建独立 fixup commit，提交标题严格使用
+  `#fixup feat(kv_pool): build Mooncake layer range batches`（GitExtensions style）。
 - fixup commit 创建后保持独立；只有收到用户明确的 rebase 命令后，才将其折叠到
   原提交。
 - 未采纳、仍有争议或仅用于讨论的建议不写入本文。
-
-## 执行状态
-
-- 2026-07-16：两项建议均已实施，并折叠到对应拆分提交。
-- 当前源码 HEAD 为 `6a825ca54761131c9b73c8871a886381c49513d8`，已推送到
-  `origin/feature/mooncake-layerwise-kv-pool`。
-- 实施后验证：AscendStore CPU suite 为 `361 passed`；相关 Ruff、整段
-  `git diff --check` 和 8 个 feature commit 的 `git show --check` 均通过。
-- Mooncake wheel contract 与 NPU E2E 尚未验证；CPU 单测不能替代真实 ranged
-  transfer 集成测试。
 
 ## 检视范围
 
@@ -61,69 +41,46 @@ ff2557f74 feat(kv_pool): add Mooncake ranged layer save
 
 重点检视：
 
-1. key-major metadata 是否始终保持 key、block ID、buffer、size 和 object offset 对齐。
-2. ranged write/read 的非负成功码、负错误码和 result shape 是否按 contract 处理。
-3. save 失败是否只 revoke 对应 active key，并确保后续 layer 不再传输失败 key。
-4. 最终 layer 是否只 commit active key，并正确清理本地 session tracker。
-5. load 失败是否映射到准确的本地 block ID，并保证 layer event 与 queue accounting 收尾。
-6. 新增路径是否保持 Memcache flat-GVA 行为，并避免把 save-only 规则误用于 load。
+1. `SharedBlockData` 是否明确区分 Memcache flat-GVA metadata 与 Mooncake
+   key-major metadata，并保持原有 Memcache 路径行为。
+2. `LayerBatchBuilder` 是否始终保持 object key、local block ID、buffer address、
+   transfer size 和 object offset 对齐。
+3. `None` key 的过滤是否同步作用于所有对齐字段，不会造成 key 与 block 错配。
+4. K/V 等多段 cache buffer 是否使用正确的本地 stride、layer 内偏移和
+   `layer_id * page_size` 对象偏移。
+5. save batch 与 load batch 是否保留各自需要的重复 key 语义，不会错误丢失目标
+   local block。
+6. 新增测试是否覆盖 key-major batch 的结构、跨 layer offset、过滤与多 buffer
+   对齐，而不是只验证理想的单 key、单 buffer 路径。
 
 ## 已采纳建议
 
-### P1：range save 异常路径必须平衡 request 完成计数
+### P2：补充同一 shared metadata 的跨层 range-batch 测试
 
-- 检视结论：已采纳并实施。
-- 问题：`KVCacheStoreLayerSendingThread._handle_range_request()` 只在正常路径调用
-  `dec_stored_request()` 和 `try_finish_and_delete_stored_request()`。当
-  `build_addrs()`、同步 event、`batch_copy_put()` 或 batch result shape validation
-  抛出异常时，异常分支会 revoke active key，但不会平衡此前由 `save_kv_layer()`
-  增加的 `stored_requests` 计数。
-- 影响：queue item 虽已调用 `task_done()`，layer finished event 也已设置，但 request
-  永远不会进入 sending finished 集合。依赖 `done_sending` 的 delayed-free 路径可能
-  因而无法释放对应 KV block；同一 request ID 的 tracker 也会长期残留。
-- 设计依据：设计文档 §1.4 要求 KVPool offload 不得阻塞 HBM forward 热路径；§5.5
-  将 SendingThread 定义为逐层传输和最终收尾的责任方。异常传输已经结束时，线程必须
-  完成本地 request accounting，不能把失败转化为永不完成的本地状态。
-- implementation plan：Task 4 步骤 6 明确要求每个出队 item 恰好调用一次
-  `task_done()` 并在 `finally` 中设置 layer event，但没有明确写出
-  `stored_requests` 必须同样成对收尾；这是计划覆盖缺口，不是与设计冲突。
-- 统一修改方案：把每层 request accounting 移到 guaranteed-finalization 路径，并从
-  原始 `LayerTransferTask.block_ranges` 获取 request ID，确保 probe 尚未生成
-  `LayerRangeReqMeta` 时也能收尾。每次 `add_stored_request()` 必须恰好对应一次
-  decrement；失败只表示传输工作结束，不得因此发布成功的 `BlockStored` 事件。
-- 实施归属：通用 finalization 与异常测试折叠到 `29f2a8e69`；ranged save 的 malformed
-  result、revoke 和 tracker 测试折叠到 `ff2557f74`。
-- 新增测试：分别注入 `build_addrs` exception、`batch_copy_put` exception、过短、过长和
-  非整数 result；断言 `task_done()` 与 layer event 各完成一次、`stored_requests` 不残留、
-  request 进入 transfer-finished 集合，并确认没有发布成功的 `BlockStored` 事件。
-- 验证证据：malformed `batch_copy_put` 动态复现后得到
-  `stored_requests={'r1': 1}`、`finished_requests=set()`、`unfinished_tasks=0`。
-
-### P2：save key-major batch 必须按 object key 稳定去重
-
-- 检视结论：已采纳并实施。
-- 问题：`LayerBatchBuilder._build_key_major_shared()` 会直接累计同一 batch 内所有
-  request 的 save key；SendingThread 虽用 `set` 跟踪 active key，随后仍按原始
-  `req_meta.keys` 构造 `active_indices`，因此重复 key 会继续进入 ranged write 和最终
-  commit。
-- 影响：共享 prefix 的多个 request 会对同一 Mooncake object 重复传输，并在同一个
-  `batch_commit` 中重复提交相同 key。当前 Mooncake Client/Master 实现可能容忍同 batch
-  的重复 `PutEnd`，但 Backend contract 没有承诺重复 key 语义；这还会造成冗余数据传输，
-  并使 per-key 失败处理和返回码对齐变得含糊。
-- 设计依据：设计文档 §1.2、§2.3 和 §5.5 定义“每个 logical block 对应一个 key”，
-  `SharedBlockData.block_keys` 与 `block_ids_arr` 一一对应，SendingThread 末层只 commit
-  本批 active key。相同 object key 在 save batch 中应只有一个 writer entry。
-- implementation plan：Task 3 规定 key-major 对齐和失败项过滤，Task 4 要求 commit
-  全部 active key，但没有覆盖多个 request 共享同一 prefix key 的 batch；这是测试矩阵
-  缺口。
-- 统一修改方案：仅对 save shared batch 按 object key 保持首次出现顺序去重，并保留与
-  所选 key 对应的 block ID。load 侧不得按 key 简单去重，因为同一远端 object 可能需要
-  复制到多个不同的本地 block ID。
-- 实施归属：key-major builder 基础折叠到 `2b2ae920e`；save-only stable dedupe 与
-  write/commit 测试折叠到 `ff2557f74`；重复 remote key 的 load 对照测试折叠到
-  `89b1a88ea`。
-- 新增测试：构造两个 request 共享同一 full-block key，断言 save 的
-  `SharedBlockData`、`batch_copy_put` 和 `batch_commit` 均只包含一次该 key；另加 load
-  对照测试，确认相同远端 key 仍能复制到两个本地 block，避免误把 save 去重扩展到 load。
-- 验证证据：当前实现动态复现得到
-  `shared_keys=['key-1', 'key-1']`，且 `batch_copy_put`、`batch_commit` 收到相同重复列表。
+- 检视结论：已采纳并实施，fixup commit 已折叠到原提交。
+- 问题：implementation plan 要求 key-major metadata 与 offset 测试“至少覆盖
+  两层”，但提交中的 `_build()` 将 `LayerTransferTask.layer_id` 固定为 `2`，新增的
+  key-major 正常路径与 `None` key 过滤测试均只验证 layer 2。
+- 影响：现有测试验证了非零 object offset，却没有证明同一份跨层不变的
+  `SharedBlockData` 能在不同 `layer_id` 下生成对应层的 local buffer address、size 和
+  object offset。若后续改动错误地复用某一层的 base address、stride 或 offset，当前
+  测试不一定能发现。
+- 设计依据：设计文档 §5.5 规定 `build_shared` 预计算跨层不变的 block metadata，
+  `build_addrs(layer_id)` 再按层计算本地 address/size；Mooncake object offset 必须为
+  `layer_id * page_size_bytes + layer_inner_offset[j]`。
+- implementation plan：Task 3 步骤 1 明确要求两个 block、每层两个 cache segment，
+  并至少覆盖两层；当前测试只覆盖其中的 layer 2，未完整满足该测试要求。
+- 统一修改方案：构造一次 key-major `SharedBlockData`，至少分别调用
+  `build_addrs(shared, 0)` 与 `build_addrs(shared, 2)`；断言两层保持相同的 key/block
+  对齐和 `[2][2]` 嵌套 shape，同时分别得到各层正确的 local buffer address 和
+  object offset（layer 0 为 `[0, 64]`，layer 2 为 `[192, 256]`）。保留现有
+  `None` key 同步过滤测试。
+- 实施归属：`21bd87100 feat(kv_pool): build Mooncake layer range batches`。
+- 实施结果：原 fixup `6bb780019` 已折叠；新增同一份 `SharedBlockData` 分别构建
+  layer 0 与 layer 2 range batch 的测试，验证两层 key/block/size 对齐，以及各自的
+  local buffer address 和 object offset。
+- rebase 结果：后续提交已重放，feature 分支最终 HEAD 为 `8cfd1e22f`，并已用精确
+  `--force-with-lease` 推送到 `origin/feature/mooncake-layerwise-kv-pool`。
+- 验证结果：完整 AscendStore CPU suite 为 `362 passed`；相关 Ruff check、Ruff
+  format check、整段 `git diff --check` 和全部 6 个重写 commit 的
+  `git show --check` 均通过；range-diff 证明后续 5 个 commit 内容未漂移。
