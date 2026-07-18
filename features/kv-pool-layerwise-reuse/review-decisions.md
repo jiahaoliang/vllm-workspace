@@ -69,7 +69,7 @@ feat(kv_pool): add Mooncake ranged layer load
 
 ### P1：按 transfer row 而不是 remote key 跟踪 ranged-load active 状态
 
-- 检视结论：已采纳，尚未修改源码。
+- 检视结论：已采纳并实施；fixup `f63392063` 已折叠为 `fed655080`。
 - 问题：`KVCacheStoreLayerRecvingThread` 当前使用 `_active_load_keys: set[str]`
   和 `_active_load_blocks: dict[str, set[int]]` 跨层跟踪 load 状态。同一个 remote
   key 被读取到多个本地 block 时，任一 entry 返回负数都会将该 key 对应的全部本地
@@ -101,7 +101,7 @@ feat(kv_pool): add Mooncake ranged layer load
 
 ### P2：覆盖 `batch_copy_get` 直接抛异常的 ranged-load 收尾
 
-- 检视结论：已采纳，尚未修改源码。
+- 检视结论：已采纳并实施；fixup `f63392063` 已折叠为 `fed655080`。
 - 问题：现有 `test_load_exception_finishes_queue_and_marks_blocks_invalid` 让
   `LayerBatchBuilder.build_addrs()` 抛异常，只覆盖进入 ranged transfer 前的通用
   handler finalization；malformed-result 测试覆盖 backend 返回后发生的 protocol
@@ -122,7 +122,7 @@ feat(kv_pool): add Mooncake ranged layer load
 
 ### P3：为 ranged-load row 状态机补充生命周期和 ownership 注释
 
-- 检视结论：已采纳，尚未修改源码。
+- 检视结论：已采纳并实施；fixup `f63392063` 已折叠为 `fed655080`。
 - 问题：`_handle_range_request()` 同时承担首层 active 状态初始化、跨层 payload
   过滤、per-entry 失败移除、最终层 request completion 和本批状态清理；异常路径还要
   通过 event 通知 Worker 收尾 session。现有代码没有解释这些跨层 invariant 和责任
@@ -137,3 +137,27 @@ feat(kv_pool): add Mooncake ranged layer load
   `SharedBlockData` 在各层保持稳定顺序；负返回值只淘汰当前 transfer row；Receiver
   通过 abort event 通知 Worker，由 Worker exactly once 执行 `batch_get_end`。不对
   显而易见的列表过滤和赋值逐行注释，也不做无关重构。
+
+## 实施结果
+
+- 原 fixup：`f63392063 #fixup feat(kv_pool): add Mooncake ranged layer load`，
+  已折叠为 `fed655080 feat(kv_pool): add Mooncake ranged layer load`。
+- Receiver 改用 `_active_load_indices` 跨层跟踪 key-major row；普通 ranged-read 负返回
+  只淘汰对应 local block row，duplicate remote key 的其他成功 destination 继续读取
+  后续 layer。
+- 新增 duplicate-key 部分失败、全部失败、过滤后 payload 对齐和
+  `batch_copy_get` 抛异常的回归测试，并补充 shared row ordering、per-entry failure 和
+  Worker session-cleanup ownership 注释。
+- rebase 后后续提交依次重写为：`67ef431ae feat(kv_pool): orchestrate Mooncake
+  layerwise sessions`、`32e25f204 docs(kv_pool): document Mooncake layerwise backend`；
+  最终 feature HEAD 为 `32e25f204bf0d80fe844ba1db3a8d7d3ecf7b775`，临时 review
+  branch 已删除。
+- 在最终 feature HEAD 上通过进程内 CPU test bootstrap 运行完整
+  `tests/ut/distributed/ascend_store`：`368 passed`。目标文件 Ruff check、`py_compile`、
+  全部重写 commit 的 `git show --check` 和完整 feature diff check 均通过；range-diff
+  确认后续两个 commits patch-equivalent，最终 tree delta 的 patch-id 与原 fixup 相同。
+- 全文件 `ruff format --check` 仍会要求重排该 feature commit 中已有的长表达式；本
+  fixup 未执行全文件格式化，避免引入与本轮建议无关的 diff。新增测试区间的 range
+  format check 通过。
+- 本轮按用户要求只完成本地 rebase，尚未 force-push；在源码远端更新前不刷新
+  `workspace.lock.json`。
