@@ -67,4 +67,34 @@ feat(kv_pool): add Mooncake ranged layer load
 
 ## 已采纳建议
 
-暂无。仅在用户明确采纳后添加。
+### P1：按 transfer row 而不是 remote key 跟踪 ranged-load active 状态
+
+- 检视结论：已采纳，尚未修改源码。
+- 问题：`KVCacheStoreLayerRecvingThread` 当前使用 `_active_load_keys: set[str]`
+  和 `_active_load_blocks: dict[str, set[int]]` 跨层跟踪 load 状态。同一个 remote
+  key 被读取到多个本地 block 时，任一 entry 返回负数都会将该 key 对应的全部本地
+  block 标记为 invalid，并停止这些 block 的后续 layer read。
+- 实际 contract：Mooncake `Client::BatchTransferReadRanges` 按 batch entry 分别提交和
+  等待 transfer，返回 per-entry bytes 或 `ErrorCode`；`RealClient` 将普通 transfer
+  error 只写回原始 input index，并不删除 `get_sessions_[key]`。只有 lease expiry 等
+  明确路径删除整个 key session。因此负返回值本身只证明当前 destination entry 失败，
+  不能统一解释为整个 key/session 失效。
+- 风险：例如 `keys=["shared-key", "shared-key"]`、`block_ids=[3, 4]`、
+  `results=[96, TRANSFER_FAIL]` 时，block 3 已成功且 session 仍有效，当前实现却会把
+  block 3、4 都加入 `_invalid_block_ids`，造成不必要的重计算并跳过 block 3 的后续层。
+- 设计依据：设计文档 §4.3 要求 `keys[i]`、buffers、sizes、offsets 和返回结果按
+  index 一一对应；§5.5 要求 `SharedBlockData.block_keys` 与 `block_ids_arr` 对齐。
+  implementation plan D02 和 Task 4 步骤 5 进一步要求 ranged-read 失败映射到准确的
+  本地 block ID。Mooncake 最新 PR #2881 head `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`
+  的实际实现消除了 duplicate-key 失败粒度的歧义。
+- 统一修改方案：用 `_active_load_indices: set[int] | None` 维护 shared key-major
+  metadata 中仍 active 的 row；每层使用同一组 index 过滤 keys、buffers、sizes 和
+  offsets。返回负数时，通过 filtered result index 映射回原始 row，只标记对应
+  `req_meta.block_ids[index]` 并移除该 row。最终 layer 或整批 abort 后清理 row 状态。
+  不根据 Mooncake error code 主动执行 key-wide fan-out；若 session 确实失效，Mooncake
+  会让该 key 的其他 entries 自然返回负数。
+- 测试要求：增加两层 duplicate-key 部分失败测试，第一层返回 `[96, -1]`，断言只
+  标记第二个 block invalid，第二层仍传输第一个 row，并校验其 key、buffer、size、
+  offset 全部对齐；再覆盖两个 entries 均失败时两个 block 都被过滤。现有 malformed
+  result 和 backend exception 仍按整批 abort，不改变 session cleanup ownership、
+  Memcache GVA 路径或非 layerwise 行为。
