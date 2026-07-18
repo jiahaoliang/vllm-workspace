@@ -105,3 +105,15 @@
   `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`. Updated the local read-only branch,
   workspace lock and PR snapshot. The put-end idempotency and ranged-put
   optional `config` contract gaps remain open.
+- Folded `f635cca8b #fixup feat(kv_pool): orchestrate Mooncake layerwise sessions`
+  into rewritten orchestration commit `6aa38e791198a60f90e34bf34d6875bf5a9d2956`,
+  replayed the documentation commit as `867dd424318d88e9bb2b831cdbd5b16bb723184a`,
+  and deleted the temporary review/integration branches. Range-diff confirmed the
+  documentation commit remained patch-equivalent, and the final tree delta's
+  patch-id matched the original fixup.
+- Reverified the final feature HEAD with the dedicated CPU venv: the complete
+  `tests/ut/distributed/ascend_store` suite passed `373` tests; focused Ruff,
+  `py_compile`, feature diff checks, and both rewritten commit checks passed.
+  Force-pushed `origin/feature/mooncake-layerwise-kv-pool` with an exact lease
+  against prior remote HEAD `8bf9ac9c34397b2fd4ab1c21c1e6965b5a55eb0b`
+  and confirmed the remote now points to `867dd424318d88e9bb2b831cdbd5b16bb723184a`.

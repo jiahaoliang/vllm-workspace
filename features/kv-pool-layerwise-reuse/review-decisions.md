@@ -151,9 +151,11 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
 
 ## 实施结果
 
-- 已创建独立 fixup：
-  `f635cca8b #fixup feat(kv_pool): orchestrate Mooncake layerwise sessions`；尚未 rebase、
-  push 或更新 `workspace.lock.json`。
+- 原独立 fixup
+  `f635cca8b #fixup feat(kv_pool): orchestrate Mooncake layerwise sessions` 已折叠为
+  `6aa38e791 feat(kv_pool): orchestrate Mooncake layerwise sessions`；后续文档 commit
+  重写为 `867dd4243`，并已用 exact `--force-with-lease` 推送到
+  `origin/feature/mooncake-layerwise-kv-pool`。
 - put-session preparation 与 layer save task 现在复用同一 save-owner 判断；非 saving
   TP rank 不再调用 `batch_put_start`，但仍按需打开自己的 get session；
   `consumer_is_to_put` 既有语义由回归测试保护。
@@ -169,6 +171,10 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
   `12 passed`。
 - 使用专用 venv `C:\Users\l30034596\.venvs\vllm-ascend-cpu-tests-py314` 和 CPU
   bootstrap 运行完整 `tests/ut/distributed/ascend_store`：`373 passed`。目标文件 Ruff
-  check、`py_compile`、`git diff --check` 和 fixup `git show --check` 均通过。
+  check、`py_compile`、feature diff check 和重写 commit 的 `git show --check` 均通过；
+  range-diff 确认后续文档 commit patch-equivalent，最终 tree delta 的 patch-id 与原
+  fixup 相同。
 - 全文件 `ruff format --check` 仍会要求重排三个 feature 文件中的既有代码；未执行
   整文件格式化，避免把与本轮 P1/注释建议无关的格式差异带入 fixup。
+- `workspace.lock.json` 和 `repo-state.md` 已刷新到最终源码 HEAD
+  `867dd424318d88e9bb2b831cdbd5b16bb723184a`；临时 review/integration 分支已删除。
