@@ -148,3 +148,27 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
   表述，但不能连同其设计理由一起删除。
 - 校验要求：源码修改后人工复查所有本 commit 新增长逻辑；Ruff、format 和 UT 通过，
   且不得为了加注释进行无关重构。
+
+## 实施结果
+
+- 已创建独立 fixup：
+  `f635cca8b #fixup feat(kv_pool): orchestrate Mooncake layerwise sessions`；尚未 rebase、
+  push 或更新 `workspace.lock.json`。
+- put-session preparation 与 layer save task 现在复用同一 save-owner 判断；非 saving
+  TP rank 不再调用 `batch_put_start`，但仍按需打开自己的 get session；
+  `consumer_is_to_put` 既有语义由回归测试保护。
+- layer load timeout 现在先将当前 transfer ranges 的本地 block 标记 invalid 并设置
+  batch abort，再等待 Receiver completion event；确认在途 backend call 已返回后，才由
+  Worker exactly once 执行 `batch_get_end`。
+- 恢复并修正 scheduler 的 block-0 remote-prefix 查询说明、Memcache
+  `batch_get_key_info` 防 alloc-only false hit 的理由，以及全部 saving rank 完整性注释；
+  Mooncake put/get session 长逻辑补充了阶段、tracker ownership、dedup/fan-out 和 metadata
+  alignment 注释。
+- TDD 证据：新增的 non-saving-rank 与 timeout 测试在实现前分别因错误调用
+  `batch_put_start`、未标记 invalid/未等待 completion 而失败；实现后相关 session 测试
+  `12 passed`。
+- 使用专用 venv `C:\Users\l30034596\.venvs\vllm-ascend-cpu-tests-py314` 和 CPU
+  bootstrap 运行完整 `tests/ut/distributed/ascend_store`：`373 passed`。目标文件 Ruff
+  check、`py_compile`、`git diff --check` 和 fixup `git show --check` 均通过。
+- 全文件 `ruff format --check` 仍会要求重排三个 feature 文件中的既有代码；未执行
+  整文件格式化，避免把与本轮 P1/注释建议无关的格式差异带入 fixup。
