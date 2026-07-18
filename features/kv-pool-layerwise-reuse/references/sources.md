@@ -16,7 +16,7 @@
 - vLLM Ascend PR #10733, layerwise KV pool reuse coordination target: <https://github.com/vllm-project/vllm-ascend/pull/10733>
 - Mooncake PR #2881, WIP Client session/range implementation: <https://github.com/kvcache-ai/Mooncake/pull/2881>
   - Collaborator branch: `collaborator/feature/layerwise-kv-session` from <https://github.com/ascend-direct-dev/Mooncake/tree/feature/layerwise-kv-session>
-  - Captured head: `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`
+  - Captured head: `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`
   - Local checkout: `repos/Mooncake` branch `feature/layerwise-kv-session`
 
 ## RFC

@@ -7,7 +7,7 @@ Current Phase: source implementation complete
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
 - `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`8cfd1e22f92ee1a40139ea40b487fa5001d1c81f`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
-  `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` (WIP)
+  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
 ## Next Steps
 

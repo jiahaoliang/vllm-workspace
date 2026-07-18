@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-18T17:30:17+08:00",
+  "updated_at": "2026-07-18T19:04:43+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -31,7 +31,7 @@
         "collaborator": "https://github.com/ascend-direct-dev/Mooncake.git"
       },
       "branch": "feature/layerwise-kv-session",
-      "commit": "c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8",
+      "commit": "74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",
       "purpose": "Mooncake PR #2881 WIP integration; collaborator branch feature/layerwise-kv-session"
     }
   }

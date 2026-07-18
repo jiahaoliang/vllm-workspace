@@ -1,28 +1,30 @@
 Source: https://github.com/kvcache-ai/Mooncake/pull/2881
-Captured At: 2026-07-14T20:15:19+08:00
-Notes: WIP Mooncake Client implementation for the session/range API contract used by this feature; captured at an exact head SHA because the PR is still changing.
+Captured At: 2026-07-18T19:03:20+08:00
+Notes: Refreshed WIP Mooncake Client implementation for the session/range API contract used by this feature; captured at an exact head SHA because the PR is still changing.
 
 # kvcache-ai/Mooncake PR #2881
 
 Title: `[WIP][Store] Add put/get session APIs for ranged multi-buffer transfers`
 
-Status at capture: open, not draft, mergeable_state=`unstable`
+Status at capture: open, not draft, mergeable_state=`clean`
 
 Author: `ascend-direct-dev`
 
 Head: `ascend-direct-dev/Mooncake` branch `feature/layerwise-kv-session` at
-`c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`
+`74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`
 
 Base: `kvcache-ai/Mooncake` branch `main` at
-`75906c723bab0b5e7e938fd8fdd46aa2a425f8c7`
+`9c6fc51339a60411c2e7cd40133f76f6044dbe57`
 
 Created: 2026-07-13T12:09:42Z
 
-Updated: 2026-07-14T10:21:22Z
+Updated: 2026-07-15T10:04:13Z
 
-Diff size: 5 commits, 11 files, +1493 / -5
+Diff size: 1 commit, 11 files, +1493 / -5
 
 Patch archive: `../patches/pr-2881-mooncake-layerwise-session-ranges.patch`
+(original five-commit capture; retained because the refreshed squash head has
+the same source tree)
 
 ## Why It Matters Here
 
@@ -33,7 +35,10 @@ lease state, Python bindings, abnormal-session tests, and a TCP E2E path.
 
 The PR is WIP and is an integration input, not a stable baseline. The workspace
 records the exact head SHA so later PR updates can be reviewed and deliberately
-adopted.
+adopted. This head is a squash rewrite of the previous five-commit head
+`c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`; both commits have tree
+`d87b3b50d223054225157db7add0b11e23f0eaef`, so the refresh changes provenance
+but not source behavior.
 
 ## Implemented Contract Surface
 
@@ -68,8 +73,9 @@ adopted.
   keys, buffers, sizes, and offsets, but not the optional `ReplicateConfig`
   required by the frozen contract signature. Align the PR or explicitly revise
   the authoritative contract before passing the API gate.
-- The PR is `unstable`; unit/E2E presence is not equivalent to a validated target
-  wheel. Record the built wheel version/commit and executed results at Task 5.
+- The PR is currently reported as mergeable with `mergeable_state=clean`, but
+  unit/E2E presence is not equivalent to a validated target wheel. Record the
+  built wheel version/commit and executed results at Task 5.
 - Any later PR head must be fetched, reviewed, and recorded before updating the
   workspace lock; do not silently follow the floating branch.
 
@@ -91,8 +97,4 @@ adopted.
 
 ## Commits Captured
 
-- `5020b99bb6c000b2111ab26be1f2f85ebdfdb6b9` - `[WIP][Store] Add put/get session APIs for ranged multi-buffer transfers`
-- `72403142379aeb68da2f0cc9965b891eb3fed34d` - `[Store] Address review: overflow guards, lock-scope RPC, response size checks`
-- `36b807921972f657b65cb3d840a754789dce2f7b` - `[Store] Drop friend class RealClient in favor of public accessors`
-- `6f70893bcc158f565cefb7ec0454f1705e3a0a49` - `[Store] Replace raw member accessors with named Client operations`
-- `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` - `[Store] Encapsulate session range transfers in Client batch methods`
+- `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` - `[WIP][Store] Add put/get session APIs for ranged multi-buffer transfers`

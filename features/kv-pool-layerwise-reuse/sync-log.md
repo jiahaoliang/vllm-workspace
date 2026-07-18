@@ -98,3 +98,10 @@
   to `origin/feature/mooncake-layerwise-kv-pool` with an exact
   `--force-with-lease` against prior remote HEAD
   `1d56db71e19130ddb4c22e23f21f76756c3d6295`.
+- Fetched the force-updated Mooncake collaborator branch and verified that
+  `collaborator/feature/layerwise-kv-session` and upstream PR #2881 both point to
+  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`. The PR squashed the previous five
+  feature commits into one; its source tree is identical to captured head
+  `c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`. Updated the local read-only branch,
+  workspace lock and PR snapshot. The put-end idempotency and ranged-put
+  optional `config` contract gaps remain open.

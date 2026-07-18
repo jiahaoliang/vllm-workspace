@@ -231,9 +231,11 @@ contract 在 signature 和行为层面是完整的：
   和部署配置决定。
 
 当前实现来源：Mooncake PR #2881，captured head
-`c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8`。该 WIP head 已暴露上述七个方法，但当前
-测试将第二次 `batch_put_end` 视为 `INVALID_PARAMS`，且 Python binding 的
-`batch_put_from_multi_buffer_ranges` 尚未暴露 contract 中的可选 `config` 参数。Task 5
+`74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`。该 head 将旧
+`c1d5bf1f12b9c44a3d12601ab2fac94dd4fcc3a8` 的五个 feature commits squash 为一个
+commit，两个 head 的 source tree 完全一致。该 WIP head 已暴露上述七个方法，但当前
+测试仍将第二次 `batch_put_end` 视为 `INVALID_PARAMS`，且 Python binding 的
+`batch_put_from_multi_buffer_ranges` 仍未暴露 contract 中的可选 `config` 参数。Task 5
 仍要求 put-end 幂等和完整 signature；PR 行为与最终 contract 对齐前不得通过
 real-wheel gate。
 
