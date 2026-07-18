@@ -61,6 +61,9 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
 - 本 commit 新增或显著改写的连续逻辑超过 40 行时，必须保留原有有效注释，并在
   阶段边界补充必要注释，说明状态不变量、失败处理和 ownership；不添加逐行复述
   代码的无效注释。
+- 重构、改名或 backend 泛化不得无故删除原源码中仍然有效的注释。若代码结构或职责
+  已改变，应把原注释迁移到新的对应分支并按当前语义改写，保留其设计理由和风险说明；
+  只有注释已经失效时才可删除，并应以新的准确注释替代。
 
 ## 检视范围
 
@@ -137,5 +140,11 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
 - 注释内容：说明 key construction、backend query、per-block prefix decision、
   put tracker ownership、get-key deduplication、result fan-out、invalid-block mapping 和
   exactly-once cleanup 等阶段及不变量。避免对显而易见的赋值、循环和列表推导逐行复述。
+- 恢复或迁移本 commit 在 scheduler 泛化过程中删除、弱化的原有设计说明：
+  `_get_block_key_layerwise_hit_tokens()` 从 block 0 **查询** remote contiguous prefix 的
+  理由；Memcache 必须使用 `batch_get_key_info` 而不是 `batch_is_exist`，以避免只完成
+  alloc、尚未完成全部 layer save 的对象形成 false hit；以及同一 block 的全部 saving
+  rank 都必须返回有效 GVA 才算完整。原注释中把“查询”描述为“加载”的部分应改为准确
+  表述，但不能连同其设计理由一起删除。
 - 校验要求：源码修改后人工复查所有本 commit 新增长逻辑；Ruff、format 和 UT 通过，
   且不得为了加注释进行无关重构。
