@@ -76,3 +76,25 @@
 - Folded `c2c817574 #fixup refactor(kv_pool): make layer transfer completion exception-safe` into rewritten commit `e0bec4ca4`, making the Layer receiver share the Worker's invalid-block set/lock and restoring the transfer lifecycle comments accepted during review.
 - Replayed ranged save as `e9893579a`, ranged load as `ff4c810b6`, orchestration as `9af376c37`, and docs as `1d56db71e`. Resolved ranged-load and orchestration overlap by keeping the invalid-block wiring in the exception-safe commit and leaving `load_abort_event` ownership in orchestration; deleted the temporary review branch.
 - Verified `363 passed`; Ruff check, full-range `git diff --check`, all five rewritten commit checks, and range-diff passed. Force-pushed final source HEAD `1d56db71e19130ddb4c22e23f21f76756c3d6295` with an exact `--force-with-lease` against prior remote `8cfd1e22f92ee1a40139ea40b487fa5001d1c81f`.
+
+## 2026-07-18
+
+- Reviewed `feat(kv_pool): add Mooncake ranged layer save` against the Mooncake
+  layerwise design and implementation plan. Added active-subset payload alignment
+  assertions, commit/revoke exception and malformed-result coverage, and lifecycle
+  comments for `_handle_range_request` and `_put_started_keys` cleanup.
+- Folded `d53c64768 #fixup feat(kv_pool): add Mooncake ranged layer save` into
+  rewritten ranged-save commit `a3611520dfd204ab6349637680fb43235513bc03`.
+  Replayed ranged load as `29c5f2cfa9089f584d6502fe9daa153cee0f36fc`,
+  orchestration as `54e6684f1eee86fcf6f98a7cb01826726486605d`, and docs as
+  `8bf9ac9c34397b2fd4ab1c21c1e6965b5a55eb0b`; deleted the temporary review
+  branch.
+- `py_compile`, focused Ruff, `git diff --check`, all rewritten commit checks,
+  final-tree comparison, and range-diff passed. The focused pytest class could not
+  complete collection on this Windows CPU environment: the normal conftest needs
+  generated Ascend `_build_info`, while isolated collection exposes the existing
+  `_mock_deps.py` `zmq` stub lacking vLLM v0.24.0 `zmq.asyncio`.
+- Force-pushed final source HEAD `8bf9ac9c34397b2fd4ab1c21c1e6965b5a55eb0b`
+  to `origin/feature/mooncake-layerwise-kv-pool` with an exact
+  `--force-with-lease` against prior remote HEAD
+  `1d56db71e19130ddb4c22e23f21f76756c3d6295`.
