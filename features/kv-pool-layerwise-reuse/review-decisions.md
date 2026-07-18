@@ -98,3 +98,42 @@ feat(kv_pool): add Mooncake ranged layer load
   offset 全部对齐；再覆盖两个 entries 均失败时两个 block 都被过滤。现有 malformed
   result 和 backend exception 仍按整批 abort，不改变 session cleanup ownership、
   Memcache GVA 路径或非 layerwise 行为。
+
+### P2：覆盖 `batch_copy_get` 直接抛异常的 ranged-load 收尾
+
+- 检视结论：已采纳，尚未修改源码。
+- 问题：现有 `test_load_exception_finishes_queue_and_marks_blocks_invalid` 让
+  `LayerBatchBuilder.build_addrs()` 抛异常，只覆盖进入 ranged transfer 前的通用
+  handler finalization；malformed-result 测试覆盖 backend 返回后发生的 protocol
+  validation error。两者都没有覆盖 `batch_copy_get()` 本身抛异常且 active row 状态
+  已初始化的路径。
+- 风险：若未来修改 ranged backend exception handling，可能遗漏 active rows 的
+  invalid-block 上报或 abort 通知；Worker 将无法及时执行 exactly-once
+  `batch_get_end`，或者 `task_done()`、layer event、`get_event` 未释放而阻塞 forward。
+- 设计依据：设计文档 §1.4 要求 offload 不阻塞 forward，§5.5 将 ranged copy 责任放在
+  `kv_transfer`、load session 收尾责任放在 `pool_worker`。implementation plan Task 4
+  步骤 5、6 要求意外 load exception 在释放 layer event 前标记剩余 active block
+  invalid，由 Receiver 通知 abort，并保证每个 queue item 和 layer event 安全完成。
+- 统一修改方案：令测试中的 `store.batch_copy_get` 抛出 `RuntimeError`，断言所有
+  active block 被标记 invalid、active row 状态清空、`load_abort_event` 被设置，
+  `request_queue.task_done()` 恰好调用一次，当前 layer event 与 `get_event` 均被设置，
+  且异常不向 thread 外传播。Receiver 不调用 `batch_get_end`；session cleanup 仍由
+  Worker 的 exactly-once helper 负责。
+
+### P3：为 ranged-load row 状态机补充生命周期和 ownership 注释
+
+- 检视结论：已采纳，尚未修改源码。
+- 问题：`_handle_range_request()` 同时承担首层 active 状态初始化、跨层 payload
+  过滤、per-entry 失败移除、最终层 request completion 和本批状态清理；异常路径还要
+  通过 event 通知 Worker 收尾 session。现有代码没有解释这些跨层 invariant 和责任
+  边界。
+- 风险：维护者可能把 row 状态改回 key-level fan-out，或在 Receiver 中直接调用
+  `batch_get_end`，与 Worker 的 exactly-once cleanup 重复关闭 session。
+- 设计依据：设计文档 §5.5 规定 shared metadata 跨层复用，并将逐层 copy 交给
+  `kv_transfer`、load 末层 `get_end` 交给 `pool_worker`。implementation plan Task 4
+  步骤 5 也明确 Receiver 只负责 ranged read、invalid-block 上报和 layer event，不拥有
+  session cleanup。
+- 统一修改方案：只在三个非显然位置添加简短注释：active row index 依赖同一
+  `SharedBlockData` 在各层保持稳定顺序；负返回值只淘汰当前 transfer row；Receiver
+  通过 abort event 通知 Worker，由 Worker exactly once 执行 `batch_get_end`。不对
+  显而易见的列表过滤和赋值逐行注释，也不做无关重构。
