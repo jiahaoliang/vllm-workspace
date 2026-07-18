@@ -58,6 +58,9 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
 - fixup commit 创建后保持独立；只有收到用户明确的 rebase 命令后，才将其折叠到
   原提交。
 - 未采纳、仍有争议或仅用于讨论的建议不写入本文。
+- 本 commit 新增或显著改写的连续逻辑超过 40 行时，必须保留原有有效注释，并在
+  阶段边界补充必要注释，说明状态不变量、失败处理和 ownership；不添加逐行复述
+  代码的无效注释。
 
 ## 检视范围
 
@@ -84,4 +87,55 @@ feat(kv_pool): orchestrate Mooncake layerwise sessions
 
 ## 已采纳建议
 
-暂无。等待用户确认第一轮检视结论。
+### P1：只有 saving TP rank 才能打开 Mooncake put session
+
+- 问题：`_prepare_mooncake_layerwise_sessions()` 当前在每个 TP rank 上调用
+  `_prepare_mooncake_put_session()`，而 `_process_save_for_layer_batch()` 只允许
+  `tp_rank % put_step == 0` 的 saving rank 建立 save task。
+- 风险：MLA 中同一 `put_step` group 的多个 rank 共享相同
+  `model@block_hash@head_or_tp_rank` key。非 saving rank 可能先成功执行
+  `batch_put_start`，使真正负责 ranged write 的 saving rank 得到 duplicate/conflict；
+  该对象随后没有数据写入并停留在 PROCESSING。
+- 设计依据：设计文档 §2.3 明确规定 MLA 只有
+  `tp_rank % put_step == 0` 的 rank 保存；§3 将 `batch_put_start` 和逐层 ranged write
+  归属于同一个 saving rank。implementation plan Task 4 步骤 3 也要求 put-session
+  preparation 与 LayerSendingThread 的 save ownership 一致。
+- 统一修改方案：只对 put-session preparation 增加与 save task 相同的 saving-rank
+  及 KV role 门控；不能跳过整个 session preparation，因为每个需要读取 KV 的 TP rank
+  仍须用自己的 Mooncake Client 打开 get session。复用同一判断，避免 put preparation
+  与 layer task selection 再次漂移。
+- 测试要求：增加 TP=4、MLA `put_step=4` 测试；rank 0 调用一次
+  `batch_put_start` 并建立 save metadata，rank 1/2/3 不调用 `batch_put_start`，但有 load
+  需求时仍调用 `batch_get_start`。
+
+### P1：只能在 ranged read 完成或 Receiver abort finalization 后关闭 get session
+
+- 问题：`wait_for_layer_load()` 的 layer event 等待超时后，即使 `is_finish=False`，
+  final layer 仍会调用 `_close_load_sessions_once()`。
+- 风险：Receiver 可能仍在执行 `batch_copy_get`；此时 `batch_get_end` 删除 Client
+  get-session，会与在途 ranged read 竞态。Worker 同时继续 forward，可能使用未完成的
+  KV 数据。
+- 设计依据：设计文档 §3 的时序要求 final ranged read 完成后才执行
+  `batch_get_end`；§5.5 将 session cleanup 归 Worker 所有。implementation plan Task 4
+  步骤 5 明确要求正常最终 layer **完成**或 Receiver 已完成异常 abort 后 exactly once
+  收尾，而不是仅凭 wait 超时收尾。
+- 统一修改方案：关闭条件必须以 Receiver 已完成 transfer handler/finalization 为准。
+  timeout 不能直接调用 `batch_get_end`；timeout 路径必须先进入明确的失败处理，等待在途
+  handler 完成并标记受影响 block invalid，再由 Worker 的 exactly-once helper 关闭
+  session。Receiver 仍只通知 completion/abort，不直接拥有 `batch_get_end`。
+- 测试要求：覆盖 final layer 正常完成、Receiver abort 和 wait timeout 三条路径；断言
+  timeout 时不会提前调用 `batch_get_end`，handler finalization 后只调用一次，并验证
+  invalid-block fallback、layer event 和 queue completion 都已完成。
+
+### P2：为超过 40 行的连续编排逻辑补充阶段和状态注释
+
+- 要求：本 commit 新增或显著改写的连续逻辑超过 40 行时，必须增加必要注释，并保留
+  原有仍然有效的注释。
+- 重点范围：`_get_block_key_layerwise_hit_tokens()`、
+  `_prepare_mooncake_put_session()`、`_open_mooncake_get_sessions()`，以及修改后仍超过
+  40 行的其他连续 session-orchestration 逻辑。
+- 注释内容：说明 key construction、backend query、per-block prefix decision、
+  put tracker ownership、get-key deduplication、result fan-out、invalid-block mapping 和
+  exactly-once cleanup 等阶段及不变量。避免对显而易见的赋值、循环和列表推导逐行复述。
+- 校验要求：源码修改后人工复查所有本 commit 新增长逻辑；Ruff、format 和 UT 通过，
+  且不得为了加注释进行无关重构。
