@@ -75,6 +75,12 @@ Mooncake PR #2881 已提供七个 API 的 WIP 实现，因此 vLLM Ascend 开发
 fake 固定 contract，同时用记录的 PR head 构建 wheel 运行真实 contract gate。WIP
 实现与 contract 不一致时以本计划的 gate 为准，不在 Backend 中兼容两套语义。
 
+内部 `Backend` 的 layerwise session/range method（包括 `batch_commit` 和
+`batch_revoke`）对不支持的 backend 一律抛出 `NotImplementedError`，不得使用默认成功
+返回值。Memcache flat-GVA 路径不调用 commit/revoke，因此无需通过 no-op override
+伪装 capability。该决策修正了当前 HackMD 设计 §§2.4/5.2/5.3 的旧描述；同步状态见
+`references/design-errata.md`。
+
 **否决的方案：** 运行时 fallback 到旧路径；等 Mooncake 团队完成后再开始 vLLM
 Ascend 工作。
 
@@ -242,11 +248,12 @@ real-wheel gate。
 ## 计划中的文件职责
 
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/backend.py`:
-  内部 Backend contract 与 no-op 默认实现。
+  内部 Backend contract；不支持的 session/range method 显式抛出
+  `NotImplementedError`。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py`:
   capability check 与 Mooncake Client 薄委托。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/memcache_backend.py`:
-  显式的 commit/revoke no-op 实现。
+  保持既有 flat-GVA alloc/copy/lease 行为；不声明未使用的 commit/revoke capability。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py`:
   block-key helper 与 Mooncake range metadata type。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py`:
@@ -402,7 +409,8 @@ def test_mooncake_layerwise_methods_delegate(self):
 
 还要测试：缺少 Client method 时抛出 `RuntimeError` 并列出缺失名称；
 `enable_ssd_offload=True` 不会导致 capability validation 失败，且仍会进入现有 setup
-kwargs 路径。为长度准确、结果过短、结果过长、`None` 和非整数值添加 shape test。
+kwargs 路径。为长度准确、结果过短、结果过长、`None`、Python/NumPy float、numeric
+string 和 bool 添加 shape test；只有 Python/NumPy integral（不含 bool）可通过。
 
 - [ ] **步骤 2：运行聚焦测试并确认其失败**
 
@@ -418,6 +426,7 @@ python -m pytest -q tests/ut/distributed/ascend_store/test_backend.py
 
 ```python
 from collections.abc import Iterable
+from numbers import Integral
 
 
 class BatchResultShapeError(RuntimeError):
@@ -429,12 +438,15 @@ def require_aligned_batch_results(
     keys: list[str],
     results: Iterable[int] | None,
 ) -> list[int]:
-    try:
-        values = [int(value) for value in results] if results is not None else []
-    except (TypeError, ValueError) as exc:
+    raw_values = list(results) if results is not None else []
+    if any(
+        isinstance(value, bool) or not isinstance(value, Integral)
+        for value in raw_values
+    ):
         raise BatchResultShapeError(
             f"{operation} returned non-integer batch results"
-        ) from exc
+        )
+    values = [int(value) for value in raw_values]
     if len(values) != len(keys):
         raise BatchResultShapeError(
             f"{operation} returned {len(values)} results for {len(keys)} keys"
@@ -446,10 +458,10 @@ def validate_layerwise_support(self) -> None:
     return None
 
 def batch_commit(self, keys: list[str]) -> list[int]:
-    return [0] * len(keys)
+    raise NotImplementedError(f"{type(self).__name__} does not support batch_commit")
 
 def batch_revoke(self, keys: list[str]) -> list[int]:
-    return [0] * len(keys)
+    raise NotImplementedError(f"{type(self).__name__} does not support batch_revoke")
 
 def batch_put_start(self, keys: list[str], sizes: list[int]) -> list[int]:
     raise NotImplementedError(f"{type(self).__name__} does not support batch_put_start")
@@ -917,7 +929,9 @@ Set-Location repos\vllm-ascend
 
 说明仅支持 TP、必需的 Client method、object offset 语义、默认 lease-TTL 责任，以及
 首期不支持 Mooncake transfer splitting。说明 SSD 仍由现有 Mooncake 配置控制：vLLM
-Ascend 既不强制关闭 SSD，也不保证每个 SSD replica 都能提供 ranged transfer。
+Ascend 既不强制关闭 SSD，也不保证每个 SSD replica 都能提供 ranged transfer。明确
+`layerwise_max_transfer_blocks` / `layerwise_max_transfer_bytes` 当前只限制 Memcache
+flat-GVA `batch_copy`，不会拆分 Mooncake ranged request。
 
 - [ ] **步骤 2：在标准 Linux 环境中运行 unit 与 static gate**
 
