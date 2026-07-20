@@ -93,4 +93,67 @@ feat(kv_pool): support Mooncake chunked prefill sessions
 
 ## 已采纳建议
 
-暂无。仅在用户明确采纳后添加。
+### P1：get-start 协议失败不得绕过共享 key 的最后 owner
+
+- 问题：`_open_mooncake_get_sessions()` 在 `batch_get_start` 抛异常或返回结果
+  shape/type 不合法时，直接对本批全部 keys 调用 `batch_get_end`，随后通过
+  `invalidate_get_sessions()` 删除这些 keys 的全部 active owners。
+- 已验证影响：当 `model@0a@0` 已由另一个 request 持有时，新 request 的 malformed
+  get-start 结果仍会立即触发 `batch_get_end(["model@0a@0"])`；旧 owner 随后 release
+  返回空，说明其 session 已在 owner 完成前被关闭。现有
+  `test_get_start_shape_error_ends_all_keys_and_marks_all_blocks_invalid` 只覆盖单 owner，且把
+  这一行为固化为预期。
+- 设计依据：implementation plan D13 要求 Worker 维护
+  `key -> active request owners`，只有最后 owner 被移除时才调用 `batch_get_end`；Task 6
+  步骤 4 同样要求 shared key 的其他 owner 存在时不得 end。设计文档 §5.7 规定
+  `batch_get_end` 只在 request 的 last chunk 最终 onload 后释放。
+- 统一修改方案：把 get-start 异常/shape failure 的 cleanup 交给 tracker。tracker 应只
+  释放本次尝试涉及的 request owners，保留未参与本次失败的其他 active owners；仅将
+  owner 集合变空的 keys 返回给 Worker 执行 `batch_get_end`。当前 request 的 desired
+  entries 必须保留供后续 chunk 重试，本批对应 local blocks 全部标记 invalid。不得直接
+  对原始 `keys` 列表做无条件 get-end 或全局 owner invalidation。
+- 测试要求：增加“旧 request 已持有 shared key，新 request 的 get-start 抛异常、返回过短、
+  过长或非整数结果”测试；断言新 request blocks 全部 invalid、旧 owner 仍存在且不调用
+  get-end，旧 owner 最终 release 后恰好调用一次。另覆盖没有其他 owner 时协议失败仍
+  best-effort get-end，以及当前 request desired entries 在 retry 时仍可重建。
+- fixup 归属：
+  `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
+
+### P2：Chunk preparation 必须先 get-start 再 put-start
+
+- 问题：`_prepare_mooncake_layerwise_sessions()` 当前逐 request 先调用
+  `_prepare_mooncake_put_session()`，全部 put-start 完成后才统一调用
+  `_open_mooncake_get_sessions()`。实际 backend 调用顺序为
+  `batch_put_start -> batch_get_start`。
+- 设计依据：设计文档 §5.7 的 API 表和伪代码均明确规定每个 chunk 进入 layer pipeline
+  前先执行 `batch_get_start`，随后 saving rank 执行 `batch_put_start`。这是直接设计偏差，
+  不是 implementation plan 推断。该顺序虽来自父 commit，但本 commit 纳入 §5.7 后仍未
+  校正，因此属于本能力的缺失要求。
+- 统一修改方案：将 preparation 改成两个明确阶段。第一阶段为所有 requests 合并累计
+  load entries、去重并完成一次 `batch_get_start` 及结果 fan-out；第二阶段才逐 request
+  准备本 chunk save metadata 并调用 `batch_put_start`。保留 non-saving TP rank 只做
+  get-start、partial failure 对齐和 get-start 失败后仍可进入 recompute/save 的现有语义。
+- 测试要求：使用 backend call sequence 断言单 request 和多 request 均为所有
+  get-start 先于任何 put-start；覆盖 saving rank、non-saving rank、shared load key、
+  get-start 部分失败以及无 load keys 但有 save keys 的 chunk。
+- fixup 归属：
+  `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
+
+### P3：用具名生命周期操作替代 `drop_state` 布尔参数
+
+- 问题：`MooncakeSessionTracker.release_requests(..., drop_state: bool)` 同时编码两种语义：
+  retryable abort 只释放 active owner并保留 desired/pending 状态；last、preempt、finished
+  的 terminal cleanup 还要删除完整 request 状态。调用方只看到布尔值，传反不会产生
+  类型或即时错误，却会导致重试数据被误删或 terminal request 状态泄漏。
+- 判断性质：这是 Standards 轴的 Primitive Obsession / 可维护性判断，不是已经复现的
+  运行时 bug。D13 和 Task 6 步骤 4 明确区分 abort 与 terminal cleanup，为两个具名领域
+  操作提供了语义依据。
+- 统一修改方案：对外暴露具名方法，例如 `release_for_retry(req_ids)` 与
+  `release_terminal(req_ids)`；两者可复用一个私有实现，但业务调用点不得继续传裸布尔值。
+  Worker 的 wrapper 和 `_finish_current_mooncake_load_sessions()` 也应使用相同的具名语义，
+  让 abort、last、preempt 和 finished 分支可直接从方法名审查。
+- 测试要求：分别验证 retry release 保留 desired entries、terminal release 删除 desired
+  和 pending put ownership；两种方法均只对最后 active owner 返回 get-end key，并保持
+  repeated release 幂等。
+- fixup 归属：
+  `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
