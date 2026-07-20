@@ -3,7 +3,7 @@
 本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-a1e888b46dbaa3c76a9c0dd1060a3631148fe8af
+e5989049e9cb27f218b52b8e03af8e5dc841ac74
 feat(kv_pool): support Mooncake chunked prefill sessions
 ```
 
@@ -65,7 +65,7 @@ feat(kv_pool): support Mooncake chunked prefill sessions
 
 ## 检视范围
 
-临时 review 分支：`review/mooncake-chunked-prefill-sessions`
+临时 review 分支（rebase 后已删除）：`review/mooncake-chunked-prefill-sessions`
 
 - `docs/source/user_guide/feature_guide/layerwise_kv_pool.md`
 - `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/mooncake_session_tracker.py`
@@ -160,9 +160,12 @@ feat(kv_pool): support Mooncake chunked prefill sessions
 
 ## 实施结果
 
-- 已在临时源码分支 `review/mooncake-chunked-prefill-sessions` 创建并推送独立 fixup：
-  `78d84d7e0ee382a3869836f533fd208118055e9f #fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
-  fixup 保持独立，未执行 rebase。
+- 原独立 fixup
+  `78d84d7e0ee382a3869836f533fd208118055e9f #fixup feat(kv_pool): support Mooncake chunked prefill sessions`
+  已折叠为 `e5989049e9cb27f218b52b8e03af8e5dc841ac74 feat(kv_pool): support Mooncake chunked prefill sessions`。
+  最终 tree 与 rebase 前 review HEAD 相同；源码已用 exact `--force-with-lease` 从远端旧
+  SHA `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af` 更新到新 SHA，临时 review 分支已在
+  本地和远端删除。
 - P1：`MooncakeSessionTracker.release_failed_get_attempts()` 只释放失败调用涉及的 request
   owners；有其他 owner 的 shared key 不再提前 get-end，无 owner 的 key 仍由 Worker
   best-effort cleanup。当前 request 的 desired entries 保留供下一 chunk 重试。
@@ -174,8 +177,9 @@ feat(kv_pool): support Mooncake chunked prefill sessions
   提前 get-end 和反向 API 顺序；实现后目标范围 `25 passed`。
 - 使用专用 CPU venv 和隔离 bootstrap 运行完整
   `tests/ut/distributed/ascend_store`：`397 passed`。相关文件 Ruff check、`py_compile`、
-  新 tracker/测试 Ruff format check、`git diff --check` 和 fixup `git show --check` 均通过。
+  新 tracker/测试 Ruff format check、`git diff --check` 和重写 commit
+  `git show --check` 均通过。
 - S1 未纳入本轮源码修改；真实 Mooncake wheel / NPU Chunked Prefill E2E 仍按
   implementation plan Task 6 保持 pending。
-- 临时 review 分支不更新 `workspace.lock.json`；源码 feature branch 和 lock 仍指向原始
-  commit `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af`。
+- `workspace.lock.json` 和 `repo-state.md` 已刷新到最终 feature HEAD
+  `e5989049e9cb27f218b52b8e03af8e5dc841ac74`。

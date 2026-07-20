@@ -135,3 +135,14 @@
 - Verified the final source with the isolated full AscendStore CPU suite:
   `394 passed`. Focused Ruff lint, `py_compile`, and `git diff --check` passed.
   Real Mooncake wheel and NPU chunked-prefill E2E remain pending.
+- Folded
+  `78d84d7e0ee382a3869836f533fd208118055e9f #fixup feat(kv_pool): support Mooncake chunked prefill sessions`
+  into rewritten source commit `e5989049e9cb27f218b52b8e03af8e5dc841ac74`.
+  The final tree is identical to the pre-rebase review HEAD. Reverified the full
+  isolated AscendStore CPU suite with `397 passed`; focused Ruff, `py_compile`,
+  tracker/test format checks, feature diff checks, and rewritten commit checks
+  passed.
+- Force-pushed `origin/feature/mooncake-layerwise-kv-pool` with an exact lease
+  against prior remote HEAD `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af` and
+  confirmed the remote now points to `e5989049e9cb27f218b52b8e03af8e5dc841ac74`.
+  Deleted `review/mooncake-chunked-prefill-sessions` locally and remotely.
