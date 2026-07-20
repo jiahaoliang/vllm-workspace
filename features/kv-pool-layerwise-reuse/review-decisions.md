@@ -157,3 +157,25 @@ feat(kv_pool): support Mooncake chunked prefill sessions
   repeated release 幂等。
 - fixup 归属：
   `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
+
+## 实施结果
+
+- 已在临时源码分支 `review/mooncake-chunked-prefill-sessions` 创建并推送独立 fixup：
+  `78d84d7e0ee382a3869836f533fd208118055e9f #fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
+  fixup 保持独立，未执行 rebase。
+- P1：`MooncakeSessionTracker.release_failed_get_attempts()` 只释放失败调用涉及的 request
+  owners；有其他 owner 的 shared key 不再提前 get-end，无 owner 的 key 仍由 Worker
+  best-effort cleanup。当前 request 的 desired entries 保留供下一 chunk 重试。
+- P2：`_prepare_mooncake_layerwise_sessions()` 改为两阶段 preparation，先汇总、去重并
+  完成全部 `batch_get_start`，再逐 request 执行 `batch_put_start`。
+- P3：公开 lifecycle API 改为 `release_for_retry()` 和 `release_terminal()`；Worker 的
+  retry、last、preempt 和 finished 调用点不再传递 `drop_state` 裸布尔值。
+- TDD 证据：实现前目标范围 `8 failed, 17 passed`，失败覆盖缺失的具名 API、shared-owner
+  提前 get-end 和反向 API 顺序；实现后目标范围 `25 passed`。
+- 使用专用 CPU venv 和隔离 bootstrap 运行完整
+  `tests/ut/distributed/ascend_store`：`397 passed`。相关文件 Ruff check、`py_compile`、
+  新 tracker/测试 Ruff format check、`git diff --check` 和 fixup `git show --check` 均通过。
+- S1 未纳入本轮源码修改；真实 Mooncake wheel / NPU Chunked Prefill E2E 仍按
+  implementation plan Task 6 保持 pending。
+- 临时 review 分支不更新 `workspace.lock.json`；源码 feature branch 和 lock 仍指向原始
+  commit `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af`。
