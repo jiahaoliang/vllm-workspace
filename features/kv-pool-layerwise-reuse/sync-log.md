@@ -146,3 +146,18 @@
   against prior remote HEAD `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af` and
   confirmed the remote now points to `e5989049e9cb27f218b52b8e03af8e5dc841ac74`.
   Deleted `review/mooncake-chunked-prefill-sessions` locally and remotely.
+- Accepted R1 from the final commit review. Added a regression where a second
+  request reuses an already-started shared key while its new key put-start
+  fails; the red test reproduced the lost pending owner, then passed after the
+  exception path stopped clearing `previously_started`.
+- Created
+  `526df69bb4e984ae3081d028268ac777863eb3de #fixup feat(kv_pool): support Mooncake chunked prefill sessions`
+  and folded it into rewritten source commit
+  `8da904ff7048d88aed240645dd1293ca0abdf4ee`. The final tree matches the
+  pre-rebase fixup HEAD.
+- Reverified the rewritten source with the isolated full AscendStore CPU suite:
+  `398 passed`; the related focused range passed `35` tests. Ruff lint,
+  `py_compile`, feature diff checks, and rewritten commit checks passed.
+- Force-pushed with an exact lease against remote
+  `e5989049e9cb27f218b52b8e03af8e5dc841ac74` and confirmed local and remote
+  both point to `8da904ff7048d88aed240645dd1293ca0abdf4ee`.

@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`e5989049e9cb27f218b52b8e03af8e5dc841ac74`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`8da904ff7048d88aed240645dd1293ca0abdf4ee`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
@@ -16,14 +16,16 @@ Current Phase: source implementation complete
 ## Latest Validation
 
 - Added chunk-spanning Mooncake session ownership in signed source commit
-  `e5989049e9cb27f218b52b8e03af8e5dc841ac74`: Worker now retains
+  `8da904ff7048d88aed240645dd1293ca0abdf4ee`: Worker now retains
   `req_id -> keys` and `key -> active request owners`, renews accumulated keys
   on every chunk, promotes only successful PutEnd keys, and calls
   `batch_get_end` only after the final owner releases a shared key.
 - The accepted review fixes are folded into that commit: malformed get-start
   cleanup preserves unrelated owners, chunk preparation runs get-start before
-  put-start, and retry/terminal cleanup use separate named lifecycle APIs.
-- The complete isolated AscendStore CPU suite passed `397` tests. Focused Ruff
+  put-start, retry/terminal cleanup uses separate named lifecycle APIs, and a
+  request retains ownership of an already-started shared put key when a new
+  key's put-start fails.
+- The complete isolated AscendStore CPU suite passed `398` tests. Focused Ruff
   lint, `py_compile`, and `git diff --check` passed. New tracker/test files pass
   Ruff format check; no unrelated whole-file formatting was applied to the four
   legacy files with existing format deltas.

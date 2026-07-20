@@ -3,7 +3,7 @@
 本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-e5989049e9cb27f218b52b8e03af8e5dc841ac74
+8da904ff7048d88aed240645dd1293ca0abdf4ee
 feat(kv_pool): support Mooncake chunked prefill sessions
 ```
 
@@ -158,14 +158,33 @@ feat(kv_pool): support Mooncake chunked prefill sessions
 - fixup 归属：
   `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
 
+### R1：新 key start 失败不得丢失已 started 共享 key 的 request owner
+
+- 问题：同批第二个 request 同时复用 `previously_started` 共享 key 并 start 新 key 时，
+  若新 keys 的 `batch_put_start` 抛异常或返回 malformed result，异常路径会执行
+  `started.clear()`。后续 `register_put_keys()` 因而不会登记该 request 对共享 key 的
+  pending owner；共享 key 即使由另一个 request 成功 commit，也不会提升到该 request
+  的累计 load set。
+- 判断性质：这是 implementation plan D13 和 Task 6 步骤 2 的 contract/正确性偏差，
+  不是设计文档 §5.7 明文定义的失败粒度。
+- 统一修改方案：异常路径仍只对本次 `new_keys` 执行 best-effort revoke，但保留
+  `previously_started`；后续 metadata filtering 与 pending-owner registration 继续纳入
+  这些已存在的有效 session。
+- 测试要求：覆盖 request A 已 start shared key、request B 同时复用 shared key 并 start
+  新 key、request B 的新 key start 抛异常；断言 request B 仍保留 shared save key，且该
+  key commit 后进入 request B 的 future load entries。
+- fixup 归属：
+  `#fixup feat(kv_pool): support Mooncake chunked prefill sessions`。
+
 ## 实施结果
 
 - 原独立 fixup
   `78d84d7e0ee382a3869836f533fd208118055e9f #fixup feat(kv_pool): support Mooncake chunked prefill sessions`
-  已折叠为 `e5989049e9cb27f218b52b8e03af8e5dc841ac74 feat(kv_pool): support Mooncake chunked prefill sessions`。
-  最终 tree 与 rebase 前 review HEAD 相同；源码已用 exact `--force-with-lease` 从远端旧
-  SHA `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af` 更新到新 SHA，临时 review 分支已在
-  本地和远端删除。
+  先折叠为 `e5989049e9cb27f218b52b8e03af8e5dc841ac74`；本轮 R1 fixup
+  `526df69bb4e984ae3081d028268ac777863eb3de` 再折叠为
+  `8da904ff7048d88aed240645dd1293ca0abdf4ee feat(kv_pool): support Mooncake chunked prefill sessions`。
+  最终 tree 与 rebase 前 fixup HEAD 相同；源码已用 exact `--force-with-lease` 从远端旧
+  SHA `e5989049e9cb27f218b52b8e03af8e5dc841ac74` 更新到新 SHA。
 - P1：`MooncakeSessionTracker.release_failed_get_attempts()` 只释放失败调用涉及的 request
   owners；有其他 owner 的 shared key 不再提前 get-end，无 owner 的 key 仍由 Worker
   best-effort cleanup。当前 request 的 desired entries 保留供下一 chunk 重试。
@@ -173,13 +192,16 @@ feat(kv_pool): support Mooncake chunked prefill sessions
   完成全部 `batch_get_start`，再逐 request 执行 `batch_put_start`。
 - P3：公开 lifecycle API 改为 `release_for_retry()` 和 `release_terminal()`；Worker 的
   retry、last、preempt 和 finished 调用点不再传递 `drop_state` 裸布尔值。
+- R1：put-start 异常路径不再清空 `previously_started`；本次失败的 `new_keys` 仍被 revoke，
+  已 started 共享 key 继续登记当前 request owner，并在 commit 成功后提升为 future load。
 - TDD 证据：实现前目标范围 `8 failed, 17 passed`，失败覆盖缺失的具名 API、shared-owner
-  提前 get-end 和反向 API 顺序；实现后目标范围 `25 passed`。
+  提前 get-end 和反向 API 顺序；实现后目标范围 `25 passed`。R1 新用例实现前
+  `1 failed`，最小修改后 `1 passed`，相关聚焦范围 `35 passed`。
 - 使用专用 CPU venv 和隔离 bootstrap 运行完整
-  `tests/ut/distributed/ascend_store`：`397 passed`。相关文件 Ruff check、`py_compile`、
+  `tests/ut/distributed/ascend_store`：`398 passed`。相关文件 Ruff check、`py_compile`、
   新 tracker/测试 Ruff format check、`git diff --check` 和重写 commit
   `git show --check` 均通过。
 - S1 未纳入本轮源码修改；真实 Mooncake wheel / NPU Chunked Prefill E2E 仍按
   implementation plan Task 6 保持 pending。
 - `workspace.lock.json` 和 `repo-state.md` 已刷新到最终 feature HEAD
-  `e5989049e9cb27f218b52b8e03af8e5dc841ac74`。
+  `8da904ff7048d88aed240645dd1293ca0abdf4ee`。
