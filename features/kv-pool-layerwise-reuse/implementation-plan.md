@@ -174,6 +174,18 @@ replica 无法提供 ranged session 时，必须返回负数错误码，AscendSt
 `features/kv-pool-layerwise-reuse/implementation-plan.md`，其中包含这个独立的
 “决策记录”章节。
 
+### D13：Chunked Prefill read-session ownership
+
+**问题：** 多个 chunk 需要反复续约累计 load keys；多个并发请求还可能共享同一个
+prefix key。谁维护跨 chunk 状态，何时调用 `batch_get_end`？
+
+**决策：** 由 vLLM Ascend Worker 维护 `req_id -> keys` 和
+`key -> active request owners`。每个 chunk 对该请求的累计 load keys 调用
+`batch_get_start`；SendingThread 只把 `batch_put_end` 成功的 key 提升为后续 chunk
+load key。中间 chunk 不关闭 read session；last chunk、preempt 或 finished cleanup
+只移除对应 request owner，并且只有一个 key 的最后 owner 被移除时才调用
+`batch_get_end`。Mooncake Client API 不增加 owner/refcount 参数。
+
 ---
 
 ## 跨团队 API Contract
@@ -230,7 +242,8 @@ contract 在 signature 和行为层面是完整的：
 - Range call 返回非负成功值或负数错误码。
 - Client session 缺失或过期时，range call 绝不查询 Master。
 - `batch_put_end` 使 object 可见；PROCESSING object 不算 hit。
-- `batch_get_start` 在 Client 内保存 descriptor 和 lease deadline。
+- `batch_get_start` 在 Client 内保存 descriptor 和 lease deadline；重复调用会重新查询并
+  刷新该 key 的 deadline，用于每 chunk 续约。
 - `batch_get_end` 清理 Client read session。
 - 现有 Mooncake SSD setup 保持不变。replica placement 与 ranged support 由 Client
   和部署配置决定。
@@ -259,6 +272,9 @@ real-wheel gate。
   backend-specific block-key hit check。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py`:
   topology validation、session preparation、load session 收尾与跨 step put tracker。
+- `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/mooncake_session_tracker.py`:
+  Worker 内部的 chunk-spanning request/key registry、put commit promotion 与共享 key
+  owner release。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py`:
   range-batch 构建与 per-layer transfer 状态机。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py`:
@@ -779,9 +795,10 @@ Set-Location repos\vllm-ascend
 - get-start 与 ranged-read 失败映射到准确的本地 block ID；
 - 每个 `list[int]` API 返回过短、过长或非整数结果时，中止整个受影响 batch，且不能
   静默丢弃任何 key；
-- Worker 在最终 layer 完成或 data 失败后的 abort 路径中执行 `batch_get_end`；
-- 中间 layer 抛出异常时，Worker 恰好关闭一次 read session，RecvingThread 不直接
-  关闭 session；
+- Worker 在 last chunk 最终 layer 完成、preempt/finished 或 data abort 路径中释放
+  request owner；同一 key 只在最后 owner 释放时执行 `batch_get_end`；
+- 中间 layer 抛出异常时，Worker 关闭当前 active owner 并保留 desired keys 供后续 chunk
+  重试，RecvingThread 不直接关闭 session；
 - commit 成功、commit 失败后 revoke、显式 revoke 后，`_put_started_keys` 内容必须
   准确；
 - handler 抛出异常后仍调用 `task_done()` 并设置 layer event。
@@ -848,12 +865,12 @@ session 由 Master timeout 处理。
 RecvingThread 只负责 ranged read、invalid block 上报和 layer event，不调用
 `batch_get_end`。
 
-Worker 为当前 shared batch 跟踪 `opened_load_keys`、`aborted` flag 和
-`load_sessions_closed` flag。正常的最终 layer 完成和任意中间 layer abort 都通过
-Worker 的 `_close_load_sessions_once()` helper 处理。该 helper 最多调用一次
-`batch_get_end`，记录非零结果或异常，并在 `finally` block 中把 session 标记为已关闭，
-避免后续路径再次调用 end。若 ranged-read shape 不匹配，RecvingThread 将所有 active
-block 标记为 invalid 并通知 Worker 中止 batch；Worker 随即关闭所有已打开的 session。
+Worker 使用 `MooncakeSessionTracker` 跨 chunk 跟踪 request 的 desired load keys、pending
+put owner 和 active get owner。正常中间 chunk 只续约不 end；last chunk、preempt/finished
+和 abort 通过统一 request-release helper 移除 owner，helper 只把 owner 集合变空的 key
+交给 `batch_get_end`。若 ranged-read shape 不匹配，RecvingThread 将所有 active block
+标记为 invalid 并通知 Worker 中止 batch；Worker 释放当前 active owner，但保留 desired
+keys 供后续 chunk 重新 `batch_get_start`。
 
 若 Mooncake 部署使用 SSD，而 Client 无法为所选 replica 提供 ranged session，则以相同
 方式处理其负数错误码；此状态机不要读取 `enable_ssd_offload`。
@@ -969,9 +986,9 @@ git diff --check
 
 分别对一个 MLA 配置和一个 GQA 配置执行 miss -> layerwise save -> COMPLETE ->
 prefix hit -> layerwise load。保留环境现有的 Mooncake SSD 选择。将生成输出与
-no-offload 基线对比；运行足够长的 layerwise load，验证默认
-`default_kv_lease_ttl` 能覆盖完整 onload 流程；再注入一次 get-start/lease 失败以观察
-vLLM 重计算。
+no-offload 基线对比；运行至少三个 prompt chunks，验证默认
+`default_kv_lease_ttl` 能覆盖单 chunk onload，并确认后续 chunk 的
+`batch_get_start` 会续约累计 keys；再注入一次 renewal/lease 失败以观察 vLLM 重计算。
 
 - [ ] **步骤 5：提交并 push 源码文档**
 
@@ -1006,6 +1023,57 @@ git commit -s -m "chore: record Mooncake layerwise implementation state"
 git push origin kv-pool-layerwise-reuse
 ```
 
+### Task 6：支持 Chunked Prefill 的跨 chunk Mooncake Session
+
+**状态：** source implementation complete；真实 Mooncake wheel / NPU E2E pending。
+
+**文件：**
+
+- 新增：`repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/mooncake_session_tracker.py`
+- 修改：`repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py`
+- 修改：`repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py`
+- 修改：`repos/vllm-ascend/docs/source/user_guide/feature_guide/layerwise_kv_pool.md`
+- 测试：`repos/vllm-ascend/tests/ut/distributed/ascend_store/test_mooncake_session_tracker.py`
+- 测试：`repos/vllm-ascend/tests/ut/distributed/ascend_store/test_pool_worker.py`
+- 测试：`repos/vllm-ascend/tests/ut/distributed/ascend_store/test_kv_transfer.py`
+
+- [x] **步骤 1：建立线程安全的 request/key registry**
+
+记录 request 的累计 load key 与 block index、pending put key owners 和 active get
+owners。完整 block key 替换同 block index 的 partial key，避免后续 chunk 对同一 HBM
+block 重复 load 两个远端对象。
+
+- [x] **步骤 2：只提升成功 COMPLETE 的前序 chunk key**
+
+Worker 在 `batch_put_start` 成功后记录 pending owner；SendingThread 仅在末层
+`batch_commit` 返回 `0` 时将 key 提升到 owner request 的累计 load set。range/commit
+失败走 revoke，并从 pending registry 移除。
+
+- [x] **步骤 3：每个 chunk 续约并构建累计 ranged load**
+
+初始 prefix hit 与此前 COMPLETE key 合并后执行一次去重的 `batch_get_start`。结果按
+request/block slot fan-out；后续 chunk 即使 `load_spec=None`，也会从 registry 重建
+`load_block_keys` 和 layer load task。
+
+- [x] **步骤 4：按最后 owner 执行 get-end**
+
+中间 chunk 保留 owner。last chunk 在最后 ranged read 完成后释放当前 request；共享 key
+仍有其他 owner 时不调用 `batch_get_end`。preempt/finished 删除 request 状态；receiver
+abort 关闭当前 active owner，但保留 desired keys 供后续 chunk 重试。
+
+- [x] **步骤 5：完成 CPU unit/static gate**
+
+源码 commit `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af` 已通过隔离的完整
+AscendStore CPU suite（`394 passed`）、Ruff lint、`py_compile` 和
+`git diff --check`。新 tracker 与新测试文件通过 Ruff format check；四个既有大文件仍有
+本 feature 之前就存在的整文件 format delta，本 Task 不做无关格式化。
+
+- [ ] **步骤 6：完成真实 wheel / NPU Chunked Prefill E2E**
+
+使用至少三个 prompt chunks，验证每 chunk lease renewal、前序 COMPLETE key onload、
+本 chunk put-end 可见性、mixed-lastness 共享 prefix ownership 和最终 accuracy。再使用短
+lease TTL 注入一次 renewal failure，验证逐 block invalid 与 recompute policy。
+
 ## 最终验收标准
 
 - `use_layerwise=true, backend=mooncake` 选择 per-block Layer thread；若已安装的
@@ -1023,9 +1091,10 @@ git push origin kv-pool-layerwise-reuse
   `_put_started_keys` 移除；其他未收尾 PROCESSING session 由 Master timeout 清理。
 - 正数 ranged byte count 表示成功；负数 ranged code 映射到准确的本地 invalid block，
   并触发已配置的 vLLM failure policy。
-- Worker 对每个已打开的 read session 恰好执行一次 `batch_get_end`，包括中间 layer
-  abort 的情况；RecvingThread 不拥有 session cleanup，transfer exception 不能使
-  `queue.join()` 或 layer wait 一直阻塞。
+- Worker 每个 chunk 续约 request 的累计 load keys；中间 chunk 不执行
+  `batch_get_end`。last/preempt/finished/abort 释放 request owner，同一 key 只在最后一个
+  active owner 释放后执行一次 `batch_get_end`；RecvingThread 不拥有 session cleanup，
+  transfer exception 不能使 `queue.join()` 或 layer wait 一直阻塞。
 - 现有 memcache flat-GVA、Mooncake whole-key、Yuanrong KeyLayer 和 MTP guard 测试
   保持通过。
 - 严格的 fake 测试、真实 wheel contract 测试和 NPU E2E 均基于已记录的 commit 与

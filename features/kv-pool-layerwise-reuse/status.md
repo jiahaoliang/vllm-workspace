@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`8cfd1e22f92ee1a40139ea40b487fa5001d1c81f`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`a1e888b46dbaa3c76a9c0dd1060a3631148fe8af`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
@@ -15,6 +15,17 @@ Current Phase: source implementation complete
 
 ## Latest Validation
 
+- Added chunk-spanning Mooncake session ownership in signed source commit
+  `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af`: Worker now retains
+  `req_id -> keys` and `key -> active request owners`, renews accumulated keys
+  on every chunk, promotes only successful PutEnd keys, and calls
+  `batch_get_end` only after the final owner releases a shared key.
+- The complete isolated AscendStore CPU suite passed `394` tests. Focused Ruff
+  lint, `py_compile`, and `git diff --check` passed. New tracker/test files pass
+  Ruff format check; no unrelated whole-file formatting was applied to the four
+  legacy files with existing format deltas.
+- Real Mooncake wheel contract validation and NPU chunked-prefill E2E remain
+  pending; this checkpoint does not claim runtime/NPU validation.
 - Folded the accepted cross-layer range-batch test fixup into rewritten builder commit `21bd87100`, then replayed the five later commits without conflicts. Range-diff showed all five later patches unchanged.
 - Force-pushed final source HEAD `8cfd1e22f92ee1a40139ea40b487fa5001d1c81f` with an exact `--force-with-lease` against prior remote `6a825ca54761131c9b73c8871a886381c49513d8`.
 - On the rewritten HEAD, the complete isolated AscendStore CPU suite passed `362` tests; focused Ruff, format check, full-range `git diff --check`, and all six rewritten commit checks passed.

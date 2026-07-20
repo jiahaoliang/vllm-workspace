@@ -117,3 +117,21 @@
   Force-pushed `origin/feature/mooncake-layerwise-kv-pool` with an exact lease
   against prior remote HEAD `8bf9ac9c34397b2fd4ab1c21c1e6965b5a55eb0b`
   and confirmed the remote now points to `867dd424318d88e9bb2b831cdbd5b16bb723184a`.
+
+## 2026-07-20
+
+- Synced the authoritative HackMD design update that adds §5.7 Chunked Prefill
+  session hooks and archived the companion sequence diagram. The source-backed
+  review confirmed that Mooncake already refreshes `lease_deadline` on repeated
+  `batch_get_start`; the vLLM Ascend Worker lifecycle was the missing layer.
+- Implemented the accepted Worker-side ownership design in signed source commit
+  `a1e888b46dbaa3c76a9c0dd1060a3631148fe8af`
+  (`feat(kv_pool): support Mooncake chunked prefill sessions`) and pushed it to
+  `origin/feature/mooncake-layerwise-kv-pool`.
+- Added a thread-safe request/key registry. Each chunk renews the request's
+  accumulated load keys; SendingThread promotes only successful PutEnd keys;
+  mixed-lastness requests sharing a prefix key keep the Client session until
+  the final active owner releases it. Preempt/finished/abort cleanup is covered.
+- Verified the final source with the isolated full AscendStore CPU suite:
+  `394 passed`. Focused Ruff lint, `py_compile`, and `git diff --check` passed.
+  Real Mooncake wheel and NPU chunked-prefill E2E remain pending.
