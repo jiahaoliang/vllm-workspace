@@ -28,6 +28,8 @@
 
 - Mooncake Layerwise KVPool Put design: <https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/HJGESQG4ze>
   - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/design-mooncake-layerwise-gva-put.md`
+- Chunked Prefill + Layerwise Mooncake sequence: <https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/rJUTYuX4Ml>
+  - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/sequence-chunked-prefill-layerwise-mooncake.md`
 
 ## Local Snapshots
 
@@ -35,6 +37,8 @@
 - `snapshots/rfc-33980-sparse-attention-kv-offload.md`
 - `snapshots/ader47-vllm-ascend-674594c5-kv-pool-layerwise-reuse.md`
 - `snapshots/design-mooncake-layerwise-gva-put.md`
+- `snapshots/sequence-chunked-prefill-layerwise-mooncake.md`
+- `snapshots/research-chunked-prefill-update-2026-07-20.md`
 - `snapshots/pr-11444-layerwise-kv-pooling-memcache.md`
 - `snapshots/pr-10733-layerwise-kv-pool-reuse.md`
 - `snapshots/pr-2881-mooncake-layerwise-session-ranges.md`
