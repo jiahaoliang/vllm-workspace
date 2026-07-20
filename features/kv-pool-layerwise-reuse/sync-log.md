@@ -176,3 +176,17 @@
 - Force-pushed rewritten source HEAD
   `1c75b507fe268b91a6f4183da0ae6221ffd05568` with an exact lease against remote
   `8da904ff7048d88aed240645dd1293ca0abdf4ee` and confirmed local and remote match.
+- Implemented the final feature-branch review decisions in independent
+  vLLM-Ascend fixup `cfe97c8de2cce781750be05e34ac7d0030fd9c0b`: MC2 adds a bounded
+  Mooncake-only fatal drain timeout without racing `batch_get_end`, and D3 sends
+  uncertain put-start revokes through `KVCacheStoreLayerSendingThread`.
+- The user then narrowed implementation scope to vLLM-Ascend only. Restored
+  Mooncake to unchanged collaborator HEAD
+  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`; no Mooncake commit was pushed.
+  Added vLLM-Ascend adapter fixup `f5ab64a1f` so the final tree continues using
+  the collaborator wheel's current two-argument put-start and four-argument
+  ranged-put signatures.
+- Pushed vLLM-Ascend HEAD `f5ab64a1f` to
+  `origin/feature/mooncake-layerwise-kv-pool`. The isolated AscendStore CPU suite
+  passed `402` tests; Ruff, `py_compile`, `git diff --check`, and fixup commit
+  checks passed. No real Mooncake wheel, memcache E2E, or NPU E2E was run.

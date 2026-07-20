@@ -5,16 +5,28 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`1c75b507fe268b91a6f4183da0ae6221ffd05568`),
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`f5ab64a1f`),
   rebased onto `upstream/main` (`9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
 ## Next Steps
 
-- Run the real vLLM v0.24.0 integration gate, then integrate the Mooncake wheel and run contract/NPU gates.
+- In an environment with the Mooncake C++ toolchain, validate the unchanged collaborator wheel contract and run the real vLLM v0.24.0 integration gate. NPU E2E is not a local acceptance item.
 
 ## Latest Validation
+
+- Implemented the accepted MC2/D3 review decisions in vLLM-Ascend fixup
+  `cfe97c8de`: Mooncake load timeout now has a bounded fatal drain path without
+  early `batch_get_end`, while memcache retains its original drain behavior;
+  put-start exception revoke runs on the layer SendingThread control queue.
+- The latest scope decision forbids Mooncake source changes. Mooncake remains
+  exactly at collaborator HEAD `74b0acf15`; vLLM-Ascend adapter rollback
+  `f5ab64a1f` preserves its current two-argument put-start and four-argument
+  ranged-put calls.
+- The complete isolated AscendStore CPU suite passed `402` tests. Focused Ruff,
+  `py_compile`, `git diff --check`, and fixup commit checks passed. Real
+  Mooncake wheel, memcache E2E, and NPU E2E were not run.
 
 - Rebased the feature onto latest `vllm-ascend` `upstream/main`
   `9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`; the rewritten signed feature HEAD is
