@@ -161,3 +161,18 @@
 - Force-pushed with an exact lease against remote
   `e5989049e9cb27f218b52b8e03af8e5dc841ac74` and confirmed local and remote
   both point to `8da904ff7048d88aed240645dd1293ca0abdf4ee`.
+- Fetched latest `vllm-project/vllm-ascend` `upstream/main` at
+  `9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384` and rebased
+  `feature/mooncake-layerwise-kv-pool` from `8da904ff7048d88aed240645dd1293ca0abdf4ee`.
+- The rebase had overlapping semantic conflicts in `kv_transfer.py`,
+  `pool_scheduler.py`, and `pool_worker.py`. Resolutions retained upstream
+  multi-group `group_id` / `layer_idx_in_group` behavior together with Mooncake
+  key-major ranges, exception-safe finalization, and chunked-prefill owner tracking.
+  Upstream-equivalent commits `efb3e85a0` and `d7affe61e` were not replayed.
+- Reverified the rebased source with the isolated full AscendStore CPU suite:
+  `398 passed`. Ruff lint, `py_compile`, and `git diff --check` passed. The stale
+  FlashComm2 test sentinel was updated to verify the real `parallel_state` module
+  after upstream removed FlashComm2 in `f583c2fa1`.
+- Force-pushed rewritten source HEAD
+  `1c75b507fe268b91a6f4183da0ae6221ffd05568` with an exact lease against remote
+  `8da904ff7048d88aed240645dd1293ca0abdf4ee` and confirmed local and remote match.

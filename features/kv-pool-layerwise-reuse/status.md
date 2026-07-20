@@ -5,7 +5,8 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`8da904ff7048d88aed240645dd1293ca0abdf4ee`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`1c75b507fe268b91a6f4183da0ae6221ffd05568`),
+  rebased onto `upstream/main` (`9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
@@ -15,8 +16,10 @@ Current Phase: source implementation complete
 
 ## Latest Validation
 
-- Added chunk-spanning Mooncake session ownership in signed source commit
-  `8da904ff7048d88aed240645dd1293ca0abdf4ee`: Worker now retains
+- Rebased the feature onto latest `vllm-ascend` `upstream/main`
+  `9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`; the rewritten signed feature HEAD is
+  `1c75b507fe268b91a6f4183da0ae6221ffd05568`. The rebase preserved chunk-spanning
+  Mooncake session ownership: Worker retains
   `req_id -> keys` and `key -> active request owners`, renews accumulated keys
   on every chunk, promotes only successful PutEnd keys, and calls
   `batch_get_end` only after the final owner releases a shared key.
@@ -29,6 +32,10 @@ Current Phase: source implementation complete
   lint, `py_compile`, and `git diff --check` passed. New tracker/test files pass
   Ruff format check; no unrelated whole-file formatting was applied to the four
   legacy files with existing format deltas.
+- The rebase had semantic conflicts in `kv_transfer.py`, `pool_scheduler.py`, and
+  `pool_worker.py`. Resolutions preserve upstream multi-group layer indexing and
+  the feature's Mooncake key-major ranges, exception-safe finalization, and
+  last-owner session cleanup.
 - Real Mooncake wheel contract validation and NPU chunked-prefill E2E remain
   pending; this checkpoint does not claim runtime/NPU validation.
 - Folded the accepted cross-layer range-batch test fixup into rewritten builder commit `21bd87100`, then replayed the five later commits without conflicts. Range-diff showed all five later patches unchanged.

@@ -3,7 +3,7 @@
 本文只记录以下提交中经用户明确采纳的检视建议：
 
 ```text
-8da904ff7048d88aed240645dd1293ca0abdf4ee
+1c75b507fe268b91a6f4183da0ae6221ffd05568
 feat(kv_pool): support Mooncake chunked prefill sessions
 ```
 
@@ -204,4 +204,6 @@ feat(kv_pool): support Mooncake chunked prefill sessions
 - S1 未纳入本轮源码修改；真实 Mooncake wheel / NPU Chunked Prefill E2E 仍按
   implementation plan Task 6 保持 pending。
 - `workspace.lock.json` 和 `repo-state.md` 已刷新到最终 feature HEAD
-  `8da904ff7048d88aed240645dd1293ca0abdf4ee`。
+  `1c75b507fe268b91a6f4183da0ae6221ffd05568`。
+- 该 commit 已从旧 HEAD `8da904ff7048d88aed240645dd1293ca0abdf4ee` rebase 到最新
+  `vllm-ascend` `upstream/main` `9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`；R1 语义和回归测试均保留。
