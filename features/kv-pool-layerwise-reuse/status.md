@@ -5,7 +5,7 @@ Current Phase: source implementation complete
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`f5ab64a1f`),
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`663209fd6`),
   rebased onto `upstream/main` (`9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
@@ -16,17 +16,18 @@ Current Phase: source implementation complete
 
 ## Latest Validation
 
-- Implemented the accepted MC2/D3 review decisions in vLLM-Ascend fixup
-  `cfe97c8de`: Mooncake load timeout now has a bounded fatal drain path without
+- Folded the accepted MC2/D3 review decisions into vLLM-Ascend orchestration
+  commit `9f2aefa59`: Mooncake load timeout now has a bounded fatal drain path without
   early `batch_get_end`, while memcache retains its original drain behavior;
   put-start exception revoke runs on the layer SendingThread control queue.
 - The latest scope decision forbids Mooncake source changes. Mooncake remains
-  exactly at collaborator HEAD `74b0acf15`; vLLM-Ascend adapter rollback
-  `f5ab64a1f` preserves its current two-argument put-start and four-argument
-  ranged-put calls.
+  exactly at collaborator HEAD `74b0acf15`; folded Backend contract commit
+  `0e5c41c00` preserves its current two-argument put-start and four-argument
+  ranged-put calls. No `fixup!` commits remain in the feature history.
 - The complete isolated AscendStore CPU suite passed `402` tests. Focused Ruff,
-  `py_compile`, `git diff --check`, and fixup commit checks passed. Real
-  Mooncake wheel, memcache E2E, and NPU E2E were not run.
+  `py_compile`, `git diff --check`, and all nine rewritten commit checks passed.
+  The pre/post-autosquash tree hash is identical. Real Mooncake wheel, memcache
+  E2E, and NPU E2E were not run.
 
 - Rebased the feature onto latest `vllm-ascend` `upstream/main`
   `9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`; the rewritten signed feature HEAD is

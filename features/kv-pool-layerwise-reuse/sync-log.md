@@ -190,3 +190,17 @@
   `origin/feature/mooncake-layerwise-kv-pool`. The isolated AscendStore CPU suite
   passed `402` tests; Ruff, `py_compile`, `git diff --check`, and fixup commit
   checks passed. No real Mooncake wheel, memcache E2E, or NPU E2E was run.
+- Autosquashed all three review fixups into their owning commits. D3/MC2 are now
+  part of orchestration commit `9f2aefa59c239171d5e31c800b8979e67ff62c18`;
+  the two Backend contract fixups cancel inside patch-equivalent commit
+  `0e5c41c00c0f893dd8fe7bd87533a93aab47ac9f`. The rewritten feature contains
+  nine commits and no `fixup!` subjects.
+- Resolved two `pool_worker.py` autosquash conflicts by retaining the historical
+  lifecycle appropriate to the orchestration commit, then allowing the later
+  chunked-prefill commit to install request-owner tracking while preserving the
+  asynchronous revoke path. The final tree hash stayed exactly
+  `96cb96b70854e4f69f5598feab74c3e7e1fd6605`.
+- Reverified `402 passed`, focused Ruff, `py_compile`, `git diff --check`, and
+  all nine rewritten commit checks. Force-pushed final HEAD
+  `663209fd6208a59a48742f75116345bf5f5281ec` with an exact lease against
+  `f5ab64a1f574896c2894283e09a7a7e867b597d4`.

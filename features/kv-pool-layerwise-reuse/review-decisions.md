@@ -108,15 +108,18 @@
 
 ## 当前实施状态
 
-- vLLM-Ascend MC2/D3 fixup：
-  `cfe97c8de2cce781750be05e34ac7d0030fd9c0b`，归属
-  `feat(kv_pool): orchestrate Mooncake layerwise sessions`。
-- vLLM-Ascend Mooncake contract 适配回退：
-  `f5ab64a1f`；最终源码不依赖 D2 的新 signature。
-- vLLM-Ascend feature HEAD：`f5ab64a1f`，已推送
-  `origin/feature/mooncake-layerwise-kv-pool`；fixup 未 rebase。
+- MC2/D3 已折叠到 vLLM-Ascend commit
+  `9f2aefa59c239171d5e31c800b8979e67ff62c18`
+  (`feat(kv_pool): orchestrate Mooncake layerwise sessions`)。
+- 两个相互抵消的 Mooncake contract fixup 已折叠到
+  `0e5c41c00c0f893dd8fe7bd87533a93aab47ac9f`；该 commit 的最终 patch 与折叠前
+  原 Backend contract commit 等价，源码不依赖 D2 的新 signature。
+- vLLM-Ascend feature HEAD：`663209fd6208a59a48742f75116345bf5f5281ec`，
+  已使用精确 `--force-with-lease` 推送到
+  `origin/feature/mooncake-layerwise-kv-pool`；feature history 中不再有 `fixup!` commit。
 - Mooncake 已恢复到未修改的 collaborator HEAD
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`，没有 Mooncake commit 或 push。
 - 隔离 AscendStore CPU suite：`402 passed`；Ruff、`py_compile`、
-  `git diff --check` 和 fixup commit checks 通过。
+  `git diff --check` 和全部 9 个重写 commit checks 通过。折叠前后最终 tree hash 均为
+  `96cb96b70854e4f69f5598feab74c3e7e1fd6605`。
 - 未运行真实 Mooncake wheel、memcache E2E 或 NPU E2E；本轮不声称经过 NPU 验证。
