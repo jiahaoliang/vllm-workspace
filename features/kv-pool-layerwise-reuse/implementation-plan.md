@@ -75,11 +75,10 @@ Mooncake PR #2881 已提供七个 API 的 WIP 实现，因此 vLLM Ascend 开发
 fake 固定 contract，同时用记录的 PR head 构建 wheel 运行真实 contract gate。WIP
 实现与 contract 不一致时以本计划的 gate 为准，不在 Backend 中兼容两套语义。
 
-内部 `Backend` 的 layerwise session/range method（包括 `batch_commit` 和
-`batch_revoke`）对不支持的 backend 一律抛出 `NotImplementedError`，不得使用默认成功
-返回值。Memcache flat-GVA 路径不调用 commit/revoke，因此无需通过 no-op override
-伪装 capability。该决策修正了当前 HackMD 设计 §§2.4/5.2/5.3 的旧描述；同步状态见
-`references/design-errata.md`。
+内部 `Backend.batch_commit` / `batch_revoke` 默认返回 `[0] * len(keys)`；Memcache
+显式实现相同的 no-op，因为 flat-GVA holes 无需单独发布或撤销 session。Mooncake 覆盖
+这两个方法并委托 `batch_put_end` / `batch_put_revoke`。其他不支持的 session/range
+method 继续显式抛出 `NotImplementedError`。
 
 **否决的方案：** 运行时 fallback 到旧路径；等 Mooncake 团队完成后再开始 vLLM
 Ascend 工作。
@@ -248,12 +247,12 @@ real-wheel gate。
 ## 计划中的文件职责
 
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/backend.py`:
-  内部 Backend contract；不支持的 session/range method 显式抛出
-  `NotImplementedError`。
+  内部 Backend contract；commit/revoke 默认成功，其他不支持的 session/range method
+  显式抛出 `NotImplementedError`。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py`:
   capability check 与 Mooncake Client 薄委托。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/memcache_backend.py`:
-  保持既有 flat-GVA alloc/copy/lease 行为；不声明未使用的 commit/revoke capability。
+  保持既有 flat-GVA alloc/copy/lease 行为，并显式实现 commit/revoke no-op。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py`:
   block-key helper 与 Mooncake range metadata type。
 - `repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py`:
@@ -458,10 +457,10 @@ def validate_layerwise_support(self) -> None:
     return None
 
 def batch_commit(self, keys: list[str]) -> list[int]:
-    raise NotImplementedError(f"{type(self).__name__} does not support batch_commit")
+    return [0] * len(keys)
 
 def batch_revoke(self, keys: list[str]) -> list[int]:
-    raise NotImplementedError(f"{type(self).__name__} does not support batch_revoke")
+    return [0] * len(keys)
 
 def batch_put_start(self, keys: list[str], sizes: list[int]) -> list[int]:
     raise NotImplementedError(f"{type(self).__name__} does not support batch_put_start")
