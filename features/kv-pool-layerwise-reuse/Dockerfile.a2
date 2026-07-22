@@ -1,0 +1,182 @@
+#
+# vLLM Ascend layerwise KV pool development image
+# Target: ARM64 Atlas A2 / Ascend 910B
+#
+
+FROM quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12
+
+SHELL ["/bin/bash", "-c"]
+
+ARG PIP_INDEX_URL="https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+ARG BUILD_JOBS=32
+ARG SOC_VERSION="ascend910b1"
+ARG COMPILE_CUSTOM_KERNELS=1
+
+ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
+ARG VLLM_COMMIT="ee0da84ab9e04ac7610e28580af62c365e898389"
+
+ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
+ARG VLLM_ASCEND_COMMIT="663209fd6208a59a48742f75116345bf5f5281ec"
+
+ARG MOONCAKE_REPO="https://github.com/ascend-direct-dev/Mooncake.git"
+ARG MOONCAKE_COMMIT="74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    SOC_VERSION=${SOC_VERSION} \
+    COMPILE_CUSTOM_KERNELS=${COMPILE_CUSTOM_KERNELS} \
+    TASK_QUEUE_ENABLE=1 \
+    OMP_NUM_THREADS=1
+
+WORKDIR /workspace
+
+# Base build tools, clang for triton-ascend, and Mooncake runtime dependencies.
+RUN set -euxo pipefail; \
+    apt-get update -y; \
+    apt-get install -y \
+        ca-certificates \
+        git \
+        vim \
+        wget \
+        unzip \
+        net-tools \
+        gcc \
+        g++ \
+        cmake \
+        numactl \
+        libnuma-dev \
+        libibverbs-dev \
+        libjemalloc2 \
+        libhiredis-dev \
+        clang-15; \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20; \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20; \
+    rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
+# Clone the exact vLLM commit.
+RUN set -euxo pipefail; \
+    git clone --depth 1 --no-checkout \
+        "${VLLM_REPO}" /vllm-workspace/vllm; \
+    git -C /vllm-workspace/vllm fetch --depth 1 \
+        origin "${VLLM_COMMIT}"; \
+    git -C /vllm-workspace/vllm checkout --detach "${VLLM_COMMIT}"; \
+    test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = \
+        "${VLLM_COMMIT}"
+
+# Clone the exact vLLM Ascend feature commit.
+RUN set -euxo pipefail; \
+    git clone --depth 1 --no-checkout \
+        "${VLLM_ASCEND_REPO}" /vllm-workspace/vllm-ascend; \
+    git -C /vllm-workspace/vllm-ascend fetch --depth 1 \
+        origin "${VLLM_ASCEND_COMMIT}"; \
+    git -C /vllm-workspace/vllm-ascend checkout --detach \
+        "${VLLM_ASCEND_COMMIT}"; \
+    git -C /vllm-workspace/vllm-ascend submodule update \
+        --init --recursive --depth 1; \
+    test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = \
+        "${VLLM_ASCEND_COMMIT}"
+
+# Clone the Mooncake commit containing the layerwise session/range APIs.
+RUN set -euxo pipefail; \
+    git clone --depth 1 --no-checkout \
+        "${MOONCAKE_REPO}" /vllm-workspace/Mooncake; \
+    git -C /vllm-workspace/Mooncake fetch --depth 1 \
+        origin "${MOONCAKE_COMMIT}"; \
+    git -C /vllm-workspace/Mooncake checkout --detach \
+        "${MOONCAKE_COMMIT}"; \
+    git -C /vllm-workspace/Mooncake submodule update \
+        --init --recursive --depth 1; \
+    test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = \
+        "${MOONCAKE_COMMIT}"
+
+# Install Mooncake source-build dependencies.
+RUN set -euxo pipefail; \
+    cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh \
+        /vllm-workspace/Mooncake/mooncake_installer.sh; \
+    cd /vllm-workspace/Mooncake; \
+    bash mooncake_installer.sh -y; \
+    apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev; \
+    rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
+# Build and install Mooncake with Ascend Direct support.
+RUN set -euxo pipefail; \
+    cd /vllm-workspace/Mooncake; \
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh; \
+    export LD_LIBRARY_PATH="/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:${LD_LIBRARY_PATH:-}"; \
+    cmake -S . -B build \
+        -DUSE_ASCEND_DIRECT=ON \
+        -DBUILD_UNIT_TESTS=OFF \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_BENCHMARK=OFF \
+        -DWITH_STORE_RUST=OFF; \
+    cmake --build build --parallel "${BUILD_JOBS}"; \
+    cmake --install build; \
+    ldconfig; \
+    rm -rf build
+
+RUN pip config set global.index-url "${PIP_INDEX_URL}"
+
+# Install vLLM from the pinned source.
+RUN set -euxo pipefail; \
+    VLLM_TARGET_DEVICE=empty python3 -m pip install \
+        -e "/vllm-workspace/vllm[audio]" \
+        --extra-index-url https://download.pytorch.org/whl/cpu/; \
+    python3 -m pip uninstall -y triton; \
+    python3 -m pip cache purge
+
+# Install vLLM Ascend from the pinned feature source.
+RUN set -euxo pipefail; \
+    export PIP_EXTRA_INDEX_URL="https://mirrors.huaweicloud.com/ascend/repos/pypi"; \
+    export VLLM_BATCH_INVARIANT=1; \
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh; \
+    set +u; \
+    source /usr/local/Ascend/nnal/atb/set_env.sh; \
+    set -u; \
+    python3 -m pip install \
+        -e /vllm-workspace/vllm-ascend \
+        --extra-index-url https://download.pytorch.org/whl/cpu/; \
+    python3 -m pip uninstall -y triton triton-ascend; \
+    python3 -m pip install \
+        triton-ascend==3.2.1 \
+        --extra-index-url \
+        https://mirrors.huaweicloud.com/ascend/repos/pypi; \
+    python3 -m pip cache purge
+
+# Additional runtime utilities.
+RUN set -euxo pipefail; \
+    python3 -m pip install \
+        modelscope \
+        'ray>=2.47.1,<=2.48.0' \
+        'protobuf>3.20.0'; \
+    python3 -m pip cache purge
+
+ENV LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
+
+# The driver is mounted only in an Ascend pod, so verify the compiled pybind
+# extension statically here instead of loading it against CANN's driver stubs.
+RUN set -euo pipefail; \
+    store_modules=( \
+        /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so \
+    ); \
+    test -f "${store_modules[0]}"; \
+    for api_name in \
+        batch_put_start \
+        batch_put_from_multi_buffer_ranges \
+        batch_put_end \
+        batch_put_revoke \
+        batch_get_start \
+        batch_get_into_multi_buffer_ranges \
+        batch_get_end; \
+    do \
+        grep -F -q "${api_name}" < <(strings "${store_modules[0]}"); \
+    done
+
+LABEL org.opencontainers.image.title="vLLM Ascend layerwise KV pool" \
+      org.opencontainers.image.vllm.commit="${VLLM_COMMIT}" \
+      org.opencontainers.image.vllm-ascend.commit="${VLLM_ASCEND_COMMIT}" \
+      org.opencontainers.image.mooncake.commit="${MOONCAKE_COMMIT}"
+
+RUN echo 'export LD_PRELOAD=/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2:${LD_PRELOAD:-}' >> /root/.bashrc && \
+    echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib' >> /root/.bashrc
+
+WORKDIR /workspace
+CMD ["/bin/bash"]
