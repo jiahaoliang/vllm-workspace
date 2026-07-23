@@ -2,7 +2,7 @@
 
 ## Result
 
-The deployment smoke passed for this path:
+The original sequential deployment smoke passed for this path:
 
 ```text
 standard Kubernetes proxy
@@ -15,6 +15,17 @@ This is smoke-level evidence for routing, shared block-key visibility, and a
 successful consumer layerwise load. It is not strict proof that every physical
 layer used the ranged APIs or that the whole-key APIs were never called; the
 current source has no structured per-layer operation trace.
+
+The final distinct-cache concurrent correctness smoke also passed. Four
+requests shared 12 leading blocks and each had 13 request-specific blocks. Both
+direct decoder and full proxy concurrency returned each request's own marker,
+with per-response logs proving that all 25 blocks were loaded layerwise.
+
+An earlier same-cache prototype did reproduce `CASE_ONE -> CASE_TWO` through
+the proxy. Because all four requests in that prototype loaded the same block
+keys, it did not test cache selection. The anomaly remains a separate proxy
+concurrency risk even though it did not recur in the final distinct-cache run.
+Neither test is a ranged API test; ranged API validation is deferred.
 
 ## Locked inputs
 
@@ -100,6 +111,59 @@ snapshot. The helper was then extended to also save `proxy-endpoints.json` on
 subsequent runs. These artifacts are ephemeral and disappear when that Pod is
 replaced.
 
+## Concurrent KV cache correctness evidence
+
+The final helper constructed four prompts with 12 identical leading blocks and
+13 request-specific blocks. Each unique region repeatedly contained one of
+`CASE_ZERO` through `CASE_THREE`; the uncached question suffix was identical for
+all requests. Prompts were sent as token IDs, and the runtime assertion recorded
+exactly 3200 cached tokens followed by 15 token-for-token identical uncached
+tokens. Therefore a request could return its own marker only after using the
+corresponding request-specific prompt state. The tokenizer predicted 64 unique
+Mooncake objects:
+
+```text
+12 shared + (4 requests * 13 unique) = 64 keys
+```
+
+Starting from an empty Master, all four concurrent direct decoder baselines
+reported `0/25`, returned their own markers, and left `master_key_count=0`.
+Case 0 was then populated and reused sequentially through the proxy, followed
+by cases 1 through 3. Master reached 25 keys after case 0 and exactly 64 keys
+after all four caches were warm.
+
+The final concurrent phases produced:
+
+| Path | Semantic result | Exact responses | KV evidence |
+| --- | --- | ---: | --- |
+| warmed decoder direct | 4/4 validated | 4/4 | decoder 4/4 at `25/25`, 3200 tokens |
+| standard proxy | 4/4 validated | 4/4 | prefiller and decoder 8/8 at `25/25`, 3200 tokens |
+
+All responses exactly matched their no-KV baselines, contained their own cached
+marker, and contained no foreign marker. The Master key count remained 64, so
+neither consumer loads nor duplicate producer requests created unexpected
+objects. `log-validation.json` passed all 12 role/case checks and confirmed
+`use_layerwise=True` for every target response ID.
+
+The host-side evidence is retained at
+`/tmp/layerwise-smoke-distinct-cache-20260723-r4/`. Its
+`concurrent-summary.json` reports `status=passed`, `validated=true`, and
+`diagnosis=passed`; both smoke and log-validation exit codes are zero.
+
+### Earlier same-cache anomaly
+
+Before the distinct-cache fixture was introduced, four requests loaded the
+same 25 cached blocks and varied only in their uncached suffix. Direct warmed
+decoder concurrency returned all expected markers, while the full proxy path
+twice produced `CASE_ONE -> CASE_TWO`; serial replay returned `CASE_ONE`. The
+corrupted response ID was `cmpl-39c907d6-520f-4238-953a-8904b437389d`.
+
+That prototype detected a real request/output isolation anomaly but could not
+show that a request selected another cache because all cache keys were shared.
+The final distinct-cache run did not reproduce it. Investigation should still
+trace proxy request bodies and prefiller-returned `kv_transfer_params` if this
+anomaly appears again.
+
 ## Issue found during validation
 
 The first attempt omitted `PYTHONHASHSEED`. vLLM initializes the root of its
@@ -113,9 +177,15 @@ vLLM, the first decoder request changed from `0/25` to `25/25`.
 
 ## Remaining acceptance work
 
+The requested distinct-cache concurrent load path is accepted for this smoke
+run. The earlier same-cache proxy anomaly remains a residual concurrency risk;
+any recurrence must preserve foreign-marker output as a hard failure and trace
+the request body plus prefiller-returned `kv_transfer_params` into the decoder.
+
 This run does not claim the strict matrix from
 `development-confirmation-request.md`. That requires opt-in structured trace
 evidence for every chunk and physical layer, ranged offsets and byte counts,
 successful session close semantics, zero whole-key operations, and injected
 lease/failure paths. Those assertions cannot be recovered from HTTP status,
-scheduler hit logs, or aggregate Master metrics alone.
+scheduler hit logs, or aggregate Master metrics alone. Ranged API testing is
+explicitly deferred and is not part of the concurrent smoke result above.

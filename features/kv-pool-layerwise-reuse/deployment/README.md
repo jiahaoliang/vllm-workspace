@@ -146,31 +146,82 @@ synced container-layer changes.
 
 ## Smoke test
 
-The smoke helper generates a tokenizer-measured shared prefix longer than 3072
-tokens and sends two non-streaming requests with different suffixes:
+Both engines use `--max-num-seqs 4`, so the scheduler can admit all four
+concurrent cases instead of merely queueing them behind a single sequence.
+
+The smoke helper requires an empty Mooncake pool. Stop both vLLM processes,
+restart Mooncake Master, then manually start the engines again before running
+it. It builds four 25-block prompts with 12 identical leading blocks and 13
+request-specific blocks. The unique `CASE_ZERO` through `CASE_THREE` markers
+exist only in those cached request-specific blocks. The prompt is sent as token
+IDs so the suffix after the 3200-token cache boundary is token-for-token identical
+for all cases; loading another request's KV state is therefore a hard failure.
+The helper performs four phases:
+
+1. It sends four requests concurrently and directly to the decoder while the
+   pool is empty. These responses are the full-recompute correctness baselines;
+   the pure consumer must leave `master_key_count` at zero.
+2. It sends case 0 twice through the proxy to retain the original populate and
+   reuse check, then warms cases 1 through 3. The expected key count is derived
+   from the tokenizer-verified shared and unique blocks.
+3. It sends all four warmed payloads concurrently and directly to the decoder,
+   isolating consumer-side concurrent KV loading from proxy behavior.
+4. It sends the same four payloads concurrently through the proxy, covering
+   the complete prefiller-to-decoder path.
+
+Each KV-load response uses the same fixed seed as its baseline. Exact response
+matches are accepted directly. Whitespace-only text changes are also accepted
+after normalization. For other quantized concurrent batching differences, the
+response must retain its own marker, contain no foreign marker, keep identical
+finish/token metadata, and a serial KV-load replay must match the no-KV baseline
+exactly. The marker exists only in the request-specific cached blocks; the
+uncached question suffix is identical for all four cases.
+
+Run the host-side wrapper from the workspace root. Its optional argument is an
+empty output directory; the default is `/tmp/layerwise-smoke-<timestamp>`.
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
-  -c prefill-engine -- python3 /opt/vllm-layerwise/smoke-test.py
+features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh
 
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
-  -c decode-engine -- \
-  grep -E 'kvpool hit tokens[^0-9]*[1-9][0-9]*' /tmp/vllm-decode.log
+features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh \
+  /tmp/my-layerwise-smoke
 ```
+
+The wrapper discovers exactly one Running Pod for each component, clears only
+the old `/tmp/layerwise-smoke` artifacts in the prefiller Pod, and runs the
+embedded test there. Whether the test passes or fails, it copies the partial
+summary and response artifacts and captures final Master metrics, both engine
+logs, proxy logs, Master logs, and Pod state. It then correlates every completed
+direct and proxy phase response ID with `hit_blocks=25/25`,
+`kvpool hit tokens: 3200`, and `use_layerwise=True` log evidence. A smoke,
+collection, or log-validation failure makes the wrapper exit nonzero while
+retaining all available evidence.
 
 Expected smoke evidence:
 
-- both requests return HTTP 200 with non-empty `choices`;
+- all four direct decoder baselines return HTTP 200 while the pool remains empty;
+- all five sequential warmup requests return HTTP 200 and Mooncake reaches the
+  tokenizer-derived expected key count;
+- both warmed concurrent phases return four HTTP 200 responses with non-empty
+  `choices`;
+- `concurrent-summary.json` reports `status: passed` and four validated cases
+  in both `direct_kv_load` and `proxy_kv_load`; each case is `exact_match` or
+  `concurrent_generation_variation`;
 - proxy `/health` succeeds and `/listEndPoints` reports exactly one prefiller and
   one decoder;
-- decoder logs contain `kvpool hit tokens > 0`;
+- `log-validation.json` reports complete per-response KV hit evidence in the
+  decoder log for direct loads and in both engine logs for proxy loads;
 - no load failure is hidden by recompute because `kv_load_failure_policy=fail`;
-- `/tmp/layerwise-smoke/` contains responses and a Master metrics snapshot.
+- the host output directory contains Pod-side response artifacts, summary,
+  Master metrics, engine/proxy/Master logs, and before/after Pod state.
 
-This evidence validates deployment, routing, external KVPool hit, and the
-configured layerwise path. The current commit has no structured per-layer range
-trace, so this smoke test does not independently prove that every physical
-layer called the ranged Mooncake APIs or that whole-key APIs remained unused.
+The no-KV comparison detects a concurrent request reading another request's KV
+state or otherwise loading corrupted cache content. Together with the per-ID
+decoder hit logs, it validates deployment, routing, concurrent external KVPool
+loads, and output correctness. The current commit still has no structured
+per-layer range trace, so this smoke test does not independently prove that
+every physical layer called the ranged Mooncake APIs or that whole-key APIs
+remained unused.
 
 The result from the first run on this machine is recorded in
 [`validation-2026-07-23.md`](validation-2026-07-23.md).

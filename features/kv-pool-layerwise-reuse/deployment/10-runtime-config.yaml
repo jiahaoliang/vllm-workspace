@@ -51,7 +51,7 @@ data:
       --enable-chunked-prefill \
       --max-model-len 4096 \
       --max-num-batched-tokens 1024 \
-      --max-num-seqs 1 \
+      --max-num-seqs 4 \
       --no-enable-prefix-caching \
       --gpu-memory-utilization 0.90 \
       --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}' \
@@ -104,7 +104,7 @@ data:
       --enable-chunked-prefill \
       --max-model-len 4096 \
       --max-num-batched-tokens 1024 \
-      --max-num-seqs 1 \
+      --max-num-seqs 4 \
       --no-enable-prefix-caching \
       --gpu-memory-utilization 0.90 \
       --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}' \
@@ -193,7 +193,9 @@ data:
     print("cross-process block hash seed: 0")
     print("Mooncake session/range APIs: OK")
   smoke-test.py: |
+    import asyncio
     import json
+    import time
     from pathlib import Path
 
     import httpx
@@ -202,62 +204,581 @@ data:
     model_path = "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"
     served_model = "vllm-ascend/DeepSeek-V2-Lite-W8A8"
     proxy_url = "http://vllm-proxy-service:8000/v1/completions"
+    master_metrics_url = "http://mooncake-master-service:9003/metrics"
     output_dir = Path("/tmp/layerwise-smoke")
     output_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = output_dir / "concurrent-summary.json"
 
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    unit = "Layerwise KV cache validation keeps this prefix identical across requests. "
-    prefix = unit
-    while len(tokenizer.encode(prefix, add_special_tokens=False)) < 3200:
-        prefix += unit
+    block_size = 128
+    expected_hit_blocks = 25
+    expected_hit_tokens = block_size * expected_hit_blocks
+    expected_shared_blocks = 12
+    concurrency = 4
 
-    prefix_tokens = len(tokenizer.encode(prefix, add_special_tokens=False))
-    if not 3072 < prefix_tokens < 3900:
-        raise RuntimeError(f"unexpected generated prefix length: {prefix_tokens}")
+    summary = {
+        "schema_version": 1,
+        "status": "initializing",
+        "validated": False,
+        "diagnosis": "not_completed",
+        "concurrency": concurrency,
+        "block_size": block_size,
+        "expected_hit_blocks": expected_hit_blocks,
+        "expected_hit_tokens": expected_hit_tokens,
+        "expected_master_key_count": None,
+        "prompt_layout": {},
+        "phases": {
+            "empty_pool_baseline": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "warmup": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "direct_kv_load": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "proxy_kv_load": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+        },
+    }
 
-    suffixes = (
-        " First request suffix: return the word alpha.",
-        " Second request suffix: return the word beta.",
-    )
-    with httpx.Client(timeout=1200.0) as client:
-        health = client.get("http://vllm-proxy-service:8000/health")
-        health.raise_for_status()
-        endpoints = client.get("http://vllm-proxy-service:8000/listEndPoints")
-        endpoints.raise_for_status()
-        endpoint_body = endpoints.json()
-        prefiller_count = len(endpoint_body.get("prefill_nodes", []))
-        decoder_count = len(endpoint_body.get("decode_nodes", []))
-        if prefiller_count != 1 or decoder_count != 1:
-            raise RuntimeError(
-                "proxy did not discover exactly one engine for each role: "
-                f"{endpoint_body}"
-            )
-        (output_dir / "proxy-endpoints.json").write_text(
-            json.dumps(endpoint_body, indent=2), encoding="utf-8"
+
+    def write_summary():
+        summary_path.write_text(
+            json.dumps(summary, indent=2, ensure_ascii=True), encoding="utf-8"
         )
 
-        for index, suffix in enumerate(suffixes, start=1):
-            response = client.post(
-                proxy_url,
-                json={
-                    "model": served_model,
-                    "prompt": prefix + suffix,
-                    "max_tokens": 8,
-                    "temperature": 0,
-                    "stream": False,
-                },
+
+    def write_response(path, status_code, text):
+        path.write_text(text, encoding="utf-8")
+        if status_code >= 400:
+            raise RuntimeError(
+                f"request failed with HTTP {status_code}; response={path}"
             )
-            output = output_dir / f"request-{index}.json"
-            output.write_text(response.text, encoding="utf-8")
-            print(f"request {index}: HTTP {response.status_code}; response={output}")
-            response.raise_for_status()
-            body = response.json()
-            if not body.get("choices"):
-                raise RuntimeError(f"request {index} returned no choices: {json.dumps(body)}")
+        body = json.loads(text)
+        if not body.get("choices"):
+            raise RuntimeError(f"request returned no choices: {json.dumps(body)}")
+        return body
 
-        metrics = client.get("http://mooncake-master-service:9003/metrics")
-        metrics.raise_for_status()
-        (output_dir / "mooncake-master.metrics").write_text(metrics.text, encoding="utf-8")
 
-    print(f"shared prefix tokens: {prefix_tokens}")
-    print(f"smoke artifacts: {output_dir}")
+    def response_signature(body):
+        choice = body["choices"][0]
+        usage = body.get("usage") or {}
+        return {
+            "text": choice.get("text"),
+            "finish_reason": choice.get("finish_reason"),
+            "stop_reason": choice.get("stop_reason"),
+            "prompt_tokens": usage.get("prompt_tokens"),
+            "completion_tokens": usage.get("completion_tokens"),
+        }
+
+
+    def normalized_text(text):
+        return " ".join((text or "").split())
+
+
+    def metric_value(metrics_text, name):
+        prefix = f"{name} "
+        for line in metrics_text.splitlines():
+            if line.startswith(prefix):
+                return float(line[len(prefix) :])
+        raise RuntimeError(f"metric not found: {name}")
+
+
+    def request_isolation(text, own_marker, markers):
+        text = text or ""
+        foreign_markers = [
+            marker for marker in markers if marker != own_marker and marker in text
+        ]
+        return own_marker in text and not foreign_markers, foreign_markers
+
+
+    def wait_for_master_key_count(client, expected, artifact_name):
+        deadline = time.monotonic() + 30
+        while True:
+            metrics = client.get(master_metrics_url)
+            metrics.raise_for_status()
+            actual = metric_value(metrics.text, "master_key_count")
+            if actual == expected:
+                (output_dir / artifact_name).write_text(
+                    metrics.text, encoding="utf-8"
+                )
+                return actual
+            if actual > expected:
+                raise RuntimeError(
+                    "Mooncake contains more keys than the prompt layout predicts; "
+                    f"expected={expected}, actual={actual:g}"
+                )
+            if time.monotonic() >= deadline:
+                raise RuntimeError(
+                    "Mooncake key count did not reach the expected value; "
+                    f"expected={expected}, actual={actual:g}"
+                )
+            time.sleep(0.5)
+
+
+    async def post_concurrently(url, payloads):
+        limits = httpx.Limits(
+            max_connections=len(payloads),
+            max_keepalive_connections=len(payloads),
+        )
+        async with httpx.AsyncClient(timeout=1200.0, limits=limits) as client:
+            requests = [client.post(url, json=payload) for payload in payloads]
+            responses = await asyncio.gather(*requests)
+        return [(response.status_code, response.text) for response in responses]
+
+
+    def build_payloads(tokenizer):
+        markers = ("CASE_ZERO", "CASE_ONE", "CASE_TWO", "CASE_THREE")
+        names = ("zero", "one", "two", "three")
+        shared_unit = (
+            "Shared layerwise cache content is identical for every concurrent request. "
+        )
+        shared_token_target = expected_shared_blocks * block_size
+        unique_token_target = expected_hit_tokens - shared_token_target
+
+        shared_text = shared_unit
+        while len(tokenizer.encode(shared_text, add_special_tokens=False)) < shared_token_target:
+            shared_text += shared_unit
+        shared_tokens = tokenizer.encode(
+            shared_text, add_special_tokens=False
+        )[:shared_token_target]
+
+        instruction = (
+            "\nQuestion: What is the private cache branch identity marker?"
+            "\nAnswer:"
+        )
+        instruction_tokens = tokenizer.encode(
+            instruction, add_special_tokens=False
+        )
+
+        prompts = []
+        token_ids_by_case = []
+        for index, (name, marker) in enumerate(zip(names, markers)):
+            unique_unit = (
+                f"Private cache branch {name} belongs only to request {index}; "
+                f"its identity marker is {marker}. "
+            )
+            unique_text = unique_unit
+            while len(tokenizer.encode(unique_text, add_special_tokens=False)) < unique_token_target:
+                unique_text += unique_unit
+            unique_tokens = tokenizer.encode(
+                unique_text, add_special_tokens=False
+            )[:unique_token_target]
+            cached_tokens = shared_tokens + unique_tokens
+            cached_text = tokenizer.decode(cached_tokens)
+            if marker not in cached_text:
+                raise RuntimeError(
+                    f"case {index} marker is not present in its cached tokens"
+                )
+            token_ids = cached_tokens + instruction_tokens
+            prompts.append(token_ids)
+            token_ids_by_case.append(token_ids)
+
+        uncached_suffixes = {
+            tuple(token_ids[expected_hit_tokens:])
+            for token_ids in token_ids_by_case
+        }
+        if len(uncached_suffixes) != 1:
+            raise RuntimeError("uncached prompt suffix differs across cases")
+        uncached_text = tokenizer.decode(next(iter(uncached_suffixes)))
+        leaked_markers = [marker for marker in markers if marker in uncached_text]
+        if leaked_markers:
+            raise RuntimeError(
+                f"request markers leaked into the uncached suffix: {leaked_markers}"
+            )
+
+        common_blocks = 0
+        for block_index in range(expected_hit_blocks):
+            start = block_index * block_size
+            stop = start + block_size
+            blocks = {
+                tuple(token_ids[start:stop]) for token_ids in token_ids_by_case
+            }
+            if len(blocks) == 1:
+                if block_index != common_blocks:
+                    raise RuntimeError("prompt branches converge after diverging")
+                common_blocks += 1
+            elif len(blocks) != concurrency:
+                raise RuntimeError(
+                    "prompt branch blocks are not fully isolated; "
+                    f"block={block_index}, distinct={len(blocks)}"
+                )
+
+        if common_blocks != expected_shared_blocks:
+            raise RuntimeError(
+                "unexpected shared block count; "
+                f"expected={expected_shared_blocks}, actual={common_blocks}"
+            )
+
+        expected_keys = common_blocks + concurrency * (
+            expected_hit_blocks - common_blocks
+        )
+        payloads = [
+            {
+                "model": served_model,
+                "prompt": prompt,
+                "max_tokens": 16,
+                "temperature": 0,
+                "seed": 2026072300 + index,
+                "stream": False,
+            }
+            for index, prompt in enumerate(prompts)
+        ]
+        layout = {
+            "shared_blocks": common_blocks,
+            "shared_prefix_tokens": len(shared_tokens),
+            "unique_blocks_per_case": expected_hit_blocks - common_blocks,
+            "prompt_tokens_by_case": [len(tokens) for tokens in token_ids_by_case],
+            "uncached_suffix_tokens": len(instruction_tokens),
+            "uncached_suffix_identical": True,
+            "markers": list(markers),
+        }
+        return payloads, markers, expected_keys, layout
+
+
+    def baseline_case(index, body, markers, payloads):
+        signature = response_signature(body)
+        isolated, foreign_markers = request_isolation(
+            signature["text"], markers[index], markers
+        )
+        return {
+            "case": index,
+            "marker": markers[index],
+            "seed": payloads[index]["seed"],
+            "response_id": body.get("id"),
+            "signature": signature,
+            "request_isolation": isolated,
+            "foreign_markers": foreign_markers,
+            "validated": isolated,
+            "classification": "recompute_baseline" if isolated else "invalid",
+        }
+
+
+    def compare_case(index, body, baseline, markers, payloads):
+        signature = response_signature(body)
+        baseline_signature = baseline["signature"]
+        exact_match = signature == baseline_signature
+        normalized_match = (
+            normalized_text(signature["text"])
+            == normalized_text(baseline_signature["text"])
+        )
+        metadata_match = {
+            key: value for key, value in signature.items() if key != "text"
+        } == {
+            key: value for key, value in baseline_signature.items() if key != "text"
+        }
+        isolated, foreign_markers = request_isolation(
+            signature["text"], markers[index], markers
+        )
+        return {
+            "case": index,
+            "marker": markers[index],
+            "seed": payloads[index]["seed"],
+            "response_id": body.get("id"),
+            "baseline_response_id": baseline["response_id"],
+            "signature": signature,
+            "baseline_signature": baseline_signature,
+            "exact_match": exact_match,
+            "normalized_match": normalized_match,
+            "metadata_match": metadata_match,
+            "request_isolation": isolated,
+            "foreign_markers": foreign_markers,
+            "serial_replay_response_id": None,
+            "serial_replay_signature": None,
+            "serial_replay_match": None,
+            "validated": False,
+            "classification": "pending",
+        }
+
+
+    def run_concurrent_phase(client, phase_name, url, payloads, markers, baselines):
+        phase = summary["phases"][phase_name]
+        phase["status"] = "running"
+        write_summary()
+        responses = asyncio.run(post_concurrently(url, payloads))
+        for index, (status_code, text) in enumerate(responses):
+            artifact = output_dir / f"{phase_name}-{index}.json"
+            body = write_response(artifact, status_code, text)
+            phase["cases"].append(
+                compare_case(index, body, baselines[index], markers, payloads)
+            )
+            write_summary()
+
+        for case in phase["cases"]:
+            if case["exact_match"]:
+                continue
+            index = case["case"]
+            replay = client.post(url, json=payloads[index])
+            artifact = output_dir / f"{phase_name}-serial-replay-{index}.json"
+            replay_body = write_response(artifact, replay.status_code, replay.text)
+            replay_signature = response_signature(replay_body)
+            replay_isolated, replay_foreign_markers = request_isolation(
+                replay_signature["text"], markers[index], markers
+            )
+            case["serial_replay_response_id"] = replay_body.get("id")
+            case["serial_replay_signature"] = replay_signature
+            case["serial_replay_match"] = (
+                replay_signature == case["baseline_signature"]
+            )
+            case["serial_replay_isolation"] = replay_isolated
+            case["serial_replay_foreign_markers"] = replay_foreign_markers
+            write_summary()
+
+        for case in phase["cases"]:
+            deterministic_or_replayed = (
+                case["exact_match"]
+                or case["normalized_match"]
+                or case["serial_replay_match"] is True
+            )
+            case["validated"] = (
+                case["metadata_match"]
+                and case["request_isolation"]
+                and deterministic_or_replayed
+            )
+            if not case["validated"]:
+                case["classification"] = "invalid"
+            elif case["exact_match"]:
+                case["classification"] = "exact_match"
+            else:
+                case["classification"] = "concurrent_generation_variation"
+
+        phase["validated_cases"] = sum(case["validated"] for case in phase["cases"])
+        phase["exact_matches"] = sum(case["exact_match"] for case in phase["cases"])
+        phase["validated"] = phase["validated_cases"] == concurrency
+        phase["status"] = "passed" if phase["validated"] else "failed"
+        write_summary()
+
+
+    def run():
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        payloads, markers, expected_keys, layout = build_payloads(tokenizer)
+        summary["expected_master_key_count"] = expected_keys
+        summary["prompt_layout"] = layout
+        summary["status"] = "running"
+        write_summary()
+
+        with httpx.Client(timeout=1200.0) as client:
+            health = client.get("http://vllm-proxy-service:8000/health")
+            health.raise_for_status()
+            endpoints = client.get("http://vllm-proxy-service:8000/listEndPoints")
+            endpoints.raise_for_status()
+            endpoint_body = endpoints.json()
+            prefiller_count = len(endpoint_body.get("prefill_nodes", []))
+            decoder_count = len(endpoint_body.get("decode_nodes", []))
+            if prefiller_count != 1 or decoder_count != 1:
+                raise RuntimeError(
+                    "proxy did not discover exactly one engine for each role: "
+                    f"{endpoint_body}"
+                )
+            (output_dir / "proxy-endpoints.json").write_text(
+                json.dumps(endpoint_body, indent=2), encoding="utf-8"
+            )
+            decoder_url = (
+                endpoint_body["decode_nodes"][0]["endpoint"] + "/v1/completions"
+            )
+
+            baseline_phase = summary["phases"]["empty_pool_baseline"]
+            baseline_phase["status"] = "running"
+            initial_metrics = client.get(master_metrics_url)
+            initial_metrics.raise_for_status()
+            (output_dir / "mooncake-master-initial.metrics").write_text(
+                initial_metrics.text, encoding="utf-8"
+            )
+            initial_key_count = metric_value(initial_metrics.text, "master_key_count")
+            baseline_phase["master_key_count_before"] = initial_key_count
+            write_summary()
+            if initial_key_count != 0:
+                raise RuntimeError(
+                    "concurrent correctness test requires an empty Mooncake pool; "
+                    f"master_key_count={initial_key_count:g}. Restart Mooncake Master "
+                    "before running smoke-test.py"
+                )
+
+            responses = asyncio.run(post_concurrently(decoder_url, payloads))
+            for index, (status_code, text) in enumerate(responses):
+                artifact = output_dir / f"empty-pool-baseline-{index}.json"
+                body = write_response(artifact, status_code, text)
+                baseline_phase["cases"].append(
+                    baseline_case(index, body, markers, payloads)
+                )
+                write_summary()
+
+            post_baseline_metrics = client.get(master_metrics_url)
+            post_baseline_metrics.raise_for_status()
+            baseline_key_count = metric_value(
+                post_baseline_metrics.text, "master_key_count"
+            )
+            (output_dir / "mooncake-master-after-baseline.metrics").write_text(
+                post_baseline_metrics.text, encoding="utf-8"
+            )
+            baseline_phase["master_key_count_after"] = baseline_key_count
+            baseline_phase["validated"] = (
+                baseline_key_count == 0
+                and all(case["validated"] for case in baseline_phase["cases"])
+            )
+            baseline_phase["status"] = (
+                "passed" if baseline_phase["validated"] else "failed"
+            )
+            write_summary()
+            if not baseline_phase["validated"]:
+                raise RuntimeError(
+                    "empty-pool decoder baseline failed request isolation or "
+                    f"unexpectedly populated Mooncake; master_key_count={baseline_key_count:g}"
+                )
+
+            warmup_phase = summary["phases"]["warmup"]
+            warmup_phase["status"] = "running"
+            write_summary()
+            warmup_steps = (
+                (0, "populate"),
+                (0, "reuse"),
+                (1, "populate"),
+                (2, "populate"),
+                (3, "populate"),
+            )
+            for index, operation in warmup_steps:
+                response = client.post(proxy_url, json=payloads[index])
+                artifact = output_dir / f"warmup-case-{index}-{operation}.json"
+                body = write_response(artifact, response.status_code, response.text)
+                signature = response_signature(body)
+                isolated, foreign_markers = request_isolation(
+                    signature["text"], markers[index], markers
+                )
+                warmup_phase["cases"].append(
+                    {
+                        "case": index,
+                        "operation": operation,
+                        "marker": markers[index],
+                        "response_id": body.get("id"),
+                        "signature": signature,
+                        "request_isolation": isolated,
+                        "foreign_markers": foreign_markers,
+                        "validated": isolated,
+                        "classification": "isolated" if isolated else "invalid",
+                    }
+                )
+                write_summary()
+                if index == 0 and operation == "populate":
+                    warmup_phase["case_zero_populate_key_count"] = (
+                        wait_for_master_key_count(
+                            client,
+                            expected_hit_blocks,
+                            "mooncake-master-after-case-zero-populate.metrics",
+                        )
+                    )
+                    write_summary()
+
+            warmup_phase["master_key_count_after"] = wait_for_master_key_count(
+                client, expected_keys, "mooncake-master-after-warmup.metrics"
+            )
+            warmup_phase["validated"] = all(
+                case["validated"] for case in warmup_phase["cases"]
+            )
+            warmup_phase["status"] = (
+                "passed" if warmup_phase["validated"] else "failed"
+            )
+            write_summary()
+
+            baselines = baseline_phase["cases"]
+            run_concurrent_phase(
+                client,
+                "direct_kv_load",
+                decoder_url,
+                payloads,
+                markers,
+                baselines,
+            )
+            direct_metrics = client.get(master_metrics_url)
+            direct_metrics.raise_for_status()
+            (output_dir / "mooncake-master-after-direct-kv-load.metrics").write_text(
+                direct_metrics.text, encoding="utf-8"
+            )
+            direct_phase = summary["phases"]["direct_kv_load"]
+            direct_phase["master_key_count_after"] = metric_value(
+                direct_metrics.text, "master_key_count"
+            )
+            if direct_phase["master_key_count_after"] != expected_keys:
+                direct_phase["validated"] = False
+                direct_phase["status"] = "failed"
+            write_summary()
+
+            run_concurrent_phase(
+                client,
+                "proxy_kv_load",
+                proxy_url,
+                payloads,
+                markers,
+                baselines,
+            )
+
+            final_metrics = client.get(master_metrics_url)
+            final_metrics.raise_for_status()
+            (output_dir / "mooncake-master.metrics").write_text(
+                final_metrics.text, encoding="utf-8"
+            )
+            summary["actual_master_key_count"] = metric_value(
+                final_metrics.text, "master_key_count"
+            )
+            proxy_phase = summary["phases"]["proxy_kv_load"]
+            proxy_phase["master_key_count_after"] = summary[
+                "actual_master_key_count"
+            ]
+            if proxy_phase["master_key_count_after"] != expected_keys:
+                proxy_phase["validated"] = False
+                proxy_phase["status"] = "failed"
+            write_summary()
+
+        direct_valid = summary["phases"]["direct_kv_load"]["validated"]
+        proxy_valid = summary["phases"]["proxy_kv_load"]["validated"]
+        warmup_valid = summary["phases"]["warmup"]["validated"]
+        summary["validated"] = direct_valid and proxy_valid and warmup_valid
+        if not direct_valid:
+            summary["diagnosis"] = "decoder_concurrent_kv_load_failure"
+        elif not proxy_valid or not warmup_valid:
+            summary["diagnosis"] = "proxy_or_prefiller_concurrent_path_failure"
+        else:
+            summary["diagnosis"] = "passed"
+        summary["status"] = "passed" if summary["validated"] else "failed"
+        write_summary()
+
+        if not summary["validated"]:
+            raise RuntimeError(
+                "concurrent KV-load correctness validation failed; "
+                f"diagnosis={summary['diagnosis']}; summary={summary_path}"
+            )
+
+        print(
+            f"prompt layout: {layout['shared_blocks']} shared blocks + "
+            f"{layout['unique_blocks_per_case']} unique blocks per case"
+        )
+        print(
+            "concurrent KV-load correctness: direct decoder and proxy phases "
+            f"validated {concurrency}/{concurrency} cases"
+        )
+        print(f"smoke artifacts: {output_dir}")
+
+
+    write_summary()
+    try:
+        run()
+    except Exception as error:
+        if summary["status"] != "failed":
+            summary["status"] = "failed"
+            summary["validated"] = False
+        if summary["diagnosis"] == "not_completed":
+            summary["diagnosis"] = "setup_or_execution_failure"
+        summary["error"] = {
+            "type": type(error).__name__,
+            "message": str(error),
+        }
+        write_summary()
+        raise

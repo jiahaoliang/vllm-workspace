@@ -12,14 +12,33 @@ Current Phase: source implementation complete
 
 ## Next Steps
 
+- Preserve the earlier same-cache proxy marker swap as a residual concurrency
+  risk. If it recurs, trace request markers, prefiller-returned
+  `kv_transfer_params`, and decoder payloads; foreign markers remain hard
+  failures rather than quantized batching variation.
 - Add opt-in per-layer ranged-operation tracing before claiming strict physical-layer
-  coverage, whole-key exclusion, or lease/failure-path acceptance. The deployment
-  smoke is complete, but those stronger assertions remain pending.
+  coverage, whole-key exclusion, or lease/failure-path acceptance. The sequential
+  and distinct-cache concurrent deployment smokes are complete, while ranged API
+  validation is deferred.
 
 ## Latest Validation
 
+- The final four-request distinct-cache smoke passed. Each request loaded 12
+  shared plus 13 request-specific blocks, followed by the same 15 uncached token
+  IDs. The empty-pool baselines were `0/25`; warmup produced exactly 64 Mooncake
+  keys; warmed direct decoder and full proxy concurrency both matched all four
+  baselines exactly. Per-response logs passed 12/12 checks for `25/25`, 3200 hit
+  tokens, and `use_layerwise=True`.
+- An earlier same-cache prototype twice observed `CASE_ONE -> CASE_TWO` only on
+  the full proxy path, while direct warmed decoder concurrency was correct. That
+  fixture loaded identical keys for all requests, so it was an output/request
+  isolation signal rather than proof of wrong cache selection. The anomaly did
+  not recur in the final distinct-cache run and remains documented as residual
+  risk. Neither result claims ranged API coverage; ranged testing is deferred.
+  Detailed evidence is in `deployment/validation-2026-07-23.md`.
 - On 2026-07-23, the feature deployment smoke passed on two Ascend910B4 NPUs with
-  `vllm-ascend/DeepSeek-V2-Lite-W8A8`. The standard Kubernetes proxy routed both
+  `vllm-ascend/DeepSeek-V2-Lite-W8A8`. This was the original sequential smoke:
+  the standard Kubernetes proxy routed both
   requests through one prefiller and one decoder. Starting from an empty Mooncake
   pool, the prefiller logged `0/25` on the first lookup, while the decoder logged
   `25/25`, `kvpool hit tokens: 3200`, and a layerwise load spec. Both HTTP requests
