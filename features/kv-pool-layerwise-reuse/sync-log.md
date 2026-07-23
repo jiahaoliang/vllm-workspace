@@ -223,3 +223,17 @@
   this environment because the downloaded Node binary requires unavailable
   `libatomic.so.1`. Focused Ruff check and codespell passed; Ruff's unrelated
   baseline reformatting was discarded after review.
+- Ran one clean standard-proxy request after stopping both engines, restarting
+  Master to `master_key_count=0`, and starting the same engine Pods with
+  `VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1`. Both `/v1/models` endpoints returned HTTP
+  200 and the request returned HTTP 200 with a non-empty choice.
+- The fail-closed checker passed: save and load each covered exactly physical
+  layers `0..26`; all four per-layer key results equaled the `147456`-byte
+  fragment sum; the final commit followed the last save; whole-key events were
+  zero. Decoder KVPool load was `512/512` tokens.
+- Persisted the independent G4 artifact under
+  `/root/ljh/validation-artifacts/ranged-api-g4-20260723T132919Z/runtime-audit`.
+  Destination `sha256sum -c SHA256SUMS` passed and the manifest digest is
+  `af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d`.
+  The prior G0-G3 artifact was not modified. Both debug engines were stopped
+  after evidence collection; the original engine Pods remain in place.
