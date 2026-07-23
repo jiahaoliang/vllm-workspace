@@ -217,8 +217,10 @@
 - Pushed the source commit to
   `origin/feature/mooncake-layerwise-kv-pool`. The three affected test files
   passed `138` tests, and the complete four-file AscendStore target passed
-  `248` tests. Both existing engine Pods received only the three production
-  Python files; their SHA-256 digests match the committed local files.
+  `248` tests. Both existing engine Pods received the three production Python
+  files; the prefill Pod also received the three Python test files for Pod-local
+  pytest because the host had no pytest installation. Production-file SHA-256
+  digests in both Pods match the committed local files.
 - `bash format.sh ci` was attempted but its markdownlint hook could not run in
   this environment because the downloaded Node binary requires unavailable
   `libatomic.so.1`. Focused Ruff check and codespell passed; Ruff's unrelated
