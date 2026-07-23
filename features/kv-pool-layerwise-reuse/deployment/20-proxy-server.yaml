@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vllm-proxy-sa
+  namespace: ai-inference
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vllm-proxy-pod-reader
+  namespace: ai-inference
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vllm-proxy-pod-reader
+  namespace: ai-inference
+subjects:
+  - kind: ServiceAccount
+    name: vllm-proxy-sa
+    namespace: ai-inference
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vllm-proxy-pod-reader
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-server-deployment
+  namespace: ai-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      nodeName: n1
+      serviceAccountName: vllm-proxy-sa
+      containers:
+        - name: proxy-server
+          image: cr.openfuyao.cn/openfuyao/proxy-server:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-lc"]
+          args:
+            - >-
+              exec python3 /app/k8s_proxy_server_example.py
+              --host 0.0.0.0
+              --port 8000
+              --prefiller-labels app=prefill
+              --decoder-labels app=decode
+              --prefiller-container prefill-engine
+              --decoder-container decode-engine
+              --prefiller-port-name prefill-port
+              --decoder-port-name decode-port
+              --namespace ai-inference
+          ports:
+            - name: proxy-port
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-proxy-service
+  namespace: ai-inference
+spec:
+  type: ClusterIP
+  selector:
+    app: proxy
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8000
+      targetPort: proxy-port

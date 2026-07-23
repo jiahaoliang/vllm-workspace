@@ -1,0 +1,263 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: layerwise-runtime-config
+  namespace: ai-inference
+data:
+  mooncake.json: |
+    {
+      "metadata_server": "P2PHANDSHAKE",
+      "protocol": "ascend",
+      "device_name": "",
+      "master_server_address": "mooncake-master-service:30089",
+      "global_segment_size": "1GB",
+      "local_buffer_size": 0,
+      "preferred_segment": false,
+      "prefer_alloc_in_same_node": true,
+      "enable_ssd_offload": false
+    }
+  start-prefill.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    pid_file=/tmp/vllm-prefill.pid
+    log_file=/tmp/vllm-prefill.log
+
+    if [[ -s "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      if kill -0 "${old_pid}" 2>/dev/null; then
+        echo "prefill vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      rm -f "${pid_file}"
+    fi
+
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 \
+      --port 8100 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend \
+      --trust-remote-code \
+      --enforce-eager \
+      --data-parallel-size 1 \
+      --tensor-parallel-size 1 \
+      --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 \
+      --decode-context-parallel-size 1 \
+      --block-size 128 \
+      --enable-chunked-prefill \
+      --max-model-len 4096 \
+      --max-num-batched-tokens 1024 \
+      --max-num-seqs 1 \
+      --no-enable-prefix-caching \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}' \
+      >"${log_file}" 2>&1 </dev/null &
+
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if ! kill -0 "${new_pid}" 2>/dev/null; then
+      echo "prefill vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+
+    echo "prefill vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  start-decode.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    pid_file=/tmp/vllm-decode.pid
+    log_file=/tmp/vllm-decode.log
+
+    if [[ -s "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      if kill -0 "${old_pid}" 2>/dev/null; then
+        echo "decode vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      rm -f "${pid_file}"
+    fi
+
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 \
+      --port 8200 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend \
+      --trust-remote-code \
+      --enforce-eager \
+      --data-parallel-size 1 \
+      --tensor-parallel-size 1 \
+      --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 \
+      --decode-context-parallel-size 1 \
+      --block-size 128 \
+      --enable-chunked-prefill \
+      --max-model-len 4096 \
+      --max-num-batched-tokens 1024 \
+      --max-num-seqs 1 \
+      --no-enable-prefix-caching \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}' \
+      >"${log_file}" 2>&1 </dev/null &
+
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if ! kill -0 "${new_pid}" 2>/dev/null; then
+      echo "decode vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+
+    echo "decode vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  stop-engine.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if [[ $# -ne 1 || ( "$1" != "prefill" && "$1" != "decode" ) ]]; then
+      echo "usage: $0 <prefill|decode>" >&2
+      exit 2
+    fi
+
+    role=$1
+    pid_file="/tmp/vllm-${role}.pid"
+    if [[ ! -s "${pid_file}" ]]; then
+      echo "${role} vLLM has no PID file"
+      exit 0
+    fi
+
+    pid="$(<"${pid_file}")"
+    if ! kill -0 "${pid}" 2>/dev/null; then
+      echo "${role} vLLM PID ${pid} is no longer running"
+      rm -f "${pid_file}"
+      exit 0
+    fi
+
+    kill -TERM "${pid}"
+    for _ in $(seq 1 60); do
+      if ! kill -0 "${pid}" 2>/dev/null; then
+        rm -f "${pid_file}"
+        echo "${role} vLLM stopped"
+        exit 0
+      fi
+      sleep 1
+    done
+
+    echo "${role} vLLM did not exit after 60 seconds; sending SIGKILL" >&2
+    kill -KILL "${pid}"
+    rm -f "${pid_file}"
+  check-runtime.py: |
+    import os
+    from pathlib import Path
+
+    import vllm
+    import vllm_ascend
+    from mooncake.store import MooncakeDistributedStore
+    from vllm_ascend.utils import vllm_version_is
+
+    methods = (
+        "batch_put_start",
+        "batch_put_from_multi_buffer_ranges",
+        "batch_put_end",
+        "batch_put_revoke",
+        "batch_get_start",
+        "batch_get_into_multi_buffer_ranges",
+        "batch_get_end",
+    )
+    missing = [name for name in methods if not callable(getattr(MooncakeDistributedStore, name, None))]
+    assert not missing, f"missing Mooncake session/range APIs: {missing}"
+
+    source = Path(vllm_ascend.__file__).resolve()
+    expected = Path("/vllm-workspace/vllm-ascend").resolve()
+    assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
+    assert os.environ.get("PYTHONHASHSEED") == "0", (
+        "PYTHONHASHSEED must have the same fixed value in every engine Pod"
+    )
+    assert vllm_version_is("0.24.0"), (
+        f"vLLM compatibility gate selected the wrong source line; installed version={vllm.__version__}"
+    )
+    print(f"vllm-ascend source: {source}")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.24.0")
+    print("cross-process block hash seed: 0")
+    print("Mooncake session/range APIs: OK")
+  smoke-test.py: |
+    import json
+    from pathlib import Path
+
+    import httpx
+    from transformers import AutoTokenizer
+
+    model_path = "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"
+    served_model = "vllm-ascend/DeepSeek-V2-Lite-W8A8"
+    proxy_url = "http://vllm-proxy-service:8000/v1/completions"
+    output_dir = Path("/tmp/layerwise-smoke")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    unit = "Layerwise KV cache validation keeps this prefix identical across requests. "
+    prefix = unit
+    while len(tokenizer.encode(prefix, add_special_tokens=False)) < 3200:
+        prefix += unit
+
+    prefix_tokens = len(tokenizer.encode(prefix, add_special_tokens=False))
+    if not 3072 < prefix_tokens < 3900:
+        raise RuntimeError(f"unexpected generated prefix length: {prefix_tokens}")
+
+    suffixes = (
+        " First request suffix: return the word alpha.",
+        " Second request suffix: return the word beta.",
+    )
+    with httpx.Client(timeout=1200.0) as client:
+        health = client.get("http://vllm-proxy-service:8000/health")
+        health.raise_for_status()
+        endpoints = client.get("http://vllm-proxy-service:8000/listEndPoints")
+        endpoints.raise_for_status()
+        endpoint_body = endpoints.json()
+        prefiller_count = len(endpoint_body.get("prefill_nodes", []))
+        decoder_count = len(endpoint_body.get("decode_nodes", []))
+        if prefiller_count != 1 or decoder_count != 1:
+            raise RuntimeError(
+                "proxy did not discover exactly one engine for each role: "
+                f"{endpoint_body}"
+            )
+        (output_dir / "proxy-endpoints.json").write_text(
+            json.dumps(endpoint_body, indent=2), encoding="utf-8"
+        )
+
+        for index, suffix in enumerate(suffixes, start=1):
+            response = client.post(
+                proxy_url,
+                json={
+                    "model": served_model,
+                    "prompt": prefix + suffix,
+                    "max_tokens": 8,
+                    "temperature": 0,
+                    "stream": False,
+                },
+            )
+            output = output_dir / f"request-{index}.json"
+            output.write_text(response.text, encoding="utf-8")
+            print(f"request {index}: HTTP {response.status_code}; response={output}")
+            response.raise_for_status()
+            body = response.json()
+            if not body.get("choices"):
+                raise RuntimeError(f"request {index} returned no choices: {json.dumps(body)}")
+
+        metrics = client.get("http://mooncake-master-service:9003/metrics")
+        metrics.raise_for_status()
+        (output_dir / "mooncake-master.metrics").write_text(metrics.text, encoding="utf-8")
+
+    print(f"shared prefix tokens: {prefix_tokens}")
+    print(f"smoke artifacts: {output_dir}")

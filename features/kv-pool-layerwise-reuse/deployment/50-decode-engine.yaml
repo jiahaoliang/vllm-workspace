@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: decode-engine-deployment
+  namespace: ai-inference
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: decode
+  template:
+    metadata:
+      labels:
+        app: decode
+    spec:
+      nodeName: n1
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: decode-engine
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          imagePullPolicy: Never
+          command: ["/bin/bash", "-lc"]
+          args: ["exec sleep infinity"]
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HCCL_IF_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: GLOO_SOCKET_IFNAME
+              value: eth0
+            - name: TP_SOCKET_IFNAME
+              value: eth0
+            - name: HCCL_SOCKET_IFNAME
+              value: eth0
+            - name: HCCL_INTRA_ROCE_ENABLE
+              value: "1"
+            - name: ASCEND_BUFFER_POOL
+              value: "4:8"
+            - name: MOONCAKE_CONFIG_PATH
+              value: /opt/vllm-layerwise/mooncake.json
+            - name: MOONCAKE_MASTER
+              value: mooncake-master-service:30089
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PYTHONHASHSEED
+              value: "0"
+            - name: VLLM_VERSION
+              value: "0.24.0"
+          resources:
+            requests:
+              huawei.com/Ascend910: "1"
+            limits:
+              huawei.com/Ascend910: "1"
+          ports:
+            - name: decode-port
+              containerPort: 8200
+          readinessProbe:
+            httpGet:
+              path: /v1/models
+              port: decode-port
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 120
+          volumeMounts:
+            - name: shm
+              mountPath: /dev/shm
+            - name: dcmi
+              mountPath: /usr/local/dcmi
+            - name: npusmi
+              mountPath: /usr/local/bin/npu-smi
+            - name: driver-lib64
+              mountPath: /usr/local/Ascend/driver/lib64
+            - name: driver-version
+              mountPath: /usr/local/Ascend/driver/version.info
+            - name: ascend-install-info
+              mountPath: /etc/ascend_install.info
+            - name: model-cache
+              mountPath: /root/.cache
+            - name: hccn-tool
+              mountPath: /usr/bin/hccn_tool
+            - name: hccn-conf
+              mountPath: /etc/hccn.conf
+            - name: runtime-config
+              mountPath: /opt/vllm-layerwise
+              readOnly: true
+      volumes:
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 24Gi
+        - name: dcmi
+          hostPath:
+            path: /usr/local/dcmi
+            type: Directory
+        - name: npusmi
+          hostPath:
+            path: /usr/local/bin/npu-smi
+            type: File
+        - name: driver-lib64
+          hostPath:
+            path: /usr/local/Ascend/driver/lib64
+            type: Directory
+        - name: driver-version
+          hostPath:
+            path: /usr/local/Ascend/driver/version.info
+            type: File
+        - name: ascend-install-info
+          hostPath:
+            path: /etc/ascend_install.info
+            type: File
+        - name: model-cache
+          hostPath:
+            path: /home/llm_cache
+            type: Directory
+        - name: hccn-tool
+          hostPath:
+            path: /usr/bin/hccn_tool
+            type: File
+        - name: hccn-conf
+          hostPath:
+            path: /etc/hccn.conf
+            type: File
+        - name: runtime-config
+          configMap:
+            name: layerwise-runtime-config
+            defaultMode: 0555

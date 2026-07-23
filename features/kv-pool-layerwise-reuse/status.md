@@ -12,9 +12,23 @@ Current Phase: source implementation complete
 
 ## Next Steps
 
-- In an environment with the Mooncake C++ toolchain, validate the unchanged collaborator wheel contract and run the real vLLM v0.24.0 integration gate. NPU E2E is not a local acceptance item.
+- Add opt-in per-layer ranged-operation tracing before claiming strict physical-layer
+  coverage, whole-key exclusion, or lease/failure-path acceptance. The deployment
+  smoke is complete, but those stronger assertions remain pending.
 
 ## Latest Validation
+
+- On 2026-07-23, the feature deployment smoke passed on two Ascend910B4 NPUs with
+  `vllm-ascend/DeepSeek-V2-Lite-W8A8`. The standard Kubernetes proxy routed both
+  requests through one prefiller and one decoder. Starting from an empty Mooncake
+  pool, the prefiller logged `0/25` on the first lookup, while the decoder logged
+  `25/25`, `kvpool hit tokens: 3200`, and a layerwise load spec. Both HTTP requests
+  returned 200. The result and evidence boundary are in
+  `deployment/validation-2026-07-23.md`.
+- The initial deployment attempt exposed a missing cross-process hash prerequisite:
+  without a fixed `PYTHONHASHSEED`, the decoder saw `0/25` even after the producer
+  populated Mooncake. Both engine manifests now set `PYTHONHASHSEED=0`, and the
+  runtime checker asserts it before startup.
 
 - Folded the accepted MC2/D3 review decisions into vLLM-Ascend orchestration
   commit `9f2aefa59`: Mooncake load timeout now has a bounded fatal drain path without
