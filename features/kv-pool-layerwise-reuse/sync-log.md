@@ -204,3 +204,22 @@
   all nine rewritten commit checks. Force-pushed final HEAD
   `663209fd6208a59a48742f75116345bf5f5281ec` with an exact lease against
   `f5ab64a1f574896c2894283e09a7a7e867b597d4`.
+
+## 2026-07-23
+
+- Entered the approved G4/D1 runtime-audit gate and added default-disabled
+  `VLLM_ASCEND_KVPOOL_RANGE_DEBUG` instrumentation in signed vLLM-Ascend commit
+  `849c1a7f1f4643e03de74f6784b69504dd5174b5`.
+- The source change is limited to the six production/test files allowed by the
+  validation plan. It records physical-layer ranged save/load byte results,
+  final commit results, and legacy whole-key backstop events without recording
+  keys, request IDs, pointers, GVA values, prompts, or generated text.
+- Pushed the source commit to
+  `origin/feature/mooncake-layerwise-kv-pool`. The three affected test files
+  passed `138` tests, and the complete four-file AscendStore target passed
+  `248` tests. Both existing engine Pods received only the three production
+  Python files; their SHA-256 digests match the committed local files.
+- `bash format.sh ci` was attempted but its markdownlint hook could not run in
+  this environment because the downloaded Node binary requires unavailable
+  `libatomic.so.1`. Focused Ruff check and codespell passed; Ruff's unrelated
+  baseline reformatting was discarded after review.
