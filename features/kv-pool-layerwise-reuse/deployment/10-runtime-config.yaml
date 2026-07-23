@@ -259,9 +259,9 @@ data:
 
     def write_response(path, status_code, text):
         path.write_text(text, encoding="utf-8")
-        if status_code >= 400:
+        if status_code != 200:
             raise RuntimeError(
-                f"request failed with HTTP {status_code}; response={path}"
+                f"request returned HTTP {status_code}, expected 200; response={path}"
             )
         body = json.loads(text)
         if not body.get("choices"):
@@ -445,7 +445,7 @@ data:
         return payloads, markers, expected_keys, layout
 
 
-    def baseline_case(index, body, markers, payloads):
+    def baseline_case(index, status_code, body, markers, payloads):
         signature = response_signature(body)
         isolated, foreign_markers = request_isolation(
             signature["text"], markers[index], markers
@@ -454,6 +454,7 @@ data:
             "case": index,
             "marker": markers[index],
             "seed": payloads[index]["seed"],
+            "http_status": status_code,
             "response_id": body.get("id"),
             "signature": signature,
             "request_isolation": isolated,
@@ -463,7 +464,7 @@ data:
         }
 
 
-    def compare_case(index, body, baseline, markers, payloads):
+    def compare_case(index, status_code, body, baseline, markers, payloads):
         signature = response_signature(body)
         baseline_signature = baseline["signature"]
         exact_match = signature == baseline_signature
@@ -483,6 +484,7 @@ data:
             "case": index,
             "marker": markers[index],
             "seed": payloads[index]["seed"],
+            "http_status": status_code,
             "response_id": body.get("id"),
             "baseline_response_id": baseline["response_id"],
             "signature": signature,
@@ -493,6 +495,7 @@ data:
             "request_isolation": isolated,
             "foreign_markers": foreign_markers,
             "serial_replay_response_id": None,
+            "serial_replay_http_status": None,
             "serial_replay_signature": None,
             "serial_replay_match": None,
             "validated": False,
@@ -509,7 +512,9 @@ data:
             artifact = output_dir / f"{phase_name}-{index}.json"
             body = write_response(artifact, status_code, text)
             phase["cases"].append(
-                compare_case(index, body, baselines[index], markers, payloads)
+                compare_case(
+                    index, status_code, body, baselines[index], markers, payloads
+                )
             )
             write_summary()
 
@@ -525,6 +530,7 @@ data:
                 replay_signature["text"], markers[index], markers
             )
             case["serial_replay_response_id"] = replay_body.get("id")
+            case["serial_replay_http_status"] = replay.status_code
             case["serial_replay_signature"] = replay_signature
             case["serial_replay_match"] = (
                 replay_signature == case["baseline_signature"]
@@ -535,9 +541,7 @@ data:
 
         for case in phase["cases"]:
             deterministic_or_replayed = (
-                case["exact_match"]
-                or case["normalized_match"]
-                or case["serial_replay_match"] is True
+                case["exact_match"] or case["serial_replay_match"] is True
             )
             case["validated"] = (
                 case["metadata_match"]
@@ -608,7 +612,7 @@ data:
                 artifact = output_dir / f"empty-pool-baseline-{index}.json"
                 body = write_response(artifact, status_code, text)
                 baseline_phase["cases"].append(
-                    baseline_case(index, body, markers, payloads)
+                    baseline_case(index, status_code, body, markers, payloads)
                 )
                 write_summary()
 
@@ -658,6 +662,7 @@ data:
                         "case": index,
                         "operation": operation,
                         "marker": markers[index],
+                        "http_status": response.status_code,
                         "response_id": body.get("id"),
                         "signature": signature,
                         "request_isolation": isolated,
