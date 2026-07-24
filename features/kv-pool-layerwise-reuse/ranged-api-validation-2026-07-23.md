@@ -37,6 +37,350 @@ every physical model layer.
 The live engine and Master Pods reported the same image config ID. OCI labels
 inside the image matched all three locked source commits.
 
+## Historical Reproduction Runbook
+
+This runbook was reconstructed from the approved plan, frozen G3 fixture,
+committed runners, and checked-in evidence. It was added without rerunning G0,
+G1, G2, or G3. The first section reproduces the recorded acceptance decision
+offline; the second section is the procedure for a future live rerun that must
+write a new artifact directory.
+
+The 2026-07-23 run used vLLM-Ascend commit
+`663209fd6208a59a48742f75116345bf5f5281ec`. A later checkout or a Pod with
+Python-only source sync is a different input. Do not update this report's
+identity or reuse its artifact paths for such a run.
+
+### Verify G0-G3 evidence without rerunning
+
+Run from the control-repo root:
+
+```bash
+set -euo pipefail
+
+readonly ranged_evidence_root=features/kv-pool-layerwise-reuse/evidence/ranged-api-20260723T094716Z
+readonly ranged_direct_summary="${ranged_evidence_root}/direct/range-api-summary.json"
+readonly ranged_unit_dir="${ranged_evidence_root}/unit"
+readonly ranged_deployment_dir="${ranged_evidence_root}/deployment"
+
+(
+  cd "${ranged_evidence_root}"
+  sha256sum -c SHA256SUMS
+)
+test "$(sha256sum "${ranged_evidence_root}/SHA256SUMS" | awk '{print $1}')" = \
+  e5b4a768485f1aaf2b39d7421ab1c2f1308077f06f8f010f059a640cfb95d1f9
+
+jq -e '
+  .passed == true and
+  (.cases | length) == 43 and
+  all(.cases[]; .passed == true) and
+  .source_checksum == .destination_checksum_after and
+  all(.cleanup[]; .passed == true)
+' "${ranged_direct_summary}"
+
+cmp "${ranged_unit_dir}/git-status-before.txt" \
+  "${ranged_unit_dir}/git-status-after.txt"
+grep -Eq '242 passed, 14 warnings' "${ranged_unit_dir}/pytest.log"
+
+jq -e '
+  .status == "passed" and .validated == true and .diagnosis == "passed" and
+  .expected_master_key_count == 64 and .actual_master_key_count == 64 and
+  ([.phases.direct_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4 and
+  ([.phases.proxy_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4
+' "${ranged_deployment_dir}/concurrent-summary.json"
+jq -e '
+  .passed == true and .errors == [] and (.checks | length) == 12 and
+  all(.checks[];
+    .passed == true and .hit_blocks == true and
+    .hit_tokens == true and .layerwise_load == true)
+' "${ranged_deployment_dir}/log-validation.json"
+grep -qx '0' "${ranged_deployment_dir}/smoke-test.exit-code"
+grep -qx '0' "${ranged_deployment_dir}/log-validation.exit-code"
+```
+
+These checks validate the immutable evidence used for this report. They do not
+turn archived output into a new runtime result.
+
+### Create a new artifact root for a future live rerun
+
+Use the exact archived runner and frozen deployment source, not their evolving
+counterparts on the branch:
+
+```bash
+readonly ranged_namespace=ai-inference
+readonly ranged_historical_vllm_ascend=663209fd6208a59a48742f75116345bf5f5281ec
+readonly ranged_runner="${ranged_evidence_root}/direct/range-api-smoke.py"
+readonly ranged_fixture_root="${ranged_evidence_root}/environment/deployment-fixture"
+readonly ranged_fixture_source="${ranged_fixture_root}/source"
+readonly ranged_historical_deployment="${ranged_fixture_source}/features/kv-pool-layerwise-reuse/deployment"
+
+ranged_timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+ranged_artifact_root="/tmp/ranged-api-reproduction-${ranged_timestamp}"
+test ! -e "${ranged_artifact_root}"
+mkdir -p \
+  "${ranged_artifact_root}/environment" \
+  "${ranged_artifact_root}/direct" \
+  "${ranged_artifact_root}/unit"
+
+grep -Fx 'G3_FIXTURE_ID=commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d' \
+  "${ranged_fixture_root}/IDENTITY.txt"
+(
+  cd "${ranged_fixture_source}"
+  sha256sum -c SOURCE-SHA256SUMS
+)
+test "$(sha256sum "${ranged_runner}" | awk '{print $1}')" = \
+  b37cfe0812a7b843aedac44dc7d9dbce9bbce3b6cab106a38d3e94a53dbf01da
+```
+
+### G0: verify the live image, Pods, model, NPU, and APIs
+
+Resolve exactly one Running Pod for each role and save the environment before
+using either NPU:
+
+```bash
+for ranged_selector in \
+  app=prefill app=decode app=proxy app=mooncake-master; do
+  test "$(kubectl get pods -n "${ranged_namespace}" \
+    -l "${ranged_selector}" -o json | \
+    jq '[.items[] | select(.status.phase == "Running")] | length')" -eq 1
+done
+
+ranged_prefill_pod="$(kubectl get pods -n "${ranged_namespace}" \
+  -l app=prefill -o jsonpath='{.items[0].metadata.name}')"
+ranged_decode_pod="$(kubectl get pods -n "${ranged_namespace}" \
+  -l app=decode -o jsonpath='{.items[0].metadata.name}')"
+
+kubectl get pods -n "${ranged_namespace}" -o yaml \
+  >"${ranged_artifact_root}/environment/pods.yaml"
+nerdctl -n k8s.io image inspect \
+  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2 \
+  >"${ranged_artifact_root}/environment/image-inspect.json"
+
+for ranged_target in \
+  "${ranged_prefill_pod}:prefill-engine" \
+  "${ranged_decode_pod}:decode-engine"; do
+  ranged_pod="${ranged_target%%:*}"
+  ranged_container="${ranged_target##*:}"
+  test "$(kubectl exec -n "${ranged_namespace}" "${ranged_pod}" \
+    -c "${ranged_container}" -- \
+    git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = \
+    "${ranged_historical_vllm_ascend}"
+  test -z "$(kubectl exec -n "${ranged_namespace}" "${ranged_pod}" \
+    -c "${ranged_container}" -- \
+    git -C /vllm-workspace/vllm-ascend status --porcelain)"
+  kubectl exec -n "${ranged_namespace}" "${ranged_pod}" \
+    -c "${ranged_container}" -- \
+    python3 /opt/vllm-layerwise/check-runtime.py
+  kubectl exec -n "${ranged_namespace}" "${ranged_pod}" \
+    -c "${ranged_container}" -- python3 -c '
+from mooncake.engine import TransferEngine
+
+required = ("get_engine", "get_rpc_port", "register_memory", "unregister_memory")
+missing = [name for name in required if not callable(getattr(TransferEngine, name, None))]
+assert not missing, missing
+'
+done
+
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- npu-smi info \
+  >"${ranged_artifact_root}/environment/npu-prefill.txt"
+kubectl exec -n "${ranged_namespace}" "${ranged_decode_pod}" \
+  -c decode-engine -- npu-smi info \
+  >"${ranged_artifact_root}/environment/npu-decode.txt"
+test "$(kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- bash -lc \
+  'find /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 -maxdepth 1 -name "*.safetensors" | wc -l')" -eq 4
+```
+
+If the commit or clean-status check fails, stop. Reusing a G4-synced Pod would
+change both the G2 test count and the production source identity. Prepare a
+clean historical fixture rather than overwriting later in-Pod work.
+
+### G1: run the direct Ascend ranged contract
+
+Stop prefill vLLM so the runner has exclusive use of its visible NPU. The stop
+script removes its PID file only after the process exits or is killed:
+
+```bash
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- bash -lc \
+  'test ! -s /tmp/vllm-prefill.pid && ! pgrep -af "[v]llm.entrypoints.openai.api_server.*--port 8100"'
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- npu-smi info \
+  >"${ranged_artifact_root}/direct/npu-before-g1.txt"
+grep -Fq 'No running processes found' \
+  "${ranged_artifact_root}/direct/npu-before-g1.txt"
+
+kubectl cp -n "${ranged_namespace}" -c prefill-engine \
+  "${ranged_runner}" "${ranged_prefill_pod}:/tmp/range-api-smoke.py"
+test "$(kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- sha256sum /tmp/range-api-smoke.py | awk '{print $1}')" = \
+  b37cfe0812a7b843aedac44dc7d9dbce9bbce3b6cab106a38d3e94a53dbf01da
+
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- python3 /tmp/range-api-smoke.py \
+  --run-negative --output /tmp/range-api-summary.json \
+  2>&1 | tee "${ranged_artifact_root}/direct/range-api.log"
+kubectl cp -n "${ranged_namespace}" -c prefill-engine \
+  "${ranged_prefill_pod}:/tmp/range-api-summary.json" \
+  "${ranged_artifact_root}/direct/range-api-summary.json"
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- npu-smi info \
+  >"${ranged_artifact_root}/direct/npu-after-g1.txt"
+grep -Fq 'No running processes found' \
+  "${ranged_artifact_root}/direct/npu-after-g1.txt"
+
+jq -e '
+  .passed == true and (.cases | length) == 43 and
+  all(.cases[]; .passed == true) and
+  .source_checksum == .destination_checksum_after and
+  all(.cleanup[]; .passed == true)
+' "${ranged_artifact_root}/direct/range-api-summary.json"
+
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
+```
+
+Require the restarted prefill API to return HTTP 200 before continuing:
+
+```bash
+ranged_wait_for_url() {
+  local ranged_wait_pod=$1
+  local ranged_wait_container=$2
+  local ranged_wait_url=$3
+
+  for _ in $(seq 1 240); do
+    if kubectl exec -n "${ranged_namespace}" "${ranged_wait_pod}" \
+      -c "${ranged_wait_container}" -- python3 -c \
+      'import sys, urllib.request; response = urllib.request.urlopen(sys.argv[1], timeout=5); assert response.status == 200' \
+      "${ranged_wait_url}" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 5
+  done
+  return 1
+}
+
+ranged_wait_for_url "${ranged_prefill_pod}" prefill-engine \
+  http://127.0.0.1:8100/v1/models
+```
+
+### G2: run the existing AscendStore tests without source changes
+
+Run the four historical test files in the clean prefill Pod and prove that the
+source status is unchanged:
+
+```bash
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- \
+  git -C /vllm-workspace/vllm-ascend status --porcelain=v1 \
+  >"${ranged_artifact_root}/unit/git-status-before.txt"
+
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- bash -lc '
+cd /vllm-workspace/vllm-ascend
+TORCH_DEVICE_BACKEND_AUTOLOAD=0 \
+VLLM_VERSION=0.24.0 \
+PYTHONDONTWRITEBYTECODE=1 \
+PYTEST_ADDOPTS="-p no:cacheprovider" \
+python3 -m pytest -q \
+  tests/ut/distributed/ascend_store/test_backend.py \
+  tests/ut/distributed/ascend_store/test_kv_transfer.py \
+  tests/ut/distributed/ascend_store/test_mooncake_session_tracker.py \
+  tests/ut/distributed/ascend_store/test_pool_worker.py
+' 2>&1 | tee "${ranged_artifact_root}/unit/pytest.log"
+
+kubectl exec -n "${ranged_namespace}" "${ranged_prefill_pod}" \
+  -c prefill-engine -- \
+  git -C /vllm-workspace/vllm-ascend status --porcelain=v1 \
+  >"${ranged_artifact_root}/unit/git-status-after.txt"
+cmp "${ranged_artifact_root}/unit/git-status-before.txt" \
+  "${ranged_artifact_root}/unit/git-status-after.txt"
+grep -Eq '242 passed, 14 warnings' \
+  "${ranged_artifact_root}/unit/pytest.log"
+```
+
+### G3: rerun the frozen deployment smoke
+
+Use the reset/start procedure in the
+[deployment validation runbook](deployment/validation-2026-07-23.md#historical-reproduction-runbook),
+but set its output directory to this new artifact root:
+
+```bash
+kubectl exec -n "${ranged_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh prefill
+kubectl exec -n "${ranged_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh decode
+kubectl rollout restart -n "${ranged_namespace}" \
+  deployment/mooncake-master-deployment
+kubectl rollout status -n "${ranged_namespace}" \
+  deployment/mooncake-master-deployment --timeout=120s
+
+kubectl exec -n "${ranged_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- python3 -c \
+  'import sys, urllib.request; data = urllib.request.urlopen(sys.argv[1], timeout=10).read().decode(); print(data, end=""); assert "master_key_count 0" in data.splitlines()' \
+  http://mooncake-master-service:9003/metrics \
+  >"${ranged_artifact_root}/environment/mooncake-master-before-smoke.metrics"
+
+kubectl exec -n "${ranged_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/start-prefill.sh
+kubectl exec -n "${ranged_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/start-decode.sh
+ranged_wait_for_url "${ranged_prefill_pod}" prefill-engine \
+  http://127.0.0.1:8100/v1/models
+ranged_wait_for_url "${ranged_decode_pod}" decode-engine \
+  http://127.0.0.1:8200/v1/models
+
+bash "${ranged_historical_deployment}/run-smoke-test.sh" \
+  "${ranged_artifact_root}/deployment"
+
+jq -e '
+  .status == "passed" and .validated == true and .diagnosis == "passed" and
+  .expected_master_key_count == 64 and .actual_master_key_count == 64 and
+  ([.phases.direct_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4 and
+  ([.phases.proxy_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4
+' "${ranged_artifact_root}/deployment/concurrent-summary.json"
+jq -e '
+  .passed == true and .errors == [] and (.checks | length) == 12 and
+  all(.checks[]; .passed == true)
+' "${ranged_artifact_root}/deployment/log-validation.json"
+```
+
+### Finalize the future artifact and preserve the historical decision
+
+Stop both vLLM processes after collection, then checksum the new artifact:
+
+```bash
+kubectl exec -n "${ranged_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh prefill
+kubectl exec -n "${ranged_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh decode
+
+(
+  cd "${ranged_artifact_root}"
+  find . -type f ! -name SHA256SUMS -print0 \
+    | sort -z | xargs -0 sha256sum >SHA256SUMS
+  sha256sum -c SHA256SUMS
+)
+echo "new G0-G3 artifact: ${ranged_artifact_root}"
+```
+
+For this historical run D1 remains **No**. G4 was authorized and executed only
+later, using a separate source identity and artifact; its procedure and result
+are recorded in
+[the G4 validation report](ranged-api-g4-validation-2026-07-23.md).
+
 ## G0 Preflight
 
 G0 passed.

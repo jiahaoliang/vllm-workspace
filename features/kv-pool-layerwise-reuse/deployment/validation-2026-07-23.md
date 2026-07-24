@@ -45,6 +45,249 @@ The image's shallow editable vLLM install reports
 `0.1.dev1+gee0da84ab`; both engine Pods used the supported
 `VLLM_VERSION=0.24.0` compatibility override.
 
+## Historical Reproduction Runbook
+
+This runbook was reconstructed from the committed fixture, scripts, and
+checked-in evidence after the validation completed. Adding it did not rerun the
+cluster test. It has two distinct uses:
+
+- the evidence replay below verifies the original result without Kubernetes;
+- the live procedure creates a new result and must never overwrite or be
+  represented as the 2026-07-23 evidence.
+
+Run all commands from the control-repo root in Bash. The accepted result is the
+final distinct-cache smoke; its warmup phase also retains the sequential
+populate/reuse coverage. The earlier same-cache prototype is historical
+diagnostic evidence and is not a reproduction target.
+
+### Verify the checked-in result without rerunning
+
+```bash
+set -euo pipefail
+
+readonly deployment_evidence_root=features/kv-pool-layerwise-reuse/evidence/ranged-api-20260723T094716Z
+readonly deployment_evidence="${deployment_evidence_root}/deployment"
+
+(
+  cd "${deployment_evidence_root}"
+  sha256sum -c SHA256SUMS
+)
+
+grep -qx '0' "${deployment_evidence}/smoke-test.exit-code"
+grep -qx '0' "${deployment_evidence}/log-validation.exit-code"
+jq -e '
+  .status == "passed" and
+  .validated == true and
+  .diagnosis == "passed" and
+  .expected_master_key_count == 64 and
+  .actual_master_key_count == 64 and
+  (.phases.empty_pool_baseline.cases | length) == 4 and
+  all(.phases.empty_pool_baseline.cases[];
+    .http_status == 200 and .validated == true) and
+  (.phases.warmup.cases | length) == 5 and
+  all(.phases.warmup.cases[];
+    .http_status == 200 and .validated == true) and
+  ([.phases.direct_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4 and
+  ([.phases.proxy_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4
+' "${deployment_evidence}/concurrent-summary.json"
+
+jq -e '
+  .passed == true and
+  .errors == [] and
+  (.checks | length) == 12 and
+  all(.checks[];
+    .passed == true and .hit_blocks == true and
+    .hit_tokens == true and .layerwise_load == true)
+' "${deployment_evidence}/log-validation.json"
+
+grep -Eq '^master_key_count 0$' \
+  "${deployment_evidence}/smoke-artifacts/mooncake-master-initial.metrics"
+grep -Eq '^master_key_count 64$' \
+  "${deployment_evidence}/mooncake-master.metrics"
+```
+
+The complete checksum command verifies the G0-G3 archive because the deployment
+files share that immutable artifact root. The deployment-specific assertions
+then reproduce the acceptance decision recorded in this report.
+
+### Prepare the frozen fixture for a future live rerun
+
+The historical source snapshot and runner are committed under the evidence
+tree. Use them instead of the evolving files in the current branch:
+
+```bash
+readonly deployment_namespace=ai-inference
+readonly historical_fixture_root="${deployment_evidence_root}/environment/deployment-fixture"
+readonly historical_source_root="${historical_fixture_root}/source"
+readonly historical_deployment_dir="${historical_source_root}/features/kv-pool-layerwise-reuse/deployment"
+readonly historical_vllm_ascend_commit=663209fd6208a59a48742f75116345bf5f5281ec
+readonly historical_fixture_manifest_sha=3d6671676e1959f2f7967102e1f53ae5289ac57fcbafa4eca889642a383ec79d
+
+grep -Fx 'G3_FIXTURE_ID=commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d' \
+  "${historical_fixture_root}/IDENTITY.txt"
+test "$(sha256sum "${historical_source_root}/SOURCE-SHA256SUMS" | awk '{print $1}')" = \
+  "${historical_fixture_manifest_sha}"
+(
+  cd "${historical_source_root}"
+  sha256sum -c SOURCE-SHA256SUMS
+)
+
+for deployment_manifest in \
+  00-namespace.yaml \
+  10-runtime-config.yaml \
+  30-mooncake-master.yaml \
+  40-prefill-engine.yaml \
+  50-decode-engine.yaml \
+  20-proxy-server.yaml; do
+  kubectl apply -f "${historical_deployment_dir}/${deployment_manifest}"
+done
+
+kubectl rollout status -n "${deployment_namespace}" \
+  deployment/mooncake-master-deployment --timeout=120s
+kubectl rollout status -n "${deployment_namespace}" \
+  deployment/proxy-server-deployment --timeout=120s
+kubectl wait -n "${deployment_namespace}" \
+  --for=jsonpath='{.status.phase}'=Running pod -l app=prefill --timeout=120s
+kubectl wait -n "${deployment_namespace}" \
+  --for=jsonpath='{.status.phase}'=Running pod -l app=decode --timeout=120s
+```
+
+Before changing process state, require exactly the image baseline in each engine
+Pod. `git status` catches Python files copied during a later G4 session even
+though the embedded Git `HEAD` remains unchanged:
+
+```bash
+test "$(kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = \
+  "${historical_vllm_ascend_commit}"
+test -z "$(kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  git -C /vllm-workspace/vllm-ascend status --porcelain)"
+test "$(kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = \
+  "${historical_vllm_ascend_commit}"
+test -z "$(kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  git -C /vllm-workspace/vllm-ascend status --porcelain)"
+
+kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  python3 /opt/vllm-layerwise/check-runtime.py
+kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  python3 /opt/vllm-layerwise/check-runtime.py
+```
+
+If either source check fails, the existing Pods are not the historical fixture.
+Do not silently copy `663209fd` over later work. Preserve the synced files and
+use a clean, deliberately prepared fixture. A run against another source tree
+is valid only as a new experiment with a newly recorded identity.
+
+### Reset, start, and execute the future rerun
+
+Stop only the child vLLM processes, reset Master, and prove the pool is empty:
+
+```bash
+kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh prefill
+kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh decode
+
+kubectl rollout restart -n "${deployment_namespace}" \
+  deployment/mooncake-master-deployment
+kubectl rollout status -n "${deployment_namespace}" \
+  deployment/mooncake-master-deployment --timeout=120s
+
+deployment_empty_metrics="/tmp/mooncake-master-empty-$(date -u +%Y%m%dT%H%M%SZ).metrics"
+kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- python3 -c \
+  'import sys, urllib.request; sys.stdout.buffer.write(urllib.request.urlopen(sys.argv[1], timeout=10).read())' \
+  http://mooncake-master-service:9003/metrics >"${deployment_empty_metrics}"
+grep -Eq '^master_key_count 0$' "${deployment_empty_metrics}"
+grep -Eq '^master_allocated_bytes 0$' "${deployment_empty_metrics}"
+
+kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/start-prefill.sh
+kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/start-decode.sh
+```
+
+Wait for the real HTTP endpoints rather than relying only on Kubernetes Ready:
+
+```bash
+deployment_wait_for_url() {
+  local deployment_resource=$1
+  local container_name=$2
+  local endpoint=$3
+
+  for _ in $(seq 1 240); do
+    if kubectl exec -n "${deployment_namespace}" "${deployment_resource}" \
+      -c "${container_name}" -- python3 -c \
+      'import sys, urllib.request; response = urllib.request.urlopen(sys.argv[1], timeout=5); assert response.status == 200' \
+      "${endpoint}" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 5
+  done
+  return 1
+}
+
+deployment_wait_for_url deploy/prefill-engine-deployment prefill-engine \
+  http://127.0.0.1:8100/v1/models
+deployment_wait_for_url deploy/decode-engine-deployment decode-engine \
+  http://127.0.0.1:8200/v1/models
+
+deployment_rerun_dir="/tmp/layerwise-smoke-reproduction-$(date -u +%Y%m%dT%H%M%SZ)"
+bash "${historical_deployment_dir}/run-smoke-test.sh" \
+  "${deployment_rerun_dir}"
+```
+
+Apply the same fail-closed acceptance checks to the new directory, then create
+its own checksum manifest:
+
+```bash
+jq -e '
+  .status == "passed" and .validated == true and .diagnosis == "passed" and
+  .expected_master_key_count == 64 and .actual_master_key_count == 64 and
+  ([.phases.direct_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4 and
+  ([.phases.proxy_kv_load.cases[] |
+    select(.validated == true and .exact_match == true)] | length) == 4
+' "${deployment_rerun_dir}/concurrent-summary.json"
+jq -e '
+  .passed == true and .errors == [] and (.checks | length) == 12 and
+  all(.checks[]; .passed == true)
+' "${deployment_rerun_dir}/log-validation.json"
+grep -qx '0' "${deployment_rerun_dir}/smoke-test.exit-code"
+grep -qx '0' "${deployment_rerun_dir}/log-validation.exit-code"
+
+(
+  cd "${deployment_rerun_dir}"
+  find . -type f ! -name SHA256SUMS -print0 \
+    | sort -z | xargs -0 sha256sum >SHA256SUMS
+  sha256sum -c SHA256SUMS
+)
+```
+
+After collection, stop vLLM without replacing either engine Pod:
+
+```bash
+kubectl exec -n "${deployment_namespace}" \
+  deploy/prefill-engine-deployment -c prefill-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh prefill
+kubectl exec -n "${deployment_namespace}" \
+  deploy/decode-engine-deployment -c decode-engine -- \
+  /opt/vllm-layerwise/stop-engine.sh decode
+```
+
 ## Deployment state
 
 All four workloads were `Running` and Ready on `n1`. The proxy discovered the
@@ -145,9 +388,11 @@ neither consumer loads nor duplicate producer requests created unexpected
 objects. `log-validation.json` passed all 12 role/case checks and confirmed
 `use_layerwise=True` for every target response ID.
 
-The host-side evidence is retained at
-`/tmp/layerwise-smoke-distinct-cache-20260723-r4/`. Its
-`concurrent-summary.json` reports `status=passed`, `validated=true`, and
+The original host-side evidence was retained at
+`/tmp/layerwise-smoke-distinct-cache-20260723-r4/`. A byte-identical persistent
+copy is now tracked under
+`features/kv-pool-layerwise-reuse/evidence/ranged-api-20260723T094716Z/deployment/`.
+Its `concurrent-summary.json` reports `status=passed`, `validated=true`, and
 `diagnosis=passed`; both smoke and log-validation exit codes are zero.
 
 ### Earlier same-cache anomaly
