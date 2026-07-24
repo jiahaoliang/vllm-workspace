@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: layerwise-stress-runtime-config
+  namespace: ai-inference
+data:
+  mooncake.json: |
+    {
+      "metadata_server": "P2PHANDSHAKE",
+      "protocol": "ascend",
+      "device_name": "",
+      "master_server_address": "mooncake-master-service:30089",
+      "global_segment_size": "1GB",
+      "local_buffer_size": 0,
+      "preferred_segment": false,
+      "prefer_alloc_in_same_node": true,
+      "enable_ssd_offload": false
+    }
+  start-prefill.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    pid_file=/tmp/vllm-prefill.pid
+    log_file=/tmp/vllm-prefill.log
+    if [[ -s "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      if kill -0 "${old_pid}" 2>/dev/null; then
+        echo "prefill vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      rm -f "${pid_file}"
+    fi
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 --port 8100 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend --trust-remote-code --enforce-eager \
+      --distributed-executor-backend mp \
+      --data-parallel-size 2 --data-parallel-size-local 2 --data-parallel-backend mp \
+      --tensor-parallel-size 2 --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 --decode-context-parallel-size 1 \
+      --block-size 128 --enable-chunked-prefill --max-model-len 65536 \
+      --max-num-batched-tokens 1024 --max-num-seqs 16 \
+      --no-enable-prefix-caching --enable-logging-iteration-details \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}' \
+      >"${log_file}" 2>&1 </dev/null &
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if ! kill -0 "${new_pid}" 2>/dev/null; then
+      echo "prefill vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+    echo "prefill vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  start-decode.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    pid_file=/tmp/vllm-decode.pid
+    log_file=/tmp/vllm-decode.log
+    if [[ -s "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      if kill -0 "${old_pid}" 2>/dev/null; then
+        echo "decode vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      rm -f "${pid_file}"
+    fi
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 --port 8200 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend --trust-remote-code --enforce-eager \
+      --distributed-executor-backend mp \
+      --data-parallel-size 1 --data-parallel-backend mp \
+      --tensor-parallel-size 2 --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 --decode-context-parallel-size 1 \
+      --block-size 128 --enable-chunked-prefill --max-model-len 65536 \
+      --max-num-batched-tokens 1024 --max-num-seqs 16 \
+      --no-enable-prefix-caching --enable-logging-iteration-details \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}' \
+      >"${log_file}" 2>&1 </dev/null &
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if ! kill -0 "${new_pid}" 2>/dev/null; then
+      echo "decode vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+    echo "decode vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  stop-engine.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [[ $# -ne 1 || ( "$1" != prefill && "$1" != decode ) ]]; then
+      echo "usage: $0 <prefill|decode>" >&2
+      exit 2
+    fi
+    role=$1
+    pid_file="/tmp/vllm-${role}.pid"
+    if [[ ! -s "${pid_file}" ]]; then
+      echo "${role} vLLM has no PID file"
+      exit 0
+    fi
+    pid="$(<"${pid_file}")"
+    if ! kill -0 "${pid}" 2>/dev/null; then
+      echo "${role} vLLM PID ${pid} is no longer running"
+      rm -f "${pid_file}"
+      exit 0
+    fi
+    kill -TERM "${pid}"
+    for _ in $(seq 1 60); do
+      if ! kill -0 "${pid}" 2>/dev/null; then
+        rm -f "${pid_file}"
+        echo "${role} vLLM stopped"
+        exit 0
+      fi
+      sleep 1
+    done
+    echo "${role} vLLM did not exit after 60 seconds; sending SIGKILL" >&2
+    kill -KILL "${pid}"
+    rm -f "${pid_file}"
+  check-runtime.py: |
+    import os
+    from pathlib import Path
+    import vllm
+    import vllm_ascend
+    from mooncake.store import MooncakeDistributedStore
+    from vllm_ascend.utils import vllm_version_is
+    methods = (
+        "batch_put_start", "batch_put_from_multi_buffer_ranges",
+        "batch_put_end", "batch_put_revoke", "batch_get_start",
+        "batch_get_into_multi_buffer_ranges", "batch_get_end",
+    )
+    missing = [name for name in methods if not callable(getattr(MooncakeDistributedStore, name, None))]
+    assert not missing, f"missing Mooncake session/range APIs: {missing}"
+    source = Path(vllm_ascend.__file__).resolve()
+    expected = Path("/vllm-workspace/vllm-ascend").resolve()
+    assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
+    assert os.environ.get("PYTHONHASHSEED") == "0", "PYTHONHASHSEED must be fixed"
+    assert vllm_version_is("0.24.0"), f"wrong compatibility line: {vllm.__version__}"
+    print(f"vllm-ascend source: {source}")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.24.0")
+    print("cross-process block hash seed: 0")
+    print("Mooncake session/range APIs: OK")
