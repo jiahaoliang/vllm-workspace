@@ -1,0 +1,493 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "diagnosis": "passed",
+  "concurrency": 4,
+  "block_size": 128,
+  "expected_hit_blocks": 25,
+  "expected_hit_tokens": 3200,
+  "expected_master_key_count": 64,
+  "prompt_layout": {
+    "shared_blocks": 12,
+    "shared_prefix_tokens": 1536,
+    "unique_blocks_per_case": 13,
+    "prompt_tokens_by_case": [
+      3215,
+      3215,
+      3215,
+      3215
+    ],
+    "uncached_suffix_tokens": 15,
+    "uncached_suffix_identical": true,
+    "markers": [
+      "CASE_ZERO",
+      "CASE_ONE",
+      "CASE_TWO",
+      "CASE_THREE"
+    ]
+  },
+  "phases": {
+    "empty_pool_baseline": {
+      "status": "passed",
+      "validated": true,
+      "cases": [
+        {
+          "case": 0,
+          "marker": "CASE_ZERO",
+          "seed": 2026072300,
+          "http_status": 200,
+          "response_id": "cmpl-ad29a5264043730c",
+          "signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "recompute_baseline"
+        },
+        {
+          "case": 1,
+          "marker": "CASE_ONE",
+          "seed": 2026072301,
+          "http_status": 200,
+          "response_id": "cmpl-9edc09f0a5c7d567",
+          "signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "recompute_baseline"
+        },
+        {
+          "case": 2,
+          "marker": "CASE_TWO",
+          "seed": 2026072302,
+          "http_status": 200,
+          "response_id": "cmpl-ad9eb04f44dfa5a0",
+          "signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "recompute_baseline"
+        },
+        {
+          "case": 3,
+          "marker": "CASE_THREE",
+          "seed": 2026072303,
+          "http_status": 200,
+          "response_id": "cmpl-b34a82d2f3764709",
+          "signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "recompute_baseline"
+        }
+      ],
+      "master_key_count_before": 0.0,
+      "master_key_count_after": 0.0
+    },
+    "warmup": {
+      "status": "passed",
+      "validated": true,
+      "cases": [
+        {
+          "case": 0,
+          "operation": "populate",
+          "marker": "CASE_ZERO",
+          "http_status": 200,
+          "response_id": "cmpl-6e3279e1-8996-4aa8-92a0-03317abe4966",
+          "signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "isolated"
+        },
+        {
+          "case": 0,
+          "operation": "reuse",
+          "marker": "CASE_ZERO",
+          "http_status": 200,
+          "response_id": "cmpl-4f557047-296b-4697-b4be-4d97f6703954",
+          "signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "isolated"
+        },
+        {
+          "case": 1,
+          "operation": "populate",
+          "marker": "CASE_ONE",
+          "http_status": 200,
+          "response_id": "cmpl-987cacad-4a5f-40e9-a5fa-d924db0df9ba",
+          "signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "isolated"
+        },
+        {
+          "case": 2,
+          "operation": "populate",
+          "marker": "CASE_TWO",
+          "http_status": 200,
+          "response_id": "cmpl-53abd833-b616-4ad9-af35-b22a6a033354",
+          "signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "isolated"
+        },
+        {
+          "case": 3,
+          "operation": "populate",
+          "marker": "CASE_THREE",
+          "http_status": 200,
+          "response_id": "cmpl-ae8c9a2f-7e7b-4032-8d83-c78341d2b35b",
+          "signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "request_isolation": true,
+          "foreign_markers": [],
+          "validated": true,
+          "classification": "isolated"
+        }
+      ],
+      "case_zero_populate_key_count": 25.0,
+      "master_key_count_after": 64.0
+    },
+    "direct_kv_load": {
+      "status": "passed",
+      "validated": true,
+      "cases": [
+        {
+          "case": 0,
+          "marker": "CASE_ZERO",
+          "seed": 2026072300,
+          "http_status": 200,
+          "response_id": "cmpl-be7428660e4334b8",
+          "baseline_response_id": "cmpl-ad29a5264043730c",
+          "signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 1,
+          "marker": "CASE_ONE",
+          "seed": 2026072301,
+          "http_status": 200,
+          "response_id": "cmpl-87553c8027c37492",
+          "baseline_response_id": "cmpl-9edc09f0a5c7d567",
+          "signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 2,
+          "marker": "CASE_TWO",
+          "seed": 2026072302,
+          "http_status": 200,
+          "response_id": "cmpl-927584b63e6d17a0",
+          "baseline_response_id": "cmpl-ad9eb04f44dfa5a0",
+          "signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 3,
+          "marker": "CASE_THREE",
+          "seed": 2026072303,
+          "http_status": 200,
+          "response_id": "cmpl-9adee6271b8b3f15",
+          "baseline_response_id": "cmpl-b34a82d2f3764709",
+          "signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        }
+      ],
+      "validated_cases": 4,
+      "exact_matches": 4,
+      "master_key_count_after": 64.0
+    },
+    "proxy_kv_load": {
+      "status": "passed",
+      "validated": true,
+      "cases": [
+        {
+          "case": 0,
+          "marker": "CASE_ZERO",
+          "seed": 2026072300,
+          "http_status": 200,
+          "response_id": "cmpl-f96ed397-1d3f-4d77-81b8-19907457cf94",
+          "baseline_response_id": "cmpl-ad29a5264043730c",
+          "signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_ZERO\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 1,
+          "marker": "CASE_ONE",
+          "seed": 2026072301,
+          "http_status": 200,
+          "response_id": "cmpl-47df0603-241c-4eb4-a819-f348d5bb1acb",
+          "baseline_response_id": "cmpl-9edc09f0a5c7d567",
+          "signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 2,
+          "marker": "CASE_TWO",
+          "seed": 2026072302,
+          "http_status": 200,
+          "response_id": "cmpl-6a7ed9be-d239-4299-81be-a5b28f2f1004",
+          "baseline_response_id": "cmpl-ad9eb04f44dfa5a0",
+          "signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        },
+        {
+          "case": 3,
+          "marker": "CASE_THREE",
+          "seed": 2026072303,
+          "http_status": 200,
+          "response_id": "cmpl-7989c088-0721-4a0b-91ff-28a94cd205fd",
+          "baseline_response_id": "cmpl-b34a82d2f3764709",
+          "signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "baseline_signature": {
+            "text": " CASE_THREE\nQuestion: What is the private cache branch identity marker?",
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "exact_match": true,
+          "normalized_match": true,
+          "metadata_match": true,
+          "request_isolation": true,
+          "foreign_markers": [],
+          "serial_replay_response_id": null,
+          "serial_replay_http_status": null,
+          "serial_replay_signature": null,
+          "serial_replay_match": null,
+          "validated": true,
+          "classification": "exact_match"
+        }
+      ],
+      "validated_cases": 4,
+      "exact_matches": 4,
+      "master_key_count_after": 64.0
+    }
+  },
+  "actual_master_key_count": 64.0
+}

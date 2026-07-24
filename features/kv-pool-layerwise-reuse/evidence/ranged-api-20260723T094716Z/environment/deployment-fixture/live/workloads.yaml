@@ -1,0 +1,598 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"decode-engine-deployment","namespace":"ai-inference"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"decode"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"decode"}},"spec":{"containers":[{"args":["exec sleep infinity"],"command":["/bin/bash","-lc"],"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"HCCL_IF_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"GLOO_SOCKET_IFNAME","value":"eth0"},{"name":"TP_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_INTRA_ROCE_ENABLE","value":"1"},{"name":"ASCEND_BUFFER_POOL","value":"4:8"},{"name":"MOONCAKE_CONFIG_PATH","value":"/opt/vllm-layerwise/mooncake.json"},{"name":"MOONCAKE_MASTER","value":"mooncake-master-service:30089"},{"name":"PYTHONUNBUFFERED","value":"1"},{"name":"PYTHONHASHSEED","value":"0"},{"name":"VLLM_VERSION","value":"0.24.0"}],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2","imagePullPolicy":"Never","name":"decode-engine","ports":[{"containerPort":8200,"name":"decode-port"}],"readinessProbe":{"failureThreshold":120,"httpGet":{"path":"/v1/models","port":"decode-port"},"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"huawei.com/Ascend910":"1"},"requests":{"huawei.com/Ascend910":"1"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm"},{"mountPath":"/usr/local/dcmi","name":"dcmi"},{"mountPath":"/usr/local/bin/npu-smi","name":"npusmi"},{"mountPath":"/usr/local/Ascend/driver/lib64","name":"driver-lib64"},{"mountPath":"/usr/local/Ascend/driver/version.info","name":"driver-version"},{"mountPath":"/etc/ascend_install.info","name":"ascend-install-info"},{"mountPath":"/root/.cache","name":"model-cache"},{"mountPath":"/usr/bin/hccn_tool","name":"hccn-tool"},{"mountPath":"/etc/hccn.conf","name":"hccn-conf"},{"mountPath":"/opt/vllm-layerwise","name":"runtime-config","readOnly":true}]}],"nodeName":"n1","terminationGracePeriodSeconds":120,"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"24Gi"},"name":"shm"},{"hostPath":{"path":"/usr/local/dcmi","type":"Directory"},"name":"dcmi"},{"hostPath":{"path":"/usr/local/bin/npu-smi","type":"File"},"name":"npusmi"},{"hostPath":{"path":"/usr/local/Ascend/driver/lib64","type":"Directory"},"name":"driver-lib64"},{"hostPath":{"path":"/usr/local/Ascend/driver/version.info","type":"File"},"name":"driver-version"},{"hostPath":{"path":"/etc/ascend_install.info","type":"File"},"name":"ascend-install-info"},{"hostPath":{"path":"/home/llm_cache","type":"Directory"},"name":"model-cache"},{"hostPath":{"path":"/usr/bin/hccn_tool","type":"File"},"name":"hccn-tool"},{"hostPath":{"path":"/etc/hccn.conf","type":"File"},"name":"hccn-conf"},{"configMap":{"defaultMode":365,"name":"layerwise-runtime-config"},"name":"runtime-config"}]}}}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    generation: 5
+    name: decode-engine-deployment
+    namespace: ai-inference
+    resourceVersion: "20289966"
+    uid: e5207e6d-61bf-4e79-ab12-c1f9294d953d
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: decode
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: decode
+      spec:
+        containers:
+        - args:
+          - exec sleep infinity
+          command:
+          - /bin/bash
+          - -lc
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: HCCL_IF_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: GLOO_SOCKET_IFNAME
+            value: eth0
+          - name: TP_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_INTRA_ROCE_ENABLE
+            value: "1"
+          - name: ASCEND_BUFFER_POOL
+            value: "4:8"
+          - name: MOONCAKE_CONFIG_PATH
+            value: /opt/vllm-layerwise/mooncake.json
+          - name: MOONCAKE_MASTER
+            value: mooncake-master-service:30089
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: PYTHONHASHSEED
+            value: "0"
+          - name: VLLM_VERSION
+            value: 0.24.0
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          imagePullPolicy: Never
+          name: decode-engine
+          ports:
+          - containerPort: 8200
+            name: decode-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /v1/models
+              port: decode-port
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              huawei.com/Ascend910: "1"
+            requests:
+              huawei.com/Ascend910: "1"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+          - mountPath: /usr/local/dcmi
+            name: dcmi
+          - mountPath: /usr/local/bin/npu-smi
+            name: npusmi
+          - mountPath: /usr/local/Ascend/driver/lib64
+            name: driver-lib64
+          - mountPath: /usr/local/Ascend/driver/version.info
+            name: driver-version
+          - mountPath: /etc/ascend_install.info
+            name: ascend-install-info
+          - mountPath: /root/.cache
+            name: model-cache
+          - mountPath: /usr/bin/hccn_tool
+            name: hccn-tool
+          - mountPath: /etc/hccn.conf
+            name: hccn-conf
+          - mountPath: /opt/vllm-layerwise
+            name: runtime-config
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 120
+        volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 24Gi
+          name: shm
+        - hostPath:
+            path: /usr/local/dcmi
+            type: Directory
+          name: dcmi
+        - hostPath:
+            path: /usr/local/bin/npu-smi
+            type: File
+          name: npusmi
+        - hostPath:
+            path: /usr/local/Ascend/driver/lib64
+            type: Directory
+          name: driver-lib64
+        - hostPath:
+            path: /usr/local/Ascend/driver/version.info
+            type: File
+          name: driver-version
+        - hostPath:
+            path: /etc/ascend_install.info
+            type: File
+          name: ascend-install-info
+        - hostPath:
+            path: /home/llm_cache
+            type: Directory
+          name: model-cache
+        - hostPath:
+            path: /usr/bin/hccn_tool
+            type: File
+          name: hccn-tool
+        - hostPath:
+            path: /etc/hccn.conf
+            type: File
+          name: hccn-conf
+        - configMap:
+            defaultMode: 365
+            name: layerwise-runtime-config
+          name: runtime-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-23T02:56:10Z"
+      lastUpdateTime: "2026-07-23T02:56:10Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-23T02:27:47Z"
+      lastUpdateTime: "2026-07-23T02:56:10Z"
+      message: ReplicaSet "decode-engine-deployment-568d8d8b89" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "10"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"mooncake-master-deployment","namespace":"ai-inference"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mooncake-master"}},"template":{"metadata":{"labels":{"app":"mooncake-master"}},"spec":{"containers":[{"args":["exec mooncake_master --rpc_port=50001 --metrics_port=9003 --enable_offload=false --logtostderr=true"],"command":["/bin/bash","-lc"],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2","imagePullPolicy":"Never","name":"mooncake-master","ports":[{"containerPort":50001,"name":"master-rpc"},{"containerPort":9003,"name":"metrics"}],"readinessProbe":{"failureThreshold":20,"initialDelaySeconds":2,"periodSeconds":3,"tcpSocket":{"port":"master-rpc"}}}],"nodeName":"n1"}}}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    generation: 10
+    name: mooncake-master-deployment
+    namespace: ai-inference
+    resourceVersion: "20530504"
+    uid: 0b269a40-ae26-4df2-a210-5ec401e4d9c5
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mooncake-master
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-07-23T18:09:43+08:00"
+        labels:
+          app: mooncake-master
+      spec:
+        containers:
+        - args:
+          - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --enable_offload=false
+            --logtostderr=true
+          command:
+          - /bin/bash
+          - -lc
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          imagePullPolicy: Never
+          name: mooncake-master
+          ports:
+          - containerPort: 50001
+            name: master-rpc
+            protocol: TCP
+          - containerPort: 9003
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 20
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            tcpSocket:
+              port: master-rpc
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-23T02:31:49Z"
+      lastUpdateTime: "2026-07-23T02:31:49Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-23T02:27:47Z"
+      lastUpdateTime: "2026-07-23T10:09:46Z"
+      message: ReplicaSet "mooncake-master-deployment-647d845875" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 10
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"prefill-engine-deployment","namespace":"ai-inference"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"prefill"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"prefill"}},"spec":{"containers":[{"args":["exec sleep infinity"],"command":["/bin/bash","-lc"],"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"HCCL_IF_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"GLOO_SOCKET_IFNAME","value":"eth0"},{"name":"TP_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_INTRA_ROCE_ENABLE","value":"1"},{"name":"ASCEND_BUFFER_POOL","value":"4:8"},{"name":"MOONCAKE_CONFIG_PATH","value":"/opt/vllm-layerwise/mooncake.json"},{"name":"MOONCAKE_MASTER","value":"mooncake-master-service:30089"},{"name":"PYTHONUNBUFFERED","value":"1"},{"name":"PYTHONHASHSEED","value":"0"},{"name":"VLLM_VERSION","value":"0.24.0"}],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2","imagePullPolicy":"Never","name":"prefill-engine","ports":[{"containerPort":8100,"name":"prefill-port"}],"readinessProbe":{"failureThreshold":120,"httpGet":{"path":"/v1/models","port":"prefill-port"},"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"huawei.com/Ascend910":"1"},"requests":{"huawei.com/Ascend910":"1"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm"},{"mountPath":"/usr/local/dcmi","name":"dcmi"},{"mountPath":"/usr/local/bin/npu-smi","name":"npusmi"},{"mountPath":"/usr/local/Ascend/driver/lib64","name":"driver-lib64"},{"mountPath":"/usr/local/Ascend/driver/version.info","name":"driver-version"},{"mountPath":"/etc/ascend_install.info","name":"ascend-install-info"},{"mountPath":"/root/.cache","name":"model-cache"},{"mountPath":"/usr/bin/hccn_tool","name":"hccn-tool"},{"mountPath":"/etc/hccn.conf","name":"hccn-conf"},{"mountPath":"/opt/vllm-layerwise","name":"runtime-config","readOnly":true}]}],"nodeName":"n1","terminationGracePeriodSeconds":120,"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"24Gi"},"name":"shm"},{"hostPath":{"path":"/usr/local/dcmi","type":"Directory"},"name":"dcmi"},{"hostPath":{"path":"/usr/local/bin/npu-smi","type":"File"},"name":"npusmi"},{"hostPath":{"path":"/usr/local/Ascend/driver/lib64","type":"Directory"},"name":"driver-lib64"},{"hostPath":{"path":"/usr/local/Ascend/driver/version.info","type":"File"},"name":"driver-version"},{"hostPath":{"path":"/etc/ascend_install.info","type":"File"},"name":"ascend-install-info"},{"hostPath":{"path":"/home/llm_cache","type":"Directory"},"name":"model-cache"},{"hostPath":{"path":"/usr/bin/hccn_tool","type":"File"},"name":"hccn-tool"},{"hostPath":{"path":"/etc/hccn.conf","type":"File"},"name":"hccn-conf"},{"configMap":{"defaultMode":365,"name":"layerwise-runtime-config"},"name":"runtime-config"}]}}}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    generation: 5
+    name: prefill-engine-deployment
+    namespace: ai-inference
+    resourceVersion: "20290037"
+    uid: dedc229d-13a3-4573-83ea-2dac0e7f9589
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: prefill
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: prefill
+      spec:
+        containers:
+        - args:
+          - exec sleep infinity
+          command:
+          - /bin/bash
+          - -lc
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: HCCL_IF_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: GLOO_SOCKET_IFNAME
+            value: eth0
+          - name: TP_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_INTRA_ROCE_ENABLE
+            value: "1"
+          - name: ASCEND_BUFFER_POOL
+            value: "4:8"
+          - name: MOONCAKE_CONFIG_PATH
+            value: /opt/vllm-layerwise/mooncake.json
+          - name: MOONCAKE_MASTER
+            value: mooncake-master-service:30089
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: PYTHONHASHSEED
+            value: "0"
+          - name: VLLM_VERSION
+            value: 0.24.0
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          imagePullPolicy: Never
+          name: prefill-engine
+          ports:
+          - containerPort: 8100
+            name: prefill-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /v1/models
+              port: prefill-port
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              huawei.com/Ascend910: "1"
+            requests:
+              huawei.com/Ascend910: "1"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+          - mountPath: /usr/local/dcmi
+            name: dcmi
+          - mountPath: /usr/local/bin/npu-smi
+            name: npusmi
+          - mountPath: /usr/local/Ascend/driver/lib64
+            name: driver-lib64
+          - mountPath: /usr/local/Ascend/driver/version.info
+            name: driver-version
+          - mountPath: /etc/ascend_install.info
+            name: ascend-install-info
+          - mountPath: /root/.cache
+            name: model-cache
+          - mountPath: /usr/bin/hccn_tool
+            name: hccn-tool
+          - mountPath: /etc/hccn.conf
+            name: hccn-conf
+          - mountPath: /opt/vllm-layerwise
+            name: runtime-config
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 120
+        volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 24Gi
+          name: shm
+        - hostPath:
+            path: /usr/local/dcmi
+            type: Directory
+          name: dcmi
+        - hostPath:
+            path: /usr/local/bin/npu-smi
+            type: File
+          name: npusmi
+        - hostPath:
+            path: /usr/local/Ascend/driver/lib64
+            type: Directory
+          name: driver-lib64
+        - hostPath:
+            path: /usr/local/Ascend/driver/version.info
+            type: File
+          name: driver-version
+        - hostPath:
+            path: /etc/ascend_install.info
+            type: File
+          name: ascend-install-info
+        - hostPath:
+            path: /home/llm_cache
+            type: Directory
+          name: model-cache
+        - hostPath:
+            path: /usr/bin/hccn_tool
+            type: File
+          name: hccn-tool
+        - hostPath:
+            path: /etc/hccn.conf
+            type: File
+          name: hccn-conf
+        - configMap:
+            defaultMode: 365
+            name: layerwise-runtime-config
+          name: runtime-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-23T02:56:18Z"
+      lastUpdateTime: "2026-07-23T02:56:18Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-23T02:27:47Z"
+      lastUpdateTime: "2026-07-23T02:56:18Z"
+      message: ReplicaSet "prefill-engine-deployment-76d79b9c56" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"proxy-server-deployment","namespace":"ai-inference"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"proxy"}},"template":{"metadata":{"labels":{"app":"proxy"}},"spec":{"containers":[{"args":["exec python3 /app/k8s_proxy_server_example.py --host 0.0.0.0 --port 8000 --prefiller-labels app=prefill --decoder-labels app=decode --prefiller-container prefill-engine --decoder-container decode-engine --prefiller-port-name prefill-port --decoder-port-name decode-port --namespace ai-inference"],"command":["/bin/bash","-lc"],"image":"cr.openfuyao.cn/openfuyao/proxy-server:latest","imagePullPolicy":"IfNotPresent","name":"proxy-server","ports":[{"containerPort":8000,"name":"proxy-port"}],"resources":{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}}}],"nodeName":"n1","serviceAccountName":"vllm-proxy-sa"}}}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    generation: 2
+    name: proxy-server-deployment
+    namespace: ai-inference
+    resourceVersion: "20276086"
+    uid: 3c893326-1b5c-4022-a2e7-5d4cc35d1e5c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: proxy
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: proxy
+      spec:
+        containers:
+        - args:
+          - exec python3 /app/k8s_proxy_server_example.py --host 0.0.0.0 --port 8000
+            --prefiller-labels app=prefill --decoder-labels app=decode --prefiller-container
+            prefill-engine --decoder-container decode-engine --prefiller-port-name
+            prefill-port --decoder-port-name decode-port --namespace ai-inference
+          command:
+          - /bin/bash
+          - -lc
+          image: cr.openfuyao.cn/openfuyao/proxy-server:latest
+          imagePullPolicy: IfNotPresent
+          name: proxy-server
+          ports:
+          - containerPort: 8000
+            name: proxy-port
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: vllm-proxy-sa
+        serviceAccountName: vllm-proxy-sa
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-23T02:28:06Z"
+      lastUpdateTime: "2026-07-23T02:28:06Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-23T02:27:47Z"
+      lastUpdateTime: "2026-07-23T02:31:48Z"
+      message: ReplicaSet "proxy-server-deployment-8c4c59f46" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"mooncake-master-service","namespace":"ai-inference"},"spec":{"ports":[{"name":"master-rpc","port":30089,"protocol":"TCP","targetPort":"master-rpc"},{"name":"metrics","port":9003,"protocol":"TCP","targetPort":"metrics"}],"selector":{"app":"mooncake-master"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    name: mooncake-master-service
+    namespace: ai-inference
+    resourceVersion: "20273424"
+    uid: 237d4eae-0fc0-4978-8920-df54d3774541
+  spec:
+    clusterIP: 10.96.82.244
+    clusterIPs:
+    - 10.96.82.244
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: master-rpc
+      port: 30089
+      protocol: TCP
+      targetPort: master-rpc
+    - name: metrics
+      port: 9003
+      protocol: TCP
+      targetPort: metrics
+    selector:
+      app: mooncake-master
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"vllm-proxy-service","namespace":"ai-inference"},"spec":{"ports":[{"name":"http-api","port":8000,"protocol":"TCP","targetPort":"proxy-port"}],"selector":{"app":"proxy"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-07-23T02:27:47Z"
+    name: vllm-proxy-service
+    namespace: ai-inference
+    resourceVersion: "20273465"
+    uid: ac211484-6e15-4dc0-9dc3-0b9ba5b61e64
+  spec:
+    clusterIP: 10.96.243.17
+    clusterIPs:
+    - 10.96.243.17
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-api
+      port: 8000
+      protocol: TCP
+      targetPort: proxy-port
+    selector:
+      app: proxy
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

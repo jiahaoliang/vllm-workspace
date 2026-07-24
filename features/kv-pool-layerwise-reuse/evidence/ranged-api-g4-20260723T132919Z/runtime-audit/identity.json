@@ -1,0 +1,14 @@
+{
+  "control_plan_commit": "f2c06f159b326e944129b962de4dcf4b09cc093c",
+  "control_execution_commit": "7a09ae11ff00f9500b2ad7a981ef83870c2ac3ee",
+  "vllm_ascend_commit": "849c1a7f1f4643e03de74f6784b69504dd5174b5",
+  "vllm_commit": "ee0da84ab9e04ac7610e28580af62c365e898389",
+  "mooncake_commit": "74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2",
+  "image_manifest_digest": "sha256:661c9bc2c50c1b7253d6f9ec7905cc83f49908ef8cb1919108a5ea828c2cff8d",
+  "image_config_id": "sha256:a370384ab214665c3e6d7179aba82d0e5799a290a41370abe372b53f9593283d",
+  "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+  "namespace": "ai-inference",
+  "node": "n1",
+  "staging_root": "/tmp/ranged-api-g4-20260723T132919Z"
+}

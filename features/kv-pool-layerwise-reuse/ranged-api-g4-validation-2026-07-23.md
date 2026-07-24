@@ -113,14 +113,22 @@ The machine-readable checker status is `passed` with no errors:
 
 ## Evidence
 
-Persistent artifact directory:
+Control-repo evidence directory:
 
 ```text
-/root/ljh/validation-artifacts/ranged-api-g4-20260723T132919Z/runtime-audit
+features/kv-pool-layerwise-reuse/evidence/ranged-api-g4-20260723T132919Z/runtime-audit
 ```
 
-`sha256sum -c SHA256SUMS` passed in that persistent destination. The
-`SHA256SUMS` digest is:
+The persistent artifact was imported byte-for-byte into the control repo.
+`sha256sum -c SHA256SUMS` passed again in the checked-in directory. Key evidence:
+
+- [SHA256SUMS](evidence/ranged-api-g4-20260723T132919Z/runtime-audit/SHA256SUMS)
+- [checker summary](evidence/ranged-api-g4-20260723T132919Z/runtime-audit/range-debug-summary.json)
+- [request result](evidence/ranged-api-g4-20260723T132919Z/runtime-audit/request-result.json)
+- [prefill log](evidence/ranged-api-g4-20260723T132919Z/runtime-audit/vllm-prefill.log)
+- [decode log](evidence/ranged-api-g4-20260723T132919Z/runtime-audit/vllm-decode.log)
+
+The `SHA256SUMS` digest is:
 
 ```text
 af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d
@@ -129,8 +137,8 @@ af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d
 The artifact contains the complete request and response, model config, both
 engine logs, both `/v1/models` responses, empty/final Master metrics, Pod state,
 identity, checker source, and machine-readable checker/request summaries. The
-completed G0-G3 directory
-`/root/ljh/validation-artifacts/ranged-api-20260723T094716Z` was not modified.
+completed [G0-G3 evidence](evidence/ranged-api-20260723T094716Z/SHA256SUMS)
+was imported separately and was not modified by G4.
 
 ## Cleanup And Evidence Boundary
 

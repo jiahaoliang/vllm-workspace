@@ -1,0 +1,4 @@
+identity_type=commit
+G3_FIXTURE_ID=commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d
+PLAN_COMMIT_SHA=a3406334959d8c68537b305c6242450db3c684c2
+control_repo=https://github.com/jiahaoliang/vllm-workspace.git

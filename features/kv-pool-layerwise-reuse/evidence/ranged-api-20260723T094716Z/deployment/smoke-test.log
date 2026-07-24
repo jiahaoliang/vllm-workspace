@@ -1,0 +1,3 @@
+prompt layout: 12 shared blocks + 13 unique blocks per case
+concurrent KV-load correctness: direct decoder and proxy phases validated 4/4 cases
+smoke artifacts: /tmp/layerwise-smoke

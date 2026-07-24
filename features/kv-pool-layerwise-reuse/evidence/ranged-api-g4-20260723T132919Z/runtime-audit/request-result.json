@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "http_status": 200,
+  "choice_count": 1,
+  "prompt_tokens": 525,
+  "completion_tokens": 16,
+  "decoder_kv_hit_tokens": 512,
+  "decoder_kv_need_to_load": 512,
+  "prefill_completion_post_count": 1,
+  "decode_completion_post_count": 1,
+  "other_inference_traffic_observed": false,
+  "debug_env_confirmed_in_prefill": true,
+  "debug_env_confirmed_in_decode": true,
+  "master_key_count_before_request": 0
+}

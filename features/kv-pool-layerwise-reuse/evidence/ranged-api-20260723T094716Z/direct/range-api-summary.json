@@ -1,0 +1,1333 @@
+{
+  "api_calls": [
+    {
+      "operation": "TransferEngine.initialize",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "MooncakeDistributedStore.setup",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "TransferEngine.register_memory",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "TransferEngine.register_memory",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "operation": "batch_put_start",
+      "phase": "positive",
+      "result": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ],
+        [
+          16384,
+          18432
+        ],
+        [
+          32768,
+          34816
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ],
+        [
+          0,
+          2048
+        ],
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          4096,
+          6144
+        ],
+        [
+          20480,
+          22528
+        ],
+        [
+          36864,
+          38912
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          4096,
+          6144
+        ],
+        [
+          4096,
+          6144
+        ],
+        [
+          4096,
+          6144
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          8192,
+          10240
+        ],
+        [
+          24576,
+          26624
+        ],
+        [
+          40960,
+          43008
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          8192,
+          10240
+        ],
+        [
+          8192,
+          10240
+        ],
+        [
+          8192,
+          10240
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          12288,
+          14336
+        ],
+        [
+          28672,
+          30720
+        ],
+        [
+          45056,
+          47104
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          12288,
+          14336
+        ],
+        [
+          12288,
+          14336
+        ],
+        [
+          12288,
+          14336
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "operation": "batch_put_end",
+      "phase": "positive",
+      "result": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "operation": "batch_get_start",
+      "phase": "positive",
+      "result": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ],
+        [
+          16384,
+          18432
+        ],
+        [
+          32768,
+          34816
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ],
+        [
+          0,
+          2048
+        ],
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          4096,
+          6144
+        ],
+        [
+          20480,
+          22528
+        ],
+        [
+          36864,
+          38912
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          4096,
+          6144
+        ],
+        [
+          4096,
+          6144
+        ],
+        [
+          4096,
+          6144
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          8192,
+          10240
+        ],
+        [
+          24576,
+          26624
+        ],
+        [
+          40960,
+          43008
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          8192,
+          10240
+        ],
+        [
+          8192,
+          10240
+        ],
+        [
+          8192,
+          10240
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          12288,
+          14336
+        ],
+        [
+          28672,
+          30720
+        ],
+        [
+          45056,
+          47104
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "object_offsets": [
+        [
+          12288,
+          14336
+        ],
+        [
+          12288,
+          14336
+        ],
+        [
+          12288,
+          14336
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "positive",
+      "result": [
+        4096,
+        4096,
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ],
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-positive-0",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-1",
+        "range-smoke-1784800911031-9768-6c07c88e-positive-2"
+      ],
+      "operation": "batch_get_end",
+      "phase": "positive",
+      "result": 0
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-no-put-session"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "negative_no_session",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-no-get-session"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "negative_no_session",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-duplicate-put-start"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_duplicate",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-duplicate-put-start"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_duplicate",
+      "result": [
+        -600
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-duplicate-put-start"
+      ],
+      "operation": "batch_put_revoke",
+      "phase": "negative_duplicate",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-offset-overflow"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_overflow",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-offset-overflow"
+      ],
+      "object_offsets": [
+        [
+          16384
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "negative_overflow",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          4096
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-offset-overflow"
+      ],
+      "operation": "batch_put_revoke",
+      "phase": "negative_overflow",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-put-arity"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_put_arity",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-put-arity"
+      ],
+      "object_offsets": [
+        [
+          0
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "negative_put_arity",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          4096
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-put-arity"
+      ],
+      "operation": "batch_put_revoke",
+      "phase": "negative_put_arity",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_after_put_end",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          8192
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "object_offsets": [
+        [
+          0,
+          8192
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "negative_after_put_end",
+      "result": [
+        16384
+      ],
+      "sizes": [
+        [
+          8192,
+          8192
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_put_end",
+      "phase": "negative_after_put_end",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "negative_after_put_end",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_get_start",
+      "phase": "negative_after_get_end",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_get_end",
+      "phase": "negative_after_get_end",
+      "result": 0
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "negative_after_get_end",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_get_start",
+      "phase": "negative_get_arity",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0
+        ]
+      ],
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "object_offsets": [
+        [
+          0
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "negative_get_arity",
+      "result": [
+        -600
+      ],
+      "sizes": [
+        [
+          4096,
+          4096
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-after-end"
+      ],
+      "operation": "batch_get_end",
+      "phase": "negative_get_arity",
+      "result": 0
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-revoke"
+      ],
+      "operation": "batch_put_start",
+      "phase": "negative_revoke",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-revoke"
+      ],
+      "operation": "batch_put_revoke",
+      "phase": "negative_revoke",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1784800911031-9768-6c07c88e-revoke"
+      ],
+      "operation": "batch_get_start",
+      "phase": "negative_revoke",
+      "result": [
+        -704
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "transfer_engine_initialize",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "store_setup",
+      "passed": true
+    },
+    {
+      "actual": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+      "expected": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+      "name": "source_pattern",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "register_source",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "register_destination",
+      "passed": true
+    },
+    {
+      "actual": [
+        0,
+        0,
+        0
+      ],
+      "expected": "all 0",
+      "name": "positive_put_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_put_layer_0",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_put_layer_1",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_put_layer_2",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_put_layer_3",
+      "passed": true
+    },
+    {
+      "actual": [
+        0,
+        0,
+        0
+      ],
+      "expected": "all 0",
+      "name": "positive_put_end",
+      "passed": true
+    },
+    {
+      "actual": [
+        0,
+        0,
+        0
+      ],
+      "expected": "all 0",
+      "name": "positive_get_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_get_layer_0",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_get_layer_1",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_get_layer_2",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096,
+        4096,
+        4096
+      ],
+      "expected": "all 4096",
+      "name": "positive_get_layer_3",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "positive_get_end",
+      "passed": true
+    },
+    {
+      "actual": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+      "expected": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+      "name": "positive_byte_compare",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "positive_nonzero_object_offset",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_no_put_session",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_no_get_session",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_duplicate_first_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_duplicate_put_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": "all 0",
+      "name": "negative_duplicate_revoke",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_overflow_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_offset_overflow",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": "all 0",
+      "name": "negative_overflow_revoke",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_put_arity_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_put_arity_mismatch",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": "all 0",
+      "name": "negative_put_arity_revoke",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_after_put_end_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        16384
+      ],
+      "expected": "one 16384",
+      "name": "negative_after_put_end_write",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": "one 0",
+      "name": "negative_after_put_end_commit",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_ranged_put_after_end",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_after_get_end_start",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "negative_after_get_end_close",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_ranged_get_after_end",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_get_arity_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        -600
+      ],
+      "expected": "one negative code",
+      "name": "negative_get_arity_mismatch",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "negative_get_arity_close",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "negative_revoke_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": "all 0",
+      "name": "negative_revoke",
+      "passed": true
+    },
+    {
+      "actual": [
+        -704
+      ],
+      "expected": "one negative code",
+      "name": "negative_revoke_not_gettable",
+      "passed": true
+    }
+  ],
+  "cleanup": [
+    {
+      "passed": true,
+      "result": null,
+      "step": "torch.npu.synchronize"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "TransferEngine.unregister_memory:20617006940160"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "TransferEngine.unregister_memory:20617006989824"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "MooncakeDistributedStore.close"
+    },
+    {
+      "passed": true,
+      "result": null,
+      "step": "tensor_release_and_empty_cache"
+    }
+  ],
+  "config": {
+    "num_keys": 3,
+    "num_layers": 4,
+    "object_size": 16384,
+    "page_size": 4096,
+    "run_negative": true,
+    "total_size": 49152
+  },
+  "destination_checksum_after": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+  "destination_checksum_before": "bce9b3e25cf4af0f2081d022b4c09b326f3604ecb8565607044c7ee6aa68580a",
+  "errors": [],
+  "finished_at_unix": 1784800922.5981991,
+  "g3_fixture_id": "commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d",
+  "passed": true,
+  "plan_commit_sha": "a3406334959d8c68537b305c6242450db3c684c2",
+  "runtime": {
+    "device_count": 1,
+    "device_name": "Ascend910B4",
+    "local_ip": "10.250.40.143",
+    "logical_device": 0,
+    "mooncake_distribution_version": "not installed as a named distribution",
+    "mooncake_engine_module": "mooncake.engine",
+    "mooncake_engine_module_file": "/usr/local/Ascend/ascend-toolkit/latest/python/site-packages/mooncake/engine.cpython-312-aarch64-linux-gnu.so",
+    "mooncake_store_module": "mooncake.store",
+    "mooncake_store_module_file": "/usr/local/Ascend/ascend-toolkit/latest/python/site-packages/mooncake/store.cpython-312-aarch64-linux-gnu.so",
+    "physical_device_visibility": "not exposed by environment",
+    "python_executable": "/usr/local/python3.12.13/bin/python3",
+    "python_version": "3.12.13",
+    "store_config": {
+      "config_path": "/opt/vllm-layerwise/mooncake.json",
+      "device_name": "",
+      "engine_passed_explicitly": true,
+      "global_segment_size": 67108864,
+      "local_buffer_size": 0,
+      "local_hostname": "10.250.40.143:16775",
+      "master_server_address": "mooncake-master-service:30089",
+      "metadata_server": "P2PHANDSHAKE",
+      "protocol": "ascend"
+    },
+    "torch_module": "/usr/local/python3.12.13/lib/python3.12/site-packages/torch/__init__.py",
+    "torch_npu_module": "/usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/__init__.py",
+    "torch_npu_version": "2.10.0.post2",
+    "torch_version": "2.10.0+cpu"
+  },
+  "schema_version": 1,
+  "source_checksum": "7d1e6c4abf707792c756417dfd026d12b037e95d92f0a582aab68a025bed2260",
+  "started_at_unix": 1784800911.026978
+}

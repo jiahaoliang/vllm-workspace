@@ -1,0 +1,900 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      ascend.kubectl.kubernetes.io/ascend-910-configuration: '{"pod_name":"decode-engine-deployment-568d8d8b89-mhj26","server_id":"1772da18-3ba9-4e1a-b214-b42b952c7f09","host_ip":"192.168.200.27","super_pod_id":-1,"devices":[{"device_id":"2","device_ip":"192.168.102.27","super_device_id":"4291297282"}]}'
+      cni.projectcalico.org/containerID: d89c2d85f4f0ef165b7e0e835edd0c84431dcd4fe04b2e5f06afa96344579178
+      cni.projectcalico.org/podIP: 10.250.40.129/32
+      cni.projectcalico.org/podIPs: 10.250.40.129/32
+      huawei.com/Ascend910: Ascend910-2
+      huawei.com/AscendReal: Ascend910-2
+      huawei.com/kltDev: Ascend910-2
+    creationTimestamp: "2026-07-23T02:53:07Z"
+    generateName: decode-engine-deployment-568d8d8b89-
+    generation: 1
+    labels:
+      app: decode
+      pod-template-hash: 568d8d8b89
+    name: decode-engine-deployment-568d8d8b89-mhj26
+    namespace: ai-inference
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: decode-engine-deployment-568d8d8b89
+      uid: 028f6be4-e1a3-4b81-82f7-c3020ffd321d
+    resourceVersion: "20289963"
+    uid: 1772da18-3ba9-4e1a-b214-b42b952c7f09
+  spec:
+    containers:
+    - args:
+      - exec sleep infinity
+      command:
+      - /bin/bash
+      - -lc
+      env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: HCCL_IF_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: GLOO_SOCKET_IFNAME
+        value: eth0
+      - name: TP_SOCKET_IFNAME
+        value: eth0
+      - name: HCCL_SOCKET_IFNAME
+        value: eth0
+      - name: HCCL_INTRA_ROCE_ENABLE
+        value: "1"
+      - name: ASCEND_BUFFER_POOL
+        value: "4:8"
+      - name: MOONCAKE_CONFIG_PATH
+        value: /opt/vllm-layerwise/mooncake.json
+      - name: MOONCAKE_MASTER
+        value: mooncake-master-service:30089
+      - name: PYTHONUNBUFFERED
+        value: "1"
+      - name: PYTHONHASHSEED
+        value: "0"
+      - name: VLLM_VERSION
+        value: 0.24.0
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imagePullPolicy: Never
+      name: decode-engine
+      ports:
+      - containerPort: 8200
+        name: decode-port
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 120
+        httpGet:
+          path: /v1/models
+          port: decode-port
+          scheme: HTTP
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          huawei.com/Ascend910: "1"
+        requests:
+          huawei.com/Ascend910: "1"
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/shm
+        name: shm
+      - mountPath: /usr/local/dcmi
+        name: dcmi
+      - mountPath: /usr/local/bin/npu-smi
+        name: npusmi
+      - mountPath: /usr/local/Ascend/driver/lib64
+        name: driver-lib64
+      - mountPath: /usr/local/Ascend/driver/version.info
+        name: driver-version
+      - mountPath: /etc/ascend_install.info
+        name: ascend-install-info
+      - mountPath: /root/.cache
+        name: model-cache
+      - mountPath: /usr/bin/hccn_tool
+        name: hccn-tool
+      - mountPath: /etc/hccn.conf
+        name: hccn-conf
+      - mountPath: /opt/vllm-layerwise
+        name: runtime-config
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-bm2z2
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: n1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 120
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 30
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 30
+    volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 24Gi
+      name: shm
+    - hostPath:
+        path: /usr/local/dcmi
+        type: Directory
+      name: dcmi
+    - hostPath:
+        path: /usr/local/bin/npu-smi
+        type: File
+      name: npusmi
+    - hostPath:
+        path: /usr/local/Ascend/driver/lib64
+        type: Directory
+      name: driver-lib64
+    - hostPath:
+        path: /usr/local/Ascend/driver/version.info
+        type: File
+      name: driver-version
+    - hostPath:
+        path: /etc/ascend_install.info
+        type: File
+      name: ascend-install-info
+    - hostPath:
+        path: /home/llm_cache
+        type: Directory
+      name: model-cache
+    - hostPath:
+        path: /usr/bin/hccn_tool
+        type: File
+      name: hccn-tool
+    - hostPath:
+        path: /etc/hccn.conf
+        type: File
+      name: hccn-conf
+    - configMap:
+        defaultMode: 365
+        name: layerwise-runtime-config
+      name: runtime-config
+    - name: kube-api-access-bm2z2
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:08Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:56:10Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:56:10Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        huawei.com/Ascend910: "1"
+      containerID: containerd://f397b9749bd02c5de0c1f7967ffaa0aafc9d8f5f2f32313050431c3640efe473
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imageID: sha256:a370384ab214665c3e6d7179aba82d0e5799a290a41370abe372b53f9593283d
+      lastState: {}
+      name: decode-engine
+      ready: true
+      resources:
+        limits:
+          huawei.com/Ascend910: "1"
+        requests:
+          huawei.com/Ascend910: "1"
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-07-23T02:53:08Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /dev/shm
+        name: shm
+      - mountPath: /usr/local/dcmi
+        name: dcmi
+      - mountPath: /usr/local/bin/npu-smi
+        name: npusmi
+      - mountPath: /usr/local/Ascend/driver/lib64
+        name: driver-lib64
+      - mountPath: /usr/local/Ascend/driver/version.info
+        name: driver-version
+      - mountPath: /etc/ascend_install.info
+        name: ascend-install-info
+      - mountPath: /root/.cache
+        name: model-cache
+      - mountPath: /usr/bin/hccn_tool
+        name: hccn-tool
+      - mountPath: /etc/hccn.conf
+        name: hccn-conf
+      - mountPath: /opt/vllm-layerwise
+        name: runtime-config
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-bm2z2
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.200.27
+    hostIPs:
+    - ip: 192.168.200.27
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.250.40.129
+    podIPs:
+    - ip: 10.250.40.129
+    qosClass: BestEffort
+    startTime: "2026-07-23T02:53:07Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/containerID: 9169f6de9502c2299001cee333f3f55fa0ce06134be791fa472a227a65ec325e
+      cni.projectcalico.org/podIP: 10.250.40.189/32
+      cni.projectcalico.org/podIPs: 10.250.40.189/32
+      kubectl.kubernetes.io/restartedAt: "2026-07-23T18:09:43+08:00"
+    creationTimestamp: "2026-07-23T10:09:43Z"
+    generateName: mooncake-master-deployment-647d845875-
+    generation: 1
+    labels:
+      app: mooncake-master
+      pod-template-hash: 647d845875
+    name: mooncake-master-deployment-647d845875-zt7p5
+    namespace: ai-inference
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: mooncake-master-deployment-647d845875
+      uid: 2540d96c-f3e2-4dac-9a6a-87c67a4dd816
+    resourceVersion: "20530489"
+    uid: 4c24d1fa-a387-4b1c-8306-8fb735e8d155
+  spec:
+    containers:
+    - args:
+      - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --enable_offload=false
+        --logtostderr=true
+      command:
+      - /bin/bash
+      - -lc
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imagePullPolicy: Never
+      name: mooncake-master
+      ports:
+      - containerPort: 50001
+        name: master-rpc
+        protocol: TCP
+      - containerPort: 9003
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 20
+        initialDelaySeconds: 2
+        periodSeconds: 3
+        successThreshold: 1
+        tcpSocket:
+          port: master-rpc
+        timeoutSeconds: 1
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-xwgkr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: n1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 30
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 30
+    volumes:
+    - name: kube-api-access-xwgkr
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T10:09:45Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T10:09:43Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T10:09:46Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T10:09:46Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T10:09:43Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://9b8ab4a07f07cd8e409e5f92d2f9c9e3b3dcdbb7ccec05f74002043bd886d9f3
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imageID: sha256:a370384ab214665c3e6d7179aba82d0e5799a290a41370abe372b53f9593283d
+      lastState: {}
+      name: mooncake-master
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-07-23T10:09:44Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-xwgkr
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.200.27
+    hostIPs:
+    - ip: 192.168.200.27
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.250.40.189
+    podIPs:
+    - ip: 10.250.40.189
+    qosClass: BestEffort
+    startTime: "2026-07-23T10:09:43Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      ascend.kubectl.kubernetes.io/ascend-910-configuration: '{"pod_name":"prefill-engine-deployment-76d79b9c56-2wznn","server_id":"4f5d10fe-e713-4337-a5bf-dffb85185582","host_ip":"192.168.200.27","super_pod_id":-1,"devices":[{"device_id":"0","device_ip":"192.168.102.25","super_device_id":"4290772992"}]}'
+      cni.projectcalico.org/containerID: b2fb24fbd51b72423ed256cbeecf6cc4584714a25116322756c04b17b9d2a074
+      cni.projectcalico.org/podIP: 10.250.40.143/32
+      cni.projectcalico.org/podIPs: 10.250.40.143/32
+      huawei.com/Ascend910: Ascend910-0
+      huawei.com/AscendReal: Ascend910-0
+      huawei.com/kltDev: Ascend910-0
+    creationTimestamp: "2026-07-23T02:53:07Z"
+    generateName: prefill-engine-deployment-76d79b9c56-
+    generation: 1
+    labels:
+      app: prefill
+      pod-template-hash: 76d79b9c56
+    name: prefill-engine-deployment-76d79b9c56-2wznn
+    namespace: ai-inference
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: prefill-engine-deployment-76d79b9c56
+      uid: 81554964-a4bf-4136-9cf6-8b8b679656f0
+    resourceVersion: "20290035"
+    uid: 4f5d10fe-e713-4337-a5bf-dffb85185582
+  spec:
+    containers:
+    - args:
+      - exec sleep infinity
+      command:
+      - /bin/bash
+      - -lc
+      env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: HCCL_IF_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: GLOO_SOCKET_IFNAME
+        value: eth0
+      - name: TP_SOCKET_IFNAME
+        value: eth0
+      - name: HCCL_SOCKET_IFNAME
+        value: eth0
+      - name: HCCL_INTRA_ROCE_ENABLE
+        value: "1"
+      - name: ASCEND_BUFFER_POOL
+        value: "4:8"
+      - name: MOONCAKE_CONFIG_PATH
+        value: /opt/vllm-layerwise/mooncake.json
+      - name: MOONCAKE_MASTER
+        value: mooncake-master-service:30089
+      - name: PYTHONUNBUFFERED
+        value: "1"
+      - name: PYTHONHASHSEED
+        value: "0"
+      - name: VLLM_VERSION
+        value: 0.24.0
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imagePullPolicy: Never
+      name: prefill-engine
+      ports:
+      - containerPort: 8100
+        name: prefill-port
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 120
+        httpGet:
+          path: /v1/models
+          port: prefill-port
+          scheme: HTTP
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          huawei.com/Ascend910: "1"
+        requests:
+          huawei.com/Ascend910: "1"
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/shm
+        name: shm
+      - mountPath: /usr/local/dcmi
+        name: dcmi
+      - mountPath: /usr/local/bin/npu-smi
+        name: npusmi
+      - mountPath: /usr/local/Ascend/driver/lib64
+        name: driver-lib64
+      - mountPath: /usr/local/Ascend/driver/version.info
+        name: driver-version
+      - mountPath: /etc/ascend_install.info
+        name: ascend-install-info
+      - mountPath: /root/.cache
+        name: model-cache
+      - mountPath: /usr/bin/hccn_tool
+        name: hccn-tool
+      - mountPath: /etc/hccn.conf
+        name: hccn-conf
+      - mountPath: /opt/vllm-layerwise
+        name: runtime-config
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-dwdtx
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: n1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 120
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 30
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 30
+    volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 24Gi
+      name: shm
+    - hostPath:
+        path: /usr/local/dcmi
+        type: Directory
+      name: dcmi
+    - hostPath:
+        path: /usr/local/bin/npu-smi
+        type: File
+      name: npusmi
+    - hostPath:
+        path: /usr/local/Ascend/driver/lib64
+        type: Directory
+      name: driver-lib64
+    - hostPath:
+        path: /usr/local/Ascend/driver/version.info
+        type: File
+      name: driver-version
+    - hostPath:
+        path: /etc/ascend_install.info
+        type: File
+      name: ascend-install-info
+    - hostPath:
+        path: /home/llm_cache
+        type: Directory
+      name: model-cache
+    - hostPath:
+        path: /usr/bin/hccn_tool
+        type: File
+      name: hccn-tool
+    - hostPath:
+        path: /etc/hccn.conf
+        type: File
+      name: hccn-conf
+    - configMap:
+        defaultMode: 365
+        name: layerwise-runtime-config
+      name: runtime-config
+    - name: kube-api-access-dwdtx
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:09Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:56:18Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:56:18Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:53:07Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        huawei.com/Ascend910: "1"
+      containerID: containerd://e47f011b7ca22b1a0fbac2aaa9cf66a6a24857c1728f94a0fd05ec4aef112f63
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imageID: sha256:a370384ab214665c3e6d7179aba82d0e5799a290a41370abe372b53f9593283d
+      lastState: {}
+      name: prefill-engine
+      ready: true
+      resources:
+        limits:
+          huawei.com/Ascend910: "1"
+        requests:
+          huawei.com/Ascend910: "1"
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-07-23T02:53:08Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /dev/shm
+        name: shm
+      - mountPath: /usr/local/dcmi
+        name: dcmi
+      - mountPath: /usr/local/bin/npu-smi
+        name: npusmi
+      - mountPath: /usr/local/Ascend/driver/lib64
+        name: driver-lib64
+      - mountPath: /usr/local/Ascend/driver/version.info
+        name: driver-version
+      - mountPath: /etc/ascend_install.info
+        name: ascend-install-info
+      - mountPath: /root/.cache
+        name: model-cache
+      - mountPath: /usr/bin/hccn_tool
+        name: hccn-tool
+      - mountPath: /etc/hccn.conf
+        name: hccn-conf
+      - mountPath: /opt/vllm-layerwise
+        name: runtime-config
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-dwdtx
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.200.27
+    hostIPs:
+    - ip: 192.168.200.27
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.250.40.143
+    podIPs:
+    - ip: 10.250.40.143
+    qosClass: BestEffort
+    startTime: "2026-07-23T02:53:07Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/containerID: 94baab3c415f537709dedbdd90c7f112e6ad64d1cdecf24a93b7dd78d30ef5d5
+      cni.projectcalico.org/podIP: 10.250.40.184/32
+      cni.projectcalico.org/podIPs: 10.250.40.184/32
+    creationTimestamp: "2026-07-23T02:31:46Z"
+    generateName: proxy-server-deployment-8c4c59f46-
+    generation: 1
+    labels:
+      app: proxy
+      pod-template-hash: 8c4c59f46
+    name: proxy-server-deployment-8c4c59f46-rlrpl
+    namespace: ai-inference
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: proxy-server-deployment-8c4c59f46
+      uid: 5e76354f-44d8-4b93-a119-6b62bdac5933
+    resourceVersion: "20276070"
+    uid: 1335d5cf-9690-4474-a2bd-6aa2226e9b9f
+  spec:
+    containers:
+    - args:
+      - exec python3 /app/k8s_proxy_server_example.py --host 0.0.0.0 --port 8000 --prefiller-labels
+        app=prefill --decoder-labels app=decode --prefiller-container prefill-engine
+        --decoder-container decode-engine --prefiller-port-name prefill-port --decoder-port-name
+        decode-port --namespace ai-inference
+      command:
+      - /bin/bash
+      - -lc
+      image: cr.openfuyao.cn/openfuyao/proxy-server:latest
+      imagePullPolicy: IfNotPresent
+      name: proxy-server
+      ports:
+      - containerPort: 8000
+        name: proxy-port
+        protocol: TCP
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-52x75
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: n1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: vllm-proxy-sa
+    serviceAccountName: vllm-proxy-sa
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 30
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 30
+    volumes:
+    - name: kube-api-access-52x75
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:31:48Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:31:46Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:31:48Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:31:48Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-23T02:31:46Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 250m
+        memory: 512Mi
+      containerID: containerd://57a364ff173eab0ba7a0508c2a73236bd5e34d6b9be47686cd41ac6152094b16
+      image: cr.openfuyao.cn/openfuyao/proxy-server:latest
+      imageID: cr.openfuyao.cn/openfuyao/proxy-server@sha256:fa8d04696e4bcf04e0e6c2c084bb8ecefa1b85191414d66889a778750ff1e3e0
+      lastState: {}
+      name: proxy-server
+      ready: true
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-07-23T02:31:47Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-52x75
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.200.27
+    hostIPs:
+    - ip: 192.168.200.27
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.250.40.184
+    podIPs:
+    - ip: 10.250.40.184
+    qosClass: Burstable
+    startTime: "2026-07-23T02:31:46Z"
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,7 @@
+captured_at=2026-07-23T18:13:19+08:00
+namespace=ai-inference
+prefill_pod=prefill-engine-deployment-76d79b9c56-2wznn
+decode_pod=decode-engine-deployment-568d8d8b89-mhj26
+proxy_pod=proxy-server-deployment-8c4c59f46-rlrpl
+master_pod=mooncake-master-deployment-647d845875-zt7p5
+remote_artifact_dir=/tmp/layerwise-smoke

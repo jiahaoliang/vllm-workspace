@@ -173,14 +173,23 @@ production ranged calls per physical layer or prove whole-key call count zero.
 
 ## Evidence
 
-Persistent artifact directory:
+Control-repo evidence directory:
 
 ```text
-/root/ljh/validation-artifacts/ranged-api-20260723T094716Z
+features/kv-pool-layerwise-reuse/evidence/ranged-api-20260723T094716Z
 ```
 
-The directory was first staged under `/tmp`, then copied outside the workspace.
-`sha256sum -c SHA256SUMS` passed again in the persistent destination.
+The directory was first staged under `/tmp`, persisted outside the workspace,
+and then imported byte-for-byte into the control repo at the path above.
+`sha256sum -c SHA256SUMS` passed again in the checked-in directory.
+
+Key evidence:
+
+- [SHA256SUMS](evidence/ranged-api-20260723T094716Z/SHA256SUMS)
+- [G1 direct summary](evidence/ranged-api-20260723T094716Z/direct/range-api-summary.json)
+- [G2 pytest log](evidence/ranged-api-20260723T094716Z/unit/pytest.log)
+- [G3 concurrent summary](evidence/ranged-api-20260723T094716Z/deployment/concurrent-summary.json)
+- [G3 log validation](evidence/ranged-api-20260723T094716Z/deployment/log-validation.json)
 
 `SHA256SUMS` digest:
 

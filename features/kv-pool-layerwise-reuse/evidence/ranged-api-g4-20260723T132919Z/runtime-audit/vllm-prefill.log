@@ -1,0 +1,299 @@
+INFO 07-23 13:35:18 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-23 13:35:18 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-23 13:35:18 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-23 13:35:18 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-23 13:35:18 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-23 13:35:30 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-23 13:35:30 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339] 
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339]        █     █     █▄   ▄█
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.1.dev1+gee0da84ab
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339]   █▄█▀ █     █     █     █  model   /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:339] 
+(APIServer pid=14303) INFO 07-23 13:35:30 [api_utils.py:273] non-default args: {'host': '0.0.0.0', 'port': 8100, 'model': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'trust_remote_code': True, 'max_model_len': 4096, 'quantization': 'ascend', 'enforce_eager': True, 'served_model_name': ['vllm-ascend/DeepSeek-V2-Lite-W8A8'], 'block_size': 128, 'gpu_memory_utilization': 0.9, 'enable_prefix_caching': False, 'max_num_batched_tokens': 1024, 'max_num_seqs': 4, 'enable_chunked_prefill': True, 'kv_transfer_config': KVTransferConfig(kv_connector='AscendStoreConnector', engine_id='672b5c22-9420-4ee3-a394-e45f552ad715', kv_buffer_device='npu', kv_buffer_size=1000000000.0, kv_role='kv_producer', kv_rank=None, kv_parallel_size=1, kv_ip='127.0.0.1', kv_port=14579, kv_connector_extra_config={'backend': 'mooncake', 'use_layerwise': True, 'layerwise_prefetch_layers': 1, 'lookup_rpc_port': 0}, kv_connector_module_path=None, enable_permute_local_kv=False, kv_load_failure_policy='fail')}
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_VERSION
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_HOST
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PORT
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PROTO
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_ASCEND_KVPOOL_RANGE_DEBUG
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_ADDR
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT_HTTP_API
+(APIServer pid=14303) WARNING 07-23 13:35:30 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_USE_V1
+(APIServer pid=14303) INFO 07-23 13:35:30 [model.py:598] Resolved architecture: DeepseekV2ForCausalLM
+(APIServer pid=14303) INFO 07-23 13:35:30 [model.py:1725] Using max model len 4096
+(APIServer pid=14303) INFO 07-23 13:35:30 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=1024.
+(APIServer pid=14303) INFO 07-23 13:35:31 [vllm.py:1006] Asynchronous scheduling is enabled.
+(APIServer pid=14303) WARNING 07-23 13:35:31 [vllm.py:1062] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=14303) WARNING 07-23 13:35:31 [vllm.py:1110] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=14303) INFO 07-23 13:35:31 [kernel.py:276] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=14303) INFO 07-23 13:35:31 [vllm.py:1288] Cudagraph is disabled under eager mode
+(APIServer pid=14303) WARNING 07-23 13:35:31 [platform.py:1043] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=14303) INFO 07-23 13:35:31 [ascend_config.py:811] Dynamic EPLB is False
+(APIServer pid=14303) INFO 07-23 13:35:31 [ascend_config.py:812] The number of redundant experts is 0
+(APIServer pid=14303) INFO 07-23 13:35:31 [platform.py:486] Compilation disabled, using eager mode by default
+(APIServer pid=14303) INFO 07-23 13:35:31 [platform.py:770] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=14303) INFO 07-23 13:35:31 [compilation.py:310] Enabled custom fusions: norm_quant, act_quant
+INFO 07-23 13:35:42 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-23 13:35:42 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-23 13:35:42 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-23 13:35:42 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-23 13:35:42 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=14339) INFO 07-23 13:35:53 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore pid=14339) INFO 07-23 13:35:53 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore pid=14339) INFO 07-23 13:35:53 [core.py:114] Initializing a V1 LLM engine (v0.1.dev1+gee0da84ab) with config: model='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', speculative_config=None, tokenizer='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=4096, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=ascend, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=npu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_verbose=False), seed=0, served_model_name=vllm-ascend/DeepSeek-V2-Lite-W8A8, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'vllm_ascend.compilation.compiler_interface.AscendCompiler', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [1024], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=14339) INFO 07-23 13:35:55 [ascend_config.py:811] Dynamic EPLB is False
+(EngineCore pid=14339) INFO 07-23 13:35:55 [ascend_config.py:812] The number of redundant experts is 0
+(EngineCore pid=14339) INFO 07-23 13:35:57 [parallel_state.py:1588] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://10.250.40.143:55431 backend=hccl
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+(EngineCore pid=14339) INFO 07-23 13:35:58 [parallel_state.py:1923] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+(EngineCore pid=14339) INFO 07-23 13:35:58 [model_runner_v1.py:3755] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(EngineCore pid=14339) INFO 07-23 13:35:58 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+(EngineCore pid=14339) INFO 07-23 13:36:00 [weight_utils.py:849] Filesystem type for checkpoints: EXT4. Checkpoint size: 16.03 GiB. Available RAM: 1924.41 GiB.
+(EngineCore pid=14339) INFO 07-23 13:36:00 [weight_utils.py:872] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=14339) Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+(EngineCore pid=14339) Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:02<00:07,  2.51s/it]
+(EngineCore pid=14339) Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:05<00:05,  2.62s/it]
+(EngineCore pid=14339) Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:07<00:02,  2.61s/it]
+(EngineCore pid=14339) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:08<00:00,  1.87s/it]
+(EngineCore pid=14339) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:08<00:00,  2.13s/it]
+(EngineCore pid=14339) 
+(EngineCore pid=14339) INFO 07-23 13:36:09 [default_loader.py:430] Loading weights took 8.58 seconds
+INFO 07-23 13:36:20 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-23 13:36:20 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-23 13:36:20 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-23 13:36:20 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-23 13:36:20 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=14339) INFO 07-23 13:36:33 [model_runner_v1.py:3831] Loading model weights took 15.2958 GB
+(EngineCore pid=14339) INFO 07-23 13:36:33 [model_runner_v1.py:3858] Model runner load_model total time: 35.45 seconds
+(EngineCore pid=14339) INFO 07-23 13:36:38 [worker.py:591] Available KV cache memory: 11.09 GiB
+(EngineCore pid=14339) INFO 07-23 13:36:38 [kv_cache_utils.py:2146] GPU KV cache size: 382,720 tokens
+(EngineCore pid=14339) INFO 07-23 13:36:38 [kv_cache_utils.py:2147] Maximum concurrency for 4,096 tokens per request: 93.44x
+(EngineCore pid=14339) INFO 07-23 13:36:38 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: 672b5c22-9420-4ee3-a394-e45f552ad715-b865c4df68114356abc64900ae892aaa
+(EngineCore pid=14339) WARNING 07-23 13:36:38 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore pid=14339) INFO 07-23 13:36:38 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0723 13:36:38.953020 14339 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0723 13:36:38.953166 14339 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0723 13:36:38.953190 14339 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.143 port: 12001
+I0723 13:36:38.953285 14339 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.143:15121
+I0723 13:36:38.953444 14339 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.143:15121
+I0723 13:36:38.953461 14339 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0723 13:36:38.953469 14339 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0723 13:36:38.953473 14339 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0723 13:36:38.953519 14339 utils.cpp:219] Find available between 20000 and 20100
+I0723 13:36:38.955880 14339 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0723 13:36:38.955952 14339 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0723 13:36:38.955961 14339 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0723 13:36:38.966310 14339 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.143:20084, pid:14339
+I0723 13:36:38.990097 14339 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0723 13:36:38.990145 14339 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0723 13:36:38.993688 14339 client_service.cpp:287] client_id=1030526879476669823-11705950136754781334
+I0723 13:36:38.993716 14339 client_service.cpp:289] client_id=1030526879476669823-11705950136754781334, host_id=10.250.40.143
+I0723 13:36:38.993723 14339 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0723 13:36:38.996774 14339 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0723 13:36:38.996812 14339 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0723 13:36:38.998082 14339 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0723 13:36:38.998103 14339 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0723 13:36:38.998111 14339 real_client.cpp:857] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0723 13:36:39.003993 14339 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d2c0000000
+I0723 13:36:39.004099 14339 transfer_executor_base.cpp:427] Ignore register host mem:0x12d2c0000000 when buffer pool is enabled.
+(EngineCore pid=14339) INFO 07-23 13:36:39 [pool_worker.py:394] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(EngineCore pid=14339) INFO 07-23 13:36:39 [pool_worker.py:742] num_blocks: 2990
+(EngineCore pid=14339) INFO 07-23 13:36:39 [pool_worker.py:747] block_shape: torch.Size([128, 1, 512])
+(EngineCore pid=14339) INFO 07-23 13:36:39 [pool_worker.py:747] block_shape: torch.Size([128, 1, 64])
+(EngineCore pid=14339) INFO 07-23 13:36:39 [pool_worker.py:761] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([2990, 128, 1, 512])
+I0723 13:36:39.367416 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce13c00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367491 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2b400000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367537 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2e400000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367574 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce45c00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367609 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce48c00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367645 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce60400000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367681 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce63400000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367717 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce7ac00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367758 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce7de00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367794 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce95600000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367828 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce98600000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367871 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceafe00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367911 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceb2e00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.367949 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceca600000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.367985 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd600000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368021 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cee4e00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368055 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cee8000000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368095 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceff800000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368151 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf02800000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368186 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1a000000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368232 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1d000000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368269 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34800000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368304 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf37800000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368336 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf4f000000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368374 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf52200000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368407 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf69a00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368448 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf6ca00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368489 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf84200000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368525 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf87200000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368564 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ea00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368602 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfa1a00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368636 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfb9200000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368675 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfbc400000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368711 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfd3c00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368747 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfd6c00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368788 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfee400000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368825 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff1400000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368865 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d008c00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368907 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d00bc00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.368945 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d023400000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.368983 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d026600000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369024 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d03de00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369061 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d040e00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369098 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d058600000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369146 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d05b600000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369184 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d072e00000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369220 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d075e00000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369261 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d08d600000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369299 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d090800000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369338 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a8000000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369379 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0ab000000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369417 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c2800000, length:48988160, mem type:device, engine index:0
+I0723 13:36:39.369457 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c5800000, length:391905280, mem type:device, engine index:0
+I0723 13:36:39.369496 14339 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0dd000000, length:48988160, mem type:device, engine index:0
+(EngineCore pid=14339) INFO 07-23 13:36:39 [worker.py:765] Free memory on device (29.14/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 15.3 GiB for weights, 0.12 GiB for peak activation, 0.04 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=11750710374` (10.94 GiB) to fit into requested memory, or `--kv-cache-memory=14539720192` (13.54 GiB) to fully utilize NPU free memory. Current KV cache memory: 11.09 GiB. After warmup: torch reserved memory 26.57 GiB, torch allocated memory 26.53 GiB.
+(EngineCore pid=14339) INFO 07-23 13:36:40 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=0 visible_npus=[0]
+(EngineCore pid=14339) INFO 07-23 13:36:40 [cpu_binding.py:626] The CPU allocation plan is as follows:
+(EngineCore pid=14339) INFO 07-23 13:36:40 [cpu_binding.py:641] NPU0: main=[146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189]  acl=[190]  release=[[191]]
+(EngineCore pid=14339) INFO 07-23 13:36:40 [cpu_binding.py:667] [migrate] NPU:0 -> NUMA [6]
+(EngineCore pid=14339) INFO 07-23 13:36:43 [core.py:344] init engine (profile, create kv cache, warmup model) took 9.77 s
+(EngineCore pid=14339) INFO 07-23 13:36:44 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: 672b5c22-9420-4ee3-a394-e45f552ad715-b865c4df68114356abc64900ae892aaa
+(EngineCore pid=14339) WARNING 07-23 13:36:44 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore pid=14339) INFO 07-23 13:36:44 [pool_scheduler.py:161] KV pool page_size_bytes: 147456
+I0723 13:36:44.604573 14339 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0723 13:36:44.604635 14339 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0723 13:36:44.610581 14339 client_service.cpp:287] client_id=959231431745351029-16492666098689040059
+I0723 13:36:44.610636 14339 client_service.cpp:289] client_id=959231431745351029-16492666098689040059, host_id=10.250.40.143
+I0723 13:36:44.610642 14339 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0723 13:36:44.612591 14339 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0723 13:36:44.612625 14339 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0723 13:36:44.613221 14339 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0723 13:36:44.613240 14339 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0723 13:36:44.613247 14339 real_client.cpp:934] Global segment size is 0, skip mounting segment
+(EngineCore pid=14339) INFO 07-23 13:36:45 [vllm.py:1006] Asynchronous scheduling is enabled.
+(EngineCore pid=14339) WARNING 07-23 13:36:45 [vllm.py:1062] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore pid=14339) WARNING 07-23 13:36:45 [vllm.py:1110] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore pid=14339) INFO 07-23 13:36:45 [kernel.py:276] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore pid=14339) INFO 07-23 13:36:45 [vllm.py:1288] Cudagraph is disabled under eager mode
+(EngineCore pid=14339) INFO 07-23 13:36:45 [platform.py:486] Compilation disabled, using eager mode by default
+(EngineCore pid=14339) INFO 07-23 13:36:45 [platform.py:770] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(EngineCore pid=14339) INFO 07-23 13:36:45 [compilation.py:310] Enabled custom fusions: norm_quant, act_quant
+(APIServer pid=14303) INFO 07-23 13:36:45 [api_server.py:577] Supported tasks: ['generate']
+(APIServer pid=14303) WARNING 07-23 13:36:45 [model.py:1477] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.3, 'top_p': 0.95}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`.
+(APIServer pid=14303) INFO 07-23 13:36:46 [hf.py:548] Detected the chat template content format to be 'string'. You can set `--chat-template-content-format` to override this.
+(APIServer pid=14303) INFO 07-23 13:36:46 [api_server.py:581] Starting vLLM server on http://0.0.0.0:8100
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:37] Available routes are:
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /docs, Methods: GET, HEAD
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /load, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /version, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /health, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /metrics, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /tokenize, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /detokenize, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/models, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /ping, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /ping, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /invocations, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/chat/completions/batch, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/responses, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/responses/{response_id}, Methods: GET
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/completions, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/messages, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/messages/count_tokens, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /generative_scoring, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /inference/v1/generate, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /scale_elastic_ep, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /is_scaling_elastic_ep, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/chat/completions/render, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/completions/render, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/chat/completions/derender, Methods: POST
+(APIServer pid=14303) INFO 07-23 13:36:46 [launcher.py:46] Route: /v1/completions/derender, Methods: POST
+(APIServer pid=14303) INFO:     Started server process [14303]
+(APIServer pid=14303) INFO:     Waiting for application startup.
+(APIServer pid=14303) INFO:     Application startup complete.
+(APIServer pid=14303) INFO:     127.0.0.1:51874 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:44454 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:44462 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:46620 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:46634 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:56144 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:56152 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:56572 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:56574 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:34454 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:34464 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:42842 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:42844 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:55766 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:55772 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:38668 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:38672 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:53296 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:53308 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:50828 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:50844 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:41122 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:41126 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:48674 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=14339) INFO 07-23 13:38:38 [pool_scheduler.py:450] [KVPOOL] block_key_hit_check req=cmpl-d6bdbb9e-c788-4d6e-a056-1649dd444f06-0-a3d0fe50 hit_blocks=0/4 states_sample=[0, 0, 0, 0]
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":0,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[0,131072],[0,131072],[0,131072],[0,131072]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":1,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[147456,278528],[147456,278528],[147456,278528],[147456,278528]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":2,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[294912,425984],[294912,425984],[294912,425984],[294912,425984]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":3,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[442368,573440],[442368,573440],[442368,573440],[442368,573440]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":4,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[589824,720896],[589824,720896],[589824,720896],[589824,720896]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":5,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[737280,868352],[737280,868352],[737280,868352],[737280,868352]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":6,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[884736,1015808],[884736,1015808],[884736,1015808],[884736,1015808]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":7,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1032192,1163264],[1032192,1163264],[1032192,1163264],[1032192,1163264]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":8,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1179648,1310720],[1179648,1310720],[1179648,1310720],[1179648,1310720]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":9,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1327104,1458176],[1327104,1458176],[1327104,1458176],[1327104,1458176]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":10,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1474560,1605632],[1474560,1605632],[1474560,1605632],[1474560,1605632]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":11,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1622016,1753088],[1622016,1753088],[1622016,1753088],[1622016,1753088]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":12,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1769472,1900544],[1769472,1900544],[1769472,1900544],[1769472,1900544]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":13,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[1916928,2048000],[1916928,2048000],[1916928,2048000],[1916928,2048000]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":14,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2064384,2195456],[2064384,2195456],[2064384,2195456],[2064384,2195456]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":15,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2211840,2342912],[2211840,2342912],[2211840,2342912],[2211840,2342912]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":16,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2359296,2490368],[2359296,2490368],[2359296,2490368],[2359296,2490368]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":17,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2506752,2637824],[2506752,2637824],[2506752,2637824],[2506752,2637824]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":18,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2654208,2785280],[2654208,2785280],[2654208,2785280],[2654208,2785280]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":19,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2801664,2932736],[2801664,2932736],[2801664,2932736],[2801664,2932736]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":20,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[2949120,3080192],[2949120,3080192],[2949120,3080192],[2949120,3080192]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":21,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3096576,3227648],[3096576,3227648],[3096576,3227648],[3096576,3227648]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":22,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3244032,3375104],[3244032,3375104],[3244032,3375104],[3244032,3375104]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":23,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3391488,3522560],[3391488,3522560],[3391488,3522560],[3391488,3522560]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":24,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3538944,3670016],[3538944,3670016],[3538944,3670016],[3538944,3670016]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":25,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3686400,3817472],[3686400,3817472],[3686400,3817472],[3686400,3817472]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:81] [KVPOOL_RANGE_DEBUG] {"event":"range","direction":"save","layer_id":26,"key_count":4,"requested_bytes":[147456,147456,147456,147456],"sizes":[[131072,16384],[131072,16384],[131072,16384],[131072,16384]],"object_offsets":[[3833856,3964928],[3833856,3964928],[3833856,3964928],[3833856,3964928]],"results":[147456,147456,147456,147456]}
+(EngineCore pid=14339) INFO 07-23 13:38:39 [kv_transfer.py:104] [KVPOOL_RANGE_DEBUG] {"event":"commit","layer_id":26,"key_count":4,"results":[0,0,0,0]}
+(APIServer pid=14303) INFO:     10.250.40.184:44626 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:48680 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO 07-23 13:38:46 [loggers.py:273] Engine 000: Avg prompt throughput: 52.5 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=14303) INFO:     192.168.200.27:48534 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:48546 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO 07-23 13:38:56 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=14303) INFO:     192.168.200.27:44922 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:44926 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:35284 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:35296 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:34456 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=14303) INFO:     192.168.200.27:34458 - "GET /v1/models HTTP/1.1" 200 OK
