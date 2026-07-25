@@ -1,0 +1,13 @@
+{
+  "allocatable": 8,
+  "used_excluding_replaced_engines": 1,
+  "available": 7,
+  "required": 6,
+  "counted_pods": [
+    {
+      "namespace": "mooncake-main",
+      "pod": "qwen3-8b-agg-01-aggregated-1",
+      "request": 1
+    }
+  ]
+}

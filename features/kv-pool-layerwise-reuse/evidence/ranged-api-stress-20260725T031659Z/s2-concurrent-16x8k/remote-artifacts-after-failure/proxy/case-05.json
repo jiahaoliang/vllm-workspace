@@ -1,0 +1,33 @@
+{
+  "body": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "logprobs": null,
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "routed_experts": null,
+        "stop_reason": null,
+        "text": " S2_CASE_05 private cache branch for case 05.\nQuestion: Return exactly the private cache",
+        "token_ids": null
+      }
+    ],
+    "created": 1784950362,
+    "id": "cmpl-b5ccb210-1948-47bd-8584-8399f3f8a59d",
+    "kv_transfer_params": null,
+    "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "object": "text_completion",
+    "service_tier": null,
+    "system_fingerprint": "vllm-0.1.dev1+gee0da84ab-tp2-6ed40618",
+    "usage": {
+      "completion_tokens": 24,
+      "prompt_tokens": 8082,
+      "prompt_tokens_details": null,
+      "total_tokens": 8106
+    }
+  },
+  "elapsed_seconds": 27.877161741256714,
+  "error": null,
+  "status_code": 200
+}

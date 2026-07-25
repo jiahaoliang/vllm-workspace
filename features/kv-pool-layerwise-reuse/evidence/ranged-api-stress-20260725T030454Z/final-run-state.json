@@ -1,0 +1,9 @@
+{
+  "finished_at": "2026-07-25T03:06:05Z",
+  "exit_code": 1,
+  "prefill_pod": "prefill-engine-deployment-6c6848bbc9-hts9g",
+  "decode_pod": "decode-engine-deployment-66c47c8bd4-bdzhq",
+  "engines_stopped": true,
+  "stress_pods_retained": true,
+  "allocated_npus_retained": 6
+}

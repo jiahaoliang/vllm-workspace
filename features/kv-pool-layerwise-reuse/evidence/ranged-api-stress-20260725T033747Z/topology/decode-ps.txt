@@ -1,0 +1,169 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 01:46 ?        00:00:00 sleep infinity
+root         269       1  0 01:58 ?        00:00:28 [python3] <defunct>
+root         341       1  1 01:59 ?        00:01:33 [VLLM::Worker_TP] <defunct>
+root         366       1  1 01:59 ?        00:01:27 [VLLM::Worker_TP] <defunct>
+root         514       1  0 02:00 ?        00:00:19 [python3] <defunct>
+root         515       1  0 02:00 ?        00:00:18 [python3] <defunct>
+root         622       1  0 02:00 ?        00:00:00 [python3] <defunct>
+root         623       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         624       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         625       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         626       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         627       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         628       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         629       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         630       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         631       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         632       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         633       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         634       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         635       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         636       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         637       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         638       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         639       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         694       1  0 02:00 ?        00:00:00 [python3] <defunct>
+root         695       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         696       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         697       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         698       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         699       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         700       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         701       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         702       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         703       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         704       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         705       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         706       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         707       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         708       1  0 02:00 ?        00:00:03 [python3] <defunct>
+root         709       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         710       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root         711       1  0 02:00 ?        00:00:02 [python3] <defunct>
+root        2918       1  2 03:20 ?        00:00:25 [python3] <defunct>
+root        2985       1 11 03:21 ?        00:02:18 [VLLM::Worker_TP] <defunct>
+root        3009       1 11 03:21 ?        00:02:16 [VLLM::Worker_TP] <defunct>
+root        3161       1  1 03:22 ?        00:00:18 [python3] <defunct>
+root        3162       1  1 03:22 ?        00:00:18 [python3] <defunct>
+root        3264       1  0 03:22 ?        00:00:00 [python3] <defunct>
+root        3265       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3266       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3267       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3268       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3269       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3270       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3271       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3272       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3273       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3274       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3275       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3276       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3277       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3278       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3279       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3280       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3281       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3336       1  0 03:22 ?        00:00:00 [python3] <defunct>
+root        3337       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3338       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3339       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3340       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3341       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3342       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3343       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3344       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3345       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3346       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3347       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3348       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3349       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3350       1  0 03:22 ?        00:00:03 [python3] <defunct>
+root        3351       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3352       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        3353       1  0 03:22 ?        00:00:02 [python3] <defunct>
+root        5303       1  3 03:28 ?        00:00:26 [python3] <defunct>
+root        5371       1 25 03:29 ?        00:03:12 [VLLM::Worker_TP] <defunct>
+root        5396       1 23 03:29 ?        00:02:56 [VLLM::Worker_TP] <defunct>
+root        5541       1  2 03:30 ?        00:00:18 [python3] <defunct>
+root        5542       1  2 03:30 ?        00:00:18 [python3] <defunct>
+root        5643       1  0 03:30 ?        00:00:00 [python3] <defunct>
+root        5684       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5689       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5692       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5695       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5699       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5702       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5704       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5705       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5706       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5707       1  0 03:30 ?        00:00:00 [python3] <defunct>
+root        5708       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5709       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5710       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5711       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5712       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5713       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5714       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5715       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5716       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5717       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5718       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5719       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5720       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5721       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5722       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5723       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5724       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5725       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5726       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5727       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5728       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5729       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5730       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        5731       1  0 03:30 ?        00:00:02 [python3] <defunct>
+root        5732       1  0 03:30 ?        00:00:03 [python3] <defunct>
+root        7723       1 13 03:39 ?        00:00:24 python3 -m vllm.entrypoints.openai.api_server --host 0.0.0.0 --port 8200 --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 --quantization ascend --trust-remote-code --enforce-eager --distributed-executor-backend mp --data-parallel-size 1 --data-parallel-backend mp --tensor-parallel-size 2 --pipeline-parallel-size 1 --prefill-context-parallel-size 1 --decode-context-parallel-size 1 --block-size 128 --enable-chunked-prefill --max-model-len 65536 --max-num-batched-tokens 1024 --max-num-seqs 16 --no-enable-prefix-caching --enable-logging-iteration-details --gpu-memory-utilization 0.90 --kv-transfer-config {"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}
+root        7757    7723  0 03:39 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.resource_tracker import main;main(35)
+root        7758    7723 15 03:39 ?        00:00:25 VLLM::EngineCore
+root        7790    7758 38 03:39 ?        00:00:52 VLLM::Worker_TP0
+root        7815    7758 41 03:40 ?        00:00:49 VLLM::Worker_TP1
+root        7960    7815 21 03:40 ?        00:00:17 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=36, pipe_handle=83) --multiprocessing-fork
+root        7961    7790 22 03:40 ?        00:00:17 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=36, pipe_handle=95) --multiprocessing-fork
+root        8061    7815  0 03:40 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8062    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8063    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8064    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8065    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8066    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8067    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8068    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8069    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8070    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8073    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8074    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8075    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8076    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8077    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8078    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8079    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8080    8061  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        8135    7790  0 03:40 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8136    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8137    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8138    8135  4 03:40 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8139    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8140    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8141    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8142    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8143    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8144    8135  4 03:40 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8145    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8146    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8147    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8148    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8149    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8150    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8151    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        8152    8135  4 03:41 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root        9843       0  0 03:42 ?        00:00:00 ps -efww

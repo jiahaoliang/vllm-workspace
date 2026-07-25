@@ -1,0 +1,33 @@
+{
+  "actions": {
+    "baseline": {
+      "count": 4,
+      "elapsed_seconds": 15.359940767288208,
+      "errors": []
+    },
+    "pinned-0": {
+      "decode_rank": 0,
+      "elapsed_seconds": 28.895523071289062,
+      "prefill_rank": 0
+    },
+    "pinned-1": {
+      "decode_rank": 0,
+      "elapsed_seconds": 29.87791633605957,
+      "prefill_rank": 1
+    },
+    "pinned-2": {
+      "decode_rank": 0,
+      "elapsed_seconds": 28.44133973121643,
+      "prefill_rank": 0
+    },
+    "pinned-3": {
+      "decode_rank": 0,
+      "elapsed_seconds": 28.195793628692627,
+      "prefill_rank": 1
+    },
+    "prepare": {
+      "fixture": "fixture.json"
+    }
+  },
+  "schema_version": 1
+}

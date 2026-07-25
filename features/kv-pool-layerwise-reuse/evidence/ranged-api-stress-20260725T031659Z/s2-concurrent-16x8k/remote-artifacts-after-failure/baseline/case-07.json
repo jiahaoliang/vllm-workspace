@@ -1,0 +1,33 @@
+{
+  "body": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "logprobs": null,
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "routed_experts": null,
+        "stop_reason": null,
+        "text": " S2_CASE_07 private cache branch for case 07.\nQuestion: Return exactly the private cache",
+        "token_ids": null
+      }
+    ],
+    "created": 1784950313,
+    "id": "cmpl-stress-s2-baseline-7",
+    "kv_transfer_params": null,
+    "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "object": "text_completion",
+    "service_tier": null,
+    "system_fingerprint": "vllm-0.1.dev1+gee0da84ab-tp2-6ed40618",
+    "usage": {
+      "completion_tokens": 24,
+      "prompt_tokens": 8082,
+      "prompt_tokens_details": null,
+      "total_tokens": 8106
+    }
+  },
+  "elapsed_seconds": 16.78325128555298,
+  "error": null,
+  "status_code": 200
+}

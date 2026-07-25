@@ -1,0 +1,61 @@
+{
+  "block_size": 128,
+  "cached_blocks": 127,
+  "cached_boundary_tokens": 16256,
+  "definition": {
+    "case_count": 4,
+    "expected_keys": 508,
+    "name": "s1",
+    "seed_offset": 0,
+    "shared_blocks": 0,
+    "unique_blocks": 127
+  },
+  "expected_key_count": 508,
+  "markers": [
+    "S1_CASE_00",
+    "S1_CASE_01",
+    "S1_CASE_02",
+    "S1_CASE_03"
+  ],
+  "prompt_tokens": [
+    16274,
+    16274,
+    16274,
+    16274
+  ],
+  "request_files": [
+    "requests/case-00.json",
+    "requests/case-01.json",
+    "requests/case-02.json",
+    "requests/case-03.json"
+  ],
+  "request_ids": {
+    "baseline": [
+      "stress-s1-baseline-0",
+      "stress-s1-baseline-1",
+      "stress-s1-baseline-2",
+      "stress-s1-baseline-3"
+    ],
+    "pinned": [
+      "stress-s1-pinned-0",
+      "stress-s1-pinned-1",
+      "stress-s1-pinned-2",
+      "stress-s1-pinned-3"
+    ],
+    "proxy": [
+      "stress-s1-proxy-0",
+      "stress-s1-proxy-1",
+      "stress-s1-proxy-2",
+      "stress-s1-proxy-3"
+    ]
+  },
+  "scenario": "s1",
+  "schema_version": 1,
+  "seeds": [
+    2026072400,
+    2026072401,
+    2026072402,
+    2026072403
+  ],
+  "tail_tokens": 18
+}

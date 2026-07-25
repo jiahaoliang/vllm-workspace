@@ -1,0 +1,38 @@
+﻿{
+  "version": 1,
+  "updated_at": "2026-07-24T11:21:01+08:00",
+  "repos": {
+    "vllm": {
+      "path": "repos/vllm",
+      "remotes": {
+        "origin": "https://github.com/jiahaoliang/vllm.git",
+        "upstream": "https://github.com/vllm-project/vllm.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm.git"
+      },
+      "branch": "tag:v0.24.0",
+      "commit": "ee0da84ab9e04ac7610e28580af62c365e898389",
+      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.24.0"
+    },
+    "vllm-ascend": {
+      "path": "repos/vllm-ascend",
+      "remotes": {
+        "origin": "https://github.com/jiahaoliang/vllm-ascend.git",
+        "upstream": "https://github.com/vllm-project/vllm-ascend.git",
+        "collaborator": "https://github.com/ader47/vllm-ascend.git"
+      },
+      "branch": "feature/mooncake-layerwise-kv-pool",
+      "commit": "3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6",
+      "purpose": "kv-pool-layerwise-reuse feature development; collaborator branch feature/new-memcache-layerwise"
+    },
+    "Mooncake": {
+      "path": "repos/Mooncake",
+      "remotes": {
+        "origin": "https://github.com/kvcache-ai/Mooncake.git",
+        "collaborator": "https://github.com/ascend-direct-dev/Mooncake.git"
+      },
+      "branch": "feature/layerwise-kv-session",
+      "commit": "74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",
+      "purpose": "Mooncake PR #2881 WIP integration; collaborator branch feature/layerwise-kv-session"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 01:46 ?        00:00:00 sleep infinity
+root         269       1 14 01:58 ?        00:00:27 python3 -m vllm.entrypoints.openai.api_server --host 0.0.0.0 --port 8200 --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 --quantization ascend --trust-remote-code --enforce-eager --distributed-executor-backend mp --data-parallel-size 1 --data-parallel-backend mp --tensor-parallel-size 2 --pipeline-parallel-size 1 --prefill-context-parallel-size 1 --decode-context-parallel-size 1 --block-size 128 --enable-chunked-prefill --max-model-len 65536 --max-num-batched-tokens 1024 --max-num-seqs 16 --no-enable-prefix-caching --enable-logging-iteration-details --gpu-memory-utilization 0.90 --kv-transfer-config {"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}
+root         307     269  0 01:58 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.resource_tracker import main;main(35)
+root         308     269 15 01:58 ?        00:00:25 VLLM::EngineCore
+root         341     308 41 01:59 ?        00:01:00 VLLM::Worker_TP0
+root         366     308 43 01:59 ?        00:00:56 VLLM::Worker_TP1
+root         514     366 22 02:00 ?        00:00:19 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=36, pipe_handle=83) --multiprocessing-fork
+root         515     341 22 02:00 ?        00:00:18 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=36, pipe_handle=95) --multiprocessing-fork
+root         622     341  0 02:00 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         623     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         624     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         625     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         626     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         627     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         628     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         629     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         630     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         631     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         632     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         633     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         634     622  4 02:00 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         635     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         636     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         637     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         638     622  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         639     622  4 02:00 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(91, 94, [], **{})
+root         694     366  0 02:00 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         695     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         696     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         697     694  4 02:00 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         698     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         699     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         700     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         701     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         702     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         703     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         704     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         705     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         706     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         707     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         708     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         709     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         710     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root         711     694  4 02:00 ?        00:00:02 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(80, 82, [], **{})
+root        2403       0  0 02:01 ?        00:00:00 ps -efww

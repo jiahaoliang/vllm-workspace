@@ -20,6 +20,19 @@ workspace-external archives.
 - `SHA256SUMS` digest:
   `af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d`
 
+## Multi-DP/TP Stress Validation
+
+- Report:
+  [multi-dp-tp-stress-validation-2026-07-25.md](../multi-dp-tp-stress-validation-2026-07-25.md)
+- Result: failed closed on exact response equality; no production-source
+  change or acceptance-gate reduction was made.
+- Archived runs:
+  [014317Z](ranged-api-stress-20260725T014317Z/README.md),
+  [015720Z](ranged-api-stress-20260725T015720Z/README.md),
+  [030454Z](ranged-api-stress-20260725T030454Z/README.md),
+  [031659Z](ranged-api-stress-20260725T031659Z/README.md), and
+  [033747Z](ranged-api-stress-20260725T033747Z/README.md).
+
 Verify from the control-repo root:
 
 ```bash
@@ -28,6 +41,10 @@ sha256sum -c SHA256SUMS
 
 cd ../ranged-api-g4-20260723T132919Z/runtime-audit
 sha256sum -c SHA256SUMS
+
+for evidence_dir in ranged-api-stress-20260725T*; do
+  (cd "${evidence_dir}" && sha256sum -c SHA256SUMS)
+done
 ```
 
 Do not edit evidence files in place. A changed artifact requires a new run

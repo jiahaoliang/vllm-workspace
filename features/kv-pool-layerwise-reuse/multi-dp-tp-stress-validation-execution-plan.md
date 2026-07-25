@@ -27,6 +27,14 @@ propagation completed. No vLLM process or workload started, and the same endpoin
 afterward. `capture_metrics` therefore performs a bounded 60-second readiness retry before returning the
 complete metrics response. The downstream empty-pool and key-count assertions remain unchanged and strict.
 
+**Runtime acceptance result (2026-07-25):** With the harness corrections applied, run `20260725T031659Z`
+passed S1 but failed S2 because only 8/16 cached response signatures exactly matched their empty-pool
+baselines. All 16 requests returned HTTP 200 and passed marker isolation; the aggregate checker proved both
+Prefill DP ranks, a 1024-token maximum chunk, layers 0..26, 288 committed keys, and zero whole-key events.
+The unchanged retry `20260725T033747Z` reproduced exact-output divergence in S1 case 3 (`3/4` exact) while
+all four pinned ranged checkers passed. The run stopped before S2/S3 as required. This is recorded as a
+runtime validation failure; the exact-output gate was not weakened and production source was not changed.
+
 ## 1. Non-Negotiable Rules
 
 1. Work from `/root/ljh/vllm-workspace` unless a step explicitly changes directory.
