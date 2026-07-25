@@ -7,6 +7,8 @@
 
 **Audience:** This document is intentionally explicit. An execution agent must follow the tasks in order and
 must not invent a different topology, workload, artifact schema, cleanup policy, or Git publication flow.
+Within those boundaries, the agent owns routine diagnosis and retry decisions and must continue without
+waiting for new user direction.
 
 **Goal:** Implement and run one Kubernetes stress profile that validates Prefill `DP=2/TP=2`, Decode
 `DP=1/TP=2`, 16-way concurrency, 16K/32K prompts, runtime chunked prefill, and Mooncake ranged layerwise
@@ -44,6 +46,14 @@ failed run and describe this correction.
 14. Do not silently rerun a failed scenario in the same artifact directory. A rerun gets a new UTC run ID.
 15. Never claim evidence is uploaded until the evidence commit is visible on
     `origin/kv-pool-layerwise-reuse`.
+16. A failed run does not end the overall execution task. After preserving its artifacts, diagnose it, make
+    evidence-backed fixes limited to the validation harness, manifests, checker, runner, or documentation,
+    commit those fixes locally, and retry the complete run with a new UTC run ID without waiting for user
+    direction.
+17. Do not push intermediate implementation, harness-fix, evidence, or report commits. Push GitHub once,
+    only after the final passing run, evidence import, report, and all offline verification are complete.
+18. Request new user direction only before changing production source, weakening the frozen topology or
+    workload, performing a destructive operation, or expanding the validation scope.
 
 ## 2. Frozen Inputs
 
@@ -594,8 +604,9 @@ The host runner may copy `stress-test.py` into the Prefill Pod under
 tokenizer and cluster-local endpoints are available there. The log checker runs on the host against collected
 log windows.
 
-The host runner must not commit or push. Git publication is a separate reviewed task after runtime evidence is
-complete.
+The host runner must not commit or push. The execution agent may create local commits at recoverable
+milestones, but GitHub publication occurs only once after runtime evidence, the final report, and offline
+verification are complete.
 
 ## 5. Implementation Tasks
 
@@ -682,7 +693,7 @@ Do not unit-test live HTTP or import torch/NPU in these tests.
 - [ ] Ensure collection errors affect `overall_rc`.
 - [ ] Ensure no path points into the checked-in evidence directory during live execution.
 
-### Task 5: Static Verification And Implementation Publication
+### Task 5: Static Verification And Local Implementation Commit
 
 Run from control repo root:
 
@@ -708,14 +719,9 @@ checker, workload driver, and their tests. Commit message:
 test(kv_pool): add multi-DP TP stress validation
 ```
 
-Push to:
-
-```bash
-git push origin HEAD:kv-pool-layerwise-reuse
-```
-
-Do not start live validation until the implementation commit is pushed, because the final report must link to
-tracked scripts and manifests.
+Do not push this commit yet. Record its local SHA for the final report, then begin live validation from the
+clean committed tree. The final publication task pushes the complete commit chain after all runtime and
+offline gates pass.
 
 ## 6. Live Execution Tasks
 
@@ -901,15 +907,8 @@ failure that motivated it.
   ```text
   test(kv_pool): archive multi-DP TP stress evidence
   ```
-
-- [ ] Push and verify remote contains the evidence commit:
-
-  ```bash
-  git push origin HEAD:kv-pool-layerwise-reuse
-  git ls-remote origin refs/heads/kv-pool-layerwise-reuse
-  ```
-
-Record the evidence commit SHA for the report.
+- [ ] Do not push yet. Record the local evidence commit SHA for the report and retain the complete local
+      commit chain for Task 15.
 
 ## 8. Final Validation Report
 
@@ -973,7 +972,10 @@ final-run-state.json
 
 Do not link `/tmp`, `/root`, Pod filesystem paths, or untracked files.
 
-### Task 15: Verify And Publish The Report
+Before the final push, these links target tracked paths in the local commit chain. They become pushed evidence
+links when Task 15 publishes that chain.
+
+### Task 15: Verify, Commit, And Publish The Complete Result
 
 - [ ] Check every relative evidence link exists.
 - [ ] Check every linked path appears in `git ls-tree -r HEAD` after the evidence commit.
@@ -986,12 +988,21 @@ Do not link `/tmp`, `/root`, Pod filesystem paths, or untracked files.
   ```text
   docs(kv_pool): document multi-DP TP stress validation
   ```
+- [ ] Confirm the local commit chain contains the implementation, every evidence-backed harness correction,
+      all referenced failed and passing evidence runs, and the final report.
+- [ ] Push exactly once to `origin/kv-pool-layerwise-reuse`:
 
-- [ ] Push to `origin/kv-pool-layerwise-reuse`.
+  ```bash
+  git push origin HEAD:kv-pool-layerwise-reuse
+  ```
+
 - [ ] Verify local HEAD equals remote branch HEAD.
+- [ ] Verify the remote tree contains every evidence and report path linked by the report.
 
-The task is complete only after both evidence and report commits are remotely available. If push fails, mark
-the report `publication-blocked`, preserve local commits, and report the exact authentication/network error.
+The task is complete only after the single final push makes the implementation, corrections, evidence, and
+report commits remotely available. If that push fails, mark the report `publication-blocked`, preserve local
+commits, and report the exact authentication/network error; do not alter or rerun a passing validation merely
+because publication failed.
 
 ## 9. Stop Conditions And Diagnosis Boundaries
 
@@ -1013,14 +1024,21 @@ Stop the current run after evidence capture if any of these occurs:
 - DP rank, chunk budget, layer set, bytes, commit, whole-key, or key-count gate fails;
 - evidence collection or checksum fails.
 
-For a failure, the execution agent may perform read-only diagnosis and document the likely cause. It must not
-change topology, lower workload, edit production source, rebuild the image, or rerun under the same run ID
-without new user direction.
+For a failure, stop that run, capture best-effort evidence, and preserve its artifact directory. The execution
+agent must then diagnose the failure and continue autonomously when the correction is within the validation
+harness, manifests, runner, checker, evidence assembly, or documentation. Commit each evidence-backed
+correction locally and rerun the complete validation with a new UTC run ID. Never reuse or overwrite a failed
+run directory.
+
+New user direction is not required for ordinary harness failures or retries. It is required before changing
+the frozen topology or workload, lowering a gate, editing production source, rebuilding the image, performing
+a destructive operation, or expanding scope. Until such a boundary is reached, continue through diagnosis,
+local repair, static verification, and new-run retry to a final result.
 
 ## 10. Completion Checklist
 
 - [ ] Acceptance plan status is Approved.
-- [ ] Stress manifests and tools are tracked and pushed.
+- [ ] Stress manifests and tools are tracked in local commits before live execution.
 - [ ] Static/unit checks pass.
 - [ ] One final live run has immutable identity and complete artifacts.
 - [ ] S1 proves both Prefill DP ranks with isolated 16K chunk windows.
@@ -1030,7 +1048,9 @@ without new user direction.
 - [ ] All required ranged events succeed and whole-key count is zero.
 - [ ] All cached responses exactly match empty-pool baselines.
 - [ ] vLLM processes are stopped and final cluster state is recorded.
-- [ ] Evidence is copied into the control repo, checksummed, committed, and pushed.
-- [ ] Final report links pushed evidence and contains step-by-step live/offline reproduction commands.
-- [ ] Report is committed and pushed.
+- [ ] Evidence is copied into the control repo, checksummed, and committed locally.
+- [ ] Final report links tracked evidence and contains step-by-step live/offline reproduction commands.
+- [ ] Report is committed locally after all checks pass.
+- [ ] The complete implementation, correction, evidence, and report commit chain is published by one final
+      GitHub push.
 - [ ] Local and remote feature branch HEADs match.
