@@ -35,12 +35,18 @@ require_command() {
 resolve_running_pod() {
   local role=$1 selector=$2
   local -a lines
-  mapfile -t lines < <(kubectl get pods -n "${namespace}" -l "${selector}" -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}') || return 1
-  if (( ${#lines[@]} != 1 )) || [[ ${lines[0]#*$'\t'} != Running ]]; then
-    echo "expected exactly one Running ${role} Pod, got: ${lines[*]:-none}" >&2
+  mapfile -t lines < <(
+    kubectl get pods -n "${namespace}" -l "${selector}" -o json | jq -r '
+      .items[] |
+      select(.metadata.deletionTimestamp == null and .status.phase == "Running") |
+      .metadata.name
+    '
+  ) || return 1
+  if (( ${#lines[@]} != 1 )); then
+    echo "expected exactly one non-terminating Running ${role} Pod, got: ${lines[*]:-none}" >&2
     return 1
   fi
-  printf '%s\n' "${lines[0]%%$'\t'*}"
+  printf '%s\n' "${lines[0]}"
 }
 
 record_step() {
