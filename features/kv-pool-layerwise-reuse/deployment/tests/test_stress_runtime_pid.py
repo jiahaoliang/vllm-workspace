@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 CONFIG = Path(__file__).resolve().parents[1] / "stress" / "10-runtime-config.yaml"
+MASTER_CONFIG = Path(__file__).resolve().parents[1] / "30-mooncake-master.yaml"
 
 
 def configmap_script(name: str) -> str:
@@ -76,3 +77,8 @@ def test_start_and_stop_scripts_use_state_helper_instead_of_kill_zero():
         script = configmap_script(name)
         assert "source /opt/vllm-layerwise/pid-state.sh" in script
         assert "pid_process_state" in script
+
+
+def test_master_lease_covers_long_layerwise_transfer():
+    config = MASTER_CONFIG.read_text(encoding="utf-8")
+    assert "--default_kv_lease_ttl=30s" in config

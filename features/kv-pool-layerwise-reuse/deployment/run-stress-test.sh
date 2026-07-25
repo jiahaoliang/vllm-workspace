@@ -284,7 +284,7 @@ reset_between_scenarios() {
   done
 }
 
-for command_name in kubectl git jq python3 sha256sum nerdctl; do
+for command_name in kubectl git jq python3 rg sha256sum nerdctl; do
   require_command "${command_name}" || exit 2
 done
 if [[ -e ${output_dir} && ! -d ${output_dir} ]]; then
@@ -361,6 +361,7 @@ for role in prefill decode; do
 done
 
 stop_engines >"${output_dir}/stop-before-apply.log" 2>&1 || { fail_run "could not stop old engines"; exit 1; }
+record_step "apply Mooncake Master" "${output_dir}/apply-master.log" kubectl apply -f "${script_dir}/30-mooncake-master.yaml" || { fail_run "Mooncake Master apply failed"; exit 1; }
 record_step "apply stress ConfigMap" "${output_dir}/apply-config.log" kubectl apply -f "${script_dir}/stress/10-runtime-config.yaml" || { fail_run "stress ConfigMap apply failed"; exit 1; }
 record_step "apply stress Prefill" "${output_dir}/apply-prefill.log" kubectl apply -f "${script_dir}/stress/40-prefill-engine.yaml" || { fail_run "stress Prefill apply failed"; exit 1; }
 record_step "apply stress Decode" "${output_dir}/apply-decode.log" kubectl apply -f "${script_dir}/stress/50-decode-engine.yaml" || { fail_run "stress Decode apply failed"; exit 1; }
@@ -388,6 +389,11 @@ while IFS= read -r path; do
 done <"${output_dir}/synced-python-files.txt"
 
 reset_master || { fail_run "initial Master reset failed"; exit 1; }
+collect "Mooncake Master deployment" "${output_dir}/master-deployment.json" kubectl get deployment -n "${namespace}" mooncake-master-deployment -o json || { fail_run "Master deployment capture failed"; exit 1; }
+jq -e '[.spec.template.spec.containers[] | select(.name == "mooncake-master") | .args[]] | join(" ") | contains("--default_kv_lease_ttl=30s")' \
+  "${output_dir}/master-deployment.json" >/dev/null || { fail_run "Master lease configuration mismatch"; exit 1; }
+collect "Mooncake Master startup log" "${output_dir}/master-startup.log" kubectl logs -n "${namespace}" "${master_pod}" -c mooncake-master || { fail_run "Master startup log capture failed"; exit 1; }
+rg -F 'default_kv_lease_ttl=30000' "${output_dir}/master-startup.log" >/dev/null || { fail_run "Master runtime lease TTL mismatch"; exit 1; }
 capture_metrics "${output_dir}/master-empty-initial.metrics" || { fail_run "initial metrics capture failed"; exit 1; }
 assert_metrics "${output_dir}/master-empty-initial.metrics" 0 true || { fail_run "Master was not empty"; exit 1; }
 start_engines || { fail_run "engine startup failed"; exit 1; }
