@@ -16,6 +16,7 @@ from typing import Any, Iterable
 MODEL_PATH = "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"
 SERVED_MODEL = "vllm-ascend/DeepSeek-V2-Lite-W8A8"
 BLOCK_SIZE = 128
+GENERATED_TOKENS = 24
 TIMEOUT_SECONDS = 1800.0
 SHARED_UNIT = "Shared stress validation prefix is identical across requests. "
 INSTRUCTION = (
@@ -97,22 +98,40 @@ def build_fixtures(tokenizer: Any, scenario: Scenario) -> tuple[list[dict[str, A
 
     prompts: list[list[int]] = []
     markers: list[str] = []
+    expected_marker_texts: list[str] = []
+    expected_marker_token_ids: list[list[int]] = []
     requests: list[dict[str, Any]] = []
     for index in range(scenario.case_count):
         marker = f"{scenario.name.upper()}_CASE_{index:02d}"
+        expected_marker_text = f" {marker}"
+        marker_token_ids = tokenizer.encode(
+            expected_marker_text, add_special_tokens=False
+        )
+        if not marker_token_ids:
+            raise ValidationError(
+                f"tokenizer returned no tokens for marker {expected_marker_text!r}"
+            )
+        if len(marker_token_ids) > GENERATED_TOKENS:
+            raise ValidationError(
+                f"marker requires {len(marker_token_ids)} tokens, generation budget is "
+                f"{GENERATED_TOKENS}: {expected_marker_text!r}"
+            )
         unique_unit = f"{marker} private cache branch for case {index:02d}. "
         unique = repeat_tokens(tokenizer, unique_unit, unique_target)
         prompt = shared + unique + tail
         prompts.append(prompt)
         markers.append(marker)
+        expected_marker_texts.append(expected_marker_text)
+        expected_marker_token_ids.append(marker_token_ids)
         requests.append(
             {
                 "model": SERVED_MODEL,
                 "prompt": prompt,
-                "max_tokens": 24,
+                "max_tokens": GENERATED_TOKENS,
                 "temperature": 0,
                 "seed": 2026072400 + scenario.seed_offset + index,
                 "stream": False,
+                "return_token_ids": True,
             }
         )
 
@@ -146,7 +165,7 @@ def build_fixtures(tokenizer: Any, scenario: Scenario) -> tuple[list[dict[str, A
         raise ValidationError("; ".join(errors))
 
     fixture = {
-        "schema_version": 1,
+        "schema_version": 2,
         "scenario": scenario.name,
         "definition": asdict(scenario),
         "block_size": BLOCK_SIZE,
@@ -155,6 +174,9 @@ def build_fixtures(tokenizer: Any, scenario: Scenario) -> tuple[list[dict[str, A
         "tail_tokens": len(tail),
         "prompt_tokens": [len(prompt) for prompt in prompts],
         "markers": markers,
+        "expected_marker_texts": expected_marker_texts,
+        "expected_marker_token_ids": expected_marker_token_ids,
+        "generated_tokens": GENERATED_TOKENS,
         "seeds": [request["seed"] for request in requests],
         "request_ids": {
             "baseline": [f"stress-{scenario.name}-baseline-{i}" for i in range(scenario.case_count)],
@@ -181,6 +203,7 @@ def response_signature(body: dict[str, Any]) -> dict[str, Any]:
     usage = body.get("usage") or {}
     return {
         "text": choice.get("text"),
+        "token_ids": choice.get("token_ids"),
         "finish_reason": choice.get("finish_reason"),
         "stop_reason": choice.get("stop_reason"),
         "prompt_tokens": usage.get("prompt_tokens"),
@@ -193,9 +216,96 @@ def normalized_text(value: Any) -> str:
 
 
 def isolation(text: Any, own: str, markers: Iterable[str]) -> tuple[bool, list[str]]:
-    value = text or ""
+    value = text if isinstance(text, str) else ""
     foreign = [marker for marker in markers if marker != own and marker in value]
     return own in value and not foreign, foreign
+
+
+def common_prefix_length(left: list[int], right: list[int]) -> int:
+    count = 0
+    for left_token, right_token in zip(left, right):
+        if left_token != right_token:
+            break
+        count += 1
+    return count
+
+
+def validate_completion_signature(
+    signature: dict[str, Any],
+    *,
+    expected_marker_text: str,
+    expected_marker_token_ids: list[int],
+    own_marker: str,
+    markers: Iterable[str],
+    expected_prompt_tokens: int,
+    expected_completion_tokens: int = GENERATED_TOKENS,
+) -> tuple[dict[str, Any], list[str]]:
+    errors: list[str] = []
+    token_ids = signature.get("token_ids")
+    token_ids_present = isinstance(token_ids, list) and all(
+        type(token_id) is int for token_id in token_ids
+    )
+    generated_token_count = len(token_ids) if token_ids_present else None
+    generated_token_count_match = generated_token_count == expected_completion_tokens
+    marker_token_prefix_match = (
+        token_ids_present
+        and token_ids[: len(expected_marker_token_ids)] == expected_marker_token_ids
+    )
+    text = signature.get("text")
+    text_marker_prefix_match = isinstance(text, str) and text.startswith(
+        expected_marker_text
+    )
+    isolated, foreign_markers = isolation(text, own_marker, markers)
+    prompt_tokens_match = signature.get("prompt_tokens") == expected_prompt_tokens
+    completion_tokens_match = (
+        signature.get("completion_tokens") == expected_completion_tokens
+    )
+    finish_reason_match = signature.get("finish_reason") == "length"
+
+    if not token_ids_present:
+        errors.append("response token_ids are missing or invalid")
+    elif not generated_token_count_match:
+        errors.append(
+            f"generated token count expected {expected_completion_tokens}, got "
+            f"{generated_token_count}"
+        )
+    if not marker_token_prefix_match:
+        errors.append("generated token_ids do not start with expected marker token_ids")
+    if not text_marker_prefix_match:
+        errors.append("response text does not start with expected marker text")
+    if foreign_markers:
+        errors.append(f"response text contains foreign markers: {foreign_markers}")
+    if not prompt_tokens_match:
+        errors.append(
+            f"usage prompt_tokens expected {expected_prompt_tokens}, got "
+            f"{signature.get('prompt_tokens')}"
+        )
+    if not completion_tokens_match:
+        errors.append(
+            f"usage completion_tokens expected {expected_completion_tokens}, got "
+            f"{signature.get('completion_tokens')}"
+        )
+    if not finish_reason_match:
+        errors.append(
+            f"finish_reason expected 'length', got {signature.get('finish_reason')!r}"
+        )
+
+    checks = {
+        "validated": not errors,
+        "response_token_ids_present": token_ids_present,
+        "generated_token_count": generated_token_count,
+        "generated_token_count_match": generated_token_count_match,
+        "expected_marker_token_count": len(expected_marker_token_ids),
+        "marker_token_prefix_match": marker_token_prefix_match,
+        "text_marker_prefix_match": text_marker_prefix_match,
+        "prompt_tokens_match": prompt_tokens_match,
+        "completion_tokens_match": completion_tokens_match,
+        "finish_reason_match": finish_reason_match,
+        "isolated": isolated,
+        "foreign_markers": foreign_markers,
+        "errors": errors,
+    }
+    return checks, errors
 
 
 def metric_value(text: str, name: str) -> int:
@@ -373,15 +483,19 @@ def finalize(args: argparse.Namespace) -> None:
         state = load_json(state_path(args.output))
     except Exception as exc:
         summary = {
-            "schema_version": 1,
+            "schema_version": 2,
             "scenario": args.scenario,
             "status": "failed",
             "validated": False,
             "prompt_layout": {},
             "baseline": {},
             "candidate": {},
-            "exact_match_count": 0,
+            "marker_prefix_match_count": 0,
+            "full_exact_match_count": 0,
             "isolated_count": 0,
+            "divergent_case_indices": [],
+            "common_prefix_token_count": {},
+            "first_divergence_token_index": {},
             "expected_key_count": None,
             "actual_key_count": None,
             "log_validation": [],
@@ -425,7 +539,12 @@ def finalize(args: argparse.Namespace) -> None:
             errors.append(f"log checker did not pass: {path}")
 
     candidate_dir = "pinned" if scenario == "s1" else "proxy"
-    exact = isolated_count = 0
+    marker_prefix_match_count = 0
+    full_exact_match_count = 0
+    isolated_count = 0
+    divergent_case_indices: list[int] = []
+    common_prefix_token_counts: dict[str, int] = {}
+    first_divergence_token_indices: dict[str, int | None] = {}
     cases = []
     for index, marker in enumerate(fixture["markers"]):
         try:
@@ -434,18 +553,80 @@ def finalize(args: argparse.Namespace) -> None:
             candidate_body = validate_raw(load_json(args.output / candidate_dir / suffix), f"candidate {index}")
             baseline_signature = response_signature(baseline_body)
             candidate_signature = response_signature(candidate_body)
-            exact_match = baseline_signature == candidate_signature
-            prompt_count_ok = candidate_signature["prompt_tokens"] == fixture["prompt_tokens"][index]
-            isolated, foreign = isolation(candidate_signature["text"], marker, fixture["markers"])
-            exact += int(exact_match and prompt_count_ok)
-            isolated_count += int(isolated)
-            if not exact_match:
-                errors.append(f"case {index}: exact response signature mismatch")
-            if not prompt_count_ok:
-                errors.append(f"case {index}: usage prompt_tokens mismatch")
-            if not isolated:
-                errors.append(f"case {index}: marker isolation failed")
-            cases.append({"case": index, "exact_match": exact_match, "normalized_text_equal": normalized_text(baseline_signature["text"]) == normalized_text(candidate_signature["text"]), "prompt_tokens_match": prompt_count_ok, "isolated": isolated, "foreign_markers": foreign})
+            validation_arguments = {
+                "expected_marker_text": fixture["expected_marker_texts"][index],
+                "expected_marker_token_ids": fixture["expected_marker_token_ids"][index],
+                "own_marker": marker,
+                "markers": fixture["markers"],
+                "expected_prompt_tokens": fixture["prompt_tokens"][index],
+                "expected_completion_tokens": fixture["generated_tokens"],
+            }
+            baseline_checks, baseline_errors = validate_completion_signature(
+                baseline_signature, **validation_arguments
+            )
+            candidate_checks, candidate_errors = validate_completion_signature(
+                candidate_signature, **validation_arguments
+            )
+            errors.extend(
+                f"case {index}: baseline: {error}" for error in baseline_errors
+            )
+            errors.extend(
+                f"case {index}: candidate: {error}" for error in candidate_errors
+            )
+
+            baseline_token_ids = (
+                baseline_signature["token_ids"]
+                if isinstance(baseline_signature["token_ids"], list)
+                else []
+            )
+            candidate_token_ids = (
+                candidate_signature["token_ids"]
+                if isinstance(candidate_signature["token_ids"], list)
+                else []
+            )
+            common_prefix = common_prefix_length(
+                baseline_token_ids, candidate_token_ids
+            )
+            full_exact_match = (
+                baseline_token_ids == candidate_token_ids
+                and baseline_signature["text"] == candidate_signature["text"]
+            )
+            first_divergence = None if full_exact_match else common_prefix
+            if not full_exact_match:
+                divergent_case_indices.append(index)
+            common_prefix_token_counts[str(index)] = common_prefix
+            first_divergence_token_indices[str(index)] = first_divergence
+            marker_prefix_match = (
+                candidate_checks["marker_token_prefix_match"]
+                and candidate_checks["text_marker_prefix_match"]
+            )
+            marker_prefix_match_count += int(marker_prefix_match)
+            full_exact_match_count += int(full_exact_match)
+            isolated_count += int(candidate_checks["isolated"])
+            cases.append(
+                {
+                    "case": index,
+                    "expected_marker_text": fixture["expected_marker_texts"][index],
+                    "expected_marker_token_ids": fixture["expected_marker_token_ids"][index],
+                    "baseline": {
+                        "signature": baseline_signature,
+                        "checks": baseline_checks,
+                    },
+                    "candidate": {
+                        "signature": candidate_signature,
+                        "checks": candidate_checks,
+                    },
+                    "marker_prefix_match": marker_prefix_match,
+                    "isolated": candidate_checks["isolated"],
+                    "full_exact_match": full_exact_match,
+                    "normalized_text_equal": normalized_text(
+                        baseline_signature["text"]
+                    )
+                    == normalized_text(candidate_signature["text"]),
+                    "common_prefix_token_count": common_prefix,
+                    "first_divergence_token_index": first_divergence,
+                }
+            )
         except Exception as exc:
             errors.append(f"case {index}: {type(exc).__name__}: {exc}")
     candidate_elapsed = []
@@ -463,15 +644,19 @@ def finalize(args: argparse.Namespace) -> None:
         for index in range(fixture["definition"]["case_count"])
     )
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
         "scenario": scenario,
         "status": "failed" if errors else "passed",
         "validated": not errors,
         "prompt_layout": fixture,
         "baseline": {"count": fixture["definition"]["case_count"]},
         "candidate": {"source": candidate_dir, "cases": cases},
-        "exact_match_count": exact,
+        "marker_prefix_match_count": marker_prefix_match_count,
+        "full_exact_match_count": full_exact_match_count,
         "isolated_count": isolated_count,
+        "divergent_case_indices": divergent_case_indices,
+        "common_prefix_token_count": common_prefix_token_counts,
+        "first_divergence_token_index": first_divergence_token_indices,
         "expected_key_count": fixture["expected_key_count"],
         "actual_key_count": actual_keys,
         "log_validation": log_summaries,

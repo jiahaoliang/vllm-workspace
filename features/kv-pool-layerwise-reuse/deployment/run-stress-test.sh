@@ -26,6 +26,8 @@ prefill_pod=
 decode_pod=
 proxy_pod=
 master_pod=
+active_scenario_remote=
+active_scenario_host=
 trap_active=0
 
 require_command() {
@@ -232,6 +234,10 @@ finalize_run() {
   (( incoming_rc == 0 )) || overall_rc=1
   mkdir -p "${output_dir}/final"
   if [[ -n ${prefill_pod} && -n ${decode_pod} ]]; then
+    if (( incoming_rc != 0 )) && [[ -n ${active_scenario_remote} && -n ${active_scenario_host} ]]; then
+      copy_remote_scenario "${active_scenario_remote}" "${active_scenario_host}/remote-artifacts-after-failure" || collection_failed=1
+      capture_metrics "${active_scenario_host}/failure.metrics" || true
+    fi
     capture_role_log prefill "${output_dir}/final/vllm-prefill.log" || true
     capture_role_log decode "${output_dir}/final/vllm-decode.log" || true
     stop_engines >>"${output_dir}/final/stop-engines.log" 2>&1 || collection_failed=1
@@ -419,6 +425,8 @@ record_step "copy remote stress driver" "${output_dir}/copy-driver.log" kubectl 
 # S1: four isolated 16K requests pinned to Prefill ranks 0,1,0,1.
 s1_remote=${remote_root}/s1-pinned-16k
 s1_host=${output_dir}/s1-pinned-16k
+active_scenario_remote=${s1_remote}
+active_scenario_host=${s1_host}
 mkdir -p "${s1_host}"
 record_step "create S1 remote directory" "${s1_host}/mkdir.log" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- mkdir -p "${s1_remote}" || { fail_run "S1 mkdir failed"; exit 1; }
 run_remote_driver "${s1_host}/prepare.log" prepare --scenario s1 --output "${s1_remote}" || { fail_run "S1 prepare failed"; exit 1; }
@@ -455,6 +463,8 @@ reset_between_scenarios before-s2 || { fail_run "S1 to S2 reset failed"; exit 1;
 # S2: sixteen concurrent 8K requests through proxy.
 s2_remote=${remote_root}/s2-concurrent-16x8k
 s2_host=${output_dir}/s2-concurrent-16x8k
+active_scenario_remote=${s2_remote}
+active_scenario_host=${s2_host}
 mkdir -p "${s2_host}"
 record_step "create S2 remote directory" "${s2_host}/mkdir.log" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- mkdir -p "${s2_remote}" || { fail_run "S2 mkdir failed"; exit 1; }
 run_remote_driver "${s2_host}/prepare.log" prepare --scenario s2 --output "${s2_remote}" || { fail_run "S2 prepare failed"; exit 1; }
@@ -481,6 +491,8 @@ reset_between_scenarios before-s3 || { fail_run "S2 to S3 reset failed"; exit 1;
 # S3: one isolated cold 32K proof, then four concurrent 32K proxy requests.
 s3_remote=${remote_root}/s3-concurrent-4x32k
 s3_host=${output_dir}/s3-concurrent-4x32k
+active_scenario_remote=${s3_remote}
+active_scenario_host=${s3_host}
 mkdir -p "${s3_host}"
 record_step "create S3 remote directory" "${s3_host}/mkdir.log" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- mkdir -p "${s3_remote}" || { fail_run "S3 mkdir failed"; exit 1; }
 run_remote_driver "${s3_host}/prepare.log" prepare --scenario s3 --output "${s3_remote}" || { fail_run "S3 prepare failed"; exit 1; }
@@ -517,15 +529,15 @@ capture_role_log decode "${s3_host}/vllm-decode-full.log" || true
 jq -n --slurpfile topology "${output_dir}/topology/check.json" --slurpfile s1 "${s1_host}/artifacts/scenario-summary.json" \
   --slurpfile s2 "${s2_host}/artifacts/scenario-summary.json" --slurpfile s3 "${s3_host}/artifacts/scenario-summary.json" \
   --arg control_commit "$(git rev-parse HEAD)" --arg image "${image}" --arg prefill_pod "${prefill_pod}" --arg decode_pod "${decode_pod}" \
-  '{schema_version:1,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"ee0da84ab9e04ac7610e28580af62c365e898389",vllm_ascend:"3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6",mooncake:"74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
+  '{schema_version:2,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"ee0da84ab9e04ac7610e28580af62c365e898389",vllm_ascend:"3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6",mooncake:"74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
   >"${output_dir}/overall-summary.json" || { fail_run "overall summary creation failed"; exit 1; }
 jq -e '.status == "passed" and .validated == true and .topology.validated == true and .scenarios.s1_pinned_16k.validated == true and .scenarios.s2_concurrent_16x8k.validated == true and .scenarios.s3_concurrent_4x32k.validated == true and (.errors|length)==0' \
   "${output_dir}/overall-summary.json" >/dev/null || { fail_run "overall assertion failed"; exit 1; }
-jq -e '.validated == true and .exact_match_count == 4 and .isolated_count == 4 and .actual_key_count == 508' \
+jq -e '.validated == true and .marker_prefix_match_count == 4 and .isolated_count == 4 and .actual_key_count == 508' \
   "${s1_host}/artifacts/scenario-summary.json" >/dev/null || { fail_run "S1 final assertion failed"; exit 1; }
-jq -e '.validated == true and .exact_match_count == 16 and .isolated_count == 16 and .actual_key_count == 288' \
+jq -e '.validated == true and .marker_prefix_match_count == 16 and .isolated_count == 16 and .actual_key_count == 288' \
   "${s2_host}/artifacts/scenario-summary.json" >/dev/null || { fail_run "S2 final assertion failed"; exit 1; }
-jq -e '.validated == true and .exact_match_count == 4 and .isolated_count == 4 and .actual_key_count == 348' \
+jq -e '.validated == true and .marker_prefix_match_count == 4 and .isolated_count == 4 and .actual_key_count == 348' \
   "${s3_host}/artifacts/scenario-summary.json" >/dev/null || { fail_run "S3 final assertion failed"; exit 1; }
 
 capture_metrics "${output_dir}/master-final.metrics" || { fail_run "final metrics capture failed"; exit 1; }
