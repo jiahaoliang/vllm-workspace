@@ -1,0 +1,5 @@
+prefill vLLM has no PID file
+synced prefill pod prefill-engine-deployment-6c6848bbc9-hts9g; vLLM remains stopped
+decode vLLM has no PID file
+synced decode pod decode-engine-deployment-66c47c8bd4-bdzhq; vLLM remains stopped
+start the two vLLM processes manually after reviewing the synced files

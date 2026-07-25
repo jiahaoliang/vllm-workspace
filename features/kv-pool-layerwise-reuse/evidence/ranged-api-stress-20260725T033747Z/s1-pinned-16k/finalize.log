@@ -1,0 +1,2 @@
+stress-test finalize failed: ValidationError: case 3: exact response signature mismatch
+command terminated with exit code 1

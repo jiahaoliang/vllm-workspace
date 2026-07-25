@@ -1,0 +1,75 @@
+[2026-07-25T03:05:10Z] START control and source identity
+COMMAND identity_check 
+[2026-07-25T03:05:10Z] END control and source identity exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/identity.txt
+[2026-07-25T03:05:10Z] START collect: control repo status
+COMMAND git status --short --branch 
+[2026-07-25T03:05:10Z] END collect: control repo status exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/git-status.txt
+[2026-07-25T03:05:10Z] START collect: remote feature HEAD
+COMMAND git ls-remote origin refs/heads/kv-pool-layerwise-reuse 
+[2026-07-25T03:05:11Z] END collect: remote feature HEAD exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/remote-head.txt
+[2026-07-25T03:05:11Z] START capture workspace lock
+COMMAND cp /root/ljh/vllm-workspace/workspace.lock.json /tmp/layerwise-stress-20260725T030454Z/workspace.lock.json 
+[2026-07-25T03:05:11Z] END capture workspace lock exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/workspace-lock-copy.log
+[2026-07-25T03:05:11Z] START collect: node JSON
+COMMAND kubectl get node n1 -o json 
+[2026-07-25T03:05:11Z] END collect: node JSON exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/node.json
+[2026-07-25T03:05:11Z] START collect: all cluster Pods
+COMMAND kubectl get pods -A -o json 
+[2026-07-25T03:05:12Z] END collect: all cluster Pods exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/pods-before.json
+[2026-07-25T03:05:12Z] START local image identity
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2 
+[2026-07-25T03:05:12Z] END local image identity exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/image-inspect.json
+[2026-07-25T03:05:12Z] START collect: current engine image on n1
+COMMAND kubectl get pod -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g decode-engine-deployment-66c47c8bd4-bdzhq -o json 
+[2026-07-25T03:05:12Z] END collect: current engine image on n1 exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/current-engine-image.json
+[2026-07-25T03:05:12Z] START model identity
+COMMAND kubectl exec -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g -c prefill-engine -- python3 -c import\ json\,sys\;\ p=sys.argv\[1\]\;\ c=json.load\(open\(p+\"/config.json\"\)\)\;\ assert\ c\[\"max_position_embeddings\"\]\>=65536\;\ print\(json.dumps\(\{\"path\":p\,\"max_position_embeddings\":c\[\"max_position_embeddings\"\]\}\)\) /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 
+[2026-07-25T03:05:13Z] END model identity exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/model-identity.json
+[2026-07-25T03:05:13Z] START prefill pre-replacement runtime check
+COMMAND kubectl exec -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-07-25T03:05:23Z] END prefill pre-replacement runtime check exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/prefill-runtime-check-before.log
+[2026-07-25T03:05:23Z] START decode pre-replacement runtime check
+COMMAND kubectl exec -n ai-inference decode-engine-deployment-66c47c8bd4-bdzhq -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-07-25T03:05:33Z] END decode pre-replacement runtime check exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/decode-runtime-check-before.log
+[2026-07-25T03:05:34Z] START apply stress ConfigMap
+COMMAND kubectl apply -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml 
+[2026-07-25T03:05:34Z] END apply stress ConfigMap exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/apply-config.log
+[2026-07-25T03:05:34Z] START apply stress Prefill
+COMMAND kubectl apply -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml 
+[2026-07-25T03:05:34Z] END apply stress Prefill exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/apply-prefill.log
+[2026-07-25T03:05:34Z] START apply stress Decode
+COMMAND kubectl apply -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml 
+[2026-07-25T03:05:34Z] END apply stress Decode exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/apply-decode.log
+[2026-07-25T03:05:34Z] START sync vLLM-Ascend Python
+COMMAND /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/sync-vllm-ascend-python.sh 
+[2026-07-25T03:05:36Z] END sync vLLM-Ascend Python exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/source-sync.log
+[2026-07-25T03:05:36Z] START prefill runtime check
+COMMAND kubectl exec -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-07-25T03:05:46Z] END prefill runtime check exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/prefill-runtime-check.log
+[2026-07-25T03:05:46Z] START decode runtime check
+COMMAND kubectl exec -n ai-inference decode-engine-deployment-66c47c8bd4-bdzhq -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-07-25T03:05:57Z] END decode runtime check exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/decode-runtime-check.log
+[2026-07-25T03:05:58Z] START restart Mooncake Master
+COMMAND kubectl rollout restart -n ai-inference deployment/mooncake-master-deployment 
+[2026-07-25T03:05:58Z] END restart Mooncake Master exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/master-reset-030558.log
+[2026-07-25T03:05:58Z] START wait Mooncake Master rollout
+COMMAND kubectl rollout status -n ai-inference deployment/mooncake-master-deployment --timeout=300s 
+[2026-07-25T03:06:03Z] END wait Mooncake Master rollout exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/master-rollout-030558.log
+[2026-07-25T03:06:03Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\) 
+[2026-07-25T03:06:04Z] END collect: Mooncake metrics exit=1 artifact=/tmp/layerwise-stress-20260725T030454Z/master-empty-initial.metrics
+[2026-07-25T03:06:04Z] START collect: prefill engine log
+COMMAND kubectl exec -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-07-25T03:06:04Z] END collect: prefill engine log exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/final/vllm-prefill.log
+[2026-07-25T03:06:04Z] START collect: decode engine log
+COMMAND kubectl exec -n ai-inference decode-engine-deployment-66c47c8bd4-bdzhq -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-07-25T03:06:04Z] END collect: decode engine log exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/final/vllm-decode.log
+[2026-07-25T03:06:05Z] START collect: final engine Pod state
+COMMAND kubectl get pod -n ai-inference prefill-engine-deployment-6c6848bbc9-hts9g decode-engine-deployment-66c47c8bd4-bdzhq -o yaml 
+[2026-07-25T03:06:05Z] END collect: final engine Pod state exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/final/engine-pods.yaml
+[2026-07-25T03:06:05Z] START collect: final proxy log
+COMMAND kubectl logs -n ai-inference proxy-server-deployment-8c4c59f46-rlrpl -c proxy-server 
+[2026-07-25T03:06:05Z] END collect: final proxy log exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/final/proxy.log
+[2026-07-25T03:06:05Z] START collect: final Master log
+COMMAND kubectl logs -n ai-inference mooncake-master-deployment-cc7f96dd4-g4xs7 -c mooncake-master 
+[2026-07-25T03:06:05Z] END collect: final Master log exit=0 artifact=/tmp/layerwise-stress-20260725T030454Z/final/mooncake-master.log

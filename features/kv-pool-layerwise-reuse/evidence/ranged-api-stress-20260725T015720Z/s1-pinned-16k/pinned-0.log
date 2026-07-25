@@ -1,0 +1,2 @@
+stress-test pinned-load failed: ValidationError: pinned prefill response lacks kv_transfer_params
+command terminated with exit code 1

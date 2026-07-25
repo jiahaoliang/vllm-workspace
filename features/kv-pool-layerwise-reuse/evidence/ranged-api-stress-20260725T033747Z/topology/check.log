@@ -1,0 +1,1 @@
+{"checks": {"decode DP=1": true, "decode TP=2": true, "decode active devices>=2": true, "decode allocation=2": true, "prefill DP0 process": true, "prefill DP1 process": true, "prefill DP=2": true, "prefill TP=2": true, "prefill active devices>=4": true, "prefill allocation=4": true}, "errors": [], "mode": "topology", "schema_version": 1, "status": "passed", "validated": true}

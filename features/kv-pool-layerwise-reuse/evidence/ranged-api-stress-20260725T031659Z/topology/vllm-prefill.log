@@ -1,0 +1,671 @@
+INFO 07-25 03:20:54 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:20:54 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:20:54 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:20:54 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:20:54 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:21:05 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-25 03:21:05 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339] 
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339]        █     █     █▄   ▄█
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.1.dev1+gee0da84ab
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339]   █▄█▀ █     █     █     █  model   /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:339] 
+(APIServer pid=5433) INFO 07-25 03:21:06 [api_utils.py:273] non-default args: {'host': '0.0.0.0', 'port': 8100, 'model': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'trust_remote_code': True, 'max_model_len': 65536, 'quantization': 'ascend', 'enforce_eager': True, 'served_model_name': ['vllm-ascend/DeepSeek-V2-Lite-W8A8'], 'distributed_executor_backend': 'mp', 'tensor_parallel_size': 2, 'data_parallel_size': 2, 'data_parallel_size_local': 2, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'enable_prefix_caching': False, 'enable_logging_iteration_details': True, 'max_num_batched_tokens': 1024, 'max_num_seqs': 16, 'enable_chunked_prefill': True, 'kv_transfer_config': KVTransferConfig(kv_connector='AscendStoreConnector', engine_id='dc6269a9-e4be-41f8-bef7-75fdd012f6f8', kv_buffer_device='npu', kv_buffer_size=1000000000.0, kv_role='kv_producer', kv_rank=None, kv_parallel_size=1, kv_ip='127.0.0.1', kv_port=14579, kv_connector_extra_config={'backend': 'mooncake', 'use_layerwise': True, 'layerwise_prefetch_layers': 1, 'lookup_rpc_port': 0}, kv_connector_module_path=None, enable_permute_local_kv=False, kv_load_failure_policy='fail')}
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_VERSION
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_HOST
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PORT
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PROTO
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_ADDR
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT_HTTP_API
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_USE_V1
+(APIServer pid=5433) WARNING 07-25 03:21:06 [envs.py:2004] Unknown vLLM environment variable detected: VLLM_ASCEND_KVPOOL_RANGE_DEBUG
+(APIServer pid=5433) INFO 07-25 03:21:06 [model.py:598] Resolved architecture: DeepseekV2ForCausalLM
+(APIServer pid=5433) INFO 07-25 03:21:06 [model.py:1725] Using max model len 65536
+(APIServer pid=5433) INFO 07-25 03:21:06 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=1024.
+(APIServer pid=5433) INFO 07-25 03:21:06 [vllm.py:1006] Asynchronous scheduling is enabled.
+(APIServer pid=5433) INFO 07-25 03:21:06 [vllm.py:1016] Disabling NCCL for DP synchronization when using async scheduling.
+(APIServer pid=5433) WARNING 07-25 03:21:06 [vllm.py:1062] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=5433) WARNING 07-25 03:21:06 [vllm.py:1110] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=5433) INFO 07-25 03:21:06 [kernel.py:276] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=5433) INFO 07-25 03:21:06 [vllm.py:1288] Cudagraph is disabled under eager mode
+(APIServer pid=5433) WARNING 07-25 03:21:06 [platform.py:1043] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=5433) INFO 07-25 03:21:06 [ascend_config.py:811] Dynamic EPLB is False
+(APIServer pid=5433) INFO 07-25 03:21:06 [ascend_config.py:812] The number of redundant experts is 0
+(APIServer pid=5433) INFO 07-25 03:21:06 [platform.py:486] Compilation disabled, using eager mode by default
+(APIServer pid=5433) INFO 07-25 03:21:06 [platform.py:770] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=5433) INFO 07-25 03:21:06 [compilation.py:310] Enabled custom fusions: norm_quant, act_quant
+INFO 07-25 03:21:17 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:21:17 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:21:17 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:21:17 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:21:17 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(APIServer pid=5433) INFO 07-25 03:21:27 [utils.py:1127] Started DP Coordinator process (PID: 5473)
+INFO 07-25 03:21:36 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:21:36 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:21:36 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:21:36 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:21:36 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:21:56 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:21:56 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:21:56 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:21:56 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:21:56 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore_DP1 pid=5531) INFO 07-25 03:22:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore_DP0 pid=5502) INFO 07-25 03:22:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore_DP1 pid=5531) INFO 07-25 03:22:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore_DP0 pid=5502) INFO 07-25 03:22:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore_DP1 pid=5531) INFO 07-25 03:22:07 [multiproc_executor.py:140] DP group leader: node_rank=0, node_rank_within_dp=0, master_addr=127.0.0.1, mq_connect_ip=10.250.40.164 (local), world_size=2, local_world_size=2
+(EngineCore_DP0 pid=5502) INFO 07-25 03:22:07 [core.py:114] Initializing a V1 LLM engine (v0.1.dev1+gee0da84ab) with config: model='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', speculative_config=None, tokenizer='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=65536, download_dir=None, load_format=auto, tensor_parallel_size=2, pipeline_parallel_size=1, data_parallel_size=2, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=ascend, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=npu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=True, jit_monitor_verbose=False), seed=0, served_model_name=vllm-ascend/DeepSeek-V2-Lite-W8A8, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'vllm_ascend.compilation.compiler_interface.AscendCompiler', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [1024], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, moe_backend='auto', linear_backend='auto')
+(EngineCore_DP0 pid=5502) INFO 07-25 03:22:07 [multiproc_executor.py:140] DP group leader: node_rank=0, node_rank_within_dp=0, master_addr=127.0.0.1, mq_connect_ip=10.250.40.164 (local), world_size=2, local_world_size=2
+INFO 07-25 03:22:16 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:22:16 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:22:16 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:22:16 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:22:16 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:22:16 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:22:16 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:22:16 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:22:16 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:22:16 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:22:28 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-25 03:22:28 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 07-25 03:22:28 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-25 03:22:28 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 07-25 03:22:30 [ascend_config.py:811] Dynamic EPLB is False
+INFO 07-25 03:22:30 [ascend_config.py:812] The number of redundant experts is 0
+INFO 07-25 03:22:30 [ascend_config.py:811] Dynamic EPLB is False
+INFO 07-25 03:22:30 [ascend_config.py:812] The number of redundant experts is 0
+(Worker pid=5575) INFO 07-25 03:22:32 [parallel_state.py:1588] world_size=4 rank=2 local_rank=0 distributed_init_method=tcp://127.0.0.1:38449 backend=hccl
+(Worker pid=5574) INFO 07-25 03:22:33 [parallel_state.py:1588] world_size=4 rank=0 local_rank=0 distributed_init_method=tcp://127.0.0.1:38449 backend=hccl
+INFO 07-25 03:22:35 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:22:35 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:22:35 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:22:35 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:22:35 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:22:36 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:22:36 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:22:36 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:22:36 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:22:36 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:22:48 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-25 03:22:48 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 07-25 03:22:48 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-25 03:22:48 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 07-25 03:22:50 [ascend_config.py:811] Dynamic EPLB is False
+INFO 07-25 03:22:50 [ascend_config.py:812] The number of redundant experts is 0
+INFO 07-25 03:22:50 [ascend_config.py:811] Dynamic EPLB is False
+INFO 07-25 03:22:50 [ascend_config.py:812] The number of redundant experts is 0
+(Worker pid=5631) INFO 07-25 03:22:52 [parallel_state.py:1588] world_size=4 rank=1 local_rank=1 distributed_init_method=tcp://127.0.0.1:38449 backend=hccl
+(Worker pid=5630) INFO 07-25 03:22:53 [parallel_state.py:1588] world_size=4 rank=3 local_rank=1 distributed_init_method=tcp://127.0.0.1:38449 backend=hccl
+[Gloo] Rank 0 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 2 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 1 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 3 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 1 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 0 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 1 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 0 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 1 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 0 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 1 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank [Gloo] Rank 32 is connected to  is connected to 33 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 33
+
+(Worker pid=5574) INFO 07-25 03:22:53 [parallel_state.py:1923] rank 0 in world size 4 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+(Worker pid=5575) INFO 07-25 03:22:53 [parallel_state.py:1923] rank 2 in world size 4 is assigned as DP rank 1, PP rank 0, PCP rank 0, TP rank 0, EP rank 2, EPLB rank N/A
+[Gloo] Rank 2 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 1 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 0 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank 3 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:22:53 [model_runner_v1.py:3755] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:22:53 [model_runner_v1.py:3755] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:22:53 [model_runner_v1.py:3755] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:22:53 [model_runner_v1.py:3755] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:22:53 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:22:54 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:22:56 [weight_utils.py:849] Filesystem type for checkpoints: EXT4. Checkpoint size: 16.03 GiB. Available RAM: 1900.82 GiB.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:22:56 [weight_utils.py:872] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:22:56 [weight_utils.py:849] Filesystem type for checkpoints: EXT4. Checkpoint size: 16.03 GiB. Available RAM: 1900.78 GiB.
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:22:56 [weight_utils.py:872] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:02<00:06,  2.30s/it]
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:04<00:04,  2.39s/it]
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:07<00:02,  2.43s/it]
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:07<00:00,  1.65s/it]
+(Worker_DP0_TP0 pid=5574) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:07<00:00,  1.92s/it]
+(Worker_DP0_TP0 pid=5574) 
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:04 [default_loader.py:430] Loading weights took 7.70 seconds
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:04 [default_loader.py:430] Loading weights took 7.84 seconds
+INFO 07-25 03:23:14 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:23:14 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:23:14 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:23:14 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:23:14 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:23:14 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:23:14 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:23:14 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:23:15 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:23:15 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:23:15 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:23:15 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:23:15 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:23:15 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:23:15 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-25 03:23:15 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-25 03:23:15 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-25 03:23:15 [__init__.py:49] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-25 03:23:15 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-25 03:23:15 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:28 [model_runner_v1.py:3831] Loading model weights took 4.3453 GB
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:28 [model_runner_v1.py:3858] Model runner load_model total time: 34.57 seconds
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:30 [model_runner_v1.py:3831] Loading model weights took 4.3453 GB
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:30 [model_runner_v1.py:3858] Model runner load_model total time: 36.60 seconds
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:30 [model_runner_v1.py:3831] Loading model weights took 4.3453 GB
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:30 [model_runner_v1.py:3858] Model runner load_model total time: 37.50 seconds
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:30 [model_runner_v1.py:3831] Loading model weights took 4.3453 GB
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:30 [model_runner_v1.py:3858] Model runner load_model total time: 37.50 seconds
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:35 [worker.py:591] Available KV cache memory: 21.55 GiB
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:36 [kv_cache_utils.py:2146] GPU KV cache size: 743,808 tokens
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:36 [kv_cache_utils.py:2147] Maximum concurrency for 65,536 tokens per request: 11.35x
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:36 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp1
+(Worker_DP1_TP1 pid=5630) WARNING 07-25 03:23:36 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:36 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:36 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp1
+(Worker_DP1_TP0 pid=5575) WARNING 07-25 03:23:36 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:36 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:36.246698  5630 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:36.246830  5630 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:36.246847  5630 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:36.246894  5630 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:16582
+I0725 03:23:36.247040  5630 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:16582
+I0725 03:23:36.247051  5630 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:36.247058  5630 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:36.247062  5630 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:36.247112  5630 utils.cpp:219] Find available between 20700 and 20800
+I0725 03:23:36.250168  5630 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:36.250250  5630 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:36.250258  5630 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0725 03:23:36.261107  5630 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20772, pid:5630
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:36.261497  5575 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:36.261595  5575 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:36.261627  5575 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:36.261812  5575 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:15780
+I0725 03:23:36.261996  5575 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:15780
+I0725 03:23:36.262009  5575 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:36.262015  5575 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:36.262018  5575 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:36.262063  5575 utils.cpp:219] Find available between 20600 and 20700
+I0725 03:23:36.263090  5575 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:36.263136  5575 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:36.263142  5575 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0725 03:23:36.273052  5575 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20634, pid:5575
+I0725 03:23:36.285612  5630 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:36.285660  5630 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0725 03:23:36.288797  5630 client_service.cpp:287] client_id=10397106758004247628-5026462516372805007
+I0725 03:23:36.288828  5630 client_service.cpp:289] client_id=10397106758004247628-5026462516372805007, host_id=10.250.40.164
+I0725 03:23:36.288834  5630 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:36.291661  5630 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:36.291687  5630 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0725 03:23:36.292886  5630 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:36.292906  5630 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:36.292913  5630 real_client.cpp:857] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0725 03:23:36.298724  5630 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d300000000
+I0725 03:23:36.298826  5630 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+I0725 03:23:36.300781  5575 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:36.300827  5575 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:36 [pool_worker.py:394] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+I0725 03:23:36.304368  5575 client_service.cpp:287] client_id=2973026622512550268-5187332958494065590
+I0725 03:23:36.304417  5575 client_service.cpp:289] client_id=2973026622512550268-5187332958494065590, host_id=10.250.40.164
+I0725 03:23:36.304423  5575 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:36.307137  5575 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:36.307178  5575 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0725 03:23:36.308424  5575 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:36.308449  5575 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:36.308457  5575 real_client.cpp:857] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0725 03:23:36.314365  5575 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d300000000
+I0725 03:23:36.314495  5575 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:36 [pool_worker.py:394] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:36 [worker.py:591] Available KV cache memory: 21.55 GiB
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:36 [kv_cache_utils.py:2146] GPU KV cache size: 743,808 tokens
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:36 [kv_cache_utils.py:2147] Maximum concurrency for 65,536 tokens per request: 11.35x
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:36 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp0
+(Worker_DP0_TP1 pid=5631) WARNING 07-25 03:23:36 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:36 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:36 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp0
+(Worker_DP0_TP0 pid=5574) WARNING 07-25 03:23:36 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:36 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:36.766135  5631 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:36.766285  5631 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:36.766305  5631 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:36.766361  5631 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:15702
+I0725 03:23:36.766517  5631 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:15702
+I0725 03:23:36.766530  5631 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:36.766537  5631 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:36.766541  5631 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:36.766584  5631 utils.cpp:219] Find available between 20500 and 20600
+I0725 03:23:36.768169  5631 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:36.768193  5631 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:36.768198  5631 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:36.771703  5574 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:36.771843  5574 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:36.771864  5574 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:36.771919  5574 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:16434
+I0725 03:23:36.772130  5574 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:16434
+I0725 03:23:36.772143  5574 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:36.772150  5574 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:36.772154  5574 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:36.772223  5574 utils.cpp:219] Find available between 20000 and 20100
+I0725 03:23:36.775803  5574 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:36.775875  5574 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:36.775882  5574 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0725 03:23:36.777962  5631 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20600, pid:5631
+I0725 03:23:36.787359  5574 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20091, pid:5574
+I0725 03:23:36.802543  5631 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:36.802608  5631 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0725 03:23:36.806648  5631 client_service.cpp:287] client_id=8594849888216540687-13747225526227837314
+I0725 03:23:36.806679  5631 client_service.cpp:289] client_id=8594849888216540687-13747225526227837314, host_id=10.250.40.164
+I0725 03:23:36.806685  5631 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:36.809530  5631 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:36.809548  5631 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0725 03:23:36.810894  5631 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:36.810925  5631 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:36.810933  5631 real_client.cpp:857] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0725 03:23:36.812032  5574 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:36.812069  5574 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0725 03:23:36.815455  5574 client_service.cpp:287] client_id=18251126416005739285-11988657202116500912
+I0725 03:23:36.815500  5574 client_service.cpp:289] client_id=18251126416005739285-11988657202116500912, host_id=10.250.40.164
+I0725 03:23:36.815505  5574 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:36.816588  5631 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d300000000
+I0725 03:23:36.816705  5631 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+I0725 03:23:36.818796  5574 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:36.818825  5574 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:36 [pool_worker.py:394] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+I0725 03:23:36.820086  5574 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:36.820107  5574 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:36.820115  5574 real_client.cpp:857] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0725 03:23:36.825897  5574 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d300000000
+I0725 03:23:36.826009  5574 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:36 [pool_worker.py:394] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:37 [pool_worker.py:742] num_blocks: 5811
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 512])
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 64])
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:37 [pool_worker.py:761] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([5811, 128, 1, 512])
+I0725 03:23:37.008280  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb65000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008376  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb92800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008426  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb98400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008466  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbc5e00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008500  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbcba00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008538  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbf9200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008596  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbff000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008636  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc2c800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008670  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc32400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008718  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5fc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008752  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc65a00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008792  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc93200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008837  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc98e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008873  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccc6800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008912  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cccc400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.008953  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccf9c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.008991  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccffa00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009027  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd2d200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009069  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd32e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009104  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd60600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009136  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd66400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009178  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009212  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd99800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009245  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdc7200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009287  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdcce00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009341  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdfa600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009377  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce00400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009420  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2dc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009455  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce33800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009490  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce61000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009537  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce66e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009575  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009610  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce9a200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009646  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec7c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009681  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009716  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cefb000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009780  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf00e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009816  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf2e600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009855  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009898  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf61a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.009933  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf67800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.009974  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf95000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010013  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ac00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010049  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc8600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010083  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfce200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010143  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cffba00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010195  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d001800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010233  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d02f000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010275  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d034c00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010316  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d062400000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010360  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d068200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010412  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d095a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.010452  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d09b600000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.010491  5630 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c9000000, length:95207424, mem type:device, engine index:0
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:37 [pool_worker.py:742] num_blocks: 5811
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 512])
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 64])
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:37 [pool_worker.py:761] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([5811, 128, 1, 512])
+I0725 03:23:37.033424  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb65000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033502  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb92800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033543  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb98400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033581  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbc5e00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033619  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbcba00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033654  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbf9200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033696  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbff000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033731  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc2c800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033766  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc32400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033803  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5fc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033836  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc65a00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033872  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc93200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033908  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc98e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.033941  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccc6800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.033972  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cccc400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034009  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccf9c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034041  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccffa00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034072  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd2d200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034109  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd32e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034178  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd60600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034221  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd66400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034257  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034291  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd99800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034322  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdc7200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034363  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdcce00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034399  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdfa600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034431  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce00400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034484  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2dc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034519  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce33800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034552  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce61000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034585  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce66e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034618  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034650  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce9a200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034687  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec7c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034723  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034757  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cefb000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034797  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf00e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034835  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf2e600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034869  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034904  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf61a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.034936  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf67800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.034970  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf95000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035009  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ac00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035043  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc8600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035075  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfce200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035126  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cffba00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035166  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d001800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035202  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d02f000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035239  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d034c00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035279  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d062400000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035315  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d068200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035358  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d095a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.035394  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d09b600000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.035429  5575 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c9000000, length:95207424, mem type:device, engine index:0
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:37 [pool_worker.py:742] num_blocks: 5811
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 512])
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 64])
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:37 [pool_worker.py:761] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([5811, 128, 1, 512])
+I0725 03:23:37.734431  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb65000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734508  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb92800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734551  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb98400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734588  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbc5e00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734624  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbcba00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734659  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbf9200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734699  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbff000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734735  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc2c800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734772  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc32400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734813  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5fc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734849  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc65a00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734887  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc93200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.734923  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc98e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.734959  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccc6800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735014  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cccc400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735056  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccf9c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735092  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccffa00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735127  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd2d200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735169  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd32e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735204  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd60600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735239  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd66400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735272  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735304  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd99800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735337  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdc7200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735373  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdcce00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735405  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdfa600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735442  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce00400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735482  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2dc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735515  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce33800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735548  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce61000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735582  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce66e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735617  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735654  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce9a200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735693  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec7c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735726  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735762  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cefb000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735800  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf00e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735836  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf2e600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735872  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735913  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf61a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.735947  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf67800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.735980  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf95000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736019  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ac00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736055  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc8600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736090  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfce200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736135  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cffba00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736171  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d001800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736205  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d02f000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736246  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d034c00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736284  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d062400000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736322  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d068200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736359  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d095a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.736395  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d09b600000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.736431  5631 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c9000000, length:95207424, mem type:device, engine index:0
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:37 [worker.py:765] Free memory on device (29.14/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 4.35 GiB for weights, 0.11 GiB for peak activation, 0.54 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=22979535974` (21.4 GiB) to fit into requested memory, or `--kv-cache-memory=25770266112` (24.0 GiB) to fully utilize NPU free memory. Current KV cache memory: 21.55 GiB. After warmup: torch reserved memory 26.19 GiB, torch allocated memory 26.14 GiB.
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:37 [worker.py:765] Free memory on device (29.14/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 4.35 GiB for weights, 0.11 GiB for peak activation, 0.54 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=22979695718` (21.4 GiB) to fit into requested memory, or `--kv-cache-memory=25770528256` (24.0 GiB) to fully utilize NPU free memory. Current KV cache memory: 21.55 GiB. After warmup: torch reserved memory 26.19 GiB, torch allocated memory 26.14 GiB.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:37 [pool_worker.py:742] num_blocks: 5811
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 512])
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:37 [pool_worker.py:747] block_shape: torch.Size([128, 1, 64])
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:37 [pool_worker.py:761] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([5811, 128, 1, 512])
+I0725 03:23:37.765791  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb65000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.765867  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb92800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.765913  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cb98400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.765949  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbc5e00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.765987  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbcba00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766024  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbf9200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766068  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cbff000000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766105  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc2c800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766161  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc32400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766212  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5fc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766248  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc65a00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766287  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc93200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766327  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc98e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766363  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccc6800000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766397  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cccc400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766438  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccf9c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766472  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccffa00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766507  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd2d200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766551  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd32e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766585  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd60600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766618  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd66400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766651  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766685  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd99800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766721  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdc7200000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766763  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdcce00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766801  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdfa600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766849  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce00400000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766892  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2dc00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.766929  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce33800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.766963  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce61000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767005  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce66e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767045  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767082  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce9a200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767122  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec7c00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767158  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767197  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cefb000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767251  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf00e00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767293  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf2e600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767333  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767376  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf61a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767416  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf67800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767452  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf95000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767488  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ac00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767522  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc8600000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767560  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfce200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767599  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cffba00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767637  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d001800000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767675  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d02f000000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767727  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d034c00000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767766  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d062400000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767805  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d068200000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767853  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d095a00000, length:95207424, mem type:device, engine index:0
+I0725 03:23:37.767891  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d09b600000, length:761659392, mem type:device, engine index:0
+I0725 03:23:37.767927  5574 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c9000000, length:95207424, mem type:device, engine index:0
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:37 [worker.py:765] Free memory on device (29.14/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 4.35 GiB for weights, 0.11 GiB for peak activation, 0.54 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=22981207142` (21.4 GiB) to fit into requested memory, or `--kv-cache-memory=25770024448` (24.0 GiB) to fully utilize NPU free memory. Current KV cache memory: 21.55 GiB. After warmup: torch reserved memory 26.19 GiB, torch allocated memory 26.14 GiB.
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:37 [worker.py:765] Free memory on device (29.14/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 4.35 GiB for weights, 0.11 GiB for peak activation, 0.54 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=22980101222` (21.4 GiB) to fit into requested memory, or `--kv-cache-memory=25770130944` (24.0 GiB) to fully utilize NPU free memory. Current KV cache memory: 21.55 GiB. After warmup: torch reserved memory 26.19 GiB, torch allocated memory 26.14 GiB.
+(Worker_DP1_TP0 pid=5575) INFO 07-25 03:23:39 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=0 visible_npus=[0, 1, 2, 3]
+(Worker_DP1_TP0 pid=5575) WARNING 07-25 03:23:39 [worker.py:777] Bind cpus failed in rank0: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(Worker_DP1_TP1 pid=5630) INFO 07-25 03:23:39 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=1 visible_npus=[0, 1, 2, 3]
+(Worker_DP1_TP1 pid=5630) WARNING 07-25 03:23:39 [worker.py:777] Bind cpus failed in rank1: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:39 [core.py:344] init engine (profile, create kv cache, warmup model) took 8.65 s
+(Worker_DP0_TP1 pid=5631) INFO 07-25 03:23:39 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=1 visible_npus=[0, 1, 2, 3]
+(Worker_DP0_TP1 pid=5631) WARNING 07-25 03:23:39 [worker.py:777] Bind cpus failed in rank1: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(Worker_DP0_TP0 pid=5574) INFO 07-25 03:23:39 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=0 visible_npus=[0, 1, 2, 3]
+(Worker_DP0_TP0 pid=5574) WARNING 07-25 03:23:39 [worker.py:777] Bind cpus failed in rank0: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:39 [core.py:344] init engine (profile, create kv cache, warmup model) took 9.76 s
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:40 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp0
+(EngineCore_DP0 pid=5502) WARNING 07-25 03:23:40 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:40 [pool_scheduler.py:161] KV pool page_size_bytes: 147456
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:41 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: dc6269a9-e4be-41f8-bef7-75fdd012f6f8-70aedaf35fb943e7bb683e981ec98786_dp1
+(EngineCore_DP1 pid=5531) WARNING 07-25 03:23:41 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:41 [pool_scheduler.py:161] KV pool page_size_bytes: 147456
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:42.662693  5502 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:42.662914  5502 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:42.662943  5502 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:42.663056  5502 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:15024
+I0725 03:23:42.663352  5502 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:15024
+I0725 03:23:42.663370  5502 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:42.663378  5502 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:42.663381  5502 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:42.663436  5502 utils.cpp:219] Find available between 20000 and 20100
+I0725 03:23:42.665925  5502 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:42.665948  5502 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:42.665954  5502 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0725 03:23:42.677035  5502 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20058, pid:5502
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0725 03:23:42.681059  5531 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0725 03:23:42.681221  5531 transfer_engine_impl.cpp:938] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0725 03:23:42.681241  5531 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.164 port: 12001
+I0725 03:23:42.681300  5531 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.164:16314
+I0725 03:23:42.681461  5531 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.164:16314
+I0725 03:23:42.681476  5531 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0725 03:23:42.681483  5531 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0725 03:23:42.681486  5531 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0725 03:23:42.681524  5531 utils.cpp:219] Find available between 20000 and 20100
+I0725 03:23:42.683380  5531 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0725 03:23:42.683413  5531 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0725 03:23:42.683418  5531 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0725 03:23:42.693194  5531 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.164:20030, pid:5531
+I0725 03:23:42.703301  5502 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:42.703369  5502 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0725 03:23:42.710207  5502 client_service.cpp:287] client_id=17386778451548211113-9560142970853457048
+I0725 03:23:42.710235  5502 client_service.cpp:289] client_id=17386778451548211113-9560142970853457048, host_id=10.250.40.164
+I0725 03:23:42.710242  5502 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:42.713130  5502 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:42.713150  5502 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0725 03:23:42.714486  5502 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:42.714533  5502 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:42.714542  5502 real_client.cpp:934] Global segment size is 0, skip mounting segment
+I0725 03:23:42.717338  5531 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0725 03:23:42.717372  5531 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0725 03:23:42.720808  5531 client_service.cpp:287] client_id=13279034202549147490-1270858469735892396
+I0725 03:23:42.720849  5531 client_service.cpp:289] client_id=13279034202549147490-1270858469735892396, host_id=10.250.40.164
+I0725 03:23:42.720855  5531 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0725 03:23:42.723639  5531 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0725 03:23:42.723698  5531 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0725 03:23:42.724994  5531 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0725 03:23:42.725023  5531 real_client.cpp:798] Local buffer size is 0, skip registering local memory
+I0725 03:23:42.725030  5531 real_client.cpp:934] Global segment size is 0, skip mounting segment
+INFO 07-25 03:23:43 [coordinator.py:249] All engine subscriptions received by DP coordinator
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [vllm.py:1006] Asynchronous scheduling is enabled.
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [vllm.py:1006] Asynchronous scheduling is enabled.
+(EngineCore_DP0 pid=5502) WARNING 07-25 03:23:43 [vllm.py:1062] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore_DP1 pid=5531) WARNING 07-25 03:23:43 [vllm.py:1062] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore_DP0 pid=5502) WARNING 07-25 03:23:43 [vllm.py:1110] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore_DP1 pid=5531) WARNING 07-25 03:23:43 [vllm.py:1110] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [kernel.py:276] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [kernel.py:276] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [vllm.py:1288] Cudagraph is disabled under eager mode
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [vllm.py:1288] Cudagraph is disabled under eager mode
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [ascend_config.py:811] Dynamic EPLB is False
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [ascend_config.py:812] The number of redundant experts is 0
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [ascend_config.py:811] Dynamic EPLB is False
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [ascend_config.py:812] The number of redundant experts is 0
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [platform.py:486] Compilation disabled, using eager mode by default
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [platform.py:770] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(EngineCore_DP1 pid=5531) INFO 07-25 03:23:43 [compilation.py:310] Enabled custom fusions: norm_quant, act_quant
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [platform.py:486] Compilation disabled, using eager mode by default
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [platform.py:770] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(EngineCore_DP0 pid=5502) INFO 07-25 03:23:43 [compilation.py:310] Enabled custom fusions: norm_quant, act_quant
+(APIServer pid=5433) INFO 07-25 03:23:43 [api_server.py:577] Supported tasks: ['generate']
+(APIServer pid=5433) WARNING 07-25 03:23:43 [model.py:1477] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.3, 'top_p': 0.95}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`.
+(APIServer pid=5433) INFO 07-25 03:23:44 [hf.py:548] Detected the chat template content format to be 'string'. You can set `--chat-template-content-format` to override this.
+(APIServer pid=5433) INFO 07-25 03:23:44 [api_server.py:581] Starting vLLM server on http://0.0.0.0:8100
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:37] Available routes are:
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /docs, Methods: GET, HEAD
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /load, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /version, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /health, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /metrics, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /tokenize, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /detokenize, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/models, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /ping, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /ping, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /invocations, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/chat/completions/batch, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/responses, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/responses/{response_id}, Methods: GET
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/completions, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/messages, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/messages/count_tokens, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /generative_scoring, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /inference/v1/generate, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /scale_elastic_ep, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /is_scaling_elastic_ep, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/chat/completions/render, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/completions/render, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/chat/completions/derender, Methods: POST
+(APIServer pid=5433) INFO 07-25 03:23:44 [launcher.py:46] Route: /v1/completions/derender, Methods: POST
+(APIServer pid=5433) INFO:     Started server process [5433]
+(APIServer pid=5433) INFO:     Waiting for application startup.
+(APIServer pid=5433) INFO:     Application startup complete.
+(APIServer pid=5433) INFO:     192.168.200.27:50574 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=5433) INFO:     127.0.0.1:44980 - "GET /v1/models HTTP/1.1" 200 OK
