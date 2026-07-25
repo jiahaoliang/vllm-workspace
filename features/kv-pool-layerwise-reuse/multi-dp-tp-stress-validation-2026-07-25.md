@@ -23,7 +23,9 @@ gate. This report therefore does not validate the 32K scenario.
 | runtime-contract correction | `2dc15c7` |
 | autonomous execution policy | `76213e5` |
 | Master readiness correction | `91f75ea` |
-| evidence commit | `4acd08cc90fa0aa78c1017c742c441f15bc20329` |
+| evidence archive commit | `4acd08cc90fa0aa78c1017c742c441f15bc20329` |
+| runtime log evidence commit | `7d093ea` |
+| public log tracking fix | `5853910` |
 | image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
 | image digest | `sha256:661c9bc2c50c1b7253d6f9ec7905cc83f49908ef8cb1919108a5ea828c2cff8d` |
 | image config ID | `sha256:a370384ab214665c3e6d7179aba82d0e5799a290a41370abe372b53f9593283d` |
