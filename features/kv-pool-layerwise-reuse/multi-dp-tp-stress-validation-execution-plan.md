@@ -21,6 +21,12 @@ that chunked Prefill emits one successful final-layer commit per chunk, not one 
 The pinned driver and checker requirements below incorporate that evidence; the final report must link the
 failed run and describe this correction.
 
+**Master readiness correction (2026-07-25):** Failed run `20260725T030454Z` reached a successful Mooncake
+Master rollout but its first Service metrics request received a transient connection refusal before endpoint
+propagation completed. No vLLM process or workload started, and the same endpoint returned HTTP 200 shortly
+afterward. `capture_metrics` therefore performs a bounded 60-second readiness retry before returning the
+complete metrics response. The downstream empty-pool and key-count assertions remain unchanged and strict.
+
 ## 1. Non-Negotiable Rules
 
 1. Work from `/root/ljh/vllm-workspace` unless a step explicitly changes directory.

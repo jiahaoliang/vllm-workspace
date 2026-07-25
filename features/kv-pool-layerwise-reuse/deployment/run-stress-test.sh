@@ -137,7 +137,22 @@ raise SystemExit(f"timeout waiting for {url}: {last}")' "${url}"
 
 capture_metrics() {
   collect "Mooncake metrics" "$1" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- python3 -c \
-    'from urllib.request import urlopen; print(urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode(),end="")'
+    'import time
+from urllib.request import urlopen
+url="http://mooncake-master-service:9003/metrics"
+deadline=time.monotonic()+60
+last=None
+while time.monotonic()<deadline:
+ try:
+  with urlopen(url,timeout=5) as response:
+   if response.status==200:
+    print(response.read().decode(),end="")
+    raise SystemExit(0)
+   last=RuntimeError(f"HTTP {response.status}")
+ except Exception as exc:
+  last=exc
+ time.sleep(0.5)
+raise SystemExit(f"timeout waiting for Mooncake metrics: {last}")'
 }
 
 wait_for_key_count() {
