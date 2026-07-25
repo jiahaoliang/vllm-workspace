@@ -78,6 +78,28 @@ def test_foreign_marker_is_rejected():
     assert foreign == ["S1_CASE_01"]
 
 
+@pytest.mark.parametrize("transfer", [None, {}])
+def test_decode_payload_omits_empty_transfer_like_proxy(transfer):
+    payload = {"model": "test", "prompt": [1, 2, 3]}
+    decoded, attached = stress.decode_payload_with_transfer(payload, transfer)
+    assert decoded == payload
+    assert "kv_transfer_params" not in decoded
+    assert attached is False
+
+
+def test_decode_payload_attaches_nonempty_transfer_like_proxy():
+    payload = {"model": "test", "prompt": [1, 2, 3]}
+    transfer = {"remote_block_ids": [1]}
+    decoded, attached = stress.decode_payload_with_transfer(payload, transfer)
+    assert decoded["kv_transfer_params"] == transfer
+    assert attached is True
+
+
+def test_decode_payload_rejects_non_object_transfer():
+    with pytest.raises(stress.ValidationError, match="invalid kv_transfer_params"):
+        stress.decode_payload_with_transfer({"prompt": [1]}, ["invalid"])
+
+
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value), encoding="utf-8")

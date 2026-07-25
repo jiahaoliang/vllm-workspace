@@ -12,6 +12,13 @@ must not invent a different topology, workload, artifact schema, cleanup policy,
 `DP=1/TP=2`, 16-way concurrency, 16K/32K prompts, runtime chunked prefill, and Mooncake ranged layerwise
 save/load. Publish all evidence and a step-by-step reproduction report to the control repo feature branch.
 
+**Runtime contract correction (2026-07-25):** Failed run `20260725T015720Z` proved that this KVPool path
+uses shared block hashes rather than response-carried PD metadata. The running proxy accepts
+`kv_transfer_params: null` from Prefill and sends Decode the original request body. The same run also proved
+that chunked Prefill emits one successful final-layer commit per chunk, not one commit per whole request.
+The pinned driver and checker requirements below incorporate that evidence; the final report must link the
+failed run and describe this correction.
+
 ## 1. Non-Negotiable Rules
 
 1. Work from `/root/ljh/vllm-workspace` unless a step explicitly changes directory.
@@ -351,8 +358,10 @@ For `pinned-load`:
 
 4. POST to Prefill with `X-Request-Id: stress-<scenario>-pinned-<case>` and the requested
    `X-data-parallel-rank`.
-5. Require HTTP 200 and a non-empty dictionary `kv_transfer_params` in the Prefill response.
-6. Copy the original, unmodified generation payload and attach the returned transfer params.
+5. Require HTTP 200. Accept `kv_transfer_params` as null, an empty dictionary, or a non-empty dictionary;
+   reject every other type. This matches the running proxy and is expected for shared-hash KVPool.
+6. Copy the original, unmodified generation payload. Attach the returned transfer params only when they are
+   a non-empty dictionary; otherwise send Decode the original payload without that field.
 7. POST to Decode with the same request ID and `X-data-parallel-rank: 0`.
 8. Persist both raw responses and the selected ranks.
 
@@ -436,13 +445,15 @@ Common ranged-event validation must reuse the field and return-code rules from
 `deployment/check-range-debug-log.py`:
 
 - range fields match exactly;
-- direction is save for Prefill and load for Decode;
+- Prefill permits ranged load of blocks committed by earlier chunks and ranged save of the current chunk;
+  Decode permits ranged load only;
 - `layer_id` is in `0..26`;
 - vector lengths equal `key_count`;
 - fragment sizes/offsets are non-negative integers;
 - requested bytes equal the fragment sum;
 - every result equals requested bytes;
-- Prefill commit is on layer 26, all results are zero, and follows the last save;
+- every Prefill chunk commit is on layer 26, all results are zero, and immediately follows that chunk's last
+  save; the sum of successful commit `key_count` values in a pinned window equals its cached block count;
 - Decode has no commit;
 - whole-key event count is zero.
 
@@ -495,6 +506,8 @@ request; do not require every range line itself to contain a DP rank.
 
 For S1, expected hit tokens are 16256 and minimum iterations are 16. For the S3 cold probe, expected hit
 tokens on Decode are 32640 and minimum iterations are 32; Prefill hit check must show `0/255` before save.
+Both pinned windows require Prefill ranged-load and ranged-save layer sets and the Decode ranged-load layer
+set to equal `0..26`. Multiple Prefill commits are required when multiple chunks save new blocks.
 
 `aggregate` inputs and checks:
 
@@ -651,6 +664,8 @@ Do not unit-test live HTTP or import torch/NPU in these tests.
   - whole-key event;
   - valid aggregate repeated layers from batching;
   - aggregate missing DP1 activity.
+  - null/empty/non-empty Prefill transfer metadata matching proxy behavior;
+  - valid multiple per-chunk commits and committed-key-count mismatch.
 
 ### Task 4: Implement Host Orchestration
 

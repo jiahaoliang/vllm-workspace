@@ -17,11 +17,11 @@ sys.modules[SPEC.name] = checker
 SPEC.loader.exec_module(checker)
 
 
-def range_event(role, layer, *, result=None):
+def range_event(role, layer, *, result=None, direction=None):
     requested = 8
     return {
         "event": "range",
-        "direction": "save" if role == "prefill" else "load",
+        "direction": direction or ("save" if role == "prefill" else "load"),
         "layer_id": layer,
         "key_count": 1,
         "requested_bytes": [requested],
@@ -31,10 +31,16 @@ def range_event(role, layer, *, result=None):
     }
 
 
-def ranged_lines(role, layers=3, commit=True):
-    lines = [f"x {checker.PREFIX} {json.dumps(range_event(role, layer))}" for layer in range(layers)]
+def ranged_lines(role, layers=3, commit=True, commit_key_count=2):
+    lines = []
+    if role == "prefill":
+        lines.extend(
+            f"x {checker.PREFIX} {json.dumps(range_event(role, layer, direction='load'))}"
+            for layer in range(layers)
+        )
+    lines.extend(f"x {checker.PREFIX} {json.dumps(range_event(role, layer))}" for layer in range(layers))
     if role == "prefill" and commit:
-        lines.append(f"x {checker.PREFIX} " + json.dumps({"event": "commit", "layer_id": layers - 1, "key_count": 1, "results": [0]}))
+        lines.append(f"x {checker.PREFIX} " + json.dumps({"event": "commit", "layer_id": layers - 1, "key_count": commit_key_count, "results": [0] * commit_key_count}))
     return lines
 
 
@@ -81,6 +87,30 @@ def test_pinned_too_few_iterations(tmp_path):
     args = pinned_args(tmp_path, [iteration(0, 16), "hit_blocks=0/2", *ranged_lines("prefill")], ["kvpool hit tokens: 256", *ranged_lines("decode")])
     assert checker.pinned(args) == 1
     assert "at least 2" in " ".join(json.loads(args.output.read_text())["errors"])
+
+
+def test_valid_pinned_allows_one_commit_per_chunk(tmp_path):
+    first = ranged_lines("prefill", commit_key_count=1)
+    second = ranged_lines("prefill", commit_key_count=1)
+    args = pinned_args(
+        tmp_path,
+        [iteration(0, 8), iteration(0, 8), "hit_blocks=0/2", *first, *second],
+        ["kvpool hit tokens: 256", *ranged_lines("decode")],
+    )
+    assert checker.pinned(args) == 0
+    summary = json.loads(args.output.read_text())
+    assert summary["checks"]["prefill_ranges"]["commit_event_count"] == 2
+    assert summary["checks"]["prefill_ranges"]["committed_key_count"] == 2
+
+
+def test_pinned_rejects_committed_key_count_mismatch(tmp_path):
+    args = pinned_args(
+        tmp_path,
+        [iteration(0, 8), iteration(0, 8), "hit_blocks=0/2", *ranged_lines("prefill", commit_key_count=1)],
+        ["kvpool hit tokens: 256", *ranged_lines("decode")],
+    )
+    assert checker.pinned(args) == 1
+    assert "committed key count expected 2" in " ".join(json.loads(args.output.read_text())["errors"])
 
 
 @pytest.mark.parametrize(

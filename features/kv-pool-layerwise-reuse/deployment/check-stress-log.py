@@ -76,9 +76,12 @@ def validate_range_event(event: dict[str, Any], role: str, layers: int, errors: 
     if fields != RANGE_FIELDS:
         errors.append(f"{role}:{line}: range fields mismatch: missing={sorted(RANGE_FIELDS-fields)} extra={sorted(fields-RANGE_FIELDS)}")
         return
-    direction = "save" if role == "prefill" else "load"
-    if event["direction"] != direction:
-        errors.append(f"{role}:{line}: expected direction={direction}, got {event['direction']!r}")
+    allowed_directions = {"save", "load"} if role == "prefill" else {"load"}
+    if event["direction"] not in allowed_directions:
+        errors.append(
+            f"{role}:{line}: expected direction in {sorted(allowed_directions)}, "
+            f"got {event['direction']!r}"
+        )
     if not is_int(event["layer_id"]) or not 0 <= event["layer_id"] < layers:
         errors.append(f"{role}:{line}: invalid layer_id={event['layer_id']!r}")
     count = event["key_count"]
@@ -119,8 +122,22 @@ def validate_events(events: list[dict[str, Any]], role: str, layers: int, errors
         else:
             errors.append(f"{role}:{event['_line']}: unknown event={kind!r}")
     actual_layers = {event.get("layer_id") for event in ranges if is_int(event.get("layer_id"))}
-    if actual_layers != set(range(layers)):
-        errors.append(f"{role}: layer set mismatch: expected={list(range(layers))} actual={sorted(actual_layers)}")
+    direction_layers = {
+        direction: {
+            event.get("layer_id")
+            for event in ranges
+            if event.get("direction") == direction and is_int(event.get("layer_id"))
+        }
+        for direction in ("save", "load")
+    }
+    required_directions = ("save", "load") if role == "prefill" else ("load",)
+    for direction in required_directions:
+        if direction_layers[direction] != set(range(layers)):
+            errors.append(
+                f"{role}: {direction} layer set mismatch: "
+                f"expected={list(range(layers))} "
+                f"actual={sorted(direction_layers[direction])}"
+            )
     if whole:
         errors.append(f"{role}: whole-key event count must be zero, got {len(whole)}")
     for event in whole:
@@ -128,6 +145,7 @@ def validate_events(events: list[dict[str, Any]], role: str, layers: int, errors
             errors.append(f"{role}:{event['_line']}: malformed whole-key event")
     if role == "decode" and commits:
         errors.append(f"decode: commit event count must be zero, got {len(commits)}")
+    committed_key_count = 0
     if role == "prefill":
         if not commits:
             errors.append("prefill: successful final commit is missing")
@@ -140,10 +158,16 @@ def validate_events(events: list[dict[str, Any]], role: str, layers: int, errors
                 errors.append(f"prefill:{event['_line']}: commit is not on final layer")
             if not is_int(count) or count <= 0 or not isinstance(results, list) or len(results) != count or not all(is_int(value) and value == 0 for value in results):
                 errors.append(f"prefill:{event['_line']}: commit result is not successful")
+            else:
+                committed_key_count += count
             preceding = [item for item in ranges if item["_line"] < event["_line"]]
-            if not preceding or preceding[-1].get("layer_id") != layers - 1:
+            if (
+                not preceding
+                or preceding[-1].get("direction") != "save"
+                or preceding[-1].get("layer_id") != layers - 1
+            ):
                 errors.append(f"prefill:{event['_line']}: commit does not immediately follow a final-layer save")
-    return {"event_count": len(events), "range_event_count": len(ranges), "range_layers": sorted(actual_layers), "commit_event_count": len(commits), "whole_key_event_count": len(whole)}
+    return {"event_count": len(events), "range_event_count": len(ranges), "range_layers": sorted(actual_layers), "save_layers": sorted(direction_layers["save"]), "load_layers": sorted(direction_layers["load"]), "commit_event_count": len(commits), "committed_key_count": committed_key_count, "whole_key_event_count": len(whole)}
 
 
 def real_context(iterations: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -228,10 +252,10 @@ def pinned(args: argparse.Namespace) -> int:
         "prefill_ranges": validate_events(prefill_events, "prefill", args.num_layers, errors),
         "decode_ranges": validate_events(decode_events, "decode", args.num_layers, errors),
     }
-    if checks["prefill_ranges"]["commit_event_count"] != 1:
+    if checks["prefill_ranges"]["committed_key_count"] != blocks:
         errors.append(
-            "prefill: pinned window requires exactly one commit, got "
-            f"{checks['prefill_ranges']['commit_event_count']}"
+            f"prefill: committed key count expected {blocks}, got "
+            f"{checks['prefill_ranges']['committed_key_count']}"
         )
     return output(args.output, "pinned", checks, errors)
 

@@ -25,6 +25,14 @@
 本轮不验证 PP、PCP、DCP、TP mismatch、multi-node DP，也不设置吞吐或 latency 的 pass/fail
 阈值。性能数据只作为后续比较基线。
 
+### 1.1 Runtime contract 修正（2026-07-25）
+
+失败 run `20260725T015720Z` 证明当前 `AscendStoreConnector + backend=mooncake + use_layerwise=true`
+使用共享 block hash KVPool，而不是依赖 Prefill response 携带 PD metadata：运行中的 proxy 在 Prefill
+返回 `kv_transfer_params: null` 时直接向 Decode 发送原始 request body。该 run 还证明 chunked
+Prefill 每个 chunk 分别执行 final-layer commit；16K case 的 16 次成功 commit 的 `key_count` 总和为
+127。后续 pinned driver 和 checker 按此真实合同执行，最终报告必须链接该失败 run 并说明修正。
+
 ## 2. 固定基线与当前环境
 
 | 输入 | 固定值 |
@@ -175,7 +183,8 @@ Fixture：
 2. 对每个请求记录 Prefill/Decode log 起始行号；
 3. 使用 `X-data-parallel-rank` 直接请求指定 Prefill rank，body 使用 proxy 相同的
    `kv_transfer_params` prefill contract；
-4. 将 Prefill 返回的 transfer params 放入原请求，直接请求 Decode rank 0；
+4. 与当前 proxy 保持一致：Prefill 仅在返回非空 transfer params 字典时才放入原请求；返回 null 或
+   空字典时直接用原始请求访问 Decode rank 0；
 5. 截取该请求专属 log line window 并运行严格 checker。
 
 通过条件：
@@ -186,8 +195,9 @@ Fixture：
 - 每个 Prefill window 至少有 16 个 non-dummy context iterations；
 - 每轮 context tokens 不超过 1024，累计 context tokens 等于该请求实际 prompt tokens；
 - range event 所属 `EngineCore_DP*` 与指定 Prefill rank 相同；
-- 每个 window 的 save/load layer set 都精确为 `0..26`，Prefill 有且仅有一个成功 final commit，
-  Decode 无 commit，whole-key event 为 0；
+- 每个 window 中 Prefill ranged-load/ranged-save 和 Decode ranged-load layer set 都精确为 `0..26`；
+  Prefill 每个 chunk commit 都成功、紧跟该 chunk 的 layer 26 save，commit `key_count` 总和等于
+  127；Decode 无 commit，whole-key event 为 0；
 - Decode 日志报告每个请求命中 16256 tokens；
 - 最终 Mooncake key union 为 `4 * 127 = 508`。
 

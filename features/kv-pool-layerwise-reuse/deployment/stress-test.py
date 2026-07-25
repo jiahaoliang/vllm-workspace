@@ -274,6 +274,21 @@ def requests_for(output: Path) -> list[dict[str, Any]]:
     return [load_json(output / path) for path in fixture["request_files"]]
 
 
+def decode_payload_with_transfer(
+    payload: dict[str, Any], transfer: Any
+) -> tuple[dict[str, Any], bool]:
+    """Mirror the proxy: attach only non-empty transfer metadata."""
+    decode_payload = dict(payload)
+    if transfer is None or transfer == {}:
+        return decode_payload, False
+    if not isinstance(transfer, dict):
+        raise ValidationError(
+            f"pinned prefill returned invalid kv_transfer_params: {type(transfer).__name__}"
+        )
+    decode_payload["kv_transfer_params"] = transfer
+    return decode_payload, True
+
+
 async def baseline_async(args: argparse.Namespace) -> None:
     import httpx
 
@@ -314,14 +329,13 @@ async def pinned_async(args: argparse.Namespace) -> None:
         atomic_json(args.output / "pinned" / f"case-{args.case_index:02d}-prefill.json", prefill_raw, refuse_existing=True)
         prefill_body = validate_raw(prefill_raw, "pinned prefill")
         transfer = prefill_body.get("kv_transfer_params")
-        if not isinstance(transfer, dict) or not transfer:
-            raise ValidationError("pinned prefill response lacks kv_transfer_params")
-        decode_payload = dict(payload)
-        decode_payload["kv_transfer_params"] = transfer
+        decode_payload, transfer_attached = decode_payload_with_transfer(
+            payload, transfer
+        )
         decode_raw = await post_one(client, f"{decode}/v1/completions", decode_payload, {"X-Request-Id": request_id, "X-data-parallel-rank": str(args.decode_rank)})
         atomic_json(args.output / "pinned" / f"case-{args.case_index:02d}-decode.json", decode_raw, refuse_existing=True)
         validate_raw(decode_raw, "pinned decode")
-    atomic_json(args.output / "pinned" / f"case-{args.case_index:02d}-metadata.json", {"request_id": request_id, "prefill_rank": args.prefill_rank, "decode_rank": args.decode_rank, "endpoints": endpoints}, refuse_existing=True)
+    atomic_json(args.output / "pinned" / f"case-{args.case_index:02d}-metadata.json", {"request_id": request_id, "prefill_rank": args.prefill_rank, "decode_rank": args.decode_rank, "transfer_params_attached": transfer_attached, "endpoints": endpoints}, refuse_existing=True)
     update_state(args.output, f"pinned-{args.case_index}", {"prefill_rank": args.prefill_rank, "decode_rank": args.decode_rank, "elapsed_seconds": time.time() - started})
 
 
