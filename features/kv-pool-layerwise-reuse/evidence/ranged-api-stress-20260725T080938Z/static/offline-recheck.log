@@ -1,0 +1,16 @@
++ python3 -m py_compile features/kv-pool-layerwise-reuse/deployment/stress-test.py features/kv-pool-layerwise-reuse/deployment/check-stress-log.py features/kv-pool-layerwise-reuse/deployment/tests/test_stress_test.py features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py
++ bash -n features/kv-pool-layerwise-reuse/deployment/run-stress-test.sh
++ jq -e ' .status == "passed" and .validated == true and .topology.validated == true and (.errors | length) == 0 ' /tmp/layerwise-stress-20260725T080938Z/overall-summary.json
+true
++ jq -e ' .validated == true and .marker_prefix_match_count == 4 and .isolated_count == 4 and .actual_key_count == 508 and all(.candidate.cases[]; .baseline.checks.validated and .candidate.checks.validated) ' /tmp/layerwise-stress-20260725T080938Z/s1-pinned-16k/artifacts/scenario-summary.json
+true
++ jq -e ' .validated == true and .marker_prefix_match_count == 16 and .isolated_count == 16 and .actual_key_count == 288 and .full_exact_match_count == 7 and all(.candidate.cases[]; .baseline.checks.validated and .candidate.checks.validated) ' /tmp/layerwise-stress-20260725T080938Z/s2-concurrent-16x8k/artifacts/scenario-summary.json
+true
++ jq -e ' .validated == true and .marker_prefix_match_count == 4 and .isolated_count == 4 and .actual_key_count == 348 and all(.candidate.cases[]; .baseline.checks.validated and .candidate.checks.validated) ' /tmp/layerwise-stress-20260725T080938Z/s3-concurrent-4x32k/artifacts/scenario-summary.json
+true
++ jq -e ' .validated == true and .checks.context_iteration_count == 32 and .checks.max_context_tokens_seen == 1024 and .checks.prefill_ranges.committed_key_count == 255 and .checks.prefill_ranges.whole_key_event_count == 0 and .checks.decode_ranges.whole_key_event_count == 0 ' /tmp/layerwise-stress-20260725T080938Z/s3-concurrent-4x32k/pinned-check.json
+true
++ jq -e ' .validated == true and .checks.active_prefill_dp_ranks == [0,1] and .checks.prefill_ranges.committed_key_count == 93 and .checks.prefill_ranges.whole_key_event_count == 0 and .checks.decode_ranges.whole_key_event_count == 0 ' /tmp/layerwise-stress-20260725T080938Z/s3-concurrent-4x32k/aggregate-check.json
+true
++ rg -n -i 'Traceback|out of memory|\bOOM\b|Internal server error|KV load failure|HTTP/1\.1" 500|"results":\[-' /tmp/layerwise-stress-20260725T080938Z --glob '*.log'
++ git diff --check

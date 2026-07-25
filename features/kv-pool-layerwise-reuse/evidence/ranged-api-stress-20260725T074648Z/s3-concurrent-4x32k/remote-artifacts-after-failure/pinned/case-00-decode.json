@@ -1,0 +1,13 @@
+{
+  "body": {
+    "error": {
+      "code": 500,
+      "message": "Internal server error",
+      "param": null,
+      "type": "InternalServerError"
+    }
+  },
+  "elapsed_seconds": 5.2161078453063965,
+  "error": null,
+  "status_code": 500
+}

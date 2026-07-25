@@ -1,0 +1,23 @@
+{
+  "actions": {
+    "baseline": {
+      "count": 4,
+      "elapsed_seconds": 27.508724689483643,
+      "errors": []
+    },
+    "pinned-0": {
+      "decode_rank": 0,
+      "elapsed_seconds": 97.83903288841248,
+      "prefill_rank": 0
+    },
+    "prepare": {
+      "fixture": "fixture.json"
+    },
+    "proxy-load": {
+      "count": 4,
+      "elapsed_seconds": 56.28194499015808,
+      "errors": []
+    }
+  },
+  "schema_version": 1
+}

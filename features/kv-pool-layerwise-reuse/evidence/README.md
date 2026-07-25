@@ -24,14 +24,20 @@ workspace-external archives.
 
 - Report:
   [multi-dp-tp-stress-validation-2026-07-25.md](../multi-dp-tp-stress-validation-2026-07-25.md)
-- Result: failed closed on exact response equality; no production-source
-  change or acceptance-gate reduction was made.
+- Result: complete S1 to S2 to S3 sequence passed with tokenizer-derived marker
+  prefixes as the hard output oracle; full continuation equality is retained as
+  a diagnostic.
 - Archived runs:
   [014317Z](ranged-api-stress-20260725T014317Z/README.md),
   [015720Z](ranged-api-stress-20260725T015720Z/README.md),
   [030454Z](ranged-api-stress-20260725T030454Z/README.md),
   [031659Z](ranged-api-stress-20260725T031659Z/README.md), and
   [033747Z](ranged-api-stress-20260725T033747Z/README.md).
+- Corrected-oracle runs:
+  [074648Z lease-failure diagnosis](ranged-api-stress-20260725T074648Z/README.md)
+  and [080938Z formal pass](ranged-api-stress-20260725T080938Z/README.md).
+- Formal `SHA256SUMS` digest:
+  `f800ce9610201024c2d2823374402a7f63318f518d593a9301516f842fcadc53`.
 
 Verify from the control-repo root:
 

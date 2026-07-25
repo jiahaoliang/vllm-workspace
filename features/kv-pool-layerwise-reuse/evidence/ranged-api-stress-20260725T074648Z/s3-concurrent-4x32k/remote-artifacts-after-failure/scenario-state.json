@@ -1,0 +1,13 @@
+{
+  "actions": {
+    "baseline": {
+      "count": 4,
+      "elapsed_seconds": 26.99964666366577,
+      "errors": []
+    },
+    "prepare": {
+      "fixture": "fixture.json"
+    }
+  },
+  "schema_version": 1
+}

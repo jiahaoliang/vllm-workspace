@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "baseline": {
+      "count": 4,
+      "elapsed_seconds": 15.582358121871948,
+      "errors": []
+    },
+    "pinned-0": {
+      "decode_rank": 0,
+      "elapsed_seconds": 29.560041904449463,
+      "prefill_rank": 0
+    },
+    "pinned-1": {
+      "decode_rank": 0,
+      "elapsed_seconds": 28.970952033996582,
+      "prefill_rank": 1
+    },
+    "pinned-2": {
+      "decode_rank": 0,
+      "elapsed_seconds": 30.183166027069092,
+      "prefill_rank": 0
+    },
+    "prepare": {
+      "fixture": "fixture.json"
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,2 @@
+stress-test pinned-load failed: ValidationError: pinned decode: HTTP 500
+command terminated with exit code 1

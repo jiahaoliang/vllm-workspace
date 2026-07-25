@@ -1,0 +1,19 @@
+{
+  "status": "ok",
+  "prefill_nodes": [
+    {
+      "endpoint": "http://10.250.40.164:8100",
+      "host": "10.250.40.164",
+      "port": 8100,
+      "active_tokens": -1.1368683772161603e-13
+    }
+  ],
+  "decode_nodes": [
+    {
+      "endpoint": "http://10.250.40.186:8200",
+      "host": "10.250.40.186",
+      "port": 8200,
+      "active_tokens": 0.0
+    }
+  ]
+}

@@ -1,0 +1,817 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 01:46 ?        00:00:00 sleep infinity
+root         280       1  0 01:58 ?        00:00:27 [python3] <defunct>
+root         424       1  0 01:59 ?        00:01:09 [VLLM::Worker_DP] <defunct>
+root         425       1  0 01:59 ?        00:01:53 [VLLM::Worker_DP] <defunct>
+root         472       1  0 02:00 ?        00:01:17 [VLLM::Worker_DP] <defunct>
+root         473       1  0 02:00 ?        00:01:44 [VLLM::Worker_DP] <defunct>
+root         777       1  0 02:00 ?        00:00:18 [python3] <defunct>
+root         778       1  0 02:00 ?        00:00:18 [python3] <defunct>
+root         779       1  0 02:00 ?        00:00:18 [python3] <defunct>
+root         780       1  0 02:00 ?        00:00:18 [python3] <defunct>
+root         975       1  0 02:01 ?        00:00:00 [python3] <defunct>
+root         983       1  0 02:01 ?        00:00:00 [python3] <defunct>
+root         985       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root         986       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root         987       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         988       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         989       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         990       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         991       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         992       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         993       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         994       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         995       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         996       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root         997       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root         998       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root         999       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1000       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1001       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1002       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1057       1  0 02:01 ?        00:00:00 [python3] <defunct>
+root        1058       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1059       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1060       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1061       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1062       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1063       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1064       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1065       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1066       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1067       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1068       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1069       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1070       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1071       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1072       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1073       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1074       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1075       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1076       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1077       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1078       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1079       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1080       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1081       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1082       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1137       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1138       1  0 02:01 ?        00:00:00 [python3] <defunct>
+root        1139       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1140       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1141       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1142       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1143       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1144       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1145       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1146       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1147       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1148       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1149       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1150       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1151       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1152       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1153       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1154       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1155       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1156       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1157       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1158       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1159       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1160       1  0 02:01 ?        00:00:04 [python3] <defunct>
+root        1161       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        1162       1  0 02:01 ?        00:00:03 [python3] <defunct>
+root        5433       1  0 03:20 ?        00:00:25 [python3] <defunct>
+root        5574       1  0 03:22 ?        00:03:00 [VLLM::Worker_DP] <defunct>
+root        5575       1  1 03:22 ?        00:03:04 [VLLM::Worker_DP] <defunct>
+root        5630       1  1 03:22 ?        00:03:08 [VLLM::Worker_DP] <defunct>
+root        5631       1  0 03:22 ?        00:03:00 [VLLM::Worker_DP] <defunct>
+root        5925       1  0 03:23 ?        00:00:18 [python3] <defunct>
+root        5926       1  0 03:23 ?        00:00:18 [python3] <defunct>
+root        5927       1  0 03:23 ?        00:00:18 [python3] <defunct>
+root        5928       1  0 03:23 ?        00:00:17 [python3] <defunct>
+root        6076       1  0 03:23 ?        00:00:00 [python3] <defunct>
+root        6079       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6080       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6081       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6082       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6083       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6084       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6085       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6086       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6087       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6088       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6089       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6090       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6091       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6092       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6093       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6094       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6095       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6150       1  0 03:23 ?        00:00:00 [python3] <defunct>
+root        6171       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6175       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6176       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6179       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6182       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6183       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6185       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6188       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6190       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6214       1  0 03:23 ?        00:00:00 [python3] <defunct>
+root        6215       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6216       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6217       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6218       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6219       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6220       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6221       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6222       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6223       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6266       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6269       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6271       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6273       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6275       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6277       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6279       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6281       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6286       1  0 03:23 ?        00:00:00 [python3] <defunct>
+root        6287       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6288       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6289       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6290       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6291       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6292       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6293       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6294       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6295       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6296       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6297       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6298       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6299       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6300       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6301       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6302       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6303       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6304       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6305       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6306       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6307       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6308       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root        6309       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6310       1  0 03:23 ?        00:00:03 [python3] <defunct>
+root        6311       1  0 03:23 ?        00:00:04 [python3] <defunct>
+root       10269       1  0 03:28 ?        00:00:25 [python3] <defunct>
+root       10410       1  0 03:29 ?        00:02:26 [VLLM::Worker_DP] <defunct>
+root       10411       1  0 03:29 ?        00:02:27 [VLLM::Worker_DP] <defunct>
+root       10460       1  0 03:30 ?        00:02:35 [VLLM::Worker_DP] <defunct>
+root       10461       1  0 03:30 ?        00:02:29 [VLLM::Worker_DP] <defunct>
+root       10756       1  0 03:30 ?        00:00:18 [python3] <defunct>
+root       10757       1  0 03:30 ?        00:00:18 [python3] <defunct>
+root       10758       1  0 03:30 ?        00:00:18 [python3] <defunct>
+root       10759       1  0 03:30 ?        00:00:18 [python3] <defunct>
+root       10908       1  0 03:31 ?        00:00:00 [python3] <defunct>
+root       10963       1  0 03:31 ?        00:00:00 [python3] <defunct>
+root       10971       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       10974       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10977       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10981       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10984       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10987       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10990       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       10994       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       10997       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11027       1  0 03:31 ?        00:00:00 [python3] <defunct>
+root       11038       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11042       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11044       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11046       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11048       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11050       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11053       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11057       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11059       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11091       1  0 03:31 ?        00:00:00 [python3] <defunct>
+root       11092       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11093       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11094       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11095       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11096       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11097       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11098       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11099       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11100       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11101       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11102       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11103       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11104       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11105       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11106       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11107       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11108       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11109       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11110       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11111       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11112       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11113       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11114       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11115       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11116       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11117       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11118       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11119       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11120       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11121       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11122       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11123       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11124       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11125       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11126       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11127       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11128       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11129       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11130       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11131       1  0 03:31 ?        00:00:03 [python3] <defunct>
+root       11132       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11133       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11134       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11135       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11136       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11137       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11138       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11139       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11140       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       11141       1  0 03:31 ?        00:00:04 [python3] <defunct>
+root       15056       1  0 03:38 ?        00:00:25 [python3] <defunct>
+root       15193       1  1 03:40 ?        00:02:53 [VLLM::Worker_DP] <defunct>
+root       15196       1  1 03:40 ?        00:02:57 [VLLM::Worker_DP] <defunct>
+root       15243       1  1 03:40 ?        00:02:57 [VLLM::Worker_DP] <defunct>
+root       15244       1  1 03:40 ?        00:03:01 [VLLM::Worker_DP] <defunct>
+root       15539       1  0 03:41 ?        00:00:18 [python3] <defunct>
+root       15540       1  0 03:41 ?        00:00:18 [python3] <defunct>
+root       15541       1  0 03:41 ?        00:00:18 [python3] <defunct>
+root       15542       1  0 03:41 ?        00:00:18 [python3] <defunct>
+root       15690       1  0 03:41 ?        00:00:00 [python3] <defunct>
+root       15691       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15692       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15693       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15694       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15695       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15696       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15697       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15698       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15699       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15755       1  0 03:41 ?        00:00:00 [python3] <defunct>
+root       15756       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15757       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15758       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15759       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15760       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15761       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15762       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15763       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15764       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15765       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15766       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15767       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15768       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15769       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15770       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15771       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15772       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15827       1  0 03:41 ?        00:00:00 [python3] <defunct>
+root       15828       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15829       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15830       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15831       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15832       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15833       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15834       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15835       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15836       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15837       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15838       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15839       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15840       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15841       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15842       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15843       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15844       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15899       1  0 03:41 ?        00:00:00 [python3] <defunct>
+root       15900       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15901       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15902       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15903       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15904       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15905       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15906       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15907       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15908       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15909       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15910       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15911       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15912       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15913       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15914       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15915       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15916       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15917       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15918       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15919       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15920       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15921       1  0 03:41 ?        00:00:03 [python3] <defunct>
+root       15922       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15923       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       15924       1  0 03:41 ?        00:00:04 [python3] <defunct>
+root       20619       1  1 07:47 ?        00:00:26 [python3] <defunct>
+root       20761       1  8 07:49 ?        00:03:08 [VLLM::Worker_DP] <defunct>
+root       20762       1  7 07:49 ?        00:03:01 [VLLM::Worker_DP] <defunct>
+root       20810       1  8 07:49 ?        00:03:06 [VLLM::Worker_DP] <defunct>
+root       20811       1  7 07:49 ?        00:03:03 [VLLM::Worker_DP] <defunct>
+root       21107       1  0 07:50 ?        00:00:18 [python3] <defunct>
+root       21108       1  0 07:50 ?        00:00:18 [python3] <defunct>
+root       21109       1  0 07:50 ?        00:00:19 [python3] <defunct>
+root       21110       1  0 07:50 ?        00:00:18 [python3] <defunct>
+root       21259       1  0 07:50 ?        00:00:00 [python3] <defunct>
+root       21314       1  0 07:50 ?        00:00:00 [python3] <defunct>
+root       21315       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21316       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21317       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21318       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21319       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21320       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21321       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21322       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21323       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21324       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21325       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21326       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21327       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21328       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21329       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21330       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21331       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21332       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21333       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21334       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21335       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21336       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21337       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21338       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21339       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21340       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21341       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21342       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21343       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21344       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21345       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21346       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21347       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21348       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21403       1  0 07:50 ?        00:00:00 [python3] <defunct>
+root       21404       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21405       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21406       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21407       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21408       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21409       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21410       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21411       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21412       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21467       1  0 07:50 ?        00:00:00 [python3] <defunct>
+root       21468       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21469       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21470       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21471       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21472       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21473       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21474       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21475       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21476       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21477       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21478       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21479       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21480       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21481       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21482       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21483       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21484       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21485       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21486       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21487       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21488       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21489       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21490       1  0 07:50 ?        00:00:04 [python3] <defunct>
+root       21491       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       21492       1  0 07:50 ?        00:00:03 [python3] <defunct>
+root       25402       1  1 07:53 ?        00:00:25 [python3] <defunct>
+root       25544       1  7 07:55 ?        00:02:23 [VLLM::Worker_DP] <defunct>
+root       25545       1  7 07:55 ?        00:02:27 [VLLM::Worker_DP] <defunct>
+root       25593       1  7 07:55 ?        00:02:29 [VLLM::Worker_DP] <defunct>
+root       25594       1  7 07:55 ?        00:02:27 [VLLM::Worker_DP] <defunct>
+root       25888       1  0 07:56 ?        00:00:18 [python3] <defunct>
+root       25889       1  1 07:56 ?        00:00:19 [python3] <defunct>
+root       25890       1  0 07:56 ?        00:00:18 [python3] <defunct>
+root       25891       1  1 07:56 ?        00:00:19 [python3] <defunct>
+root       26038       1  0 07:56 ?        00:00:00 [python3] <defunct>
+root       26039       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26040       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26041       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26042       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26043       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26044       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26045       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26046       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26047       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26102       1  0 07:56 ?        00:00:00 [python3] <defunct>
+root       26103       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26104       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26105       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26106       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26107       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26108       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26109       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26110       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26111       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26112       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26113       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26114       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26115       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26116       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26117       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26118       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26119       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26175       1  0 07:56 ?        00:00:00 [python3] <defunct>
+root       26176       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26177       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26178       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26179       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26180       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26181       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26182       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26183       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26184       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26185       1  0 07:56 ?        00:00:04 [python3] <defunct>
+root       26186       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26187       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26188       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26189       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26190       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26191       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26192       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26193       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26194       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26195       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26196       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26197       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26198       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26199       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26200       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26255       1  0 07:56 ?        00:00:00 [python3] <defunct>
+root       26256       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26257       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26258       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26259       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26260       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26261       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26262       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26263       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26264       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26286       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26287       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26288       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26289       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26290       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26291       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26292       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       26293       1  0 07:56 ?        00:00:03 [python3] <defunct>
+root       30049       1  1 07:58 ?        00:00:25 [python3] <defunct>
+root       30191       1  4 08:00 ?        00:01:21 [VLLM::Worker_DP] <defunct>
+root       30193       1 14 08:00 ?        00:04:00 [VLLM::Worker_DP] <defunct>
+root       30242       1 12 08:00 ?        00:03:30 [VLLM::Worker_DP] <defunct>
+root       30243       1  6 08:00 ?        00:01:43 [VLLM::Worker_DP] <defunct>
+root       30538       1  1 08:01 ?        00:00:18 [python3] <defunct>
+root       30539       1  1 08:01 ?        00:00:18 [python3] <defunct>
+root       30540       1  1 08:01 ?        00:00:18 [python3] <defunct>
+root       30541       1  1 08:01 ?        00:00:18 [python3] <defunct>
+root       30691       1  0 08:01 ?        00:00:00 [python3] <defunct>
+root       30692       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30693       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30694       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30695       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30696       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30697       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30698       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30699       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30700       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30755       1  0 08:01 ?        00:00:00 [python3] <defunct>
+root       30756       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30757       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30758       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30759       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30760       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30761       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30762       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30763       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30764       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30765       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30766       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30767       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30768       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30769       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30770       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30771       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30772       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30837       1  0 08:01 ?        00:00:00 [python3] <defunct>
+root       30882       1  0 08:01 ?        00:00:00 [python3] <defunct>
+root       30883       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30884       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30885       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30886       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30887       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30888       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30889       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30890       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30891       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30892       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30893       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30894       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30895       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30896       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30897       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30898       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30899       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30900       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30901       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30902       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30903       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30904       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30905       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30906       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30907       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30908       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30909       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30910       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30911       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30912       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30913       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30914       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30915       1  0 08:01 ?        00:00:03 [python3] <defunct>
+root       30916       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30917       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30918       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30919       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30920       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30921       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30922       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30923       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       30924       1  0 08:01 ?        00:00:04 [python3] <defunct>
+root       34662       1  2 08:10 ?        00:00:25 [python3] <defunct>
+root       34805       1 19 08:12 ?        00:03:05 [VLLM::Worker_DP] <defunct>
+root       34808       1 18 08:12 ?        00:02:57 [VLLM::Worker_DP] <defunct>
+root       34857       1 19 08:12 ?        00:03:05 [VLLM::Worker_DP] <defunct>
+root       34858       1 19 08:12 ?        00:03:04 [VLLM::Worker_DP] <defunct>
+root       35153       1  2 08:13 ?        00:00:18 [python3] <defunct>
+root       35154       1  2 08:13 ?        00:00:18 [python3] <defunct>
+root       35155       1  2 08:13 ?        00:00:18 [python3] <defunct>
+root       35156       1  2 08:13 ?        00:00:18 [python3] <defunct>
+root       35305       1  0 08:13 ?        00:00:00 [python3] <defunct>
+root       35323       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35328       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35331       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35335       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35338       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35342       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35345       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35348       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35352       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35369       1  0 08:13 ?        00:00:00 [python3] <defunct>
+root       35370       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35371       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35372       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35373       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35374       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35375       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35376       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35377       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35378       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35433       1  0 08:13 ?        00:00:00 [python3] <defunct>
+root       35434       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35435       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35436       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35437       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35438       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35439       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35440       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35441       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35442       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35443       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35444       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35445       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35446       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35447       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35448       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35449       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35450       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35468       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35470       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35472       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35475       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35478       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35480       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35483       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35485       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35513       1  0 08:13 ?        00:00:00 [python3] <defunct>
+root       35514       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35515       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35516       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35517       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35518       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35519       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35520       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35521       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35522       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35523       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35524       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35525       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35526       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35527       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35528       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35529       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35530       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35531       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35532       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35533       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35534       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35535       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       35536       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35537       1  0 08:13 ?        00:00:03 [python3] <defunct>
+root       35538       1  0 08:13 ?        00:00:04 [python3] <defunct>
+root       39446       1  3 08:16 ?        00:00:25 [python3] <defunct>
+root       39591       1 24 08:18 ?        00:02:24 [VLLM::Worker_DP] <defunct>
+root       39592       1 25 08:18 ?        00:02:30 [VLLM::Worker_DP] <defunct>
+root       39638       1 25 08:18 ?        00:02:26 [VLLM::Worker_DP] <defunct>
+root       39646       1 26 08:18 ?        00:02:30 [VLLM::Worker_DP] <defunct>
+root       39935       1  3 08:19 ?        00:00:18 [python3] <defunct>
+root       39936       1  3 08:19 ?        00:00:18 [python3] <defunct>
+root       39937       1  3 08:19 ?        00:00:18 [python3] <defunct>
+root       39938       1  3 08:19 ?        00:00:18 [python3] <defunct>
+root       40085       1  0 08:19 ?        00:00:00 [python3] <defunct>
+root       40086       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40087       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40088       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40089       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40090       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40091       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40092       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40093       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40094       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40149       1  0 08:19 ?        00:00:00 [python3] <defunct>
+root       40151       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40152       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40153       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40154       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40155       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40156       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40157       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40158       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40159       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40160       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40161       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40162       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40163       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40164       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40165       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40166       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40167       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40168       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40169       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40170       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40171       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40172       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40173       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40174       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40175       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40230       1  0 08:19 ?        00:00:00 [python3] <defunct>
+root       40231       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40232       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40233       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40234       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40235       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40236       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40237       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40238       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40239       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40294       1  0 08:19 ?        00:00:00 [python3] <defunct>
+root       40295       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40296       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40297       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40298       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40299       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40300       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40301       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40302       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40303       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40304       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40305       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40306       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40307       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40308       1  0 08:19 ?        00:00:04 [python3] <defunct>
+root       40309       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40310       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40311       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40329       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40330       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40331       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40332       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40333       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40334       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40335       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       40336       1  0 08:19 ?        00:00:03 [python3] <defunct>
+root       44095       1  6 08:21 ?        00:00:24 python3 -m vllm.entrypoints.openai.api_server --host 0.0.0.0 --port 8100 --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 --quantization ascend --trust-remote-code --enforce-eager --distributed-executor-backend mp --data-parallel-size 2 --data-parallel-size-local 2 --data-parallel-backend mp --tensor-parallel-size 2 --pipeline-parallel-size 1 --prefill-context-parallel-size 1 --decode-context-parallel-size 1 --block-size 128 --enable-chunked-prefill --max-model-len 65536 --max-num-batched-tokens 1024 --max-num-seqs 16 --no-enable-prefix-caching --enable-logging-iteration-details --gpu-memory-utilization 0.90 --kv-transfer-config {"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}
+root       44138   44095  0 08:21 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.resource_tracker import main;main(30)
+root       44139   44095  4 08:21 ?        00:00:17 VLLM::DPCoordinator
+root       44168   44095 20 08:22 ?        00:01:12 VLLM::EngineCore_DP0
+root       44196   44095 21 08:22 ?        00:01:08 VLLM::EngineCore_DP1
+root       44238   44196 63 08:22 ?        00:03:16 VLLM::Worker_DP1_TP0
+root       44241   44168 99 08:22 ?        00:05:28 VLLM::Worker_DP0_TP0
+root       44290   44196 74 08:23 ?        00:03:36 VLLM::Worker_DP1_TP1
+root       44291   44168 99 08:23 ?        00:04:58 VLLM::Worker_DP0_TP1
+root       44585   44291  7 08:23 ?        00:00:18 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=31, pipe_handle=92) --multiprocessing-fork
+root       44586   44238  7 08:23 ?        00:00:18 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=31, pipe_handle=93) --multiprocessing-fork
+root       44587   44290  7 08:23 ?        00:00:17 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=31, pipe_handle=92) --multiprocessing-fork
+root       44588   44241  7 08:23 ?        00:00:17 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=31, pipe_handle=106) --multiprocessing-fork
+root       44737   44241  0 08:24 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44792   44290  0 08:24 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44793   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44794   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44795   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44796   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44797   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44798   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44799   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44800   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44801   44737  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44802   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44803   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44804   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44805   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44806   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44807   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44808   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44809   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44810   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44811   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44812   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44813   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44814   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44815   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44816   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44817   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44818   44737  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(102, 105, [], **{})
+root       44819   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44820   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44821   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44822   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44823   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44824   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44825   44792  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44826   44792  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44881   44291  0 08:24 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44882   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44883   44881  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44884   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44885   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44886   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44887   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44888   44881  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44889   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44890   44881  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44945   44238  0 08:24 ?        00:00:00 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44946   44945  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44947   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44948   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44949   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44950   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44951   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44952   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44953   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44954   44945  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44955   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44956   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44957   44881  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44958   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44959   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44960   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44961   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44962   44881  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(89, 91, [], **{})
+root       44963   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44964   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44965   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44966   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44967   44945  1 08:24 ?        00:00:04 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44968   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44969   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       44970   44945  1 08:24 ?        00:00:03 /usr/local/python3.12.13/bin/python3 -c from multiprocessing.forkserver import main; main(90, 92, [], **{})
+root       48785       0  0 08:28 ?        00:00:00 ps -efww

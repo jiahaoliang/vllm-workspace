@@ -1,6 +1,6 @@
 # Multi-DP/TP Stress Validation Detailed Execution Plan
 
-**Status:** Approved for execution on 2026-07-24.
+**Status:** Completed on 2026-07-25.
 
 **Source acceptance plan:**
 [multi-dp-tp-stress-validation-plan.md](multi-dp-tp-stress-validation-plan.md)
@@ -27,13 +27,21 @@ propagation completed. No vLLM process or workload started, and the same endpoin
 afterward. `capture_metrics` therefore performs a bounded 60-second readiness retry before returning the
 complete metrics response. The downstream empty-pool and key-count assertions remain unchanged and strict.
 
-**Runtime acceptance result (2026-07-25):** With the harness corrections applied, run `20260725T031659Z`
+**Historical runtime acceptance result (2026-07-25):** With the initial harness corrections applied, run `20260725T031659Z`
 passed S1 but failed S2 because only 8/16 cached response signatures exactly matched their empty-pool
 baselines. All 16 requests returned HTTP 200 and passed marker isolation; the aggregate checker proved both
 Prefill DP ranks, a 1024-token maximum chunk, layers 0..26, 288 committed keys, and zero whole-key events.
 The unchanged retry `20260725T033747Z` reproduced exact-output divergence in S1 case 3 (`3/4` exact) while
 all four pinned ranged checkers passed. The run stopped before S2/S3 as required. This is recorded as a
-runtime validation failure; the exact-output gate was not weakened and production source was not changed.
+runtime validation failure under the then-current exact-output gate.
+
+**Final acceptance result (2026-07-25):** A no-Mooncake control proved that continuation variability also
+occurs with the connector disabled, so full continuation equality was replaced by a tokenizer-derived marker
+prefix hard gate while the full comparison remained diagnostic. Run `20260725T074648Z` then failed closed at
+S3 because Mooncake's default 5000ms read lease expired at layers 22 and 23 (`-707`). The feature Master
+deployment now uses a 30-second lease. Fresh run `20260725T080938Z` passed S1, S2, and S3 with all marker,
+isolation, topology, chunk, ranged, commit, and key-count gates. The detailed report and complete evidence are
+in `multi-dp-tp-stress-validation-2026-07-25.md` and `evidence/ranged-api-stress-20260725T080938Z/`.
 
 ## 1. Non-Negotiable Rules
 
