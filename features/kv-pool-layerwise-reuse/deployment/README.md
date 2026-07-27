@@ -129,6 +129,46 @@ kubectl exec -n ai-inference deploy/decode-engine-deployment \
   -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
 ```
 
+## Lease expiry boundary test
+
+`lease-expiry-test.py` isolates two timeout boundaries with one two-layer
+Mooncake object. It first waits longer than the active read lease TTL between
+layer 0 and layer 1 ranged puts, while leaving the PutStart session open and
+without opening a get session. It then commits the object, opens one get
+session, reads layer 0, waits past the same TTL, and attempts the layer 1 ranged
+read on that same session.
+
+The expected results are:
+
+- layer 1 put and `batch_put_end` succeed after the long put gap, and no
+  `batch_get_start` occurs before commit;
+- the layer 1 ranged get on the expired read session returns
+  `-707 LEASE_EXPIRED`;
+- a fresh `batch_get_start` returns `0`, and layer 1 can be read with the new
+  lease;
+- the final two-layer byte comparison and all cleanup steps pass.
+
+Run it only while vLLM is stopped in the selected Prefill Pod. Copy both the
+test and its existing ranged API helper, then pass the deployed Master TTL:
+
+```bash
+PREFILL_POD=$(kubectl get pod -n ai-inference -l app=prefill \
+  -o jsonpath='{.items[0].metadata.name}')
+kubectl cp -n ai-inference \
+  features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py \
+  "${PREFILL_POD}:/tmp/range-api-smoke.py" -c prefill-engine
+kubectl cp -n ai-inference \
+  features/kv-pool-layerwise-reuse/deployment/lease-expiry-test.py \
+  "${PREFILL_POD}:/tmp/lease-expiry-test.py" -c prefill-engine
+kubectl exec -n ai-inference "${PREFILL_POD}" -c prefill-engine -- \
+  python3 /tmp/lease-expiry-test.py \
+  --output /tmp/lease-expiry-summary.json \
+  --lease-ttl-ms 30000 --wait-margin-ms 1500
+```
+
+The formal run and exact API results are archived in
+[`lease-expiry-20260727T091720Z`](../evidence/lease-expiry-20260727T091720Z/README.md).
+
 ## Python source update without Pod replacement
 
 For Python-only changes under `repos/vllm-ascend/vllm_ascend/`, run:

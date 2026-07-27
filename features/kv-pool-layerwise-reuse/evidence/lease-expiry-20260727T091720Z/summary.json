@@ -1,0 +1,456 @@
+{
+  "api_calls": [
+    {
+      "operation": "TransferEngine.initialize",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "MooncakeDistributedStore.setup",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "TransferEngine.register_memory",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "operation": "TransferEngine.register_memory",
+      "phase": "setup",
+      "result": 0
+    },
+    {
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "operation": "batch_put_start",
+      "phase": "slow_put",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "slow_put_layer_0",
+      "result": [
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "object_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "operation": "batch_put_from_multi_buffer_ranges",
+      "phase": "slow_put_layer_1",
+      "result": [
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "operation": "batch_put_end",
+      "phase": "commit",
+      "result": [
+        0
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "operation": "batch_get_start",
+      "phase": "read_session",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "object_offsets": [
+        [
+          0,
+          2048
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "read_layer_0",
+      "result": [
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "object_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "read_layer_1_expired_session",
+      "result": [
+        -707
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "operation": "batch_get_start",
+      "phase": "fresh_read_session",
+      "result": [
+        0
+      ]
+    },
+    {
+      "buffer_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "object_offsets": [
+        [
+          4096,
+          6144
+        ]
+      ],
+      "operation": "batch_get_into_multi_buffer_ranges",
+      "phase": "read_layer_1_fresh_session",
+      "result": [
+        4096
+      ],
+      "sizes": [
+        [
+          2048,
+          2048
+        ]
+      ]
+    },
+    {
+      "keys": [
+        "range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+      ],
+      "operation": "batch_get_end",
+      "phase": "fresh_read_session",
+      "result": 0
+    }
+  ],
+  "cases": [
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "transfer_engine_initialize",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "store_setup",
+      "passed": true
+    },
+    {
+      "actual": "8f091c65bb35cd9af2969d8594f88c8d3e639837a38cade92219b209212d0af5",
+      "expected": "8f091c65bb35cd9af2969d8594f88c8d3e639837a38cade92219b209212d0af5",
+      "name": "source_pattern",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "register_source",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "register_destination",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "slow_put_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096
+      ],
+      "expected": [
+        4096
+      ],
+      "name": "slow_put_layer_0",
+      "passed": true
+    },
+    {
+      "actual": 31500.154606997967,
+      "expected": ">= 30000ms",
+      "name": "between_put_layers_wait_exceeded_lease_ttl",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096
+      ],
+      "expected": [
+        4096
+      ],
+      "name": "slow_put_layer_1",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "slow_put_end",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "committed_object_get_start",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096
+      ],
+      "expected": [
+        4096
+      ],
+      "name": "read_layer_0_before_expiry",
+      "passed": true
+    },
+    {
+      "actual": 31500.09718700312,
+      "expected": ">= 30000ms",
+      "name": "between_get_layers_wait_exceeded_lease_ttl",
+      "passed": true
+    },
+    {
+      "actual": [
+        -707
+      ],
+      "expected": [
+        -707
+      ],
+      "name": "read_layer_1_old_session_lease_expired",
+      "passed": true
+    },
+    {
+      "actual": [
+        0
+      ],
+      "expected": [
+        0
+      ],
+      "name": "fresh_batch_get_start_after_expiry_finds_object",
+      "passed": true
+    },
+    {
+      "actual": [
+        4096
+      ],
+      "expected": [
+        4096
+      ],
+      "name": "read_layer_1_with_fresh_lease",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "expected": 0,
+      "name": "fresh_batch_get_end",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "name": "two_layer_data_matches_after_fresh_lease",
+      "passed": true
+    }
+  ],
+  "cleanup": [
+    {
+      "passed": true,
+      "result": 0,
+      "step": "MooncakeDistributedStore.remove:range-smoke-1785143927800-49668-5e7e4eec-lease-expiry"
+    },
+    {
+      "passed": true,
+      "result": null,
+      "step": "torch.npu.synchronize"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "TransferEngine.unregister_memory:20617006940160"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "TransferEngine.unregister_memory:20617006948864"
+    },
+    {
+      "passed": true,
+      "result": 0,
+      "step": "MooncakeDistributedStore.close"
+    },
+    {
+      "passed": true,
+      "result": null,
+      "step": "tensor_release_and_empty_cache"
+    }
+  ],
+  "config": {
+    "lease_ttl_ms": 30000,
+    "num_keys": 1,
+    "num_layers": 2,
+    "object_size": 8192,
+    "page_size": 4096,
+    "wait_margin_ms": 1500,
+    "wait_ms": 31500
+  },
+  "destination_checksum_before": "2ef1444bc950050c92f373cd2f5442022af98aa900aefd82c749cff93d4c0037",
+  "errors": [],
+  "finished_at_unix": 1785144003.1125126,
+  "g3_fixture_id": "commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d",
+  "passed": true,
+  "plan_commit_sha": "a3406334959d8c68537b305c6242450db3c684c2",
+  "runtime": {
+    "device_count": 4,
+    "device_name": "Ascend910B4",
+    "local_ip": "10.250.40.164",
+    "logical_device": 0,
+    "mooncake_distribution_version": "not installed as a named distribution",
+    "mooncake_engine_module": "mooncake.engine",
+    "mooncake_engine_module_file": "/usr/local/Ascend/ascend-toolkit/latest/python/site-packages/mooncake/engine.cpython-312-aarch64-linux-gnu.so",
+    "mooncake_store_module": "mooncake.store",
+    "mooncake_store_module_file": "/usr/local/Ascend/ascend-toolkit/latest/python/site-packages/mooncake/store.cpython-312-aarch64-linux-gnu.so",
+    "physical_device_visibility": "not exposed by environment",
+    "python_executable": "/usr/local/python3.12.13/bin/python3",
+    "python_version": "3.12.13",
+    "store_config": {
+      "config_path": "/opt/vllm-layerwise/mooncake.json",
+      "device_name": "",
+      "engine_passed_explicitly": true,
+      "global_segment_size": 67108864,
+      "local_buffer_size": 0,
+      "local_hostname": "10.250.40.164:16052",
+      "master_server_address": "mooncake-master-service:30089",
+      "metadata_server": "P2PHANDSHAKE",
+      "protocol": "ascend"
+    },
+    "torch_module": "/usr/local/python3.12.13/lib/python3.12/site-packages/torch/__init__.py",
+    "torch_npu_module": "/usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/__init__.py",
+    "torch_npu_version": "2.10.0.post2",
+    "torch_version": "2.10.0+cpu"
+  },
+  "schema_version": 1,
+  "semantic_result": {
+    "expired_session_error_code": -707,
+    "fresh_batch_get_start_after_expiry_finds_object": true,
+    "old_get_session_survives_ttl": false,
+    "slow_put_completed_after_read_ttl_gap": true
+  },
+  "source_checksum": "8f091c65bb35cd9af2969d8594f88c8d3e639837a38cade92219b209212d0af5",
+  "started_at_unix": 1785143927.7951288,
+  "test_name": "two_layer_put_gap_and_read_lease_expiry",
+  "waits": [
+    {
+      "elapsed_ms": 31500.154606997967,
+      "phase": "between_put_layers",
+      "requested_ms": 31500
+    },
+    {
+      "elapsed_ms": 31500.09718700312,
+      "phase": "between_get_layers",
+      "requested_ms": 31500
+    }
+  ]
+}

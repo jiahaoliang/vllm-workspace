@@ -39,18 +39,36 @@ workspace-external archives.
 - Formal `SHA256SUMS` digest:
   `f800ce9610201024c2d2823374402a7f63318f518d593a9301516f842fcadc53`.
 
+## Lease Expiry Boundary
+
+- Plan:
+  [lease-expiry-validation-plan.md](../lease-expiry-validation-plan.md).
+- Report:
+  [lease-expiry-validation-2026-07-27.md](../lease-expiry-validation-2026-07-27.md).
+- Evidence:
+  [lease-expiry-20260727T091720Z](lease-expiry-20260727T091720Z/README.md).
+- Result: the corrected call sequence passed. There was no pre-commit get. The
+  old committed-object get session returned `-707 LEASE_EXPIRED` on layer 1;
+  a fresh `batch_get_start` returned `0` and reread layer 1 successfully.
+- `SHA256SUMS` digest:
+  `73b12568caa02b6464d19143ae18407ccee4658fe17dc37d383d92e2e3bf8726`.
+
 Verify from the control-repo root:
 
 ```bash
-cd features/kv-pool-layerwise-reuse/evidence/ranged-api-20260723T094716Z
-sha256sum -c SHA256SUMS
+evidence_root=features/kv-pool-layerwise-reuse/evidence
 
-cd ../ranged-api-g4-20260723T132919Z/runtime-audit
-sha256sum -c SHA256SUMS
+(cd "${evidence_root}/ranged-api-20260723T094716Z" && \
+  sha256sum -c SHA256SUMS)
+(cd "${evidence_root}/ranged-api-g4-20260723T132919Z/runtime-audit" && \
+  sha256sum -c SHA256SUMS)
 
-for evidence_dir in ranged-api-stress-20260725T*; do
+for evidence_dir in "${evidence_root}"/ranged-api-stress-20260725T*; do
   (cd "${evidence_dir}" && sha256sum -c SHA256SUMS)
 done
+
+(cd "${evidence_root}/lease-expiry-20260727T091720Z" && \
+  sha256sum -c SHA256SUMS)
 ```
 
 Do not edit evidence files in place. A changed artifact requires a new run
