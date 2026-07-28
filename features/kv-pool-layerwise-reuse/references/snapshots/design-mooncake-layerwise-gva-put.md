@@ -1,6 +1,6 @@
 Source: https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/HJGESQG4ze
-Captured At: 2026-07-20T12:06:39+08:00
-Notes: Latest authoritative Mooncake layerwise KVPool put design, including section 5.7 chunked-prefill session lifecycle and lease renewal semantics.
+Captured At: 2026-07-28T17:05:16+08:00
+Notes: Latest authoritative Mooncake layerwise KVPool put design, including section 5.7 chunked-prefill session lifecycle and lease renewal semantics, plus section 5.8 multi-group KV cache handling.
 
 # Mooncake Layerwise KVPool Put 设计文档
 
@@ -10,7 +10,7 @@ Notes: Latest authoritative Mooncake layerwise KVPool put design, including sect
 
 [vLLM Issue #33398](https://github.com/vllm-project/vllm/issues/33398) 提出 layerwise KV cache onload/offload：推理按层推进，KV 在 HBM 与外接 KVPool 之间异步搬运，以降低 Prefill 阶段 HBM 占用并支撑 prefix cache。实现 PR 为 [vLLM-Ascend PR #10733](https://github.com/vllm-project/vllm-ascend/pull/10733)。
 
-该编排与 KVPool 后端解耦。**memcache** 已支持 layerwise 所需的分配、按址传输与提交语义（见 [PR #11444](https://github.com/vllm-project/vllm-ascend/pull/11444)）。**Mooncake** 在 layerwise 场景尚缺对应的元数据与生命周期接口，无法直接复用该路径。
+该编排与 KVPool 后端解耦。**memcache** 已支持 layerwise 所需的分配、按址传输与提交语义（见 [PR #11444](https://github.com/vllm-project/vllm-ascend/pull/11444)），并在 [PR #12147](https://github.com/vllm-project/vllm-ascend/pull/12147) 上扩展为 multi-group（hybrid KV cache）。**Mooncake** 在 layerwise 场景尚缺对应的元数据与生命周期接口，无法直接复用该路径。
 
 ### 1.2 动机
 
@@ -155,8 +155,9 @@ te <--> kvpool
 | MLA（`put_step = tp_size`） | `{model}@{block_hash}@{head_or_tp_rank}`，组内共享 `@0` | 仅 `tp_rank % put_step == 0`（通常 rank0） |
 | GQA（`put_step = 1`） | 每 rank 独立 `@{tp_rank}` | 每个 rank 写自己的 key |
 | 尾块 | `{model}@{req_id}_lastblock@{head_or_tp_rank}` | 同上 |
+| 多 group（§5.8） | `{model}@{group_id}@{block_hash}@{head_or_tp_rank}` | 同上；每 group 独立 object |
 
-每个 key 对应一整块 object（`size = page_size_bytes × num_layers`）；saving rank 按层 ranges 写满后对本 key `batch_put_end`。非每层独立 key。
+每个 key 对应一整块 object（单 group：`size = page_size_bytes × num_layers`；多 group 见 §5.8 按 group 的 `page × layers`）；saving rank 按层 ranges 写满后对本 key `batch_put_end`。非每层独立 key。
 
 ### 2.4 Backend ABC 统一与后端差异
 
@@ -568,6 +569,66 @@ Worker chunk Ci:
   put_end(本 chunk active_keys)
 ```
 
+### 5.8 Multi-group KV Cache
+
+#### 背景
+
+DeepSeek 等模型存在多个 `kv_cache_groups`（例如 MLA latent 与 indexer 分属不同 group）。每个 group 有独立布局与层集合，同一前缀对应多组 pool object。
+
+编排层已提供带 `group_id` 的 key、`physical_layer_to_group_layers`、每 group 的 `page_size` / 层数与 builder。本节只写 Mooncake 会话在此之上怎么调用。
+
+#### 方案
+
+多 group 时，在 Worker 每个 chunk 内按下面顺序调用（key 使用编排层已生成的字符串）。
+
+**1. 打开读会话（`pool_worker.py`）**
+
+- 输入：本 chunk 要从 pool 读回的全部 key（覆盖相关 group，含此前已写完的前缀）。
+- 调用：`batch_get_start(load_keys)`。
+- 记录：把 `load_keys` 写入 `ReqMeta`，供步骤 5 使用。
+
+**2. 打开写会话（`pool_worker.py`）**
+
+对每个 group `g`：
+
+- 输入：`save_keys[g]`；每个 size 为 `page_size[g] × num_layers[g]`。
+- 调用：`batch_put_start(save_keys[g], sizes[g])`。
+- 记录：成功的 key 写入 `ReqMeta.save_block_keys[g]`，与该 group 的 `block_ids` 对齐。
+
+**3. 按层搬运（`kv_transfer.py`）**
+
+对每个物理层 `L`，取出 `(g, ℓ)`（`ℓ` 是该层在 group `g` 里的序号）：
+
+- 用 group `g` 的 builder 生成本地地址；
+- `keys` 用该 group 的 block keys；
+- `offset = ℓ × page_size[g]`；
+- 调用 `batch_copy_put`（写出）或 `batch_copy_get`（读入）。
+
+**4. 关闭写会话（`kv_transfer.py`）**
+
+- 时机：group `g` 在本 chunk 里最后一层的 `batch_copy_put` 做完。
+- 调用：`batch_put_end(active_keys[g])`。
+- 每个 group 各一次。
+
+**5. 关闭读会话（§5.7）**
+
+- 时机：当前是 last chunk，且最后一次 onload 已完成。
+- 调用：`batch_get_end(load_keys)`（步骤 1 记下的全部 key）。
+
+```text
+chunk Ci:
+  batch_get_start(load_keys)
+  for g:
+      batch_put_start(save_keys[g], sizes[g])
+  for L:
+      for (g, ell) in groups_of(L):
+          batch_copy_*(keys[g], offset=ell*page[g])
+  if last_chunk and last_onload_done:
+      batch_get_end(load_keys)
+  for g when g's last copy_put done:
+      batch_put_end(active_keys[g])
+```
+
 ---
 
 ## 6. 测试计划
@@ -592,9 +653,9 @@ Worker chunk Ci:
 
 | 文件 | 本方案需补充 |
 |------|-------------|
-| `test_pool_scheduler.py` | `backend=mooncake` 走 `batch_is_exist` 判 hit |
-| `test_pool_worker.py` | `batch_get_start` / `batch_put_start`；结束 `batch_get_end` / `batch_put_revoke` |
-| `test_kv_transfer.py` | `batch_copy_put` / `batch_copy_get`；末层 `batch_put_end`；写失败 `batch_put_revoke`；lease 过期记失败块 |
+| `test_pool_worker.py` | `batch_get_start` / `batch_put_start`；结束 `batch_get_end` / `batch_put_revoke`；多 chunk 见 §5.7；多 group key / 按 group put_start 见 §5.8 |
+| `test_kv_transfer.py` | `batch_copy_put` / `batch_copy_get`；末层 `batch_put_end`；写失败 `batch_put_revoke`；lease 过期记失败块；多 group 按 `group_id` 选 builder |
+| `test_pool_scheduler.py` | `backend=mooncake` 走 `batch_is_exist` 判 hit；多 group 带 `group_id` 的 key |
 | `test_backend.py` | `MooncakeBackend`：`batch_get_start` / `batch_copy_*` / `batch_get_end` 委托 Client；`MemcacheBackend`：`batch_commit` / `batch_revoke` 为空实现 |
 | `_mock_deps.py` | mock Client 会话 API |
 
