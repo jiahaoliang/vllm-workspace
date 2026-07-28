@@ -10,6 +10,7 @@
 | 查看源码仓库、branch 和锁定 commit | [repo-state.md](repo-state.md) 与根仓库 `workspace.lock.json` |
 | 查看 feature 进展和历史 checkpoint | [status.md](status.md) |
 | 部署 1P1D、启动/停止引擎或运行 smoke test | [deployment/README.md](deployment/README.md) |
+| 在长期 CPU-only Pod 中运行 vLLM-Ascend UT | [UT Pod design](ut-pod-design.md) 与 [run-vllm-ascend-ut.sh](deployment/run-vllm-ascend-ut.sh) |
 | 运行 Multi-DP/TP stress test | [deployment/stress/README.md](deployment/stress/README.md) 与 [run-stress-test.sh](deployment/run-stress-test.sh) |
 | 运行 lease-expiry validation | [lease-expiry validation report 与完整 runbook](lease-expiry-validation-2026-07-27.md) |
 | 查看正式结果和校验 checksum | [evidence/README.md](evidence/README.md) |
@@ -46,6 +47,7 @@
 | Stress host/Pod drivers | [deployment/run-stress-test.sh](deployment/run-stress-test.sh) 与 [deployment/stress-test.py](deployment/stress-test.py) |
 | Runtime log checkers | [deployment/check-range-debug-log.py](deployment/check-range-debug-log.py) 与 [deployment/check-stress-log.py](deployment/check-stress-log.py) |
 | Python-only Pod source sync | [deployment/sync-vllm-ascend-python.sh](deployment/sync-vllm-ascend-python.sh) |
+| Dedicated CPU UT Pod | [deployment/60-vllm-ascend-ut-pod.yaml](deployment/60-vllm-ascend-ut-pod.yaml) 与 [deployment/run-vllm-ascend-ut.sh](deployment/run-vllm-ascend-ut.sh) |
 | Driver unit tests | [deployment/tests/](deployment/tests/) |
 | Original 1P1D validation report | [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md) |
 
@@ -104,6 +106,7 @@
 | Feature 状态记录 | [status.md](status.md) | 按时间累积的 checkpoint；较早结论需结合后续 report 阅读 |
 | 分支同步历史 | [sync-log.md](sync-log.md) | collaborator/upstream 同步与历史重写记录 |
 | 当前 repo 快照 | [repo-state.md](repo-state.md) | 与 `workspace.lock.json` 对应的人类可读状态 |
+| Kubernetes UT Pod 设计 | [ut-pod-design.md](ut-pod-design.md) | 长期 CPU-only Pod、源码同步和命令执行 contract |
 
 ## References
 

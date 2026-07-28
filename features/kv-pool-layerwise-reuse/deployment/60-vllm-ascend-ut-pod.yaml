@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vllm-ascend-ut
+  namespace: liangjiahao
+  labels:
+    app: vllm-ascend-ut
+    purpose: unit-test
+spec:
+  nodeName: n1
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 10
+  automountServiceAccountToken: false
+  enableServiceLinks: false
+  containers:
+    - name: ut
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+      imagePullPolicy: Never
+      command: ["/bin/bash", "-lc"]
+      args: ["exec sleep infinity"]
+      env:
+        - name: TORCH_DEVICE_BACKEND_AUTOLOAD
+          value: "0"
+        - name: VLLM_VERSION
+          value: "0.24.0"
+        - name: PYTHONDONTWRITEBYTECODE
+          value: "1"
+        - name: PYTEST_ADDOPTS
+          value: "-p no:cacheprovider"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+      resources:
+        requests:
+          cpu: "1"
+          memory: 4Gi
+        limits:
+          cpu: "16"
+          memory: 32Gi
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+  volumes:
+    - name: workspace
+      emptyDir:
+        sizeLimit: 8Gi

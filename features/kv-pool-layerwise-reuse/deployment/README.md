@@ -190,6 +190,58 @@ started manually after review. It refuses native, build-system, or dependency
 changes; those require rebuilding the image. Pod replacement also discards all
 synced container-layer changes.
 
+## Dedicated CPU UT Pod
+
+CPU/mock unit tests run in a separate long-running Pod. It uses the feature
+image as its dependency environment but does not request an Ascend NPU, mount
+NPU drivers or devices, mount the model cache, or reuse either engine Pod.
+
+Create the namespace and Pod from the workspace root:
+
+```bash
+deployment_dir=features/kv-pool-layerwise-reuse/deployment
+kubectl apply -f "${deployment_dir}/00-namespace.yaml"
+kubectl apply -n liangjiahao \
+  -f "${deployment_dir}/60-vllm-ascend-ut-pod.yaml"
+kubectl wait -n liangjiahao --for=jsonpath='{.status.phase}'=Running \
+  pod/vllm-ascend-ut --timeout=120s
+```
+
+The host helper synchronizes the current `repos/vllm-ascend` checkout into an
+`emptyDir` snapshot and then executes exactly the command supplied after `--`.
+It has no default test target:
+
+```bash
+features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- \
+  python3 -m pytest -q \
+  tests/ut/distributed/ascend_store/test_backend.py
+```
+
+Every invocation verifies that the live Pod uses the expected image and has no
+NPU request/limit or `hostPath` volume. It serializes sync/test operations,
+records source identity in `/workspace/vllm-ascend/.workspace-source`, excludes
+generated caches, and atomically replaces the prior source snapshot.
+
+The Pod remains Running after each command. To remove only this test runtime:
+
+```bash
+kubectl delete pod -n liangjiahao vllm-ascend-ut --wait=true
+```
+
+Do not delete the `liangjiahao` namespace. Tests explicitly routed to an NPU
+directory are outside this CPU/mock Pod contract.
+
+The initial live proof on 2026-07-28 synchronized clean source
+`feature/mooncake-layerwise-kv-pool@3f0cbf59` and ran only:
+
+```text
+tests/ut/distributed/ascend_store/test_backend.py::TestBackendABC::test_commit_and_revoke_default_to_successful_noops
+```
+
+It passed with `1 passed, 14 warnings in 0.21s`. The live Pod had no NPU
+request/limit, device plugin, or `hostPath` volume and remained Running after
+the command.
+
 ## Smoke test
 
 Both engines use `--max-num-seqs 4`, so the scheduler can admit all four
