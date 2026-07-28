@@ -1,8 +1,13 @@
-# Ranged API Validation Evidence
+# KVPool Validation Evidence
 
-This directory contains the immutable evidence captured by the ranged API
-validation runs. The files were imported byte-for-byte from their verified
-workspace-external archives.
+This directory contains immutable evidence captured by the ranged API,
+Multi-DP/TP stress, and lease-expiry validation runs. The files were imported
+byte-for-byte from their verified workspace-external archives.
+
+Use the current runbooks linked from the feature
+[README](../README.md). Commands and script copies inside archived run
+directories describe their original environment and must not be executed as
+current test entry points.
 
 ## G0-G3
 
