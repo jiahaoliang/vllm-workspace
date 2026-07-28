@@ -35,6 +35,14 @@
 - 所有 `kubectl apply`、`exec`、`logs`、`cp`、`port-forward`、`rollout` 和清理命令必须显式限定 `liangjiahao`，不得依赖当前 context 的 default namespace。
 - 清理测试资源前必须同时核对 kube context、namespace 和目标资源名；不得删除整个 namespace，除非用户明确要求。
 
+## Kubernetes UT 执行环境
+
+- 当前工作环境可访问 Kubernetes 且已有适配当前源码基线的测试镜像时，CPU/mock unit tests 必须在 `liangjiahao` namespace 的专用长期运行 UT Pod 中执行，不得复用 Prefill、Decode 等 serving Pod。
+- CPU/mock UT Pod 不得申请 `huawei.com/Ascend910`，不得挂载 NPU device、driver、`npu-smi` 或模型缓存；只有测试目录或测试说明明确要求真实 NPU 的测试才允许使用 NPU test Pod。
+- 当前 checkout 必须通过 tar + `kubectl exec` 同步到 Pod 的临时 workspace；不得使用 hostPath 挂载源码。每次执行前必须记录或核对源码 commit、branch 和 dirty 状态。
+- UT Pod 只提供执行环境，不得隐式运行默认 test suite；调用者必须在命令行显式指定 pytest target 或其他测试命令，并禁用会污染同步源码的 bytecode 和 pytest cache。
+- UT 完成后默认保留长期运行 Pod。需要清理时只能删除明确命名的 UT Pod，不得删除 `liangjiahao` namespace。
+
 ## 公共内容更新流程
 
 - 修改公共内容时，必须先切到 `main`，在 `main` 上完成修改、验证、提交并推送。
