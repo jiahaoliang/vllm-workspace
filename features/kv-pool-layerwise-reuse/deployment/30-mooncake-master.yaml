@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mooncake-master-deployment
-  namespace: ai-inference
+  namespace: liangjiahao
 spec:
   replicas: 1
   selector:
@@ -43,7 +43,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mooncake-master-service
-  namespace: ai-inference
+  namespace: liangjiahao
 spec:
   type: ClusterIP
   selector:

@@ -73,7 +73,7 @@ set -euo pipefail
 repo_root=$(git rev-parse --show-toplevel)
 cd "${repo_root}"
 
-namespace=ai-inference
+readonly namespace=liangjiahao
 role_selector='app in (prefill,decode,mooncake-master,proxy)'
 feature_dir=features/kv-pool-layerwise-reuse
 deployment_dir=${feature_dir}/deployment
@@ -88,6 +88,9 @@ mkdir -p "${scratch_dir}"
 
 printf '%s\n' "${run_id}" | tee "${scratch_dir}/run-id.txt"
 kubectl config current-context | tee "${scratch_dir}/kubectl-context.txt"
+test "${namespace}" = liangjiahao
+kubectl get namespace "${namespace}" -o name \
+  | tee "${scratch_dir}/namespace.txt"
 ```
 
 ### 2. Resolve exactly one running Pod per role
@@ -471,6 +474,7 @@ cp \
   "${scratch_dir}/master-window.log" \
   "${scratch_dir}/metrics-delta.tsv" \
   "${scratch_dir}/mooncake-head.txt" \
+  "${scratch_dir}/namespace.txt" \
   "${scratch_dir}/pods-before.txt" \
   "${scratch_dir}/pods-final.json" \
   "${scratch_dir}/pods-final.txt" \
@@ -529,7 +533,8 @@ When any gate fails:
    Step 1.
 
 Once a successful run is published, the Pod-side temporary files can be
-removed without touching the retained Pods or NPU allocations:
+removed without touching the retained Pods or NPU allocations. Cleanup must
+target the exact resources or files in `liangjiahao`; never delete the namespace:
 
 ```bash
 kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- \

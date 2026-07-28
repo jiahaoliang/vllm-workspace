@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: layerwise-runtime-config
-  namespace: ai-inference
+  namespace: liangjiahao
 data:
   mooncake.json: |
     {

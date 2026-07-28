@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prefill-engine-deployment
-  namespace: ai-inference
+  namespace: liangjiahao
 spec:
   replicas: 1
   strategy:

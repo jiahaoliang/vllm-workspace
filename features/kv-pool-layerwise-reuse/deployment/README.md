@@ -23,7 +23,7 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | vLLM-Ascend | `663209fd6208a59a48742f75116345bf5f5281ec` |
 | Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
 | Model in Pod | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
-| Namespace | `ai-inference` |
+| Namespace | `liangjiahao` |
 
 The image contains editable installs rooted at `/vllm-workspace/vllm` and
 `/vllm-workspace/vllm-ascend`. The engine Deployments do not replace these
@@ -45,7 +45,10 @@ objects written by the prefiller.
 Run these checks from the workspace root:
 
 ```bash
+readonly namespace=liangjiahao
+test "${namespace}" = liangjiahao
 kubectl config current-context
+kubectl get namespace "${namespace}"
 kubectl describe node n1
 nerdctl -n k8s.io images --digests \
   docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
@@ -70,16 +73,19 @@ Apply the numbered files in order:
 ```bash
 deployment_dir=features/kv-pool-layerwise-reuse/deployment
 kubectl apply -f "${deployment_dir}/00-namespace.yaml"
-kubectl apply -f "${deployment_dir}/10-runtime-config.yaml"
-kubectl apply -f "${deployment_dir}/30-mooncake-master.yaml"
-kubectl apply -f "${deployment_dir}/40-prefill-engine.yaml"
-kubectl apply -f "${deployment_dir}/50-decode-engine.yaml"
-kubectl apply -f "${deployment_dir}/20-proxy-server.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/10-runtime-config.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/30-mooncake-master.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/40-prefill-engine.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/50-decode-engine.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/20-proxy-server.yaml"
 
-kubectl rollout status -n ai-inference \
+kubectl rollout status -n liangjiahao \
   deployment/mooncake-master-deployment --timeout=120s
-kubectl get pods -n ai-inference -o wide
+kubectl get pods -n liangjiahao -o wide
 ```
+
+Do not delete the `liangjiahao` namespace during cleanup. Stop the engine
+processes or delete only the exact resources created by these manifests.
 
 The prefill and decode Pods are expected to show `Running` but `0/1 Ready`
 until their vLLM processes are started manually. Their container PID 1 remains
@@ -90,23 +96,23 @@ until their vLLM processes are started manually. Their container PID 1 remains
 Check the installed Mooncake API and editable source path in both Pods:
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
+kubectl exec -n liangjiahao deploy/prefill-engine-deployment \
   -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
+kubectl exec -n liangjiahao deploy/decode-engine-deployment \
   -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py
 ```
 
 Start the two vLLM processes explicitly:
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
+kubectl exec -n liangjiahao deploy/prefill-engine-deployment \
   -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
+kubectl exec -n liangjiahao deploy/decode-engine-deployment \
   -c decode-engine -- /opt/vllm-layerwise/start-decode.sh
 
-kubectl wait -n ai-inference --for=condition=Ready pod \
+kubectl wait -n liangjiahao --for=condition=Ready pod \
   -l app=prefill --timeout=20m
-kubectl wait -n ai-inference --for=condition=Ready pod \
+kubectl wait -n liangjiahao --for=condition=Ready pod \
   -l app=decode --timeout=20m
 ```
 
@@ -114,18 +120,18 @@ The vLLM processes are children started by `kubectl exec`, not the container
 main process. Read their logs inside the corresponding Pod:
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
+kubectl exec -n liangjiahao deploy/prefill-engine-deployment \
   -c prefill-engine -- tail -F /tmp/vllm-prefill.log
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
+kubectl exec -n liangjiahao deploy/decode-engine-deployment \
   -c decode-engine -- tail -F /tmp/vllm-decode.log
 ```
 
 Stop them without replacing the Pods:
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
+kubectl exec -n liangjiahao deploy/prefill-engine-deployment \
   -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
+kubectl exec -n liangjiahao deploy/decode-engine-deployment \
   -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
 ```
 
@@ -152,15 +158,15 @@ Run it only while vLLM is stopped in the selected Prefill Pod. Copy both the
 test and its existing ranged API helper, then pass the deployed Master TTL:
 
 ```bash
-PREFILL_POD=$(kubectl get pod -n ai-inference -l app=prefill \
+PREFILL_POD=$(kubectl get pod -n liangjiahao -l app=prefill \
   -o jsonpath='{.items[0].metadata.name}')
-kubectl cp -n ai-inference \
+kubectl cp -n liangjiahao \
   features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py \
   "${PREFILL_POD}:/tmp/range-api-smoke.py" -c prefill-engine
-kubectl cp -n ai-inference \
+kubectl cp -n liangjiahao \
   features/kv-pool-layerwise-reuse/deployment/lease-expiry-test.py \
   "${PREFILL_POD}:/tmp/lease-expiry-test.py" -c prefill-engine
-kubectl exec -n ai-inference "${PREFILL_POD}" -c prefill-engine -- \
+kubectl exec -n liangjiahao "${PREFILL_POD}" -c prefill-engine -- \
   python3 /tmp/lease-expiry-test.py \
   --output /tmp/lease-expiry-summary.json \
   --lease-ttl-ms 30000 --wait-margin-ms 1500

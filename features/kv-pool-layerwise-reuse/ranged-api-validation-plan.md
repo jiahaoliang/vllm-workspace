@@ -34,7 +34,7 @@ instrumentation；它不能反向扩大前三项 mandatory validation 的范围�
 | image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | node/device | `n1`, two `Ascend910B4` |
-| namespace | `ai-inference` |
+| namespace | `liangjiahao` |
 
 `repos/Mooncake` 保持只读。mandatory 路径不修改 `repos/vllm` 或
 `repos/vllm-ascend` 的生产源码。
@@ -243,17 +243,17 @@ image 中；集成负责人按固定方式交付：
 ```bash
 : "${artifact_root:?set artifact_root to an absolute workspace-external path}"
 runner=features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py
-prefill_pod=$(kubectl get pods -n ai-inference -l app=prefill \
+prefill_pod=$(kubectl get pods -n liangjiahao -l app=prefill \
   -o jsonpath='{.items[0].metadata.name}')
 sha256sum "${runner}"
-kubectl cp -n ai-inference -c prefill-engine \
+kubectl cp -n liangjiahao -c prefill-engine \
   "${runner}" "${prefill_pod}:/tmp/range-api-smoke.py"
-kubectl exec -n ai-inference "${prefill_pod}" -c prefill-engine -- \
+kubectl exec -n liangjiahao "${prefill_pod}" -c prefill-engine -- \
   sha256sum /tmp/range-api-smoke.py
-kubectl exec -n ai-inference "${prefill_pod}" -c prefill-engine -- \
+kubectl exec -n liangjiahao "${prefill_pod}" -c prefill-engine -- \
   python3 /tmp/range-api-smoke.py \
   --run-negative --output /tmp/range-api-summary.json
-kubectl cp -n ai-inference -c prefill-engine \
+kubectl cp -n liangjiahao -c prefill-engine \
   "${prefill_pod}:/tmp/range-api-summary.json" \
   "${artifact_root}/direct/range-api-summary.json"
 ```
@@ -617,10 +617,10 @@ runtime audit 必须使用独立日志窗口，且测试期间不能有其他 in
    其启动的 Python 子进程继承：
 
 ```bash
-kubectl exec -n ai-inference deploy/prefill-engine-deployment \
+kubectl exec -n liangjiahao deploy/prefill-engine-deployment \
   -c prefill-engine -- env VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
   /opt/vllm-layerwise/start-prefill.sh
-kubectl exec -n ai-inference deploy/decode-engine-deployment \
+kubectl exec -n liangjiahao deploy/decode-engine-deployment \
   -c decode-engine -- env VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
   /opt/vllm-layerwise/start-decode.sh
 ```

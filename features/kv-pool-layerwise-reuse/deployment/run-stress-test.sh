@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-readonly namespace=ai-inference
+readonly namespace=liangjiahao
 readonly node_name=n1
 readonly image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
 readonly model_path=/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
@@ -300,6 +300,14 @@ touch "${output_dir}/command-transcript.log" "${output_dir}/steps.jsonl"
 trap_active=1
 trap finalize_run EXIT
 
+if [[ "${namespace}" != liangjiahao ]]; then
+  fail_run "refusing to run outside the liangjiahao namespace"
+  exit 2
+fi
+record_step "namespace safety gate" "${output_dir}/namespace.txt" \
+  kubectl get namespace "${namespace}" -o name \
+  || { fail_run "required namespace is unavailable: ${namespace}"; exit 1; }
+
 identity_check() {
   test "$(git branch --show-current)" = kv-pool-layerwise-reuse
   test "$(git -C repos/vllm rev-parse HEAD)" = ee0da84ab9e04ac7610e28580af62c365e898389
@@ -331,7 +339,7 @@ for pod in pods:
  spec=pod.get("spec",{}); status=pod.get("status",{}); metadata=pod.get("metadata",{})
  if spec.get("nodeName")!="n1" or status.get("phase") not in {"Running","Pending"}: continue
  name=metadata.get("name",""); namespace=metadata.get("namespace")
- replaced=namespace=="ai-inference" and (name.startswith("prefill-engine-deployment-") or name.startswith("decode-engine-deployment-"))
+ replaced=namespace=="liangjiahao" and (name.startswith("prefill-engine-deployment-") or name.startswith("decode-engine-deployment-"))
  if replaced: continue
  request=sum(int(c.get("resources",{}).get("requests",{}).get("huawei.com/Ascend910",0)) for c in spec.get("containers",[]))
  if request: counted.append({"namespace":pod["metadata"]["namespace"],"pod":pod["metadata"]["name"],"request":request}); used+=request
@@ -361,10 +369,10 @@ for role in prefill decode; do
 done
 
 stop_engines >"${output_dir}/stop-before-apply.log" 2>&1 || { fail_run "could not stop old engines"; exit 1; }
-record_step "apply Mooncake Master" "${output_dir}/apply-master.log" kubectl apply -f "${script_dir}/30-mooncake-master.yaml" || { fail_run "Mooncake Master apply failed"; exit 1; }
-record_step "apply stress ConfigMap" "${output_dir}/apply-config.log" kubectl apply -f "${script_dir}/stress/10-runtime-config.yaml" || { fail_run "stress ConfigMap apply failed"; exit 1; }
-record_step "apply stress Prefill" "${output_dir}/apply-prefill.log" kubectl apply -f "${script_dir}/stress/40-prefill-engine.yaml" || { fail_run "stress Prefill apply failed"; exit 1; }
-record_step "apply stress Decode" "${output_dir}/apply-decode.log" kubectl apply -f "${script_dir}/stress/50-decode-engine.yaml" || { fail_run "stress Decode apply failed"; exit 1; }
+record_step "apply Mooncake Master" "${output_dir}/apply-master.log" kubectl apply -n "${namespace}" -f "${script_dir}/30-mooncake-master.yaml" || { fail_run "Mooncake Master apply failed"; exit 1; }
+record_step "apply stress ConfigMap" "${output_dir}/apply-config.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/10-runtime-config.yaml" || { fail_run "stress ConfigMap apply failed"; exit 1; }
+record_step "apply stress Prefill" "${output_dir}/apply-prefill.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/40-prefill-engine.yaml" || { fail_run "stress Prefill apply failed"; exit 1; }
+record_step "apply stress Decode" "${output_dir}/apply-decode.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/50-decode-engine.yaml" || { fail_run "stress Decode apply failed"; exit 1; }
 prefill_pod=$(wait_running app=prefill 4) || { fail_run "stress Prefill Pod did not run"; exit 1; }
 decode_pod=$(wait_running app=decode 2) || { fail_run "stress Decode Pod did not run"; exit 1; }
 record_step "sync vLLM-Ascend Python" "${output_dir}/source-sync.log" "${script_dir}/sync-vllm-ascend-python.sh" || { fail_run "source sync failed"; exit 1; }

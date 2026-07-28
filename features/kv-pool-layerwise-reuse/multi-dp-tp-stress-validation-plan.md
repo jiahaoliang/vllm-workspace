@@ -44,7 +44,7 @@ Prefill 每个 chunk 分别执行 final-layer commit；16K case 的 16 次成功
 | Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
 | image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
-| namespace / node | `ai-inference` / `n1` |
+| namespace / node | `liangjiahao` / `n1` |
 | model layers | `27` |
 | model max positions | `163840` |
 

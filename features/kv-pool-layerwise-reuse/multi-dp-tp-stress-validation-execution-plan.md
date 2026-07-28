@@ -53,7 +53,7 @@ in `multi-dp-tp-stress-validation-2026-07-25.md` and `evidence/ranged-api-stress
 6. Do not add a hostPath source mount. The image contains source; use the existing `kubectl cp` sync flow.
 7. Engine containers keep `sleep infinity` as PID 1. vLLM is started and stopped manually in each Pod.
 8. Do not recreate engine Pods between S1, S2, and S3. Only restart the in-Pod vLLM processes and Master.
-9. Do not stop, scale, delete, or patch workloads outside `ai-inference`.
+9. Do not stop, scale, delete, or patch workloads outside `liangjiahao`.
 10. Preserve these unrelated untracked paths and never stage them:
 
     ```text
@@ -83,7 +83,7 @@ The implementation and runtime preflight must use these values:
 
 | Name | Value |
 |---|---|
-| namespace | `ai-inference` |
+| namespace | `liangjiahao` |
 | node | `n1` |
 | image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
 | model path | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
@@ -645,7 +645,7 @@ Execute Tasks 1-5 before touching live cluster state.
 - [ ] Run:
 
   ```bash
-  kubectl apply --dry-run=client \
+  kubectl apply --dry-run=client -n liangjiahao \
     -f features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml \
     -f features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml \
     -f features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml
@@ -781,9 +781,9 @@ exclude only the two Deployments being replaced, and never delete another worklo
 - [ ] Apply in this order:
 
   ```bash
-  kubectl apply -f features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml
-  kubectl apply -f features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml
-  kubectl apply -f features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml
+  kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml
+  kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml
+  kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml
   ```
 
 - [ ] Do not use `kubectl rollout status` for engine Deployments before vLLM starts; readiness intentionally

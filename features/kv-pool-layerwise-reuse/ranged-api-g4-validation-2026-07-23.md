@@ -26,7 +26,7 @@ the legacy whole-key path.
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | physical layers | `27`, read from the captured model `config.json` |
 | node / devices | `n1`, two `Ascend910B4` |
-| namespace | `ai-inference` |
+| namespace | `liangjiahao` |
 
 The image identity remains the G0-G3 base image. G4 used a Python-only sync of
 the committed vLLM-Ascend source into the same prefill and decode Pods; neither
@@ -115,7 +115,7 @@ identical. A new run should use the current locked commit and verify the tree.
 ```bash
 set -euo pipefail
 
-readonly g4_namespace=ai-inference
+readonly g4_namespace=liangjiahao
 readonly g4_deployment_dir=features/kv-pool-layerwise-reuse/deployment
 readonly g4_reference_dir=features/kv-pool-layerwise-reuse/evidence/ranged-api-g4-20260723T132919Z/runtime-audit
 readonly g4_source_commit=3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6
@@ -142,11 +142,11 @@ For a fresh cluster, apply the same fixture before continuing:
 
 ```bash
 kubectl apply -f "${g4_deployment_dir}/00-namespace.yaml"
-kubectl apply -f "${g4_deployment_dir}/10-runtime-config.yaml"
-kubectl apply -f "${g4_deployment_dir}/30-mooncake-master.yaml"
-kubectl apply -f "${g4_deployment_dir}/40-prefill-engine.yaml"
-kubectl apply -f "${g4_deployment_dir}/50-decode-engine.yaml"
-kubectl apply -f "${g4_deployment_dir}/20-proxy-server.yaml"
+kubectl apply -n "${g4_namespace}" -f "${g4_deployment_dir}/10-runtime-config.yaml"
+kubectl apply -n "${g4_namespace}" -f "${g4_deployment_dir}/30-mooncake-master.yaml"
+kubectl apply -n "${g4_namespace}" -f "${g4_deployment_dir}/40-prefill-engine.yaml"
+kubectl apply -n "${g4_namespace}" -f "${g4_deployment_dir}/50-decode-engine.yaml"
+kubectl apply -n "${g4_namespace}" -f "${g4_deployment_dir}/20-proxy-server.yaml"
 kubectl rollout status -n "${g4_namespace}" \
   deployment/mooncake-master-deployment --timeout=120s
 kubectl rollout status -n "${g4_namespace}" \

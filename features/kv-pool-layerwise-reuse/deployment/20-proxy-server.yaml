@@ -2,13 +2,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: vllm-proxy-sa
-  namespace: ai-inference
+  namespace: liangjiahao
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: vllm-proxy-pod-reader
-  namespace: ai-inference
+  namespace: liangjiahao
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -18,11 +18,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: vllm-proxy-pod-reader
-  namespace: ai-inference
+  namespace: liangjiahao
 subjects:
   - kind: ServiceAccount
     name: vllm-proxy-sa
-    namespace: ai-inference
+    namespace: liangjiahao
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -32,7 +32,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: proxy-server-deployment
-  namespace: ai-inference
+  namespace: liangjiahao
 spec:
   replicas: 1
   selector:
@@ -61,7 +61,7 @@ spec:
               --decoder-container decode-engine
               --prefiller-port-name prefill-port
               --decoder-port-name decode-port
-              --namespace ai-inference
+              --namespace liangjiahao
           ports:
             - name: proxy-port
               containerPort: 8000
@@ -77,7 +77,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: vllm-proxy-service
-  namespace: ai-inference
+  namespace: liangjiahao
 spec:
   type: ClusterIP
   selector:

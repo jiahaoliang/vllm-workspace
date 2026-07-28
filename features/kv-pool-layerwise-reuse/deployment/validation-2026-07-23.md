@@ -39,7 +39,7 @@ Neither test is a ranged API test; ranged API validation is deferred.
 | vLLM source | `ee0da84ab9e04ac7610e28580af62c365e898389` |
 | vLLM-Ascend source | `663209fd6208a59a48742f75116345bf5f5281ec` |
 | Mooncake source | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
-| Namespace | `ai-inference` |
+| Namespace | `liangjiahao` |
 
 The image's shallow editable vLLM install reports
 `0.1.dev1+gee0da84ab`; both engine Pods used the supported
@@ -118,7 +118,7 @@ The historical source snapshot and runner are committed under the evidence
 tree. Use them instead of the evolving files in the current branch:
 
 ```bash
-readonly deployment_namespace=ai-inference
+readonly deployment_namespace=liangjiahao
 readonly historical_fixture_root="${deployment_evidence_root}/environment/deployment-fixture"
 readonly historical_source_root="${historical_fixture_root}/source"
 readonly historical_deployment_dir="${historical_source_root}/features/kv-pool-layerwise-reuse/deployment"
@@ -141,7 +141,8 @@ for deployment_manifest in \
   40-prefill-engine.yaml \
   50-decode-engine.yaml \
   20-proxy-server.yaml; do
-  kubectl apply -f "${historical_deployment_dir}/${deployment_manifest}"
+  kubectl apply -n "${deployment_namespace}" \
+    -f "${historical_deployment_dir}/${deployment_manifest}"
 done
 
 kubectl rollout status -n "${deployment_namespace}" \

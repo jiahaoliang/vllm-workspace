@@ -32,7 +32,7 @@ The top-level result is the [overall summary](evidence/ranged-api-stress-2026072
 | vLLM-Ascend | `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6` |
 | Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
-| namespace / node | `ai-inference` / `n1` |
+| namespace / node | `liangjiahao` / `n1` |
 | Prefill | one Pod, `DP=2`, `TP=2`, 4 Ascend910 devices |
 | Decode | one Pod, `DP=1`, `TP=2`, 2 Ascend910 devices |
 | Master read lease | `30000ms`, confirmed by Deployment and startup log |

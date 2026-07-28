@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-namespace=ai-inference
+namespace=liangjiahao
 remote_artifact_dir=/tmp/layerwise-smoke
 
 usage() {
@@ -19,6 +19,15 @@ for command_name in kubectl python3; do
     exit 2
   fi
 done
+
+if [[ "${namespace}" != liangjiahao ]]; then
+  echo "refusing to run outside the liangjiahao namespace" >&2
+  exit 2
+fi
+if ! kubectl get namespace "${namespace}" >/dev/null; then
+  echo "required namespace is unavailable: ${namespace}" >&2
+  exit 2
+fi
 
 output_dir=${1:-/tmp/layerwise-smoke-$(date +%Y%m%d-%H%M%S)}
 if [[ -e "${output_dir}" && ! -d "${output_dir}" ]]; then

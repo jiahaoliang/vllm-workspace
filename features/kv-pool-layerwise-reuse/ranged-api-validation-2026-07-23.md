@@ -32,7 +32,7 @@ every physical model layer.
 | Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | node | `n1` |
-| namespace | `ai-inference` |
+| namespace | `liangjiahao` |
 
 The live engine and Master Pods reported the same image config ID. OCI labels
 inside the image matched all three locked source commits.
@@ -108,7 +108,7 @@ Use the exact archived runner and frozen deployment source, not their evolving
 counterparts on the branch:
 
 ```bash
-readonly ranged_namespace=ai-inference
+readonly ranged_namespace=liangjiahao
 readonly ranged_historical_vllm_ascend=663209fd6208a59a48742f75116345bf5f5281ec
 readonly ranged_runner="${ranged_evidence_root}/direct/range-api-smoke.py"
 readonly ranged_fixture_root="${ranged_evidence_root}/environment/deployment-fixture"

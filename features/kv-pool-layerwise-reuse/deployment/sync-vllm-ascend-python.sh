@@ -2,11 +2,17 @@
 set -euo pipefail
 
 readonly BASE_COMMIT="663209fd6208a59a48742f75116345bf5f5281ec"
-readonly NAMESPACE="ai-inference"
+readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly WORKSPACE_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 readonly SOURCE_REPO="${WORKSPACE_ROOT}/repos/vllm-ascend"
 readonly CONTAINER_SOURCE="/vllm-workspace/vllm-ascend"
+
+if [[ "${NAMESPACE}" != liangjiahao ]]; then
+  echo "refusing to sync outside the liangjiahao namespace" >&2
+  exit 2
+fi
+kubectl get namespace "${NAMESPACE}" >/dev/null
 
 git -C "${SOURCE_REPO}" cat-file -e "${BASE_COMMIT}^{commit}"
 
