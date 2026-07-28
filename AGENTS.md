@@ -28,6 +28,13 @@
 - 从合作者分支同步时，必须记录到对应 `features/<feature>/sync-log.md`。
 - 每个有意义的开发节点应按顺序完成：源码仓库 commit 并 push 到个人 fork，刷新 `workspace.lock.json`，更新 `features/<feature>/repo-state.md`，最后提交根仓库状态记录。
 
+## Kubernetes 测试命名空间
+
+- 本 workspace 创建或运行的 Kubernetes 测试 workload 必须使用 `liangjiahao` namespace。
+- 禁止在 manifest、脚本、测试计划、validation 文档或 runbook 中将 `ai-inference` 用作可执行命令的 namespace；发现旧引用时应先迁移到 `liangjiahao` 再运行。
+- 所有 `kubectl apply`、`exec`、`logs`、`cp`、`port-forward`、`rollout` 和清理命令必须显式限定 `liangjiahao`，不得依赖当前 context 的 default namespace。
+- 清理测试资源前必须同时核对 kube context、namespace 和目标资源名；不得删除整个 namespace，除非用户明确要求。
+
 ## 公共内容更新流程
 
 - 修改公共内容时，必须先切到 `main`，在 `main` 上完成修改、验证、提交并推送。
