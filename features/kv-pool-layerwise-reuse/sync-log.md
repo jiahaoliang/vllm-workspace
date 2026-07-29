@@ -239,3 +239,16 @@
   `af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d`.
   The prior G0-G3 artifact was not modified. Both debug engines were stopped
   after evidence collection; the original engine Pods remain in place.
+
+## 2026-07-29
+
+- Preserved the unfinished Mooncake multi-group layerwise candidate
+  `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e` on the pushed vLLM-Ascend branch
+  `origin/wip/mooncake-multi-group-layerwise-optimization`.
+- Created the matching workspace branch
+  `origin/wip/mooncake-multi-group-layerwise-optimization` from
+  `c4250d27cebfe11f44e3df609b32aac8809ece43` and moved the active lock and state
+  records to the isolated source branch.
+- Force-pushed `origin/feature/mooncake-layerwise-kv-pool` from `1800d56dc` back
+  to its direct parent `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6` with an exact lease. The public
+  pull-request branch therefore excludes the unfinished multi-group candidate.

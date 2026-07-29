@@ -1,6 +1,6 @@
 # Mooncake Multi-group Layerwise KV Cache 设计
 
-Status: Implemented, ready for written review
+Status: Implemented candidate under optimization on an isolated WIP branch
 
 Date: 2026-07-28
 
@@ -372,6 +372,8 @@ compatibility patch tests：
 - Candidate: `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`.
 - Review diff:
   `git -C repos/vllm-ascend diff 3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6...1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`.
-- Source branch: `origin/feature/mooncake-layerwise-kv-pool`.
+- Source branch: `origin/wip/mooncake-multi-group-layerwise-optimization`.
+- Public PR branch `origin/feature/mooncake-layerwise-kv-pool` intentionally
+  remains at the fixed point and excludes this unfinished candidate.
 - Validation boundary: CPU/mock only; no real model, Mooncake deployment, NPU
   benchmark, or NPU E2E claim is included in this handoff.

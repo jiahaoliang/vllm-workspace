@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-29T10:21:51+08:00",
+  "updated_at": "2026-07-29T10:37:14+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -20,9 +20,9 @@
         "upstream": "https://github.com/vllm-project/vllm-ascend.git",
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
-      "branch": "feature/mooncake-layerwise-kv-pool",
+      "branch": "wip/mooncake-multi-group-layerwise-optimization",
       "commit": "1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e",
-      "purpose": "Mooncake multi-group layerwise KVPool implementation; reviewer baseline"
+      "purpose": "Mooncake multi-group layerwise KVPool optimization; isolated WIP baseline"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

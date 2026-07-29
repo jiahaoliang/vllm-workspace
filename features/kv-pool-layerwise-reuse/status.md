@@ -1,11 +1,11 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: Mooncake multi-group layerwise implementation ready for review
+Current Phase: Mooncake multi-group layerwise optimization on isolated WIP branches
 
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool`
+- `repos/vllm-ascend`: `wip/mooncake-multi-group-layerwise-optimization`
   (`1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`), with review fixed point
   `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6`
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
@@ -13,6 +13,12 @@ Current Phase: Mooncake multi-group layerwise implementation ready for review
 
 ## Next Steps
 
+- Fix the clipped-save range offset so every selected range includes
+  `GroupBlockKeys.block_offset`.
+- Build the load mask from the actual `kvpool_cached_tokens` boundary rather
+  than the later `target_token_len` scheduling boundary.
+- Detect runtime multi-group layouts by group count and metadata, including the
+  valid case where every group uses `FullAttentionSpec`.
 - Review `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6...1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`
   against `mooncake-multi-group-layerwise-design.md` and the §5.8 reference
   snapshot.
@@ -21,8 +27,12 @@ Current Phase: Mooncake multi-group layerwise implementation ready for review
 
 ## Latest Validation
 
-- On 2026-07-29, the Mooncake multi-group layerwise implementation was pushed as
-  vLLM-Ascend commit `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`.
+- On 2026-07-29, the Mooncake multi-group layerwise candidate was preserved as
+  vLLM-Ascend commit `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e` on
+  `origin/wip/mooncake-multi-group-layerwise-optimization`. The public
+  `origin/feature/mooncake-layerwise-kv-pool` branch was reset to the review
+  fixed point `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6`, so the unfinished candidate
+  is excluded from that branch's pull request.
   The dedicated `liangjiahao/vllm-ascend-ut` CPU-only Pod passed `454` tests:
   the complete AscendStore suite plus RecomputeScheduler, default Scheduler
   group/block failure patch, and hybrid-recompute rejection targets. Changed-file
