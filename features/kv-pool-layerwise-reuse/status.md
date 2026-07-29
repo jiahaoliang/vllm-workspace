@@ -1,27 +1,33 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: source implementation complete
+Current Phase: Mooncake multi-group layerwise implementation ready for review
 
 ## Baseline
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool` (`663209fd6`),
-  rebased onto `upstream/main` (`9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool`
+  (`1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`), with review fixed point
+  `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6`
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
 
 ## Next Steps
 
-- Preserve the earlier same-cache proxy marker swap as a residual concurrency
-  risk. If it recurs, trace request markers, prefiller-returned
-  `kv_transfer_params`, and decoder payloads; foreign markers remain hard
-  failures rather than quantized batching variation.
-- Add opt-in per-layer ranged-operation tracing before claiming strict physical-layer
-  coverage, whole-key exclusion, or lease/failure-path acceptance. The sequential
-  and distinct-cache concurrent deployment smokes are complete, while ranged API
-  validation is deferred.
+- Review `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6...1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`
+  against `mooncake-multi-group-layerwise-design.md` and the §5.8 reference
+  snapshot.
+- Run the deferred real-model/NPU plan only as a separate validation phase; the
+  current handoff makes CPU/mock correctness claims only.
 
 ## Latest Validation
+
+- On 2026-07-29, the Mooncake multi-group layerwise implementation was pushed as
+  vLLM-Ascend commit `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`.
+  The dedicated `liangjiahao/vllm-ascend-ut` CPU-only Pod passed `454` tests:
+  the complete AscendStore suite plus RecomputeScheduler, default Scheduler
+  group/block failure patch, and hybrid-recompute rejection targets. Changed-file
+  Ruff lint, Python compile, `git diff --check`, and baseline-relative Ruff
+  format checks passed. No real model or NPU workload was run.
 
 - The final four-request distinct-cache smoke passed. Each request loaded 12
   shared plus 13 request-specific blocks, followed by the same 15 uncached token

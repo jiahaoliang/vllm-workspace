@@ -99,6 +99,7 @@
 | 内容 | 文件 | 定位 |
 | --- | --- | --- |
 | 主实施计划 | [implementation-plan.md](implementation-plan.md) | Backend contract、metadata、ranged transfer、session orchestration 和验收边界 |
+| Mooncake multi-group 设计 | [mooncake-multi-group-layerwise-design.md](mooncake-multi-group-layerwise-design.md) | §5.8 的 N-group key、object、session、range、failure contract 和测试边界 |
 | Range transfer commit 拆分 | [split-range-transfer-plan.md](split-range-transfer-plan.md) | review-sized commit 与验证顺序 |
 | 部署前模型/proxy 确认 | [development-confirmation-request.md](development-confirmation-request.md) | 模型支持、proxy 选择和 E2E 证据要求 |
 | Feature branch 整体检视 | [feature-branch-review-2026-07-20.md](feature-branch-review-2026-07-20.md) | findings、风险和当时的验证结果 |

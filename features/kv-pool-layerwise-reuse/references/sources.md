@@ -30,6 +30,13 @@
   - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/design-mooncake-layerwise-gva-put.md`
 - Chunked Prefill + Layerwise Mooncake sequence: <https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/rJUTYuX4Ml>
   - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/sequence-chunked-prefill-layerwise-mooncake.md`
+- DeepSeek multi-group KV cache research:
+  - DeepSeek-V3.2-Exp: <https://github.com/deepseek-ai/DeepSeek-V3.2-Exp>
+  - DeepSeek-V4 paper: <https://arxiv.org/abs/2606.19348>
+  - DeepSeek-V4-Pro inference source: <https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/tree/main/inference>
+  - vLLM-Ascend PR #12083: <https://github.com/vllm-project/vllm-ascend/pull/12083>
+  - vLLM-Ascend PR #12147: <https://github.com/vllm-project/vllm-ascend/pull/12147>
+  - Local snapshot: `features/kv-pool-layerwise-reuse/references/snapshots/research-deepseek-multi-group-kv-cache-2026-07-28.md`
 
 ## Local Snapshots
 
@@ -39,6 +46,7 @@
 - `snapshots/design-mooncake-layerwise-gva-put.md`
 - `snapshots/sequence-chunked-prefill-layerwise-mooncake.md`
 - `snapshots/research-chunked-prefill-update-2026-07-20.md`
+- `snapshots/research-deepseek-multi-group-kv-cache-2026-07-28.md`
 - `snapshots/pr-11444-layerwise-kv-pooling-memcache.md`
 - `snapshots/pr-10733-layerwise-kv-pool-reuse.md`
 - `snapshots/pr-2881-mooncake-layerwise-session-ranges.md`
@@ -48,4 +56,3 @@
 - `patches/pr-11444-layerwise-kv-pooling-memcache.patch`
 - `patches/pr-10733-layerwise-kv-pool-reuse.patch`
 - `patches/pr-2881-mooncake-layerwise-session-ranges.patch`
-
