@@ -252,3 +252,9 @@
 - Force-pushed `origin/feature/mooncake-layerwise-kv-pool` from `1800d56dc` back
   to its direct parent `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6` with an exact lease. The public
   pull-request branch therefore excludes the unfinished multi-group candidate.
+- Corrected a stale concurrent audit report after rechecking committed candidate
+  `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`: clipped save ranges already apply
+  `GroupBlockKeys.block_offset`, load masks already use `kvpool_cached_tokens`,
+  and multiple `FullAttentionSpec` runtime groups are already recognized. The
+  focused regression tests for all three cases are part of the candidate; no
+  bug issues were created from the stale findings.

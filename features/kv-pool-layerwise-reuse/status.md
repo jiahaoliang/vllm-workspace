@@ -13,12 +13,6 @@ Current Phase: Mooncake multi-group layerwise optimization on isolated WIP branc
 
 ## Next Steps
 
-- Fix the clipped-save range offset so every selected range includes
-  `GroupBlockKeys.block_offset`.
-- Build the load mask from the actual `kvpool_cached_tokens` boundary rather
-  than the later `target_token_len` scheduling boundary.
-- Detect runtime multi-group layouts by group count and metadata, including the
-  valid case where every group uses `FullAttentionSpec`.
 - Review `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6...1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`
   against `mooncake-multi-group-layerwise-design.md` and the §5.8 reference
   snapshot.
@@ -27,6 +21,13 @@ Current Phase: Mooncake multi-group layerwise optimization on isolated WIP branc
 
 ## Latest Validation
 
+- Audit correction on 2026-07-29: three findings reported from a stale
+  concurrent audit snapshot are not outstanding in committed candidate
+  `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`. The candidate already applies
+  `GroupBlockKeys.block_offset` to clipped save ranges, builds the load mask
+  from `kvpool_cached_tokens`, and recognizes multiple `FullAttentionSpec`
+  runtime groups. Each case has a focused regression test, so no bug issues
+  were created for those findings.
 - On 2026-07-29, the Mooncake multi-group layerwise candidate was preserved as
   vLLM-Ascend commit `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e` on
   `origin/wip/mooncake-multi-group-layerwise-optimization`. The public
