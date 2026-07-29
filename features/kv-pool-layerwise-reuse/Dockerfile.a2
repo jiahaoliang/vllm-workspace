@@ -16,10 +16,10 @@ ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
 ARG VLLM_COMMIT="ee0da84ab9e04ac7610e28580af62c365e898389"
 
 ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
-ARG VLLM_ASCEND_COMMIT="663209fd6208a59a48742f75116345bf5f5281ec"
+ARG VLLM_ASCEND_COMMIT="b5b65d9bbe325d009ad887fb87b8883b7ecee156"
 
 ARG MOONCAKE_REPO="https://github.com/ascend-direct-dev/Mooncake.git"
-ARG MOONCAKE_COMMIT="74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5"
+ARG MOONCAKE_COMMIT="786c77ff7692bed58dd99971afef87d6b690cbe3"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     SOC_VERSION=${SOC_VERSION} \
@@ -159,13 +159,13 @@ RUN set -euo pipefail; \
     ); \
     test -f "${store_modules[0]}"; \
     for api_name in \
-        batch_put_start \
+        batch_put_session_start \
         batch_put_from_multi_buffer_ranges \
-        batch_put_end \
-        batch_put_revoke \
-        batch_get_start \
+        batch_put_session_end \
+        batch_put_session_revoke \
+        batch_get_session_start \
         batch_get_into_multi_buffer_ranges \
-        batch_get_end; \
+        batch_get_session_end; \
     do \
         grep -F -q "${api_name}" < <(strings "${store_modules[0]}"); \
     done

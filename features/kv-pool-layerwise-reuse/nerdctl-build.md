@@ -10,7 +10,7 @@ vLLM Ascend layerwise KV pool 镜像。该流程不创建或修改 Kubernetes wo
 当前环境通过以下变量指定 BuildKit 和 containerd namespace：
 
 ```bash
-export BUILDKIT_HOST=kube-pod://buildkitd
+export BUILDKIT_HOST='kube-pod://buildkitd?namespace=default'
 export CONTAINERD_NAMESPACE=k8s.io
 ```
 
@@ -23,7 +23,9 @@ printf 'BUILDKIT_HOST=%s\n' "$BUILDKIT_HOST"
 printf 'CONTAINERD_NAMESPACE=%s\n' "$CONTAINERD_NAMESPACE"
 ```
 
-`nerdctl build` 会调用本机的 `buildctl` 客户端连接 `buildkitd`。如果出现
+`buildkitd` 是 workspace Kubernetes namespace 规则的唯一例外，固定运行在
+`default` namespace。`nerdctl build` 会调用本机的 `buildctl` 客户端连接该
+Pod。如果出现
 `exec: "buildctl": executable file not found in $PATH`，应先确认 `buildctl` 已安装并在
 `PATH` 中。
 
@@ -35,7 +37,7 @@ printf 'CONTAINERD_NAMESPACE=%s\n' "$CONTAINERD_NAMESPACE"
 nerdctl -n k8s.io build \
   --progress=plain \
   -f features/kv-pool-layerwise-reuse/Dockerfile.a2 \
-  -t vllm-ascend:kv-pool-layerwise-v0.24.0-a2 \
+  -t vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729 \
   features/kv-pool-layerwise-reuse
 ```
 
@@ -56,7 +58,7 @@ nerdctl -n k8s.io build \
 构建成功后，BuildKit 输出：
 
 ```text
-Loaded image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+Loaded image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
 ```
 
 containerd 中的实际镜像信息：
@@ -64,20 +66,20 @@ containerd 中的实际镜像信息：
 | Field | Value |
 | --- | --- |
 | Namespace | `k8s.io` |
-| Image | `vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
+| Image | `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` |
 | Platform | `linux/arm64` |
-| Manifest digest | `sha256:155d929d8ffe8359cd1e9b7a4aa8e24df3460fb471341a731b9ead5f73c1262c` |
-| Config ID | `sha256:f5f7031f1dc453e0390b5a2f889754902087f618f5e4f8e20678686443beb3a8` |
-| Unpacked size | `19.21 GB` |
-| Blob size | `6.797 GB` |
+| Manifest digest | `sha256:bd3c7b2324d799c4a1f360bcbc8191cee2e4fa05c58f66bddc5d09bba9ee710f` |
+| Config ID | `sha256:7e190798aee3cecae8bf3c91020ce2efab82d5900b290e2d659c724bf6ee313c` |
+| Unpacked size | `19.23 GB` |
+| Blob size | `6.803 GB` |
 
 源码 labels 已核对：
 
 | Component | Commit |
 | --- | --- |
 | vLLM | `ee0da84ab9e04ac7610e28580af62c365e898389` |
-| vLLM Ascend | `663209fd6208a59a48742f75116345bf5f5281ec` |
-| Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
+| vLLM Ascend | `b5b65d9bbe325d009ad887fb87b8883b7ecee156` |
+| Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
 
 ## 常用 nerdctl 命令
 
@@ -85,21 +87,21 @@ containerd 中的实际镜像信息：
 
 ```bash
 nerdctl -n k8s.io images
-nerdctl -n k8s.io images --digests vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+nerdctl -n k8s.io images --digests vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
 ```
 
 检查镜像配置、平台和 labels：
 
 ```bash
 nerdctl -n k8s.io image inspect \
-  vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+  vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
 ```
 
 删除镜像引用：
 
 ```bash
 nerdctl -n k8s.io rmi \
-  vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+  vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
 ```
 
 `rmi` 会删除指定 namespace 中的镜像引用。执行前应确认没有 Pod 或其他部署仍依赖该

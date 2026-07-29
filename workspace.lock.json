@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-29T10:21:51+08:00",
+  "updated_at": "2026-07-29T13:06:27+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,7 +21,7 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool",
-      "commit": "1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e",
+      "commit": "b5b65d9bbe325d009ad887fb87b8883b7ecee156",
       "purpose": "Mooncake multi-group layerwise KVPool implementation; reviewer baseline"
     },
     "Mooncake": {
@@ -31,7 +31,7 @@
         "collaborator": "https://github.com/ascend-direct-dev/Mooncake.git"
       },
       "branch": "feature/layerwise-kv-session",
-      "commit": "74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",
+      "commit": "786c77ff7692bed58dd99971afef87d6b690cbe3",
       "purpose": "Mooncake PR #2881 WIP integration; collaborator branch feature/layerwise-kv-session"
     }
   }

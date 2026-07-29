@@ -6,20 +6,35 @@ Current Phase: Mooncake multi-group layerwise implementation ready for review
 
 - `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
 - `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool`
-  (`1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`), with review fixed point
-  `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6`
+  (`b5b65d9bbe325d009ad887fb87b8883b7ecee156`)
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
-  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` (WIP)
+  `786c77ff7692bed58dd99971afef87d6b690cbe3` (WIP)
 
 ## Next Steps
 
-- Review `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6...1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`
-  against `mooncake-multi-group-layerwise-design.md` and the §5.8 reference
-  snapshot.
+- Run the deferred real-model/NPU session API validation with image
+  `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729`.
 - Run the deferred real-model/NPU plan only as a separate validation phase; the
   current handoff makes CPU/mock correctness claims only.
 
 ## Latest Validation
+
+- On 2026-07-29, vLLM-Ascend commit
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156` adapted the unchanged internal
+  Backend interface to Mooncake's renamed `batch_*_session_*` client methods.
+  The dedicated `liangjiahao/vllm-ascend-ut` Pod passed the red/green focused
+  gate (`4 failed, 1 passed` before implementation; `5 passed` after), the
+  complete Backend file (`80 passed`), and the full AscendStore suite
+  (`408 passed`). Ruff 0.14.0 lint passed; both changed files retained the same
+  pre-existing whole-file format delta as parent `3f0cbf59c`; in-memory Python
+  compilation and `git diff --check` passed.
+- The clone-based nerdctl build completed on native `linux/arm64` and loaded
+  `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` into
+  containerd namespace `k8s.io`. Manifest digest is
+  `sha256:bd3c7b2324d799c4a1f360bcbc8191cee2e4fa05c58f66bddc5d09bba9ee710f`;
+  image labels match vLLM `ee0da84ab`, vLLM-Ascend `b5b65d9bb`, and Mooncake
+  `786c77ff`. The Dockerfile's binary symbol gate passed all seven renamed/range
+  APIs.
 
 - On 2026-07-29, the Mooncake multi-group layerwise implementation was pushed as
   vLLM-Ascend commit `1800d56dc2ff6553ff0e0f25f63ab9505ff5ac3e`.
@@ -59,10 +74,10 @@ Current Phase: Mooncake multi-group layerwise implementation ready for review
   commit `9f2aefa59`: Mooncake load timeout now has a bounded fatal drain path without
   early `batch_get_end`, while memcache retains its original drain behavior;
   put-start exception revoke runs on the layer SendingThread control queue.
-- The latest scope decision forbids Mooncake source changes. Mooncake remains
-  exactly at collaborator HEAD `74b0acf15`; folded Backend contract commit
-  `0e5c41c00` preserves its current two-argument put-start and four-argument
-  ranged-put calls. No `fixup!` commits remain in the feature history.
+- Mooncake source remains read-only at collaborator HEAD `786c77ff`; the
+  vLLM-Ascend adapter preserves two-argument put-start and four-argument
+  ranged-put calls while translating only the renamed session-control method
+  names. No Mooncake commit was created or pushed.
 - The complete isolated AscendStore CPU suite passed `402` tests. Focused Ruff,
   `py_compile`, `git diff --check`, and all nine rewritten commit checks passed.
   The pre/post-autosquash tree hash is identical. Real Mooncake wheel, memcache

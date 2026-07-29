@@ -239,3 +239,42 @@
   `af533b69d6128088bad74dc12dfab95fd31201882ae92577cf0c5908f754181d`.
   The prior G0-G3 artifact was not modified. Both debug engines were stopped
   after evidence collection; the original engine Pods remain in place.
+
+## 2026-07-29
+
+- Fetched the force-updated Mooncake collaborator branch
+  `feature/layerwise-kv-session` and moved the read-only Mooncake worktree from
+  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` to detached collaborator tip
+  `786c77ff7692bed58dd99971afef87d6b690cbe3`.
+- The updated Mooncake client renames the five session-control methods to
+  `batch_put_session_start`, `batch_put_session_end`,
+  `batch_put_session_revoke`, `batch_get_session_start`, and
+  `batch_get_session_end`. The two ranged transfer method names remain
+  unchanged. vLLM-Ascend adaptation and image validation are tracked in
+  `implementation-plans/2026-07-29-mooncake-session-api-adaptation.md`.
+- Adapted the vLLM-Ascend Mooncake boundary without changing the internal
+  Backend interface, committed it as
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156`, and pushed the feature branch to
+  the personal fork so the existing clone-based image build could consume the
+  exact commit.
+- In the dedicated CPU-only `liangjiahao/vllm-ascend-ut` Pod, the strict
+  adapter test produced the expected red result (`4 failed, 1 passed`) before
+  implementation and passed after it (`5 passed`). The complete backend file
+  passed `80` tests and the complete AscendStore suite passed `408` tests.
+  Ruff 0.14.0 lint, in-memory Python compilation, and `git diff --check`
+  passed; both changed Python files retained their pre-existing whole-file
+  format delta relative to parent `3f0cbf59c`.
+- Preserved the original remote-clone Dockerfile flow, pinning vLLM-Ascend to
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156` and Mooncake to
+  `786c77ff7692bed58dd99971afef87d6b690cbe3`. The shared `buildkitd` is the
+  only namespace exception and runs in `default`; UT and serving workloads
+  remain in `liangjiahao`.
+- Built native `linux/arm64` image
+  `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` into
+  containerd namespace `k8s.io`. Its manifest digest is
+  `sha256:bd3c7b2324d799c4a1f360bcbc8191cee2e4fa05c58f66bddc5d09bba9ee710f`,
+  config is
+  `sha256:7e190798aee3cecae8bf3c91020ce2efab82d5900b290e2d659c724bf6ee313c`,
+  unpacked size is `19.23 GB`, and blob size is `6.803 GB`. Image labels match
+  vLLM `ee0da84ab`, vLLM-Ascend `b5b65d9bb`, and Mooncake `786c77ff`; the
+  binary symbol gate passed all seven required session/ranged APIs.
