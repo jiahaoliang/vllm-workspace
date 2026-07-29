@@ -33,6 +33,7 @@
 - 本 workspace 创建或运行的 Kubernetes 测试 workload 必须使用 `liangjiahao` namespace。
 - 禁止在 manifest、脚本、测试计划、validation 文档或 runbook 中将 `ai-inference` 用作可执行命令的 namespace；发现旧引用时应先迁移到 `liangjiahao` 再运行。
 - 所有 `kubectl apply`、`exec`、`logs`、`cp`、`port-forward`、`rollout` 和清理命令必须显式限定 `liangjiahao`，不得依赖当前 context 的 default namespace。
+- 唯一例外是共享镜像构建基础设施 `buildkitd`：它必须运行在 `default` namespace，相关 `kubectl apply`、`exec`、`logs` 和清理命令必须显式指定 `-n default`，`BUILDKIT_HOST` 必须使用显式 namespace 的 `kube-pod://buildkitd?namespace=default`；此例外不适用于 UT、serving 或其他 feature workload。
 - 清理测试资源前必须同时核对 kube context、namespace 和目标资源名；不得删除整个 namespace，除非用户明确要求。
 
 ## Kubernetes UT 执行环境
