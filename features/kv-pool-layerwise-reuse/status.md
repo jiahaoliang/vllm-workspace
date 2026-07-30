@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun in progress
+Current Phase: 11/11 Mooncake linear integration frozen; full validation terminated at G0 on a production ABI defect
 
 ## Baseline
 
@@ -17,13 +17,33 @@ Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun i
 
 ## Next Steps
 
-- Build the unique ARM64 image pinned by `deployment/validation-identity.json`.
-- Execute the complete tooling, image, CPU/mock, G0, G1, lease, G4, smoke, and
-  stress gates in the active full-validation tracker.
-- Keep `repos/*` frozen during validation; terminate with evidence on a
-  production/ABI/runtime defect and repair only control tooling defects.
+- Resolve the vLLM-Ascend/vLLM coordinator signature mismatch in a separate,
+  explicitly authorized source change. The terminated run did not modify
+  `repos/*`.
+- After a source fix, create a new validation identity and run ID, rebuild the
+  complete image, and restart the full sequence from tooling/image/UT through
+  G0, G1, lease, G4, smoke, and stress. Do not resume this failed run at G1.
+- Preserve run `20260730T130225Z` as immutable failure evidence.
 
 ## Latest Validation
+
+- Full validation run `20260730T130225Z` built and proved the exact R4 ARM64
+  image, then passed the CPU-only UT gate (`476` AscendStore and `65`
+  deployment tests). G0 prestart identity, seven Mooncake APIs, NPU health,
+  model hashes, lease TTL, and empty-pool checks all passed. Both Prefill and
+  Decode then failed before serving with
+  `TypeError: get_kv_cache_coordinator() got an unexpected keyword argument
+  'max_num_batched_tokens'`. Static signature evidence shows pinned vLLM
+  accepts `max_in_flight_tokens`; the 11 Mooncake commits did not change the
+  wrapper. The run terminated before G1, with no production source change.
+- Failure cleanup stopped all live vLLM processes, reset Master to zero keys,
+  zero allocated bytes, and zero active clients, and retained the UT, Master,
+  proxy, Prefill, and Decode Pods. A control-only fix now makes the base
+  lifecycle helper classify zombie PIDs correctly; the complete deployment
+  collection remained `65 passed` and focused PID tests passed `3` tests.
+- The self-contained result is
+  `full-validation-rerun-2026-07-30.md`; immutable evidence commit is
+  `dfe99a1fa7c246f9d84320deac2f143033cec12b`.
 
 - On 2026-07-30, completed the requested 11/11 linear integration at
   `14beaf161cca6f1e044e20529ca96c6554dbbe50`, pushed it normally, and verified

@@ -9,6 +9,22 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
+## Full Validation Rerun 20260730T130225Z
+
+- Report:
+  [full-validation-rerun-2026-07-30.md](../full-validation-rerun-2026-07-30.md)
+- Evidence:
+  [full-validation-rerun-20260730T130225Z](full-validation-rerun-20260730T130225Z/README.md)
+- Result: tooling r4, exact ARM64 image identity, and CPU/mock UT passed. G0
+  terminated because both engine roles reproduced a production
+  vLLM-Ascend/vLLM coordinator keyword ABI defect. G1, lease, G4, smoke, and
+  stress were not run.
+- G0 `SHA256SUMS` digest:
+  `35db818c1ec6ec005e838eeeb17f464ed73f600f8837f78d6e64ee7631e6c212`.
+- Post-failure tooling `SHA256SUMS` digest:
+  `367db24d7daa19a560a21c5745c207c0cc6a31fe58a47bc0935702bb346a1e10`.
+- Evidence commit: `dfe99a1fa7c246f9d84320deac2f143033cec12b`.
+
 ## G0-G3
 
 - Report: [ranged-api-validation-2026-07-23.md](../ranged-api-validation-2026-07-23.md)

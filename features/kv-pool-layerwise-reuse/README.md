@@ -60,14 +60,17 @@
   [implementation-plans/full-validation-guide.md](implementation-plans/full-validation-guide.md)
 - Historical interrupted run tracker:
   [implementation-plans/2026-07-30-full-validation-rerun.md](implementation-plans/2026-07-30-full-validation-rerun.md)
-- Active run tracker:
+- Terminated run tracker:
   [implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md](implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md)
+- Termination report:
+  [full-validation-rerun-2026-07-30.md](full-validation-rerun-2026-07-30.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 
 Stable guide 不携带历史 run 的默认 SHA、image tag、model dimensions 或 key counts。
 每次执行必须新建 dated tracker，并优先采用用户显式指定的版本；未指定字段从当次 clean
-checkout、lock、model 和 live runtime 派生后冻结。
+checkout、lock、model 和 live runtime 派生后冻结。Run `20260730T130225Z` 已在 G0
+因 production ABI defect 终止，修复源码后必须新建 run identity，不得从 G1 续跑。
 
 ### 1P1D Smoke
 

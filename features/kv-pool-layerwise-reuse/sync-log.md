@@ -414,3 +414,51 @@
   seven static symbols, and later NPU runtime APIs remain hard gates. Identity
   regression coverage prevents reintroducing the wheel-only probe; no
   `repos/*` source was modified.
+- Attempt r4 built and loaded native ARM64 image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4`.
+  Manifest digest is
+  `sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477`
+  and config ID is
+  `sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358`.
+  Exact source heads, raw dependency-health allowlist, native libraries, seven
+  Mooncake APIs, NPU availability/health, and imageID matching all passed.
+- Recreated only the dedicated CPU-only `liangjiahao/vllm-ascend-ut` Pod on
+  the R4 image. It retained CPU/memory-only resources with no NPU, driver,
+  model, or hostPath mount. AscendStore passed `476` tests, deployment tooling
+  passed `65`, and Ruff lint/format, Python compilation, source history, clean
+  tree, and diff checks passed with bytecode/cache disabled.
+- G0 static and dynamic identity passed in both engine Pods: exact imageID and
+  source heads, package versions, seven session/range APIs, `torch_npu` NPU
+  availability, `npu-smi` health, native `ldd`, model/tokenizer hashes, Master
+  `30000 ms` lease TTL, and an initially empty pool were all proven.
+- Both Prefill and Decode failed deterministically during scheduler startup
+  before serving. vLLM-Ascend
+  `patch_kv_cache_coordinator.py:518` forwarded
+  `max_num_batched_tokens`, while pinned vLLM commit `54503ecec` exposes
+  `max_in_flight_tokens` and no such keyword. The exact TypeError appeared in
+  both full logs. The wrapper file has no diff across
+  `a46a1dabb..14beaf161`, so this is an inherited collaborator-base
+  production ABI defect, not a Mooncake conflict-resolution change.
+- Terminated the validation before G1 under the source-freeze rule. No
+  `repos/*` file changed. All live vLLM processes and endpoints were stopped,
+  Master was reset to zero keys, zero allocated bytes, and zero active clients,
+  and the final source target/protected remote refs remained
+  `14beaf161cca6f1e044e20529ca96c6554dbbe50` and
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156` respectively.
+- Failure cleanup exposed a separate control-tooling issue: `kill -0` treated
+  unreaped API-server zombies as live and waited 60 seconds per role. The base
+  ConfigMap now shares the stress runtime's `live/absent/zombie` PID helper;
+  base/stress regression coverage passed `3` tests, the full deployment
+  collection passed `65`, and rendered scripts, Ruff, compile, diff, and
+  manifest dry-run gates passed. Fixture-sync, stale-Ruff-path, format, Master
+  metrics race, and checksum-cwd retries are preserved in evidence.
+- Committed immutable run evidence and the control-only cleanup fix as
+  `dfe99a1fa7c246f9d84320deac2f143033cec12b`. The self-contained termination
+  report is `full-validation-rerun-2026-07-30.md`; G1, lease, G4, smoke, and
+  stress were not run and must start under a new image/run identity after a
+  separately authorized production source fix.
+- `pwsh` and `powershell` remained unavailable. Linux equivalents of
+  `lock-repos.ps1`, `status-all.ps1`, and `validate-workspace.ps1` passed. The
+  lock refresh corrected Mooncake's checkout label from the stale local branch
+  name to actual clean detached state `detached:786c77ff`; no Mooncake ref or
+  source file was changed.
