@@ -320,3 +320,23 @@
   `665e691662fec0292c9f2258e4193dcce01ae949`; the CPU/mock AscendStore suite
   passed `417` tests and `63` subtests, Python compilation passed, and
   `git diff --check` passed.
+- Aborted the conflicting merge on
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` and started the
+  requested linear integration by replaying the Mooncake commits directly onto
+  `collaborator/kv_offload_0723` at
+  `a46a1dabbc260e8695002969f29528eb555eb583`.
+- Published a partial `3/11` checkpoint at
+  `baa547632fcc6ebec37f1e6922469652b7cec90b`. The applied commits are
+  `3676b98f1`, `7f8bdf290`, and `baa547632`; the remaining source range starts
+  with original commit `3eddb06c6` and ends at protected branch HEAD
+  `b5b65d9bb`. Local and
+  `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` match.
+- Conflict resolution preserves collaborator `GroupTransferData`,
+  `TransferCompletion`, and `LayerTransferArrayBuilder` behavior alongside the
+  Mooncake `SharedBlockData`, `LayerBatchReqMeta`, and key-major ranged batch
+  path. `git diff --check`, Python compilation, and the linear ancestry/count
+  checks passed. CPU/mock pytest did not complete on Windows: normal collection
+  requires unavailable `uvloop`, while isolated collection replaces real `zmq`
+  with the existing `_mock_deps.py` stub and then cannot import `zmq.asyncio`.
+  Resume validation in the K8s environment before applying commits `4/11` to
+  `11/11`.
