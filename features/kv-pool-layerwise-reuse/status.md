@@ -42,6 +42,14 @@ Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun i
   image. Attempt r3 pins the observed 9-character version and adds signal-safe
   terminal recording to `run-validation-step.sh`.
 
+- Attempt r3 completed both native builds, the seven-symbol check, and the
+  fail-closed raw `pip check` gate. It then failed only because the image probe
+  requested `mooncake-transfer-engine` distribution metadata, while this
+  Dockerfile installs Mooncake modules directly with CMake and creates no
+  `.dist-info`. Attempt r4 uses the existing source-build identity contract:
+  exact Git HEAD, installed `store*.so` path, native symbols, and runtime APIs.
+  The r3 image was not loaded.
+
 - On 2026-07-30, folded `fix(kv_pool): adapt renamed Mooncake session APIs`
   into rewritten Backend contract commit `700e56cfd`. The remaining 10 commits
   were replayed without conflicts; final source HEAD `08b4f531d` has the exact

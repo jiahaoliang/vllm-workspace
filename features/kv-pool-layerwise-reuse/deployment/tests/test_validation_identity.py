@@ -99,7 +99,7 @@ class ValidationIdentityTest(unittest.TestCase):
 
     def test_run_identity_records_model_runtime_and_cluster_contract(self):
         self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
-        self.assertEqual(IDENTITY["attempt"], 3)
+        self.assertEqual(IDENTITY["attempt"], 4)
         self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
         self.assertRegex(IDENTITY["tooling_base"]["commit"], r"^[0-9a-f]{40}$")
         self.assertEqual(IDENTITY["model"]["num_layers"], 27)
@@ -169,6 +169,15 @@ class ValidationIdentityTest(unittest.TestCase):
             check=False,
         )
         self.assertEqual(unexpected.returncode, 1)
+
+        self.assertNotIn(
+            'packages=("vllm", "vllm-ascend", "mooncake-transfer-engine"',
+            dockerfile,
+        )
+        self.assertIn(
+            'print(f"mooncake-store={paths[0]}")',
+            dockerfile,
+        )
 
     def test_stress_summary_embeds_exact_source_identity(self):
         runner = read("deployment/run-stress-test.sh")

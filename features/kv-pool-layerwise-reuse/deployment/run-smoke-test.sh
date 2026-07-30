@@ -3,7 +3,7 @@ set -uo pipefail
 
 readonly namespace=liangjiahao
 readonly remote_artifact_dir=/tmp/layerwise-smoke
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
 readonly expected_vllm=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
 readonly expected_vllm_ascend=14beaf161cca6f1e044e20529ca96c6554dbbe50
 readonly expected_mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3

@@ -198,7 +198,7 @@ nerdctl -n "${CONTAINERD_NAMESPACE}" build \
   features/kv-pool-layerwise-reuse
 ```
 
-- [ ] Run raw `pip check` and fail on every unexpected issue. If the selected immutable base/plugin contract has known unsatisfiable metadata, the run identity may carry an exact, regression-tested allowlist; record every allowed line as a limitation and reject all other output. Also verify platform, manifest digest, config ID, source labels, editable Git HEADs, dependency versions, native extension, dynamic imports in an NPU Pod, and every API in `.session_apis`.
+- [ ] Run raw `pip check` and fail on every unexpected issue. If the selected immutable base/plugin contract has known unsatisfiable metadata, the run identity may carry an exact, regression-tested allowlist; record every allowed line as a limitation and reject all other output. Also verify platform, manifest digest, config ID, source labels, editable Git HEADs, dependency versions, native extension, dynamic imports in an NPU Pod, and every API in `.session_apis`. For a Mooncake source build installed directly by CMake, do not require wheel distribution metadata that the install path does not create; prove its exact Git HEAD, installed module path, native symbols, and runtime APIs instead.
 - [ ] Fail if a Pod reports the requested tag but its `imageID` does not match the recorded digest.
 - [ ] Append the new result; do not overwrite a prior image record.
 

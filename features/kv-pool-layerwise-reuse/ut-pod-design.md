@@ -9,7 +9,7 @@ tests. The Pod must not request an Ascend NPU or reuse a serving engine Pod.
 
 - Namespace: `liangjiahao`.
 - Pod name: `vllm-ascend-ut`.
-- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3` with
+- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` with
   `imagePullPolicy: Never`, pinned to `n1` where the image is stored.
 - The container runs `sleep infinity` and keeps an `emptyDir` checkout across
   test commands and container restarts.

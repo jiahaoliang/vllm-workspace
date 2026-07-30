@@ -402,3 +402,15 @@
   ready. The test now waits for a child-written artifact marker; it passed 50
   consecutive host runs and the complete dedicated-Pod deployment collection
   passed `65` tests with cache and bytecode disabled.
+- Attempt r3 completed the Mooncake and vLLM-Ascend native builds, all seven
+  required session/range symbols, and the exact raw `pip check` allowlist. The
+  next package-report command failed on
+  `importlib.metadata.version("mooncake-transfer-engine")`. Source inspection
+  and the prior ranged-API report confirm this CMake install writes the
+  `mooncake` package and native extensions directly into Ascend site-packages
+  without wheel distribution metadata; the r3 tag was never loaded.
+- Attempt r4 removes only that invalid distribution lookup and adds a native
+  module-path assertion. The exact Mooncake Git HEAD, store/engine binaries,
+  seven static symbols, and later NPU runtime APIs remain hard gates. Identity
+  regression coverage prevents reintroducing the wheel-only probe; no
+  `repos/*` source was modified.

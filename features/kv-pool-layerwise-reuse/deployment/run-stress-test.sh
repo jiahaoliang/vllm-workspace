@@ -3,7 +3,7 @@ set -uo pipefail
 
 readonly namespace=liangjiahao
 readonly node_name=n1
-readonly image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3
+readonly image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
 readonly model_path=/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"

@@ -2,12 +2,12 @@
   "schema_version": 1,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
   "run_id": "20260730T130225Z",
-  "attempt": 3,
+  "attempt": 4,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "a674091e09703481a2ec4fdb6a651831cd0108da"
+    "commit": "f6986469ba749fbb37b7b5323a3dd94aa35ff441"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
   "platform": "linux/arm64",
   "vllm_version": "0.25.1",
   "namespace": "liangjiahao",

@@ -195,7 +195,8 @@ RUN set -euo pipefail; \
     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "${VLLM_COMMIT}"; \
     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "${VLLM_ASCEND_COMMIT}"; \
     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "${MOONCAKE_COMMIT}"; \
-    python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "mooncake-transfer-engine", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))'; \
+    python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))'; \
+    python3 -c 'import glob; paths=glob.glob("/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so"); assert len(paths) == 1, paths; print(f"mooncake-store={paths[0]}")'; \
     python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))'
 
 LABEL org.opencontainers.image.title="vLLM Ascend layerwise KV pool" \

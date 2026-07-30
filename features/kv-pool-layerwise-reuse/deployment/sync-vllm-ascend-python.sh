@@ -2,7 +2,7 @@
 set -euo pipefail
 
 readonly BASE_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
-readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3"
+readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4"
 readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly WORKSPACE_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
