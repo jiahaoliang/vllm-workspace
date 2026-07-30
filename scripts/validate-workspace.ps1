@@ -2,6 +2,8 @@ param(
     [string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 )
 
+. "$PSScriptRoot\common.ps1"
+
 $ErrorActionPreference = "Stop"
 $failed = $false
 
@@ -48,8 +50,8 @@ foreach ($relativePath in $requiredPaths) {
     Require-Path $relativePath
 }
 
-Require-Text ".gitignore" "(?m)^repos/\*$" "repos/* is ignored"
-Require-Text ".gitignore" "(?m)^!repos/\.gitkeep$" "repos/.gitkeep remains trackable"
+Require-Text ".gitignore" "(?m)^repos/\*(?:\r?$)" "repos/* is ignored"
+Require-Text ".gitignore" "(?m)^!repos/\.gitkeep(?:\r?$)" "repos/.gitkeep remains trackable"
 Require-Text "AGENTS.md" "control repo" "root repo role"
 Require-Text "AGENTS.md" "repos/\*" "nested source repositories are not root-tracked"
 Require-Text "AGENTS.md" "workspace\.lock\.json" "lock file workflow"
@@ -59,6 +61,13 @@ if (Test-Path -LiteralPath $featuresRoot) {
     $featureDirs = Get-ChildItem -LiteralPath $featuresRoot -Directory
     foreach ($feature in $featureDirs) {
         $featureName = $feature.Name
+        $trackedFeatureFiles = Get-GitOutput -RepoPath $Root -GitArgs @(
+            "ls-files", "--", "features/$featureName"
+        )
+        if (-not $trackedFeatureFiles) {
+            continue
+        }
+
         foreach ($relativePath in @(
             "features/$featureName/README.md",
             "features/$featureName/status.md",
