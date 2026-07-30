@@ -54,7 +54,10 @@ function Get-GitRefName {
         return $branch
     }
 
-    $tag = Get-GitOutput -RepoPath $RepoPath -GitArgs @("describe", "--tags", "--exact-match", "HEAD")
+    $tags = Get-GitOutput -RepoPath $RepoPath -GitArgs @(
+        "tag", "--points-at", "HEAD", "--sort=-version:refname"
+    )
+    $tag = @($tags -split "\r?\n" | Where-Object { $_ })[0]
     if ($tag) {
         return "tag:$tag"
     }

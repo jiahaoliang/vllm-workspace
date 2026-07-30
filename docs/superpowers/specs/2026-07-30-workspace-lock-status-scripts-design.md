@@ -1,7 +1,7 @@
 # Workspace Lock and Status Script Compatibility Design
 
 Date: 2026-07-30
-Status: Approved for written review
+Status: Approved
 
 ## Context
 
@@ -24,8 +24,6 @@ state.
 - Make untagged detached repositories a normal supported state.
 - Let renamed feature branches reuse an existing feature directory without
   changing the normal no-argument command.
-- Provide an explicit feature-name override for branch names that cannot be
-  inferred safely.
 - Reject an unresolved feature directory before writing the lock or state file.
 - Cover the behavior with PowerShell regression tests.
 
@@ -54,46 +52,31 @@ the ref fix is implemented once.
 
 ### Feature Directory Resolution
 
-Add a shared resolver and an optional `-FeatureName` parameter to
-`lock-repos.ps1`.
+Keep the fallback local to `lock-repos.ps1`. For a non-main workspace branch,
+resolution order is:
 
-For a non-main workspace branch, resolution order is:
-
-1. A supplied `-FeatureName`, after validating it as one directory name.
-2. An exact `features/<workspace-branch>` directory.
-3. The longest existing feature directory name that is a hyphen-boundary prefix
+1. An exact `features/<workspace-branch>` directory.
+2. The longest existing feature directory name that is a hyphen-boundary prefix
    of the branch. For example,
    `kv-pool-layerwise-reuse-redesign` resolves to
    `features/kv-pool-layerwise-reuse`.
 
-If no directory resolves, fail with an error that recommends
-`-FeatureName <name>`. Resolve and validate the destination before updating the
-in-memory lock or writing either output file. The generated state heading uses
-the resolved feature name, while the source-repo branch values continue to come
-from `Get-GitRefName`.
+If no directory resolves, fail before writing either output file. The generated
+state heading uses the resolved feature name, while the source-repo branch
+values continue to come from `Get-GitRefName`.
 
 On `main`, `lock-repos.ps1` continues updating only `workspace.lock.json`.
 
 ### Failure Behavior
 
 - Git failures other than "no exact tag" remain fatal.
-- An explicit feature name containing separators or traversal syntax is
-  rejected.
-- An explicit or inferred feature directory must already exist.
+- The inferred feature directory must already exist.
 - No fallback creates a new feature directory implicitly.
 
 ## Tests
 
-Add Pester tests compatible with the available Pester 3.4 runtime:
-
-- attached branch returns the branch name;
-- detached commit with one or more exact tags returns a deterministic tag;
-- untagged detached commit returns `detached:<short-sha>` without throwing;
-- feature resolution supports explicit override, exact match, and longest
-  hyphen-prefix match;
-- missing and invalid feature names fail before output mutation.
-
-After merging the public change into `kv-pool-layerwise-reuse-redesign`, run:
+Use the existing workspace as the regression test after merging the public
+change into `kv-pool-layerwise-reuse-redesign`:
 
 ```powershell
 .\scripts\lock-repos.ps1
@@ -102,6 +85,8 @@ After merging the public change into `kv-pool-layerwise-reuse-redesign`, run:
 
 Verify that vLLM is reported as `detached:d02df748b`, all three repo HEADs match
 the lock, and `features/kv-pool-layerwise-reuse/repo-state.md` is refreshed.
+A temporary Git repository smoke also covers attached, tagged detached, and
+untagged detached ref formatting without adding a new test framework.
 
 ## Delivery
 

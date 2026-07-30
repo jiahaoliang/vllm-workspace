@@ -4,11 +4,35 @@ $ErrorActionPreference = "Stop"
 $Root = Get-WorkspaceRoot
 $LockPath = Join-Path $Root "workspace.lock.json"
 $Lock = Get-WorkspaceLock -Root $Root
-$Lock.updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssK")
 $WorkspaceBranch = Get-GitOutput -RepoPath $Root -GitArgs @("branch", "--show-current")
+$StateName = $WorkspaceBranch
+$StatePath = $null
+
+if ($WorkspaceBranch -ne "main") {
+    $featuresRoot = Join-Path $Root "features"
+    $featureDir = Get-Item -LiteralPath (Join-Path $featuresRoot $WorkspaceBranch) -ErrorAction SilentlyContinue
+    if ($null -eq $featureDir -or -not $featureDir.PSIsContainer) {
+        $featureDir = Get-ChildItem -LiteralPath $featuresRoot -Directory |
+            Where-Object {
+                $WorkspaceBranch.StartsWith(
+                    "$($_.Name)-",
+                    [System.StringComparison]::Ordinal
+                )
+            } |
+            Sort-Object { $_.Name.Length } -Descending |
+            Select-Object -First 1
+    }
+    if ($null -eq $featureDir) {
+        throw "Missing feature directory for branch $WorkspaceBranch"
+    }
+    $StateName = $featureDir.Name
+    $StatePath = Join-Path $featureDir.FullName "repo-state.md"
+}
+
+$Lock.updated_at = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssK")
 
 $stateLines = @(
-    "# $WorkspaceBranch Repo State",
+    "# $StateName Repo State",
     "",
     "Captured At: $($Lock.updated_at)",
     "",
@@ -38,13 +62,9 @@ foreach ($repoDef in Get-RepoDefinitions -Lock $Lock) {
 
 ConvertTo-WorkspaceJson -Value $Lock | Set-Content -Encoding UTF8 -LiteralPath $LockPath
 
-if ($WorkspaceBranch -ne "main") {
-    $statePath = Join-Path $Root "features/$WorkspaceBranch/repo-state.md"
-    if (-not (Test-Path -LiteralPath (Split-Path -Parent $statePath))) {
-        throw "Missing feature directory for branch $WorkspaceBranch"
-    }
-    $stateLines -join "`n" | Set-Content -Encoding UTF8 -LiteralPath $statePath
-    Write-Host "Updated workspace.lock.json and features/$WorkspaceBranch/repo-state.md"
+if ($null -ne $StatePath) {
+    $stateLines -join "`n" | Set-Content -Encoding UTF8 -LiteralPath $StatePath
+    Write-Host "Updated workspace.lock.json and features/$StateName/repo-state.md"
 }
 else {
     Write-Host "Updated workspace.lock.json"
