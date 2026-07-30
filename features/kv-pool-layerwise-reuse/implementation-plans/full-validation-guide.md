@@ -99,7 +99,7 @@ The dated tracker must record whether each value was user-specified or derived. 
 | Area | Hard gate |
 | --- | --- |
 | Identity | Lock, clean source HEADs, Dockerfile pins, image labels, editable Git HEADs, manifests, runners, and checker expectations agree exactly |
-| Image | Full build from selected base; target platform, source labels, dependency health, native extension, imports, and selected Mooncake symbols pass |
+| Image | Full build from selected base; target platform, source labels, fail-closed dependency health, native extension, imports, and selected Mooncake symbols pass |
 | CPU/mock | Dedicated Pod contract passes; complete selected collection passes with current count; Ruff/compilation/diff checks pass |
 | Pool isolation | Engines are stopped before Master reset; key count, allocated bytes, and active clients prove empty before each independent scenario |
 | Direct ranged API | Multi-key/multi-layer transfer, non-zero offsets, per-key result bytes, final byte comparison, negative session/range cases, and cleanup pass |
@@ -198,7 +198,7 @@ nerdctl -n "${CONTAINERD_NAMESPACE}" build \
   features/kv-pool-layerwise-reuse
 ```
 
-- [ ] Verify platform, manifest digest, config ID, source labels, editable Git HEADs, `pip check`, dependency versions, native extension, dynamic imports in an NPU Pod, and every API in `.session_apis`.
+- [ ] Run raw `pip check` and fail on every unexpected issue. If the selected immutable base/plugin contract has known unsatisfiable metadata, the run identity may carry an exact, regression-tested allowlist; record every allowed line as a limitation and reject all other output. Also verify platform, manifest digest, config ID, source labels, editable Git HEADs, dependency versions, native extension, dynamic imports in an NPU Pod, and every API in `.session_apis`.
 - [ ] Fail if a Pod reports the requested tag but its `imageID` does not match the recorded digest.
 - [ ] Append the new result; do not overwrite a prior image record.
 

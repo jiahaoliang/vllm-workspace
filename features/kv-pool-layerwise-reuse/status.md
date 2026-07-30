@@ -5,8 +5,8 @@ Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun i
 ## Baseline
 
 - `repos/vllm`: verified main commit
-  `d02df748bf9efd99022f1a062597dc3cb3808485` declared by vLLM-Ascend main
-  (release line `v0.25.1`)
+  `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` declared by the integrated
+  vLLM-Ascend branch (release line `v0.25.1`)
 - `repos/vllm-ascend`:
   `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`
   (`14beaf161cca6f1e044e20529ca96c6554dbbe50`), with exactly 11 linear

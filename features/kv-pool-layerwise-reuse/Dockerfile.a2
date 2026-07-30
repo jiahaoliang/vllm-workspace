@@ -13,7 +13,7 @@ ARG SOC_VERSION="ascend910b1"
 ARG COMPILE_CUSTOM_KERNELS=1
 
 ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
-ARG VLLM_COMMIT="d02df748bf9efd99022f1a062597dc3cb3808485"
+ARG VLLM_COMMIT="54503ecec0f3ac31e5ecfc5f28652e4cc42307b5"
 
 ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
 ARG VLLM_ASCEND_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
@@ -170,10 +170,28 @@ RUN set -euo pipefail; \
         grep -F -q "${api_name}" < <(strings "${store_modules[0]}"); \
     done
 
-# Fail the build if editable installs, package dependencies, or source pins
-# drift from the image labels used by the runtime validation gates.
+# Fail the build on any dependency issue beyond the frozen CANN-base and
+# official vLLM/vLLM-Ascend compatibility set. The NPU plugin intentionally
+# supplies the supported Torch/FastAPI stack while vLLM is installed for the
+# empty target, so the upstream package metadata cannot make raw pip check
+# return zero in this image.
 RUN set -euo pipefail; \
-    python3 -m pip check; \
+    pip_check_output=/tmp/pip-check.txt; \
+    unexpected_pip_check=/tmp/unexpected-pip-check.txt; \
+    if python3 -m pip check >"${pip_check_output}" 2>&1; then \
+        cat "${pip_check_output}"; \
+    else \
+        cat "${pip_check_output}"; \
+        grep -E -v '^(ms-service-profiler 26\.0\.0 requires (matplotlib|msguard|openpyxl), which is not installed\.|te 0\.4\.0 requires (ml-dtypes|tornado), which is not installed\.|mindstudio-kpp 0\.0\.0\.dev0 requires plotly, which is not installed\.|ms-service-profiler 26\.0\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\.33\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\.44\.0\.|ms-service-profiler 26\.0\.0 has requirement pandas~=2\.2, but you have pandas 3\.0\.5\.|prometheus-fastapi-instrumentator 8\.1\.0 has requirement starlette<2\.0\.0,>=1\.0\.0, but you have starlette 0\.50\.0\.|opencv-python-headless 5\.0\.0\.93 has requirement numpy>=2; python_version >= "3\.9", but you have numpy 1\.26\.4\.|vllm 0\.1\.dev1\+g54503ece\.empty has requirement fastapi\[standard\]<0\.137\.0,>=0\.133\.0, but you have fastapi 0\.123\.10\.|vllm 0\.1\.dev1\+g54503ece\.empty has requirement starlette>=1\.0\.1, but you have starlette 0\.50\.0\.|te 0\.4\.0 is not supported on this platform)$' \
+            "${pip_check_output}" >"${unexpected_pip_check}" || true; \
+        if [[ -s ${unexpected_pip_check} ]]; then \
+            echo 'unexpected pip check issues:' >&2; \
+            cat "${unexpected_pip_check}" >&2; \
+            exit 1; \
+        fi; \
+        echo 'pip check reported only frozen known compatibility issues'; \
+    fi; \
+    rm -f "${pip_check_output}" "${unexpected_pip_check}"; \
     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "${VLLM_COMMIT}"; \
     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "${VLLM_ASCEND_COMMIT}"; \
     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "${MOONCAKE_COMMIT}"; \

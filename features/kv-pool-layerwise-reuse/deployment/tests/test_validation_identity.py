@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -98,6 +99,7 @@ class ValidationIdentityTest(unittest.TestCase):
 
     def test_run_identity_records_model_runtime_and_cluster_contract(self):
         self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
+        self.assertEqual(IDENTITY["attempt"], 2)
         self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
         self.assertRegex(IDENTITY["tooling_base"]["commit"], r"^[0-9a-f]{40}$")
         self.assertEqual(IDENTITY["model"]["num_layers"], 27)
@@ -114,6 +116,59 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertEqual(
             IDENTITY["kubernetes"]["builder_platform"], IDENTITY["platform"]
         )
+
+    def test_dockerfile_pip_health_gate_is_fail_closed(self):
+        dockerfile = read("Dockerfile.a2")
+        self.assertIn("python3 -m pip check", dockerfile)
+        self.assertIn("unexpected_pip_check", dockerfile)
+        self.assertIn("if [[ -s ${unexpected_pip_check} ]]", dockerfile)
+        self.assertIn("exit 1", dockerfile)
+        for expected_known_issue in (
+            "ms-service-profiler 26\\.0\\.0",
+            "prometheus-fastapi-instrumentator 8\\.1\\.0",
+            "opencv-python-headless 5\\.0\\.0\\.93",
+            "vllm 0\\.1\\.dev1\\+g54503ece\\.empty has requirement fastapi",
+            "te 0\\.4\\.0 is not supported on this platform",
+        ):
+            self.assertIn(expected_known_issue, dockerfile)
+
+        pattern_match = re.search(r"grep -E -v '([^']+)'", dockerfile)
+        self.assertIsNotNone(pattern_match)
+        pattern = pattern_match.group(1)
+        known_issues = (
+            "ms-service-profiler 26.0.0 requires matplotlib, which is not installed.",
+            "ms-service-profiler 26.0.0 requires msguard, which is not installed.",
+            "ms-service-profiler 26.0.0 requires openpyxl, which is not installed.",
+            "te 0.4.0 requires ml-dtypes, which is not installed.",
+            "te 0.4.0 requires tornado, which is not installed.",
+            "mindstudio-kpp 0.0.0.dev0 requires plotly, which is not installed.",
+            "ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-grpc==1.33.1, but you have opentelemetry-exporter-otlp-proto-grpc 1.44.0.",
+            "ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-http==1.33.1, but you have opentelemetry-exporter-otlp-proto-http 1.44.0.",
+            "ms-service-profiler 26.0.0 has requirement pandas~=2.2, but you have pandas 3.0.5.",
+            "prometheus-fastapi-instrumentator 8.1.0 has requirement starlette<2.0.0,>=1.0.0, but you have starlette 0.50.0.",
+            'opencv-python-headless 5.0.0.93 has requirement numpy>=2; python_version >= "3.9", but you have numpy 1.26.4.',
+            "vllm 0.1.dev1+g54503ece.empty has requirement fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10.",
+            "vllm 0.1.dev1+g54503ece.empty has requirement starlette>=1.0.1, but you have starlette 0.50.0.",
+            "te 0.4.0 is not supported on this platform",
+        )
+        for issue in known_issues:
+            result = subprocess.run(
+                ["grep", "-E", pattern],
+                input=f"{issue}\n",
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, issue)
+
+        unexpected = subprocess.run(
+            ["grep", "-E", pattern],
+            input="new-package 1.0 requires missing-package, which is not installed.\n",
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(unexpected.returncode, 1)
 
     def test_stress_summary_embeds_exact_source_identity(self):
         runner = read("deployment/run-stress-test.sh")

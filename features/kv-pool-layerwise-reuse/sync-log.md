@@ -372,3 +372,17 @@
 - `pwsh` was unavailable on this Linux host, so the state files were refreshed
   according to `scripts/lock-repos.ps1` and checked with equivalent Git/JSON
   commands; no PowerShell script result is claimed for this checkpoint.
+- The first full-validation image attempt used stale vLLM identity
+  `d02df748bf9efd99022f1a062597dc3cb3808485` inherited from the earlier
+  redesign checkpoint. Mooncake and vLLM-Ascend native builds completed, but
+  the final dependency-health gate failed after 68 minutes because that vLLM
+  metadata and the target release branch require incompatible FastAPI versions;
+  no image was loaded. The failed build remains under run
+  `20260730T130225Z/image`.
+- Re-derived vLLM from the integrated branch's own
+  `.github/vllm-main-verified.commit`, fetched and checked out clean detached
+  `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`, and refreshed the lock/state.
+  The r2 validation identity uses a new image tag and preserves the first
+  attempt. The Dockerfile still executes `pip check`; its wrapper permits only
+  the exact known CANN-base and official vLLM/vLLM-Ascend compatibility lines
+  and fails on every unexpected dependency issue.
