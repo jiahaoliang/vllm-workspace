@@ -281,6 +281,12 @@
 
 ## 2026-07-30
 
+- Re-inspected image
+  `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` in the local
+  containerd `k8s.io` store and recorded its exact manifest, config, platform,
+  creation time, and full vLLM/vLLM-Ascend/Mooncake commit labels in
+  `image-component-commits.md`. This immutable image mapping is intentionally
+  separate from the newer commits in `workspace.lock.json`.
 - Fetched `vllm-project/vllm-ascend` `upstream/main` at
   `b2f683ca35a59b4f74f1c29367cb31db4125214e` and rebased the 11 commits on
   `feature/mooncake-layerwise-redesign` from prior HEAD
