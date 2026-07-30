@@ -340,3 +340,35 @@
   with the existing `_mock_deps.py` stub and then cannot import `zmq.asyncio`.
   Resume validation in the K8s environment before applying commits `4/11` to
   `11/11`.
+- Completed commits `4/11` through `11/11` on
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`, producing frozen
+  source HEAD `14beaf161cca6f1e044e20529ca96c6554dbbe50`. The merge base remains
+  `collaborator/kv_offload_0723` at
+  `a46a1dabbc260e8695002969f29528eb555eb583`; the range contains exactly 11
+  commits, matches the original Mooncake subject order, and contains no merge
+  commit.
+- Conflict resolutions retain collaborator `GroupBatchPlan`,
+  `LayerwisePreparation`, `GroupTransferData`, `TransferCompletion`,
+  `LayerTransferArrayBuilder`, lease/fatal-poll handling, and group-aware
+  shared-buffer GVA transfers. Mooncake `SharedBlockData`, session ownership,
+  chunk renewal, key-major ranged batches, ranged audit, and session/range
+  save/load remain available through explicit backend/range dispatch. The
+  positional `LayerTransferTask` constructor contract is unchanged.
+- Fixed Ruff `B023` in the chunked-prefill test closure by binding the loop
+  worker as a lambda default and folded it into commit `a2d654419`; Ruff 0.14.0
+  formatting was absorbed into the existing final commit so the history stayed
+  at 11 commits. On the existing CPU-only
+  `liangjiahao/vllm-ascend-ut` Pod, the complete
+  `tests/ut/distributed/ascend_store` collection passed `476` tests in
+  `18.09s`. Ruff lint and format, Python compilation, and range
+  `git diff --check` also passed.
+- Confirmed protected local and remote
+  `feature/mooncake-layerwise-kv-pool` remain at
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156`. Before push, the target remote
+  was still `baa547632fcc6ebec37f1e6922469652b7cec90b`; the normal fast-forward
+  push advanced it to `14beaf161cca6f1e044e20529ca96c6554dbbe50`.
+  Post-push `git ls-remote` matched the local HEAD and
+  `git rev-list --left-right --count` returned `0 0`.
+- `pwsh` was unavailable on this Linux host, so the state files were refreshed
+  according to `scripts/lock-repos.ps1` and checked with equivalent Git/JSON
+  commands; no PowerShell script result is claimed for this checkpoint.
