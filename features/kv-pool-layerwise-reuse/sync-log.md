@@ -462,3 +462,11 @@
   lock refresh corrected Mooncake's checkout label from the stale local branch
   name to actual clean detached state `detached:786c77ff`; no Mooncake ref or
   source file was changed.
+- Published evidence commit `dfe99a1fa7c246f9d84320deac2f143033cec12b`
+  and final report/state commit
+  `2895913410272e4b93c8aadc20940959915f4039` by a normal fast-forward from
+  control remote checkpoint `4b296c18472aec46bddeae9974bad24252fd44dc`.
+  Post-push `git ls-remote` returned `2895913410272e4b93c8aadc20940959915f4039`
+  and `git rev-list --left-right --count` returned `0 0`. This metadata-only
+  follow-up records that completed publication check; its own remote equality
+  is verified independently after push.
