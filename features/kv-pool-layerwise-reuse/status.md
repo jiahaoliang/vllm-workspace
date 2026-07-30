@@ -8,7 +8,7 @@ Current Phase: Mooncake multi-group layerwise redesign on current upstream main
   `d02df748bf9efd99022f1a062597dc3cb3808485` declared by vLLM-Ascend main
   (release line `v0.25.1`)
 - `repos/vllm-ascend`: `feature/mooncake-layerwise-redesign`
-  (`4e9bb324613b08e86eaaf95c8d6554ae9ddb5845`), based on
+  (`08b4f531d585fbfa5e365fa7d5f5e812bc80ab16`), based on
   `upstream/main` `b2f683ca35a59b4f74f1c29367cb31db4125214e`
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `786c77ff7692bed58dd99971afef87d6b690cbe3` (WIP)
@@ -24,6 +24,12 @@ Current Phase: Mooncake multi-group layerwise redesign on current upstream main
 
 ## Latest Validation
 
+- On 2026-07-30, folded `fix(kv_pool): adapt renamed Mooncake session APIs`
+  into rewritten Backend contract commit `700e56cfd`. The remaining 10 commits
+  were replayed without conflicts; final source HEAD `08b4f531d` has the exact
+  pre-rewrite tree `665e691662fec0292c9f2258e4193dcce01ae949` and was force-pushed
+  with an exact lease. The complete CPU/mock AscendStore suite passed `417`
+  tests and `63` subtests; Python compilation and `git diff --check` passed.
 - On 2026-07-30, rebased the 11 Mooncake layerwise feature commits from
   vLLM-Ascend base `9dcbeaa2a` onto current `upstream/main` `b2f683ca3` and
   force-pushed `origin/feature/mooncake-layerwise-redesign` at
@@ -36,10 +42,10 @@ Current Phase: Mooncake multi-group layerwise redesign on current upstream main
   `63` subtests; Python compilation and `git diff --check` passed. Kubernetes was
   unavailable because no kube context is configured, and local Ruff was not
   installed, so neither the dedicated UT Pod nor Ruff was run.
-- `scripts/lock-repos.ps1` cannot represent this untagged detached vLLM commit:
-  `Get-GitRefName` treats a failed exact-tag lookup as fatal before its detached
-  fallback. `workspace.lock.json` and `repo-state.md` were refreshed manually
-  with the exact commit.
+- Public script fix `66d62fd` now handles untagged detached refs and resolves a
+  renamed workspace branch to the longest matching feature-directory prefix.
+  After merging `main`, both `lock-repos.ps1` and `status-all.ps1` completed;
+  all three repo HEADs match `workspace.lock.json`.
 
 - On 2026-07-29, vLLM-Ascend commit
   `b5b65d9bbe325d009ad887fb87b8883b7ecee156` adapted the unchanged internal

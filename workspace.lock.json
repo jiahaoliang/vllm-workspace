@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-30T14:26:09+08:00",
+  "updated_at": "2026-07-30T14:29:41+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,7 +21,7 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-redesign",
-      "commit": "4e9bb324613b08e86eaaf95c8d6554ae9ddb5845",
+      "commit": "08b4f531d585fbfa5e365fa7d5f5e812bc80ab16",
       "purpose": "Mooncake layerwise KVPool redesign; rebased onto vLLM-Ascend upstream/main b2f683ca3"
     },
     "Mooncake": {

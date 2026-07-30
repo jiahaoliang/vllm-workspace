@@ -301,6 +301,16 @@
   `417 passed, 63 subtests passed`. Python compilation and `git diff --check`
   passed. No kube context was configured, so the dedicated `liangjiahao` UT Pod
   was unavailable; Ruff was also unavailable locally. No NPU workload was run.
-- `scripts/lock-repos.ps1` failed on the untagged detached vLLM commit before its
-  intended detached fallback. Refreshed `workspace.lock.json` and
-  `repo-state.md` manually with the exact SHA; no public tooling change was made.
+- Fixed public workspace ref handling on `main` in `66d62fd`: exact tags are now
+  queried without treating an untagged detached HEAD as an error, and
+  `lock-repos.ps1` falls back to the longest matching feature-directory prefix.
+  Merged `main` into `kv-pool-layerwise-reuse-redesign`; `lock-repos.ps1` and
+  `status-all.ps1` now complete with all three repos matching the lock.
+- Folded `565b48dea fix(kv_pool): adapt renamed Mooncake session APIs` into
+  rewritten Backend contract commit `700e56cfd`, replayed the later commits, and
+  force-pushed final source HEAD
+  `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` with an exact lease against
+  `4e9bb324613b08e86eaaf95c8d6554ae9ddb5845`. The final tree remains exactly
+  `665e691662fec0292c9f2258e4193dcce01ae949`; the CPU/mock AscendStore suite
+  passed `417` tests and `63` subtests, Python compilation passed, and
+  `git diff --check` passed.
