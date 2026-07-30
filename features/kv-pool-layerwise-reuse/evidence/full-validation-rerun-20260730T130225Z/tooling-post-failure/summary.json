@@ -1,0 +1,44 @@
+{
+  "fix": {
+    "behavior": "share live/absent/zombie PID state contract with stress runtime",
+    "defect": "base stop-engine used kill -0 and treated zombie API server as live",
+    "files": [
+      "deployment/10-runtime-config.yaml",
+      "deployment/tests/test_stress_runtime_pid.py"
+    ]
+  },
+  "gates": {
+    "deployment_tests": 65,
+    "diff_check": true,
+    "manifest_dry_run": true,
+    "pid_regression_tests": 3,
+    "python_compile": true,
+    "rendered_configmap_entries": 11,
+    "ruff_format": true,
+    "ruff_lint": true
+  },
+  "production_source_modified": false,
+  "run_id": "20260730T130225Z-tooling-post-failure",
+  "schema_version": 1,
+  "scope": "control cleanup helper only",
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "artifact": "deployment-tests-pod.log",
+      "exit_code": 1,
+      "name": "deployment-tests-pod"
+    },
+    {
+      "artifact": "ruff-check.log",
+      "exit_code": 127,
+      "name": "ruff-check"
+    },
+    {
+      "artifact": "ruff-format-check-retry1.log",
+      "exit_code": 1,
+      "name": "ruff-format-check-retry1"
+    }
+  ],
+  "validated": true,
+  "validation_disposition_unchanged": "terminated-before-g1-production-abi-defect"
+}

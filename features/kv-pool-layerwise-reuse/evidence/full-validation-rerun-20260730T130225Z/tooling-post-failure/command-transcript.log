@@ -1,0 +1,72 @@
+[2026-07-30T17:30:15Z] START ut-pod-contract
+COMMAND bash -lc kubectl\ get\ pod\ -n\ liangjiahao\ vllm-ascend-ut\ -o\ json\ \|\ jq\ \"\{name:.metadata.name\,namespace:.metadata.namespace\,phase:.status.phase\,node:.spec.nodeName\,image:.spec.containers\[0\].image\,imageID:.status.containerStatuses\[0\].imageID\,resources:.spec.containers\[0\].resources\,volumes:.spec.volumes\,mounts:.spec.containers\[0\].volumeMounts\}\" 
+[2026-07-30T17:30:16Z] END ut-pod-contract exit=0 artifact=ut-pod-contract.json
+[2026-07-30T17:30:16Z] START create-control-fixture
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir -p /workspace/control-tooling-post-failure-20260730T130225Z 
+[2026-07-30T17:30:16Z] END create-control-fixture exit=0 artifact=create-control-fixture.log
+[2026-07-30T17:30:16Z] START sync-control-fixture
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ -cf\ -\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-tooling-post-failure-20260730T130225Z\ -xf\ - 
+[2026-07-30T17:30:17Z] END sync-control-fixture exit=0 artifact=sync-control-fixture.log
+[2026-07-30T17:30:17Z] START deployment-tests-pod
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ export\ PYTEST_ADDOPTS=\"-p\ no:cacheprovider\"\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests 
+[2026-07-30T17:30:19Z] END deployment-tests-pod exit=1 artifact=deployment-tests-pod.log
+[2026-07-30T17:31:02Z] START sync-control-fixture-retry1
+COMMAND bash -lc tar\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-tooling-post-failure-20260730T130225Z\ -xf\ - 
+[2026-07-30T17:31:03Z] END sync-control-fixture-retry1 exit=0 artifact=sync-control-fixture-retry1.log
+[2026-07-30T17:31:03Z] START deployment-tests-pod-retry1
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ export\ PYTEST_ADDOPTS=\"-p\ no:cacheprovider\"\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests 
+[2026-07-30T17:31:05Z] END deployment-tests-pod-retry1 exit=0 artifact=deployment-tests-pod-retry1.log
+[2026-07-30T17:31:05Z] START pid-regression-pod
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:31:06Z] END pid-regression-pod exit=0 artifact=pid-regression-pod.log
+[2026-07-30T17:31:06Z] START rendered-configmap-compile
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ env\ PYTHONDONTWRITEBYTECODE=1\ python3\ -c\ \'from\ pathlib\ import\ Path\;\ import\ subprocess\,yaml\;\ paths=\[Path\(\"features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml\"\)\,Path\(\"features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml\"\)\]\;\ docs=\[doc\ for\ path\ in\ paths\ for\ doc\ in\ yaml.safe_load_all\(path.read_text\(\)\)\ if\ doc\ and\ doc.get\(\"kind\"\)==\"ConfigMap\"\]\;\ entries=\[\(key\,value\)\ for\ doc\ in\ docs\ for\ key\,value\ in\ doc.get\(\"data\"\,\{\}\).items\(\)\ if\ key.endswith\(\(\".py\"\,\".sh\"\)\)\]\;\ \[compile\(value\,key\,\"exec\"\)\ if\ key.endswith\(\".py\"\)\ else\ subprocess.run\(\[\"bash\"\,\"-n\"\]\,input=value\,text=True\,check=True\)\ for\ key\,value\ in\ entries\]\;\ print\(f\"rendered_entries=\{len\(entries\)\}\"\)\' 
+[2026-07-30T17:31:07Z] END rendered-configmap-compile exit=0 artifact=rendered-configmap-compile.log
+[2026-07-30T17:31:07Z] START ruff-check
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ /tmp/vllm-ascend-ruff-0.14.0/bin/ruff\ check\ --no-cache\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:31:07Z] END ruff-check exit=127 artifact=ruff-check.log
+[2026-07-30T17:31:56Z] START ruff-version-retry1
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff --version 
+[2026-07-30T17:31:56Z] END ruff-version-retry1 exit=0 artifact=ruff-version-retry1.log
+[2026-07-30T17:31:56Z] START ruff-check-retry1
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ /workspace/tools/ruff\ check\ --no-cache\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:31:56Z] END ruff-check-retry1 exit=0 artifact=ruff-check-retry1.log
+[2026-07-30T17:31:56Z] START ruff-format-check-retry1
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ /workspace/tools/ruff\ format\ --check\ --no-cache\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:31:56Z] END ruff-format-check-retry1 exit=1 artifact=ruff-format-check-retry1.log
+[2026-07-30T17:33:06Z] START sync-control-fixture-retry2
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-tooling-post-failure-20260730T130225Z\ -xf\ - 
+[2026-07-30T17:33:07Z] END sync-control-fixture-retry2 exit=0 artifact=sync-control-fixture-retry2.log
+[2026-07-30T17:33:07Z] START deployment-tests-pod-retry2
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ export\ PYTEST_ADDOPTS=\"-p\ no:cacheprovider\"\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests 
+[2026-07-30T17:33:10Z] END deployment-tests-pod-retry2 exit=0 artifact=deployment-tests-pod-retry2.log
+[2026-07-30T17:33:10Z] START pid-regression-pod-retry2
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:33:11Z] END pid-regression-pod-retry2 exit=0 artifact=pid-regression-pod-retry2.log
+[2026-07-30T17:33:11Z] START rendered-configmap-compile-retry2
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ env\ PYTHONDONTWRITEBYTECODE=1\ python3\ -c\ \'from\ pathlib\ import\ Path\;\ import\ subprocess\,yaml\;\ paths=\[Path\(\"features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml\"\)\,Path\(\"features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml\"\)\]\;\ docs=\[doc\ for\ path\ in\ paths\ for\ doc\ in\ yaml.safe_load_all\(path.read_text\(\)\)\ if\ doc\ and\ doc.get\(\"kind\"\)==\"ConfigMap\"\]\;\ entries=\[\(key\,value\)\ for\ doc\ in\ docs\ for\ key\,value\ in\ doc.get\(\"data\"\,\{\}\).items\(\)\ if\ key.endswith\(\(\".py\"\,\".sh\"\)\)\]\;\ \[compile\(value\,key\,\"exec\"\)\ if\ key.endswith\(\".py\"\)\ else\ subprocess.run\(\[\"bash\"\,\"-n\"\]\,input=value\,text=True\,check=True\)\ for\ key\,value\ in\ entries\]\;\ print\(f\"rendered_entries=\{len\(entries\)\}\"\)\' 
+[2026-07-30T17:33:11Z] END rendered-configmap-compile-retry2 exit=0 artifact=rendered-configmap-compile-retry2.log
+[2026-07-30T17:33:11Z] START ruff-check-retry2
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ /workspace/tools/ruff\ check\ --no-cache\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:33:12Z] END ruff-check-retry2 exit=0 artifact=ruff-check-retry2.log
+[2026-07-30T17:33:12Z] START ruff-format-check-retry2
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-post-failure-20260730T130225Z\ \&\&\ /workspace/tools/ruff\ format\ --check\ --no-cache\ features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:33:12Z] END ruff-format-check-retry2 exit=0 artifact=ruff-format-check-retry2.log
+[2026-07-30T17:33:12Z] START python-compile
+COMMAND env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/control-tooling-post-failure-pyc python3 -m py_compile features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py 
+[2026-07-30T17:33:12Z] END python-compile exit=0 artifact=python-compile.log
+[2026-07-30T17:33:12Z] START control-diff-check
+COMMAND git diff --check 
+[2026-07-30T17:33:12Z] END control-diff-check exit=0 artifact=control-diff-check.log
+[2026-07-30T17:33:12Z] START manifest-dry-run-base-config
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml 
+[2026-07-30T17:33:12Z] END manifest-dry-run-base-config exit=0 artifact=manifest-dry-run-base-config.log
+[2026-07-30T17:33:52Z] START tooling-fix-summary
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-post-failure\"\)\;\ steps=\[json.loads\(line\)\ for\ line\ in\ \(root/\"steps.jsonl\"\).read_text\(\).splitlines\(\)\]\;\ failures=\[\{\"name\":x\[\"name\"\]\,\"exit_code\":x\[\"exit_code\"\]\,\"artifact\":x\[\"artifact\"\]\}\ for\ x\ in\ steps\ if\ x\[\"exit_code\"\]\]\;\ expected=\[\{\"name\":\"deployment-tests-pod\"\,\"exit_code\":1\,\"artifact\":\"deployment-tests-pod.log\"\}\,\{\"name\":\"ruff-check\"\,\"exit_code\":127\,\"artifact\":\"ruff-check.log\"\}\,\{\"name\":\"ruff-format-check-retry1\"\,\"exit_code\":1\,\"artifact\":\"ruff-format-check-retry1.log\"\}\]\;\ assert\ failures==expected\,failures\;\ assert\ \"65\ passed\"\ in\ \(root/\"deployment-tests-pod-retry2.log\"\).read_text\(\)\;\ assert\ \"3\ passed\"\ in\ \(root/\"pid-regression-pod-retry2.log\"\).read_text\(\)\;\ assert\ \"rendered_entries=11\"\ in\ \(root/\"rendered-configmap-compile-retry2.log\"\).read_text\(\)\;\ assert\ \"All\ checks\ passed\"\ in\ \(root/\"ruff-check-retry2.log\"\).read_text\(\)\;\ assert\ \"already\ formatted\"\ in\ \(root/\"ruff-format-check-retry2.log\"\).read_text\(\)\;\ print\(json.dumps\(\{\"schema_version\":1\,\"status\":\"passed\"\,\"validated\":True\,\"run_id\":\"20260730T130225Z-tooling-post-failure\"\,\"scope\":\"control\ cleanup\ helper\ only\"\,\"production_source_modified\":False\,\"fix\":\{\"defect\":\"base\ stop-engine\ used\ kill\ -0\ and\ treated\ zombie\ API\ server\ as\ live\"\,\"files\":\[\"deployment/10-runtime-config.yaml\"\,\"deployment/tests/test_stress_runtime_pid.py\"\]\,\"behavior\":\"share\ live/absent/zombie\ PID\ state\ contract\ with\ stress\ runtime\"\}\,\"gates\":\{\"deployment_tests\":65\,\"pid_regression_tests\":3\,\"rendered_configmap_entries\":11\,\"ruff_lint\":True\,\"ruff_format\":True\,\"python_compile\":True\,\"diff_check\":True\,\"manifest_dry_run\":True\}\,\"superseded_steps\":failures\,\"validation_disposition_unchanged\":\"terminated-before-g1-production-abi-defect\"\}\,sort_keys=True\,indent=2\)\) 
+[2026-07-30T17:33:52Z] END tooling-fix-summary exit=0 artifact=summary.json
+[2026-07-30T17:33:52Z] START tooling-fix-summary-assert
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .production_source_modified\ ==\ false\ and\ .gates.deployment_tests\ ==\ 65\ and\ .gates.pid_regression_tests\ ==\ 3\ and\ .validation_disposition_unchanged\ ==\ \"terminated-before-g1-production-abi-defect\" features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-post-failure/summary.json 
+[2026-07-30T17:33:52Z] END tooling-fix-summary-assert exit=0 artifact=summary-assert.log
+[2026-07-30T17:33:52Z] START tooling-fix-checksums
+COMMAND bash -lc cd\ features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-post-failure\ \&\&\ find\ .\ -maxdepth\ 1\ -type\ f\ \!\ -name\ SHA256SUMS\ \!\ -name\ steps.jsonl\ \!\ -name\ command-transcript.log\ \!\ -name\ checksum-generation.log\ -print0\ \|\ sort\ -z\ \|\ xargs\ -0\ sha256sum\ \>\ SHA256SUMS\ \&\&\ sha256sum\ -c\ SHA256SUMS 
+[2026-07-30T17:33:52Z] END tooling-fix-checksums exit=0 artifact=checksum-generation.log

@@ -1,0 +1,5 @@
+serviceaccount/vllm-proxy-sa created
+role.rbac.authorization.k8s.io/vllm-proxy-pod-reader created
+rolebinding.rbac.authorization.k8s.io/vllm-proxy-pod-reader created
+deployment.apps/proxy-server-deployment created
+service/vllm-proxy-service created

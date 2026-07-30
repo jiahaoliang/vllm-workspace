@@ -1,0 +1,18 @@
+[2026-07-30T13:28:43Z] START builder-pod
+COMMAND kubectl get pod -n default buildkitd -o json 
+[2026-07-30T13:28:43Z] END builder-pod exit=0 artifact=builder-pod.json
+[2026-07-30T13:28:51Z] START builder-worker
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default buildctl debug workers 
+[2026-07-30T13:28:51Z] END builder-worker exit=0 artifact=builder-worker.txt
+[2026-07-30T13:29:01Z] START target-tag-absence
+COMMAND bash -c set\ -e\;\ rows=\$\(nerdctl\ -n\ k8s.io\ images\ --digests\ docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z\ \|\ tail\ -n\ +2\ \|\ wc\ -l\)\;\ test\ \"\$rows\"\ =\ 0\;\ printf\ \"matching_rows=%s\\n\"\ \"\$rows\" 
+[2026-07-30T13:29:01Z] END target-tag-absence exit=0 artifact=target-tag-absence.txt
+[2026-07-30T13:29:54Z] START source-remote-heads
+COMMAND bash -c set\ -e\;\ git\ -C\ repos/vllm-ascend\ ls-remote\ origin\ refs/heads/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723\;\ git\ -C\ repos/Mooncake\ ls-remote\ collaborator\ refs/heads/feature/layerwise-kv-session\;\ git\ -C\ repos/vllm\ branch\ -r\ --contains\ d02df748bf9efd99022f1a062597dc3cb3808485 
+[2026-07-30T13:29:55Z] END source-remote-heads exit=0 artifact=source-remote-heads.txt
+[2026-07-30T13:31:40Z] START mooncake-exact-fetchability
+COMMAND bash -c set\ -e\;\ test\ \!\ -e\ /tmp/mooncake-formal-fetch-20260730T130225Z\;\ git\ init\ /tmp/mooncake-formal-fetch-20260730T130225Z\;\ git\ -C\ /tmp/mooncake-formal-fetch-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/ascend-direct-dev/Mooncake.git\ 786c77ff7692bed58dd99971afef87d6b690cbe3\;\ test\ \"\$\(git\ -C\ /tmp/mooncake-formal-fetch-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 786c77ff7692bed58dd99971afef87d6b690cbe3 
+[2026-07-30T13:31:43Z] END mooncake-exact-fetchability exit=0 artifact=mooncake-exact-fetchability.log
+[2026-07-30T13:32:16Z] START image-build
+COMMAND nerdctl -n k8s.io build --progress=plain -f features/kv-pool-layerwise-reuse/Dockerfile.a2 -t docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z features/kv-pool-layerwise-reuse 
+[2026-07-30T14:40:50Z] END image-build exit=1 artifact=image-build.log

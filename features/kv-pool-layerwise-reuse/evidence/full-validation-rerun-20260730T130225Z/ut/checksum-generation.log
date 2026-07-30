@@ -1,0 +1,26 @@
+Cannot open netlink socket: Operation not permitted
+./apply-r4-ut-pod.log: OK
+./artifact-assertions.json: OK
+./ascendstore-tests.log: OK
+./control-diff-check.log: OK
+./create-control-fixture.log: OK
+./create-ruff-dir.log: OK
+./delete-old-ut-pod.log: OK
+./deployment-tests.log: OK
+./final-ut-pod.json: OK
+./pod-source-metadata.txt: OK
+./pre-recreate-pod.json: OK
+./r4-ut-pod.json: OK
+./recreate-safety.txt: OK
+./ruff-version.log: OK
+./source-diff-check.log: OK
+./source-history.json: OK
+./source-python-compile.log: OK
+./source-ruff-check.log: OK
+./source-ruff-format.log: OK
+./summary-assert.log: OK
+./summary.json: OK
+./sync-control-fixture.log: OK
+./sync-ruff.log: OK
+./ut-pod-contract.json: OK
+./wait-r4-ut-pod.log: OK

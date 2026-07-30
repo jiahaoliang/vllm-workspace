@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260730T130225Z",
+  "tooling_commit": "878fcae79601a7627235862bca998d0d1e0a4aa6",
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "gates": {
+    "identity_tests": {
+      "passed": 5
+    },
+    "deployment_tests": {
+      "passed": 63,
+      "environment": "liangjiahao/vllm-ascend-ut"
+    },
+    "shell_syntax": true,
+    "python_compile": true,
+    "ruff_check": true,
+    "ruff_format": true,
+    "diff_check": true,
+    "rendered_configmap_entries": 10,
+    "manifest_dry_runs": 10
+  },
+  "superseded_attempts": [
+    {
+      "step": "python-compile",
+      "exit_code": 126,
+      "classification": "tooling invocation quoting",
+      "replacement": "python-compile-retry"
+    }
+  ],
+  "errors": []
+}

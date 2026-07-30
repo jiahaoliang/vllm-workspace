@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260730T130225Z-ut",
+  "tooling_commit": "4b296c18472aec46bddeae9974bad24252fd44dc",
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "image": {
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+    "config_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358"
+  },
+  "pod": {
+    "namespace": "liangjiahao",
+    "name": "vllm-ascend-ut",
+    "node": "n1",
+    "cpu_only": true,
+    "npu_resources": false,
+    "host_path": false,
+    "retained_running": true,
+    "restarts": 0
+  },
+  "gates": {
+    "ascendstore_tests": {
+      "passed": 476,
+      "warnings": 14,
+      "duration_seconds": 4.10
+    },
+    "deployment_tests": {
+      "passed": 65,
+      "duration_seconds": 1.06
+    },
+    "ruff_lint": true,
+    "ruff_format": {
+      "files": 19
+    },
+    "python_compile": {
+      "files": 28
+    },
+    "diff_check": true,
+    "source_history": {
+      "merge_base": "a46a1dabbc260e8695002969f29528eb555eb583",
+      "commits": 11,
+      "merge_commits": 0
+    },
+    "source_clean": true,
+    "bytecode_disabled": true,
+    "pytest_cache_disabled": true
+  },
+  "errors": []
+}

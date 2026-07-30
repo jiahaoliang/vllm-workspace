@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "failed",
+  "validated": false,
+  "attempt": 2,
+  "run_id": "20260730T130225Z-image-r2",
+  "tooling_commit": "a674091e09703481a2ec4fdb6a651831cd0108da",
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "target_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2",
+  "image_loaded": false,
+  "build": {
+    "started_at": "2026-07-30T15:07:03Z",
+    "terminated_at": "2026-07-30T15:21:34Z",
+    "observed_exit_code": 130,
+    "terminated_early": true
+  },
+  "error": {
+    "class": "validation_tooling",
+    "source_defect": false,
+    "reason": "exact vLLM wheel version short SHA length mismatch",
+    "observed": "0.1.dev1+g54503ecec.empty",
+    "configured": "0.1.dev1+g54503ece.empty"
+  },
+  "evidence_limitation": "SIGINT exposed that the recorder did not append the build END/step record; outer session exit 130 and this classification preserve the terminal state"
+}

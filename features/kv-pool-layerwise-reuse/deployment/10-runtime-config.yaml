@@ -16,19 +16,38 @@ data:
       "prefer_alloc_in_same_node": true,
       "enable_ssd_offload": false
     }
+  pid-state.sh: |
+    #!/usr/bin/env bash
+
+    pid_process_state() {
+      local pid=${1:-} state
+      if [[ ! ${pid} =~ ^[1-9][0-9]*$ ]]; then
+        printf '%s\n' absent
+        return 0
+      fi
+      state=$(ps -o stat= -p "${pid}" 2>/dev/null | awk 'NF {print $1; exit}') || state=
+      case ${state:0:1} in
+        Z) printf '%s\n' zombie ;;
+        '') printf '%s\n' absent ;;
+        *) printf '%s\n' live ;;
+      esac
+    }
   start-prefill.sh: |
     #!/usr/bin/env bash
     set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
 
     pid_file=/tmp/vllm-prefill.pid
     log_file=/tmp/vllm-prefill.log
 
-    if [[ -s "${pid_file}" ]]; then
+    if [[ -e "${pid_file}" ]]; then
       old_pid="$(<"${pid_file}")"
-      if kill -0 "${old_pid}" 2>/dev/null; then
+      old_state=$(pid_process_state "${old_pid}")
+      if [[ ${old_state} == live ]]; then
         echo "prefill vLLM is already running with PID ${old_pid}" >&2
         exit 1
       fi
+      echo "clearing stale prefill PID file: PID ${old_pid:-unset} is ${old_state}"
       rm -f "${pid_file}"
     fi
 
@@ -60,7 +79,7 @@ data:
     new_pid=$!
     echo "${new_pid}" >"${pid_file}"
     sleep 3
-    if ! kill -0 "${new_pid}" 2>/dev/null; then
+    if [[ $(pid_process_state "${new_pid}") != live ]]; then
       echo "prefill vLLM exited during startup; recent log follows" >&2
       tail -n 80 "${log_file}" >&2 || true
       rm -f "${pid_file}"
@@ -72,16 +91,19 @@ data:
   start-decode.sh: |
     #!/usr/bin/env bash
     set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
 
     pid_file=/tmp/vllm-decode.pid
     log_file=/tmp/vllm-decode.log
 
-    if [[ -s "${pid_file}" ]]; then
+    if [[ -e "${pid_file}" ]]; then
       old_pid="$(<"${pid_file}")"
-      if kill -0 "${old_pid}" 2>/dev/null; then
+      old_state=$(pid_process_state "${old_pid}")
+      if [[ ${old_state} == live ]]; then
         echo "decode vLLM is already running with PID ${old_pid}" >&2
         exit 1
       fi
+      echo "clearing stale decode PID file: PID ${old_pid:-unset} is ${old_state}"
       rm -f "${pid_file}"
     fi
 
@@ -113,7 +135,7 @@ data:
     new_pid=$!
     echo "${new_pid}" >"${pid_file}"
     sleep 3
-    if ! kill -0 "${new_pid}" 2>/dev/null; then
+    if [[ $(pid_process_state "${new_pid}") != live ]]; then
       echo "decode vLLM exited during startup; recent log follows" >&2
       tail -n 80 "${log_file}" >&2 || true
       rm -f "${pid_file}"
@@ -125,6 +147,7 @@ data:
   stop-engine.sh: |
     #!/usr/bin/env bash
     set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
 
     if [[ $# -ne 1 || ( "$1" != "prefill" && "$1" != "decode" ) ]]; then
       echo "usage: $0 <prefill|decode>" >&2
@@ -133,31 +156,43 @@ data:
 
     role=$1
     pid_file="/tmp/vllm-${role}.pid"
-    if [[ ! -s "${pid_file}" ]]; then
+    if [[ ! -e "${pid_file}" ]]; then
       echo "${role} vLLM has no PID file"
       exit 0
     fi
 
     pid="$(<"${pid_file}")"
-    if ! kill -0 "${pid}" 2>/dev/null; then
-      echo "${role} vLLM PID ${pid} is no longer running"
+    state=$(pid_process_state "${pid}")
+    if [[ ${state} != live ]]; then
+      echo "${role} vLLM PID ${pid:-unset} is ${state}"
       rm -f "${pid_file}"
       exit 0
     fi
 
-    kill -TERM "${pid}"
+    kill -TERM "${pid}" 2>/dev/null || true
     for _ in $(seq 1 60); do
-      if ! kill -0 "${pid}" 2>/dev/null; then
+      state=$(pid_process_state "${pid}")
+      if [[ ${state} != live ]]; then
         rm -f "${pid_file}"
-        echo "${role} vLLM stopped"
+        echo "${role} vLLM stopped; PID ${pid} is ${state}"
         exit 0
       fi
       sleep 1
     done
 
     echo "${role} vLLM did not exit after 60 seconds; sending SIGKILL" >&2
-    kill -KILL "${pid}"
-    rm -f "${pid_file}"
+    kill -KILL "${pid}" 2>/dev/null || true
+    for _ in $(seq 1 10); do
+      state=$(pid_process_state "${pid}")
+      if [[ ${state} != live ]]; then
+        rm -f "${pid_file}"
+        echo "${role} vLLM stopped after SIGKILL; PID ${pid} is ${state}"
+        exit 0
+      fi
+      sleep 1
+    done
+    echo "${role} vLLM PID ${pid} remains live after SIGKILL" >&2
+    exit 1
   check-runtime.py: |
     import os
     from pathlib import Path

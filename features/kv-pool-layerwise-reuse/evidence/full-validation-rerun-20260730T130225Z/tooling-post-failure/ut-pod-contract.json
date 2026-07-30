@@ -1,0 +1,32 @@
+{
+  "name": "vllm-ascend-ut",
+  "namespace": "liangjiahao",
+  "phase": "Running",
+  "node": "n1",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+  "imageID": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+  "resources": {
+    "limits": {
+      "cpu": "16",
+      "memory": "32Gi"
+    },
+    "requests": {
+      "cpu": "1",
+      "memory": "4Gi"
+    }
+  },
+  "volumes": [
+    {
+      "emptyDir": {
+        "sizeLimit": "8Gi"
+      },
+      "name": "workspace"
+    }
+  ],
+  "mounts": [
+    {
+      "mountPath": "/workspace",
+      "name": "workspace"
+    }
+  ]
+}

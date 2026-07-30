@@ -1,0 +1,2 @@
+bash: line 1: /tmp/vllm-ascend-ruff-0.14.0/bin/ruff: No such file or directory
+command terminated with exit code 127

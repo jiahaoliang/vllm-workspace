@@ -1,0 +1,99 @@
+#1 [internal] load build definition from Dockerfile.a2
+#1 transferring dockerfile: 9.66kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12
+#2 DONE 0.8s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/16] FROM quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12@sha256:678d74de14accc2099fc6f1532990cfd2c7976d7c366fcd8970102234652339a
+#4 resolve quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12@sha256:678d74de14accc2099fc6f1532990cfd2c7976d7c366fcd8970102234652339a done
+#4 DONE 0.0s
+
+#5 [ 3/16] RUN set -euxo pipefail;     apt-get update -y;     apt-get install -y         ca-certificates         git         vim         wget         unzip         net-tools         gcc         g++         cmake         numactl         libnuma-dev         libibverbs-dev         libjemalloc2         libhiredis-dev         clang-15;     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20;     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20;     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [ 9/16] RUN pip config set global.index-url "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+#6 CACHED
+
+#7 [ 7/16] RUN set -euxo pipefail;     cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh         /vllm-workspace/Mooncake/mooncake_installer.sh;     cd /vllm-workspace/Mooncake;     bash mooncake_installer.sh -y;     apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev;     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 2/16] WORKDIR /workspace
+#8 CACHED
+
+#9 [12/16] RUN set -euxo pipefail;     python3 -m pip install         modelscope         'ray>=2.47.1,<=2.48.0'         'protobuf>3.20.0';     python3 -m pip cache purge
+#9 CACHED
+
+#10 [ 5/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/jiahaoliang/vllm-ascend.git" /vllm-workspace/vllm-ascend;     git -C /vllm-workspace/vllm-ascend fetch --depth 1         origin "14beaf161cca6f1e044e20529ca96c6554dbbe50";     git -C /vllm-workspace/vllm-ascend checkout --detach         "14beaf161cca6f1e044e20529ca96c6554dbbe50";     git -C /vllm-workspace/vllm-ascend submodule update         --init --recursive --depth 1;     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" =         "14beaf161cca6f1e044e20529ca96c6554dbbe50"
+#10 CACHED
+
+#11 [11/16] RUN set -euxo pipefail;     export PIP_EXTRA_INDEX_URL="https://mirrors.huaweicloud.com/ascend/repos/pypi";     export VLLM_BATCH_INVARIANT=1;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     set +u;     source /usr/local/Ascend/nnal/atb/set_env.sh;     set -u;     python3 -m pip install         -e /vllm-workspace/vllm-ascend         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton triton-ascend;     python3 -m pip install         triton-ascend==3.2.1         --extra-index-url         https://mirrors.huaweicloud.com/ascend/repos/pypi;     python3 -m pip cache purge
+#11 CACHED
+
+#12 [ 4/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/vllm-project/vllm.git" /vllm-workspace/vllm;     git -C /vllm-workspace/vllm fetch --depth 1         origin "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     git -C /vllm-workspace/vllm checkout --detach "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" =         "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5"
+#12 CACHED
+
+#13 [10/16] RUN set -euxo pipefail;     VLLM_TARGET_DEVICE=empty python3 -m pip install         -e "/vllm-workspace/vllm[audio]"         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton;     python3 -m pip cache purge
+#13 CACHED
+
+#14 [ 6/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/ascend-direct-dev/Mooncake.git" /vllm-workspace/Mooncake;     git -C /vllm-workspace/Mooncake fetch --depth 1         origin "786c77ff7692bed58dd99971afef87d6b690cbe3";     git -C /vllm-workspace/Mooncake checkout --detach         "786c77ff7692bed58dd99971afef87d6b690cbe3";     git -C /vllm-workspace/Mooncake submodule update         --init --recursive --depth 1;     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" =         "786c77ff7692bed58dd99971afef87d6b690cbe3"
+#14 CACHED
+
+#15 [ 8/16] RUN set -euxo pipefail;     cd /vllm-workspace/Mooncake;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     export LD_LIBRARY_PATH="/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:";     cmake -S . -B build         -DUSE_ASCEND_DIRECT=ON         -DBUILD_UNIT_TESTS=OFF         -DBUILD_EXAMPLES=OFF         -DBUILD_BENCHMARK=OFF         -DWITH_STORE_RUST=OFF;     cmake --build build --parallel "32";     cmake --install build;     ldconfig;     rm -rf build
+#15 CACHED
+
+#16 [13/16] RUN set -euo pipefail;     store_modules=(         /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so     );     test -f "${store_modules[0]}";     for api_name in         batch_put_session_start         batch_put_from_multi_buffer_ranges         batch_put_session_end         batch_put_session_revoke         batch_get_session_start         batch_get_into_multi_buffer_ranges         batch_get_session_end;     do         grep -F -q "${api_name}" < <(strings "${store_modules[0]}");     done
+#16 CACHED
+
+#17 [14/16] RUN set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >"${pip_check_output}" 2>&1; then         cat "${pip_check_output}";     else         cat "${pip_check_output}";         grep -E -v '^(ms-service-profiler 26\.0\.0 requires (matplotlib|msguard|openpyxl), which is not installed\.|te 0\.4\.0 requires (ml-dtypes|tornado), which is not installed\.|mindstudio-kpp 0\.0\.0\.dev0 requires plotly, which is not installed\.|ms-service-profiler 26\.0\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\.33\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\.44\.0\.|ms-service-profiler 26\.0\.0 has requirement pandas~=2\.2, but you have pandas 3\.0\.5\.|prometheus-fastapi-instrumentator 8\.1\.0 has requirement starlette<2\.0\.0,>=1\.0\.0, but you have starlette 0\.50\.0\.|opencv-python-headless 5\.0\.0\.93 has requirement numpy>=2; python_version >= "3\.9", but you have numpy 1\.26\.4\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement fastapi\[standard\]<0\.137\.0,>=0\.133\.0, but you have fastapi 0\.123\.10\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement starlette>=1\.0\.1, but you have starlette 0\.50\.0\.|te 0\.4\.0 is not supported on this platform)$'             "${pip_check_output}" >"${unexpected_pip_check}" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat "${unexpected_pip_check}" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f "${pip_check_output}" "${unexpected_pip_check}";     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "14beaf161cca6f1e044e20529ca96c6554dbbe50";     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "786c77ff7692bed58dd99971afef87d6b690cbe3";     python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))';     python3 -c 'import glob; paths=glob.glob("/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so"); assert len(paths) == 1, paths; print(f"mooncake-store={paths[0]}")';     python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))'
+#17 1.268 ms-service-profiler 26.0.0 requires matplotlib, which is not installed.
+#17 1.268 ms-service-profiler 26.0.0 requires msguard, which is not installed.
+#17 1.268 ms-service-profiler 26.0.0 requires openpyxl, which is not installed.
+#17 1.268 te 0.4.0 requires ml-dtypes, which is not installed.
+#17 1.268 te 0.4.0 requires tornado, which is not installed.
+#17 1.268 mindstudio-kpp 0.0.0.dev0 requires plotly, which is not installed.
+#17 1.268 ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-grpc==1.33.1, but you have opentelemetry-exporter-otlp-proto-grpc 1.44.0.
+#17 1.268 ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-http==1.33.1, but you have opentelemetry-exporter-otlp-proto-http 1.44.0.
+#17 1.268 ms-service-profiler 26.0.0 has requirement pandas~=2.2, but you have pandas 3.0.5.
+#17 1.268 prometheus-fastapi-instrumentator 8.1.0 has requirement starlette<2.0.0,>=1.0.0, but you have starlette 0.50.0.
+#17 1.268 opencv-python-headless 5.0.0.93 has requirement numpy>=2; python_version >= "3.9", but you have numpy 1.26.4.
+#17 1.268 vllm 0.1.dev1+g54503ecec.empty has requirement fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10.
+#17 1.268 vllm 0.1.dev1+g54503ecec.empty has requirement starlette>=1.0.1, but you have starlette 0.50.0.
+#17 1.268 te 0.4.0 is not supported on this platform
+#17 1.274 pip check reported only frozen known compatibility issues
+#17 1.410 vllm=0.1.dev1+g54503ecec.empty
+#17 1.410 vllm-ascend=0.1.dev1+g14beaf161
+#17 1.410 torch=2.10.0+cpu
+#17 1.410 torch-npu=2.10.0.post2
+#17 1.410 triton-ascend=3.2.1
+#17 1.476 mooncake-store=/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store.cpython-312-aarch64-linux-gnu.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/vllm_ascend_C.cpython-312-aarch64-linux-gnu.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/libvllm_ascend_kernels.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/_cann_ops_custom/vendors/custom_transformer/op_api/lib/libcust_opapi.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/_cann_ops_custom/vendors/custom_transformer/op_proto/lib/linux/aarch64/libcust_opsproto_rt2.0.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/_cann_ops_custom/vendors/custom_transformer/op_impl/cpu/aicpu_kernel/impl/libtransformer_aicpu_kernels.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/_cann_ops_custom/vendors/custom_transformer/op_impl/ai_core/tbe/op_tiling/liboptiling.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/_cann_ops_custom/vendors/custom_transformer/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64/libcust_opmaster_rt2.0.so
+#17 1.547 /vllm-workspace/vllm-ascend/vllm_ascend/lib/libvllm_ascend_kernels.so
+#17 DONE 1.6s
+
+#18 [15/16] RUN echo 'export LD_PRELOAD=/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2:${LD_PRELOAD:-}' >> /root/.bashrc &&     echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib' >> /root/.bashrc
+#18 DONE 0.2s
+
+#19 [16/16] WORKDIR /workspace
+#19 DONE 0.0s
+
+#20 exporting to docker image format
+#20 exporting layers
+#20 exporting layers 108.0s done
+#20 exporting manifest sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477 done
+#20 exporting config sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358 done
+#20 sending tarball
+#20 sending tarball 46.2s done
+#20 DONE 154.3s
+unpacking docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 (sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477)...
+Loaded image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4

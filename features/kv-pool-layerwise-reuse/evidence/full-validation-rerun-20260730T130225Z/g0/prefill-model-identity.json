@@ -1,0 +1,6 @@
+{
+  "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+  "max_position_embeddings": 163840,
+  "num_layers": 27,
+  "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669"
+}

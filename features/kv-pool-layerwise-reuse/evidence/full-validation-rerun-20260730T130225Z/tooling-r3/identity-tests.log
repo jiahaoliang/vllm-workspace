@@ -1,0 +1,11 @@
+test_all_feature_manifests_use_the_pinned_image_and_vllm_version (test_validation_identity.ValidationIdentityTest) ... ok
+test_dockerfile_pip_health_gate_is_fail_closed (test_validation_identity.ValidationIdentityTest) ... ok
+test_run_identity_records_model_runtime_and_cluster_contract (test_validation_identity.ValidationIdentityTest) ... ok
+test_runners_and_runtime_checkers_match_identity_and_new_session_api (test_validation_identity.ValidationIdentityTest) ... ok
+test_stress_summary_embeds_exact_source_identity (test_validation_identity.ValidationIdentityTest) ... ok
+test_workspace_lock_and_dockerfile_match_frozen_source_identity (test_validation_identity.ValidationIdentityTest) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.068s
+
+OK

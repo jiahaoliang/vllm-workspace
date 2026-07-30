@@ -1,0 +1,51 @@
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 468) def get_kv_cache_coordinator(
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 469)     kv_cache_config: KVCacheConfig,
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 470)     max_model_len: int,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 471)     max_in_flight_tokens: int | None = None,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 472)     use_eagle: bool = False,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 473)     enable_caching: bool = True,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 474)     enable_kv_cache_events: bool = False,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 475)     dcp_world_size: int = 1,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 476)     pcp_world_size: int = 1,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 477)     hash_block_size: int = 0,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 478)     scheduler_block_size: int | None = None,
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 479)     eagle_attn_layer_names: list[str] | None = None,
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 480)     metrics_collector: KVCacheMetricsCollector | None = None,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 481)     max_num_batched_tokens: int | None = None,
+7bce23cc05 (Zhu Yi Lin      2026-05-20 15:47:11 +0800 482) ) -> KVCacheCoordinator:
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 483)     token_budget = _select_kv_token_budget(max_model_len, max_in_flight_tokens, max_num_batched_tokens)
+3dff82b574 (jack            2026-06-11 22:45:16 +0800 484)     if _is_deepseek_v4_kv_cache_config(kv_cache_config):
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 485)         return AscendHybridKVCacheCoordinator(
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 486)             kv_cache_config,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 487)             max_model_len,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 488)             use_eagle,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 489)             enable_caching,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 490)             enable_kv_cache_events,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 491)             dcp_world_size=dcp_world_size,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 492)             pcp_world_size=pcp_world_size,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 493)             hash_block_size=hash_block_size,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 494)             eagle_attn_layer_names=eagle_attn_layer_names,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 495)             metrics_collector=metrics_collector,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 496)             max_in_flight_tokens=token_budget,
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 497)             max_num_batched_tokens=token_budget,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 498)             scheduler_block_size=scheduler_block_size,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 499)         )
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 500) 
+fad646478d (Hairui Luo      2026-06-16 17:48:18 +0800 501)     if len(kv_cache_config.kv_cache_groups) == 1 or not enable_caching:
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 502)         orig_kwargs = dict(
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 503)             kv_cache_config=kv_cache_config,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 504)             max_model_len=max_model_len,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 505)             use_eagle=use_eagle,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 506)             enable_caching=enable_caching,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 507)             enable_kv_cache_events=enable_kv_cache_events,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 508)             dcp_world_size=dcp_world_size,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 509)             pcp_world_size=pcp_world_size,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 510)             hash_block_size=hash_block_size,
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 511)             metrics_collector=metrics_collector,
+00517cfb03 (cfq0            2026-06-04 16:55:32 +0800 512)         )
+95ef5af647 (zhangxinyuehfad 2026-07-20 22:51:16 +0800 513)         if vllm_version_is("0.25.1"):
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 514)             orig_kwargs["max_num_batched_tokens"] = token_budget
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 515)         else:
+5083d88443 (zhao-stack      2026-07-14 09:23:47 +0800 516)             orig_kwargs["max_in_flight_tokens"] = token_budget
+37b9840607 (SILONG ZENG     2026-06-23 10:44:10 +0800 517)         orig_kwargs["scheduler_block_size"] = scheduler_block_size
+72797cfa15 (zhao-stack      2026-06-12 21:53:39 +0800 518)         return _orig_get_kv_cache_coordinator(**orig_kwargs)

@@ -1,0 +1,15 @@
+INFO 07-30 17:13:37 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 07-30 17:13:37 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 07-30 17:13:37 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-30 17:13:37 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-30 17:13:37 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+{
+  "api_count": 7,
+  "npu_available": true,
+  "torch": "2.10.0+cpu",
+  "torch_npu": "2.10.0.post2",
+  "triton_ascend": "3.2.1",
+  "vllm": "0.1.dev1+g54503ecec.empty",
+  "vllm_ascend": "0.1.dev1+g14beaf161",
+  "vllm_ascend_path": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"
+}

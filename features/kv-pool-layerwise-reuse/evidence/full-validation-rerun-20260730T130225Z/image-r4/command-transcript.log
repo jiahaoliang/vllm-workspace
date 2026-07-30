@@ -1,0 +1,93 @@
+[2026-07-30T16:42:15Z] START builder-pod
+COMMAND kubectl get pod -n default buildkitd -o json 
+[2026-07-30T16:42:15Z] END builder-pod exit=0 artifact=builder-pod.json
+[2026-07-30T16:42:19Z] START builder-worker
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default buildctl debug workers 
+[2026-07-30T16:42:19Z] END builder-worker exit=0 artifact=builder-worker.txt
+[2026-07-30T16:42:27Z] START target-tag-absence
+COMMAND bash -lc set\ -e\;\ rows=\$\(nerdctl\ -n\ k8s.io\ images\ --digests\ docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4\ \|\ tail\ -n\ +2\ \|\ wc\ -l\)\;\ test\ \"\$rows\"\ =\ 0\;\ printf\ \"matching_rows=%s\\n\"\ \"\$rows\" 
+[2026-07-30T16:42:29Z] END target-tag-absence exit=0 artifact=target-tag-absence.txt
+[2026-07-30T16:42:50Z] START vllm-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/vllm-formal-fetch-r4-20260730T130225Z\;\ git\ init\ /tmp/vllm-formal-fetch-r4-20260730T130225Z\;\ git\ -C\ /tmp/vllm-formal-fetch-r4-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/vllm-project/vllm.git\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\;\ test\ \"\$\(git\ -C\ /tmp/vllm-formal-fetch-r4-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 
+[2026-07-30T16:42:54Z] END vllm-exact-fetchability exit=0 artifact=vllm-exact-fetchability.log
+[2026-07-30T16:42:59Z] START vllm-ascend-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/vllm-ascend-formal-fetch-r4-20260730T130225Z\;\ git\ init\ /tmp/vllm-ascend-formal-fetch-r4-20260730T130225Z\;\ git\ -C\ /tmp/vllm-ascend-formal-fetch-r4-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/jiahaoliang/vllm-ascend.git\ 14beaf161cca6f1e044e20529ca96c6554dbbe50\;\ test\ \"\$\(git\ -C\ /tmp/vllm-ascend-formal-fetch-r4-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 14beaf161cca6f1e044e20529ca96c6554dbbe50 
+[2026-07-30T16:43:02Z] END vllm-ascend-exact-fetchability exit=0 artifact=vllm-ascend-exact-fetchability.log
+[2026-07-30T16:43:09Z] START mooncake-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/mooncake-formal-fetch-r4-20260730T130225Z\;\ git\ init\ /tmp/mooncake-formal-fetch-r4-20260730T130225Z\;\ git\ -C\ /tmp/mooncake-formal-fetch-r4-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/ascend-direct-dev/Mooncake.git\ 786c77ff7692bed58dd99971afef87d6b690cbe3\;\ test\ \"\$\(git\ -C\ /tmp/mooncake-formal-fetch-r4-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 786c77ff7692bed58dd99971afef87d6b690cbe3 
+[2026-07-30T16:43:13Z] END mooncake-exact-fetchability exit=0 artifact=mooncake-exact-fetchability.log
+[2026-07-30T16:43:30Z] START image-build
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default nerdctl -n k8s.io build --progress=plain -f features/kv-pool-layerwise-reuse/Dockerfile.a2 -t docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 features/kv-pool-layerwise-reuse 
+[2026-07-30T16:47:05Z] END image-build exit=0 artifact=image-build.log
+[2026-07-30T16:47:40Z] START image-list
+COMMAND nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 
+[2026-07-30T16:47:40Z] END image-list exit=0 artifact=image-list.txt
+[2026-07-30T16:47:44Z] START image-inspect
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 
+[2026-07-30T16:47:45Z] END image-inspect exit=0 artifact=image-inspect.json
+[2026-07-30T16:47:54Z] START image-inspect-native
+COMMAND nerdctl -n k8s.io image inspect --mode=native docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 
+[2026-07-30T16:47:54Z] END image-inspect-native exit=0 artifact=image-inspect-native.json
+[2026-07-30T16:49:13Z] START nodes-snapshot
+COMMAND kubectl get nodes -n liangjiahao -o json 
+[2026-07-30T16:49:13Z] END nodes-snapshot exit=0 artifact=nodes.json
+[2026-07-30T16:49:21Z] START all-pods-snapshot
+COMMAND kubectl get --raw /api/v1/pods -n liangjiahao 
+[2026-07-30T16:49:21Z] END all-pods-snapshot exit=0 artifact=all-pods.json
+[2026-07-30T16:49:45Z] START npu-capacity
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json; from pathlib import Path; root=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r4"); nodes=json.loads((root/"nodes.json").read_text())["items"]; pods=json.loads((root/"all-pods.json").read_text())["items"]; resource="huawei.com/Ascend910"; active={}; details=[]\nfor pod in pods:\n  node=pod.get("spec",{}).get("nodeName"); phase=pod.get("status",{}).get("phase");\n  if not node or phase in {"Succeeded","Failed"}: continue\n  regular=sum(int(c.get("resources",{}).get("requests",{}).get(resource,"0")) for c in pod.get("spec",{}).get("containers",[])); init=max([int(c.get("resources",{}).get("requests",{}).get(resource,"0")) for c in pod.get("spec",{}).get("initContainers",[])]+[0]); request=max(regular,init)\n  if request: active[node]=active.get(node,0)+request; details.append({"namespace":pod["metadata"]["namespace"],"name":pod["metadata"]["name"],"node":node,"phase":phase,"request":request})\nresult={}\nfor node in nodes:\n  name=node["metadata"]["name"]; ready=any(c["type"]=="Ready" and c["status"]=="True" for c in node["status"].get("conditions",[])); alloc=int(node["status"].get("allocatable",{}).get(resource,"0")); used=active.get(name,0); result[name]={"ready":ready,"allocatable":alloc,"active_requests":used,"free":alloc-used if ready else 0}\nprint(json.dumps({"resource":resource,"nodes":result,"requesting_pods":details},sort_keys=True,indent=2))' 
+[2026-07-30T16:49:45Z] END npu-capacity exit=0 artifact=npu-capacity.json
+[2026-07-30T16:51:19Z] START apply-runtime-config
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml 
+[2026-07-30T16:51:19Z] END apply-runtime-config exit=0 artifact=apply-runtime-config.log
+[2026-07-30T16:51:26Z] START apply-image-check-prefill
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml 
+[2026-07-30T16:51:26Z] END apply-image-check-prefill exit=0 artifact=apply-image-check-prefill.log
+[2026-07-30T16:51:33Z] START wait-image-check-pod
+COMMAND kubectl wait -n liangjiahao --for=jsonpath=\{.status.phase\}=Running pod -l app=prefill --timeout=600s 
+[2026-07-30T16:51:33Z] END wait-image-check-pod exit=0 artifact=wait-image-check-pod.log
+[2026-07-30T16:52:09Z] START image-check-pod
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ test\ -n\ \"\$pod\"\;\ kubectl\ get\ pod\ -n\ liangjiahao\ \"\$pod\"\ -o\ json 
+[2026-07-30T16:52:11Z] END image-check-pod exit=0 artifact=image-check-pod.json
+[2026-07-30T16:52:16Z] START dynamic-runtime-check
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$pod\"\ -c\ prefill-engine\ --\ env\ PYTHONDONTWRITEBYTECODE=1\ python3\ /opt/vllm-layerwise/check-runtime.py 
+[2026-07-30T16:52:26Z] END dynamic-runtime-check exit=0 artifact=dynamic-runtime-check.log
+[2026-07-30T16:52:35Z] START dynamic-import-check
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$pod\"\ -c\ prefill-engine\ --\ env\ PYTHONDONTWRITEBYTECODE=1\ python3\ -c\ \'import\ importlib.metadata\ as\ m\,\ json\;\ import\ torch\,\ torch_npu\,\ vllm\,\ vllm_ascend\;\ from\ mooncake.store\ import\ MooncakeDistributedStore\;\ methods=\(\"batch_put_session_start\"\,\"batch_put_from_multi_buffer_ranges\"\,\"batch_put_session_end\"\,\"batch_put_session_revoke\"\,\"batch_get_session_start\"\,\"batch_get_into_multi_buffer_ranges\"\,\"batch_get_session_end\"\)\;\ missing=\[name\ for\ name\ in\ methods\ if\ not\ callable\(getattr\(MooncakeDistributedStore\,name\,None\)\)\]\;\ assert\ not\ missing\,missing\;\ print\(json.dumps\(\{\"torch\":m.version\(\"torch\"\)\,\"torch_npu\":m.version\(\"torch-npu\"\)\,\"vllm\":m.version\(\"vllm\"\)\,\"vllm_ascend\":m.version\(\"vllm-ascend\"\)\,\"vllm_ascend_path\":vllm_ascend.__file__\,\"api_count\":len\(methods\)\,\"npu_available\":torch_npu.npu.is_available\(\)\}\,sort_keys=True\,indent=2\)\)\' 
+[2026-07-30T16:52:46Z] END dynamic-import-check exit=0 artifact=dynamic-import-check.json
+[2026-07-30T16:52:53Z] START image-source-heads
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$pod\"\ -c\ prefill-engine\ --\ bash\ -lc\ \'git\ -C\ /vllm-workspace/vllm\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/vllm-ascend\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/Mooncake\ rev-parse\ HEAD\' 
+[2026-07-30T16:52:54Z] END image-source-heads exit=0 artifact=image-source-heads.txt
+[2026-07-30T16:52:59Z] START npu-smi
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$pod\"\ -c\ prefill-engine\ --\ npu-smi\ info 
+[2026-07-30T16:53:00Z] END npu-smi exit=0 artifact=npu-smi.txt
+[2026-07-30T16:53:05Z] START mooncake-ldd
+COMMAND bash -lc pod=\$\(kubectl\ get\ pod\ -n\ liangjiahao\ -l\ app=prefill\ -o\ jsonpath=\"\{.items\[0\].metadata.name\}\"\)\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$pod\"\ -c\ prefill-engine\ --\ bash\ -lc\ \'ldd\ /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store\*.so\' 
+[2026-07-30T16:53:06Z] END mooncake-ldd exit=0 artifact=mooncake-ldd.txt
+[2026-07-30T16:53:58Z] START cleanup-safety
+COMMAND bash -lc set\ -e\;\ test\ \"\$\(kubectl\ -n\ liangjiahao\ config\ current-context\)\"\ =\ \"bke-cluster-admin@bke-cluster\"\;\ test\ \"\$\(kubectl\ get\ deployment\ -n\ liangjiahao\ prefill-engine-deployment\ -o\ jsonpath=\"\{.metadata.namespace\}\"\)\"\ =\ \"liangjiahao\"\;\ test\ \"\$\(kubectl\ get\ deployment\ -n\ liangjiahao\ prefill-engine-deployment\ -o\ jsonpath=\"\{.metadata.name\}\"\)\"\ =\ \"prefill-engine-deployment\"\;\ printf\ \"context=bke-cluster-admin@bke-cluster\ namespace=liangjiahao\ target=prefill-engine-deployment\\n\" 
+[2026-07-30T16:53:59Z] END cleanup-safety exit=0 artifact=cleanup-safety.txt
+[2026-07-30T16:54:05Z] START delete-image-check-deployment
+COMMAND kubectl delete deployment -n liangjiahao prefill-engine-deployment --wait=true 
+[2026-07-30T16:54:05Z] END delete-image-check-deployment exit=0 artifact=delete-image-check-deployment.log
+[2026-07-30T16:54:11Z] START wait-image-check-pod-deleted
+COMMAND kubectl wait -n liangjiahao --for=delete pod -l app=prefill --timeout=300s 
+[2026-07-30T16:55:50Z] END wait-image-check-pod-deleted exit=143 artifact=wait-image-check-pod-deleted.log
+[2026-07-30T16:56:22Z] START cleanup-empty-query
+COMMAND bash -lc set\ -e\;\ pods=\$\(kubectl\ get\ pods\ -n\ liangjiahao\ -l\ app=prefill\ -o\ name\)\;\ test\ -z\ \"\$pods\"\;\ printf\ \"remaining_prefill_pods=0\\n\" 
+[2026-07-30T16:56:23Z] END cleanup-empty-query exit=0 artifact=cleanup-empty-query.txt
+[2026-07-30T16:56:31Z] START post-cleanup-pods
+COMMAND kubectl get pods -n liangjiahao -o wide 
+[2026-07-30T16:56:31Z] END post-cleanup-pods exit=0 artifact=post-cleanup-pods.txt
+[2026-07-30T16:57:49Z] START artifact-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r4\"\)\;\ steps=\[json.loads\(line\)\ for\ line\ in\ \(root/\"steps.jsonl\"\).read_text\(\).splitlines\(\)\]\;\ assert\ len\(steps\)==27\;\ failures=\[step\ for\ step\ in\ steps\ if\ step\[\"exit_code\"\]\!=0\]\;\ assert\ len\(failures\)==1\ and\ failures\[0\]\[\"name\"\]==\"wait-image-check-pod-deleted\"\ and\ failures\[0\]\[\"exit_code\"\]==143\;\ assert\ next\(step\ for\ step\ in\ steps\ if\ step\[\"name\"\]==\"image-build\"\)\[\"exit_code\"\]==0\;\ inspect=json.loads\(\(root/\"image-inspect.json\"\).read_text\(\)\)\[0\]\;\ native=json.loads\(\(root/\"image-inspect-native.json\"\).read_text\(\)\)\[0\]\;\ manifest=\"sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477\"\;\ config=\"sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358\"\;\ assert\ native\[\"Image\"\]\[\"Target\"\]\[\"digest\"\]==manifest\ and\ native\[\"Manifest\"\]\[\"config\"\]\[\"digest\"\]==config\;\ assert\ inspect\[\"Id\"\]==config\ and\ inspect\[\"Architecture\"\]==\"arm64\"\ and\ inspect\[\"Os\"\]==\"linux\"\;\ labels=inspect\[\"Config\"\]\[\"Labels\"\]\;\ assert\ labels\[\"org.opencontainers.image.vllm.commit\"\]==\"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\ and\ labels\[\"org.opencontainers.image.vllm-ascend.commit\"\]==\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\ and\ labels\[\"org.opencontainers.image.mooncake.commit\"\]==\"786c77ff7692bed58dd99971afef87d6b690cbe3\"\;\ pod=json.loads\(\(root/\"image-check-pod.json\"\).read_text\(\)\)\;\ assert\ pod\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"imageID\"\]==config\ and\ pod\[\"spec\"\]\[\"nodeName\"\]==\"n1\"\;\ dynamic=\(root/\"dynamic-import-check.json\"\).read_text\(\)\;\ assert\ \"\\\"api_count\\\":\ 7\"\ in\ dynamic\ and\ \"\\\"npu_available\\\":\ true\"\ in\ dynamic\;\ assert\ \"Mooncake\ session/range\ APIs:\ OK\"\ in\ \(root/\"dynamic-runtime-check.log\"\).read_text\(\)\;\ assert\ \(root/\"image-source-heads.txt\"\).read_text\(\).split\(\)==\[\"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\,\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,\"786c77ff7692bed58dd99971afef87d6b690cbe3\"\]\;\ assert\ \"not\ found\"\ not\ in\ \(root/\"mooncake-ldd.txt\"\).read_text\(\)\;\ assert\ \"\|\ OK\"\ in\ \(root/\"npu-smi.txt\"\).read_text\(\)\;\ assert\ \"remaining_prefill_pods=0\"\ in\ \(root/\"cleanup-empty-query.txt\"\).read_text\(\)\;\ build=\(root/\"image-build.log\"\).read_text\(\)\;\ assert\ \"pip\ check\ reported\ only\ frozen\ known\ compatibility\ issues\"\ in\ build\ and\ \"Loaded\ image:\"\ in\ build\ and\ \"mooncake-store=\"\ in\ build\;\ print\(json.dumps\(\{\"validated\":True\,\"recorded_steps\":len\(steps\)\,\"superseded_nonzero_steps\":failures\,\"manifest_digest\":manifest\,\"config_id\":config\,\"platform\":\"linux/arm64\"\,\"api_count\":7\,\"npu_available\":True\,\"cleanup_verified\":True\}\,sort_keys=True\,indent=2\)\) 
+[2026-07-30T16:57:49Z] END artifact-assertions exit=0 artifact=artifact-assertions.json
+[2026-07-30T16:57:49Z] START image-summary
+COMMAND jq -n \{schema_version:1\,status:\"passed\"\,validated:true\,attempt:4\,run_id:\"20260730T130225Z-image-r4\"\,tooling_commit:\"4b296c18472aec46bddeae9974bad24252fd44dc\"\,source_commit:\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,image:\{name:\"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4\"\,platform:\"linux/arm64\"\,manifest_digest:\"sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477\"\,config_id:\"sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358\"\,size_gb:19.08\,blob_size_gb:6.75\}\,build:\{started_at:\"2026-07-30T16:43:30Z\"\,ended_at:\"2026-07-30T16:47:05Z\"\,exit_code:0\}\,source_commits:\{vllm:\"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\,vllm_ascend:\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,mooncake:\"786c77ff7692bed58dd99971afef87d6b690cbe3\"\}\,packages:\{vllm:\"0.1.dev1+g54503ecec.empty\"\,vllm_ascend:\"0.1.dev1+g14beaf161\"\,torch:\"2.10.0+cpu\"\,torch_npu:\"2.10.0.post2\"\,triton_ascend:\"3.2.1\"\}\,gates:\{raw_pip_check_exact_allowlist:true\,mooncake_native_path:true\,vllm_ascend_native_extensions:true\,static_session_api_symbols:7\,npu_dynamic_imports:true\,npu_available:true\,runtime_session_apis:7\,image_id_matches_config:true\,source_heads:true\,ldd_no_missing:true\,npu_health_ok:true\,cleanup_verified:true\}\,limitations:\[\"raw\ pip\ check\ reports\ 14\ exact\ known\ CANN/upstream\ metadata\ issues\ recorded\ in\ the\ build\ log\"\,\"Mooncake\ is\ source-built\ by\ CMake\ and\ has\ no\ wheel\ distribution\ metadata\;\ identity\ is\ Git\ HEAD\ plus\ native\ path\,\ symbols\,\ and\ runtime\ APIs\"\]\,superseded_attempts:\[\{step:\"wait-image-check-pod-deleted\"\,exit_code:143\,classification:\"cleanup\ wait\ orchestration\"\,replacement:\"cleanup-empty-query\"\,replacement_passed:true\}\]\,errors:\[\]\} 
+[2026-07-30T16:57:49Z] END image-summary exit=0 artifact=summary.json
+[2026-07-30T16:57:49Z] START summary-assert
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .attempt\ ==\ 4\ and\ .build.exit_code\ ==\ 0\ and\ .image.platform\ ==\ \"linux/arm64\"\ and\ .gates.static_session_api_symbols\ ==\ 7\ and\ .gates.runtime_session_apis\ ==\ 7\ and\ .gates.npu_available\ ==\ true\ and\ .gates.cleanup_verified\ ==\ true\ and\ \(.errors\ \|\ length\)\ ==\ 0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r4/summary.json 
+[2026-07-30T16:57:49Z] END summary-assert exit=0 artifact=summary-assert.log
+[2026-07-30T16:57:50Z] START image-checksums
+COMMAND bash -lc cd\ features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r4\ \&\&\ find\ .\ -maxdepth\ 1\ -type\ f\ \!\ -name\ SHA256SUMS\ \!\ -name\ steps.jsonl\ \!\ -name\ command-transcript.log\ \!\ -name\ checksum-generation.log\ -print0\ \|\ sort\ -z\ \|\ xargs\ -0\ sha256sum\ \>\ SHA256SUMS\ \&\&\ sha256sum\ -c\ SHA256SUMS 
+[2026-07-30T16:57:50Z] END image-checksums exit=0 artifact=checksum-generation.log

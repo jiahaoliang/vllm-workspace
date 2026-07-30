@@ -1,0 +1,2 @@
+NAME             READY   STATUS    RESTARTS   AGE    IP              NODE   NOMINATED NODE   READINESS GATES
+vllm-ascend-ut   1/1     Running   0          2d7h   10.250.40.133   n1     <none>           <none>

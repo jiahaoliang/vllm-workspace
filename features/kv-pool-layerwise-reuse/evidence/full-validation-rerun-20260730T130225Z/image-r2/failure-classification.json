@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "status": "failed",
+  "classification": "validation_tooling",
+  "source_defect": false,
+  "build_started_at": "2026-07-30T15:07:03Z",
+  "build_terminated_at": "2026-07-30T15:21:34Z",
+  "observed_exit_code": 130,
+  "image_loaded": false,
+  "observation": "vLLM generated wheel version 0.1.dev1+g54503ecec.empty while the exact allowlist expected 0.1.dev1+g54503ece.empty",
+  "disposition": "terminated the inevitably failing build early; preserve evidence; repair exact allowlist and signal-terminal recording; derive r3 tag"
+}

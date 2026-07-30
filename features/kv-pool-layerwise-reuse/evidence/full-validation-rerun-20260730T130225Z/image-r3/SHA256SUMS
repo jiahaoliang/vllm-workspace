@@ -1,0 +1,11 @@
+46991b11ce5534a970e9d94fac9d78ba4d158d5d21cf2bd82f96dd791cc880db  ./builder-pod.json
+5cbf755099b40f5e2d01f296c232fc78c6d2e22dc864060673f4100d4e230915  ./builder-worker.txt
+bbfd5e2cc936c089633789c13023ecc6df64f908de98c928f7c9243758776b99  ./failure-classification.json
+d1ba3b4fb73db96ef7fb168e1f441bedaa9425e5551bf3dcd4c8e3f9a4c7443e  ./image-build.log
+1cbc7eb0fc2e65417f97b5345c701c8a531386ee1b980d72afa4bda80ed42771  ./mooncake-exact-fetchability.log
+cc35f6fb4ffb0d277215991e4d3729b507f9c4a70ea85e1df36681443763a30d  ./post-failure-tag-absence.txt
+a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74  ./summary-assert.log
+efd685e1d988469d0b7e17faf2c522712288001470c9d5f1f73470e24d0ae5f4  ./summary.json
+cc35f6fb4ffb0d277215991e4d3729b507f9c4a70ea85e1df36681443763a30d  ./target-tag-absence.txt
+f20cac7e1896ed24bafb8a41c855c15230e96cdfd23f794e3a2a8419c2ac4e0c  ./vllm-ascend-exact-fetchability.log
+7887692a60bef64ed4c01160f316f91a4abe0d8fce4d182376c651cc8aff2346  ./vllm-exact-fetchability.log

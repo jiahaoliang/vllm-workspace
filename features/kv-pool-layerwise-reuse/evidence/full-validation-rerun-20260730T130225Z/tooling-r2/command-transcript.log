@@ -1,0 +1,99 @@
+[2026-07-30T15:00:55Z] START control-source-identity
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\,subprocess\;\ from\ pathlib\ import\ Path\;\ run=lambda\ \*args:\ subprocess.check_output\(args\,text=True\).strip\(\)\;\ expected=\{\"vllm\":\"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\,\"vllm-ascend\":\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,\"Mooncake\":\"786c77ff7692bed58dd99971afef87d6b690cbe3\"\}\;\ assert\ run\(\"git\"\,\"branch\"\,\"--show-current\"\)==\"kv-pool-layerwise-reuse\"\;\ assert\ run\(\"git\"\,\"rev-parse\"\,\"HEAD\"\)==\"a674091e09703481a2ec4fdb6a651831cd0108da\"\;\ states=\{\}\;\ lock=json.loads\(Path\(\"workspace.lock.json\"\).read_text\(encoding=\"utf-8-sig\"\)\)\;\ \[\(states.setdefault\(name\,\{\"head\":run\(\"git\"\,\"-C\"\,f\"repos/\{name\}\"\,\"rev-parse\"\,\"HEAD\"\)\,\"dirty\":run\(\"git\"\,\"-C\"\,f\"repos/\{name\}\"\,\"status\"\,\"--porcelain=v1\"\)\}\)\,None\)\ for\ name\ in\ expected\]\;\ assert\ all\(states\[name\]\[\"head\"\]==head\ and\ not\ states\[name\]\[\"dirty\"\]\ and\ lock\[\"repos\"\]\[name\]\[\"commit\"\]==head\ for\ name\,head\ in\ expected.items\(\)\)\;\ print\(json.dumps\(\{\"control\":\{\"branch\":\"kv-pool-layerwise-reuse\"\,\"head\":\"a674091e09703481a2ec4fdb6a651831cd0108da\"\}\,\"repos\":states\}\,sort_keys=True\,indent=2\)\) 
+[2026-07-30T15:00:55Z] END control-source-identity exit=0 artifact=identity.json
+[2026-07-30T15:00:55Z] START identity-tests
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s features/kv-pool-layerwise-reuse/deployment/tests -p test_validation_identity.py -v 
+[2026-07-30T15:00:55Z] END identity-tests exit=0 artifact=identity-tests.log
+[2026-07-30T15:00:56Z] START shell-syntax
+COMMAND find features/kv-pool-layerwise-reuse/deployment -type f -name \*.sh -exec bash -n \{\} + 
+[2026-07-30T15:00:56Z] END shell-syntax exit=0 artifact=bash-syntax.log
+[2026-07-30T15:00:56Z] START python-compile
+COMMAND env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/control-tooling-r2-pyc python3 -c from\ pathlib\ import\ Path\;\ import\ py_compile\;\ files=sorted\(Path\(\"features/kv-pool-layerwise-reuse/deployment\"\).rglob\(\"\*.py\"\)\)\;\ \[py_compile.compile\(str\(path\)\,doraise=True\)\ for\ path\ in\ files\]\;\ print\(f\"compiled=\{len\(files\)\}\"\) 
+[2026-07-30T15:00:56Z] END python-compile exit=0 artifact=python-compile.log
+[2026-07-30T15:00:56Z] START ruff-check
+COMMAND /tmp/vllm-ascend-ruff-0.14.0/bin/ruff check --no-cache features/kv-pool-layerwise-reuse/deployment/check-validation-report.py features/kv-pool-layerwise-reuse/deployment/tests/test_check_validation_report.py features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py 
+[2026-07-30T15:00:56Z] END ruff-check exit=0 artifact=ruff-check.log
+[2026-07-30T15:00:57Z] START ruff-format-check
+COMMAND /tmp/vllm-ascend-ruff-0.14.0/bin/ruff format --check --no-cache features/kv-pool-layerwise-reuse/deployment/check-validation-report.py features/kv-pool-layerwise-reuse/deployment/tests/test_check_validation_report.py features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py 
+[2026-07-30T15:00:57Z] END ruff-format-check exit=0 artifact=ruff-format-check.log
+[2026-07-30T15:00:57Z] START control-diff-check
+COMMAND git diff --check 878fcae79601a7627235862bca998d0d1e0a4aa6..a674091e09703481a2ec4fdb6a651831cd0108da 
+[2026-07-30T15:00:57Z] END control-diff-check exit=0 artifact=control-diff-check.log
+[2026-07-30T15:00:57Z] START source-diff-check
+COMMAND git -C repos/vllm-ascend diff --check a46a1dabbc260e8695002969f29528eb555eb583..14beaf161cca6f1e044e20529ca96c6554dbbe50 
+[2026-07-30T15:00:57Z] END source-diff-check exit=0 artifact=source-diff-check.log
+[2026-07-30T15:00:58Z] START identity-json
+COMMAND jq -e .schema_version\ \>=\ 1\ and\ .attempt\ ==\ 2\ and\ .run_id\ ==\ \"20260730T130225Z\"\ and\ .tooling_base.commit\ ==\ \"878fcae79601a7627235862bca998d0d1e0a4aa6\"\ and\ .commits.vllm\ ==\ \"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\ and\ .commits.vllm_ascend\ ==\ \"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\ and\ .model.num_layers\ ==\ 27\ and\ .runtime.block_size\ ==\ 128\ and\ .kubernetes.builder_platform\ ==\ .platform features/kv-pool-layerwise-reuse/deployment/validation-identity.json 
+[2026-07-30T15:00:58Z] END identity-json exit=0 artifact=identity-json.log
+[2026-07-30T15:00:58Z] START rendered-configmap-compile
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ import\ subprocess\,yaml\;\ paths=\[Path\(\"features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml\"\)\,Path\(\"features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml\"\)\]\;\ docs=\[doc\ for\ path\ in\ paths\ for\ doc\ in\ yaml.safe_load_all\(path.read_text\(\)\)\ if\ doc\ and\ doc.get\(\"kind\"\)==\"ConfigMap\"\]\;\ entries=\[\(key\,value\)\ for\ doc\ in\ docs\ for\ key\,value\ in\ doc.get\(\"data\"\,\{\}\).items\(\)\ if\ key.endswith\(\(\".py\"\,\".sh\"\)\)\]\;\ \[compile\(value\,key\,\"exec\"\)\ if\ key.endswith\(\".py\"\)\ else\ subprocess.run\(\[\"bash\"\,\"-n\"\]\,input=value\,text=True\,check=True\)\ for\ key\,value\ in\ entries\]\;\ print\(f\"rendered_entries=\{len\(entries\)\}\"\) 
+[2026-07-30T15:00:58Z] END rendered-configmap-compile exit=0 artifact=rendered-configmap-compile.log
+[2026-07-30T15:00:59Z] START source-history
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\,subprocess\;\ run=lambda\ \*args:\ subprocess.check_output\(args\,text=True\).strip\(\)\;\ repo=\"repos/vllm-ascend\"\;\ base=\"a46a1dabbc260e8695002969f29528eb555eb583\"\;\ head=\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\;\ assert\ run\(\"git\"\,\"-C\"\,repo\,\"merge-base\"\,\"collaborator/kv_offload_0723\"\,head\)==base\;\ assert\ run\(\"git\"\,\"-C\"\,repo\,\"rev-list\"\,\"--count\"\,\"collaborator/kv_offload_0723..HEAD\"\)==\"11\"\;\ assert\ not\ run\(\"git\"\,\"-C\"\,repo\,\"rev-list\"\,\"--merges\"\,\"collaborator/kv_offload_0723..HEAD\"\)\;\ protected=run\(\"git\"\,\"-C\"\,repo\,\"rev-parse\"\,\"feature/mooncake-layerwise-kv-pool\"\)\;\ remote_protected=run\(\"git\"\,\"-C\"\,repo\,\"rev-parse\"\,\"origin/feature/mooncake-layerwise-kv-pool\"\)\;\ assert\ protected==remote_protected==\"b5b65d9bbe325d009ad887fb87b8883b7ecee156\"\;\ print\(json.dumps\(\{\"merge_base\":base\,\"head\":head\,\"count\":11\,\"merge_commits\":\[\]\,\"protected\":protected\}\,sort_keys=True\,indent=2\)\) 
+[2026-07-30T15:00:59Z] END source-history exit=0 artifact=source-history.json
+[2026-07-30T15:01:29Z] START ut-pod-contract
+COMMAND bash -lc kubectl\ get\ pod\ -n\ liangjiahao\ vllm-ascend-ut\ -o\ json\ \|\ jq\ \"\{name:.metadata.name\,namespace:.metadata.namespace\,phase:.status.phase\,node:.spec.nodeName\,image:.spec.containers\[0\].image\,imageID:.status.containerStatuses\[0\].imageID\,resources:.spec.containers\[0\].resources\,volumes:.spec.volumes\,mounts:.spec.containers\[0\].volumeMounts\}\" 
+[2026-07-30T15:01:30Z] END ut-pod-contract exit=0 artifact=ut-pod-contract.json
+[2026-07-30T15:01:34Z] START create-control-fixture
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir -p /workspace/control-tooling-formal-r2-20260730T130225Z 
+[2026-07-30T15:01:34Z] END create-control-fixture exit=0 artifact=create-control-fixture.log
+[2026-07-30T15:01:37Z] START sync-control-fixture
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-tooling-formal-r2-20260730T130225Z\ -xf\ - 
+[2026-07-30T15:01:38Z] END sync-control-fixture exit=0 artifact=sync-control-fixture.log
+[2026-07-30T15:01:42Z] START control-fixture-identity
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-formal-r2-20260730T130225Z\ \&\&\ sha256sum\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment/validation-identity.json\ features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py 
+[2026-07-30T15:01:43Z] END control-fixture-identity exit=0 artifact=control-fixture-identity.log
+[2026-07-30T15:01:47Z] START deployment-tests-pod
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- bash -lc cd\ /workspace/control-tooling-formal-r2-20260730T130225Z\ \&\&\ export\ PYTHONDONTWRITEBYTECODE=1\ \&\&\ export\ PYTEST_ADDOPTS=\"-p\ no:cacheprovider\"\ \&\&\ python3\ -m\ pytest\ -q\ -p\ no:cacheprovider\ features/kv-pool-layerwise-reuse/deployment/tests 
+[2026-07-30T15:01:49Z] END deployment-tests-pod exit=0 artifact=deployment-tests-pod.log
+[2026-07-30T15:02:09Z] START manifest-dry-run-namespace
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/00-namespace.yaml 
+[2026-07-30T15:02:09Z] END manifest-dry-run-namespace exit=0 artifact=manifest-dry-run-namespace.log
+[2026-07-30T15:02:18Z] START manifest-dry-run-base-config
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml 
+[2026-07-30T15:02:18Z] END manifest-dry-run-base-config exit=0 artifact=manifest-dry-run-base-config.log
+[2026-07-30T15:02:22Z] START manifest-dry-run-proxy
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/20-proxy-server.yaml 
+[2026-07-30T15:02:22Z] END manifest-dry-run-proxy exit=0 artifact=manifest-dry-run-proxy.log
+[2026-07-30T15:02:26Z] START manifest-dry-run-master
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/30-mooncake-master.yaml 
+[2026-07-30T15:02:26Z] END manifest-dry-run-master exit=0 artifact=manifest-dry-run-master.log
+[2026-07-30T15:02:33Z] START manifest-dry-run-base-prefill
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml 
+[2026-07-30T15:02:33Z] END manifest-dry-run-base-prefill exit=0 artifact=manifest-dry-run-base-prefill.log
+[2026-07-30T15:02:37Z] START manifest-dry-run-base-decode
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/50-decode-engine.yaml 
+[2026-07-30T15:02:37Z] END manifest-dry-run-base-decode exit=0 artifact=manifest-dry-run-base-decode.log
+[2026-07-30T15:02:42Z] START manifest-dry-run-ut-pod
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/60-vllm-ascend-ut-pod.yaml 
+[2026-07-30T15:02:42Z] END manifest-dry-run-ut-pod exit=0 artifact=manifest-dry-run-ut-pod.log
+[2026-07-30T15:02:46Z] START manifest-dry-run-stress-config
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml 
+[2026-07-30T15:02:46Z] END manifest-dry-run-stress-config exit=0 artifact=manifest-dry-run-stress-config.log
+[2026-07-30T15:02:50Z] START manifest-dry-run-stress-prefill
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml 
+[2026-07-30T15:02:50Z] END manifest-dry-run-stress-prefill exit=0 artifact=manifest-dry-run-stress-prefill.log
+[2026-07-30T15:02:54Z] START manifest-dry-run-stress-decode
+COMMAND kubectl apply --dry-run=client -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml 
+[2026-07-30T15:02:54Z] END manifest-dry-run-stress-decode exit=0 artifact=manifest-dry-run-stress-decode.log
+[2026-07-30T15:03:15Z] START control-remote-head
+COMMAND git ls-remote origin refs/heads/kv-pool-layerwise-reuse 
+[2026-07-30T15:03:16Z] END control-remote-head exit=0 artifact=control-remote-head.txt
+[2026-07-30T15:03:19Z] START source-remote-head
+COMMAND git -C repos/vllm-ascend ls-remote origin refs/heads/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723 
+[2026-07-30T15:03:20Z] END source-remote-head exit=0 artifact=source-remote-head.txt
+[2026-07-30T15:03:27Z] START source-protected-remote-head
+COMMAND git -C repos/vllm-ascend ls-remote origin refs/heads/feature/mooncake-layerwise-kv-pool 
+[2026-07-30T15:03:28Z] END source-protected-remote-head exit=0 artifact=source-protected-remote-head.txt
+[2026-07-30T15:04:18Z] START artifact-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-r2\"\)\;\ steps=\[json.loads\(line\)\ for\ line\ in\ \(root/\"steps.jsonl\"\).read_text\(\).splitlines\(\)\]\;\ assert\ len\(steps\)==29\ and\ all\(step\[\"exit_code\"\]==0\ for\ step\ in\ steps\)\;\ assert\ \"Ran\ 6\ tests\"\ in\ \(root/\"identity-tests.log\"\).read_text\(\)\;\ assert\ \"64\ passed\"\ in\ \(root/\"deployment-tests-pod.log\"\).read_text\(\)\;\ assert\ \"compiled=14\"\ in\ \(root/\"python-compile.log\"\).read_text\(\)\;\ assert\ \"rendered_entries=10\"\ in\ \(root/\"rendered-configmap-compile.log\"\).read_text\(\)\;\ pod=json.loads\(\(root/\"ut-pod-contract.json\"\).read_text\(\)\)\;\ assert\ pod\[\"namespace\"\]==\"liangjiahao\"\ and\ pod\[\"phase\"\]==\"Running\"\ and\ pod\[\"node\"\]==\"n1\"\;\ assert\ \"huawei.com/Ascend910\"\ not\ in\ json.dumps\(pod\[\"resources\"\]\)\ and\ all\(\"hostPath\"\ not\ in\ volume\ for\ volume\ in\ pod\[\"volumes\"\]\)\;\ assert\ \(root/\"control-remote-head.txt\"\).read_text\(\).split\(\)\[0\]==\"a674091e09703481a2ec4fdb6a651831cd0108da\"\;\ assert\ \(root/\"source-remote-head.txt\"\).read_text\(\).split\(\)\[0\]==\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\;\ assert\ \(root/\"source-protected-remote-head.txt\"\).read_text\(\).split\(\)\[0\]==\"b5b65d9bbe325d009ad887fb87b8883b7ecee156\"\;\ print\(json.dumps\(\{\"validated\":True\,\"recorded_steps\":len\(steps\)\,\"identity_tests\":6\,\"deployment_tests\":64\,\"manifest_dry_runs\":10\,\"rendered_entries\":10\,\"compiled_python_files\":14\}\,sort_keys=True\,indent=2\)\) 
+[2026-07-30T15:04:18Z] END artifact-assertions exit=0 artifact=artifact-assertions.json
+[2026-07-30T15:04:19Z] START tooling-summary
+COMMAND jq -n --arg run_id 20260730T130225Z --arg tooling_commit a674091e09703481a2ec4fdb6a651831cd0108da --arg source_commit 14beaf161cca6f1e044e20529ca96c6554dbbe50 \{schema_version:1\,status:\"passed\"\,validated:true\,attempt:2\,run_id:\$run_id\,tooling_commit:\$tooling_commit\,source_commit:\$source_commit\,gates:\{identity_tests:\{passed:6\}\,deployment_tests:\{passed:64\,environment:\"liangjiahao/vllm-ascend-ut\"\,pod_image:\"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2\"\}\,shell_syntax:true\,python_compile:\{files:14\}\,ruff_check:true\,ruff_format:true\,diff_check:true\,source_history:true\,rendered_configmap_entries:10\,manifest_dry_runs:10\,remote_identity:true\}\,limitations:\[\"pre-build\ tooling\ tests\ used\ the\ existing\ CPU-only\ UT\ Pod\;\ formal\ UT\ is\ rerun\ after\ the\ R2\ image\ is\ built\"\]\,errors:\[\]\} 
+[2026-07-30T15:04:19Z] END tooling-summary exit=0 artifact=summary.json
+[2026-07-30T15:04:19Z] START summary-assert
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .attempt\ ==\ 2\ and\ .tooling_commit\ ==\ \"a674091e09703481a2ec4fdb6a651831cd0108da\"\ and\ .gates.identity_tests.passed\ ==\ 6\ and\ .gates.deployment_tests.passed\ ==\ 64\ and\ .gates.manifest_dry_runs\ ==\ 10\ and\ \(.errors\ \|\ length\)\ ==\ 0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-r2/summary.json 
+[2026-07-30T15:04:19Z] END summary-assert exit=0 artifact=summary-assert.log
+[2026-07-30T15:04:19Z] START tooling-checksums
+COMMAND bash -lc cd\ features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/tooling-r2\ \&\&\ find\ .\ -maxdepth\ 1\ -type\ f\ \!\ -name\ SHA256SUMS\ \!\ -name\ steps.jsonl\ \!\ -name\ command-transcript.log\ \!\ -name\ checksum-generation.log\ -print0\ \|\ sort\ -z\ \|\ xargs\ -0\ sha256sum\ \>\ SHA256SUMS\ \&\&\ sha256sum\ -c\ SHA256SUMS 
+[2026-07-30T15:04:19Z] END tooling-checksums exit=0 artifact=checksum-generation.log

@@ -1,0 +1,20 @@
+{
+  "api_count": 7,
+  "cleanup_verified": true,
+  "config_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+  "manifest_digest": "sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477",
+  "npu_available": true,
+  "platform": "linux/arm64",
+  "recorded_steps": 27,
+  "superseded_nonzero_steps": [
+    {
+      "artifact": "wait-image-check-pod-deleted.log",
+      "command": "kubectl wait -n liangjiahao --for=delete pod -l app=prefill --timeout=300s ",
+      "ended_at": "2026-07-30T16:55:50Z",
+      "exit_code": 143,
+      "name": "wait-image-check-pod-deleted",
+      "started_at": "2026-07-30T16:54:11Z"
+    }
+  ],
+  "validated": true
+}

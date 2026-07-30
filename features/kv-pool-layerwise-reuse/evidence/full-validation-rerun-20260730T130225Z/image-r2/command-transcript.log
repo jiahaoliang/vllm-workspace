@@ -1,0 +1,32 @@
+[2026-07-30T15:05:26Z] START builder-pod
+COMMAND kubectl get pod -n default buildkitd -o json 
+[2026-07-30T15:05:26Z] END builder-pod exit=0 artifact=builder-pod.json
+[2026-07-30T15:05:33Z] START builder-worker
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default buildctl debug workers 
+[2026-07-30T15:05:33Z] END builder-worker exit=0 artifact=builder-worker.txt
+[2026-07-30T15:05:37Z] START target-tag-absence
+COMMAND bash -lc set\ -e\;\ rows=\$\(nerdctl\ -n\ k8s.io\ images\ --digests\ docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2\ \|\ tail\ -n\ +2\ \|\ wc\ -l\)\;\ test\ \"\$rows\"\ =\ 0\;\ printf\ \"matching_rows=%s\\n\"\ \"\$rows\" 
+[2026-07-30T15:05:38Z] END target-tag-absence exit=0 artifact=target-tag-absence.txt
+[2026-07-30T15:05:55Z] START vllm-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/vllm-formal-fetch-r2-20260730T130225Z\;\ git\ init\ /tmp/vllm-formal-fetch-r2-20260730T130225Z\;\ git\ -C\ /tmp/vllm-formal-fetch-r2-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/vllm-project/vllm.git\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\;\ test\ \"\$\(git\ -C\ /tmp/vllm-formal-fetch-r2-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 
+[2026-07-30T15:06:00Z] END vllm-exact-fetchability exit=0 artifact=vllm-exact-fetchability.log
+[2026-07-30T15:06:07Z] START vllm-ascend-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/vllm-ascend-formal-fetch-r2-20260730T130225Z\;\ git\ init\ /tmp/vllm-ascend-formal-fetch-r2-20260730T130225Z\;\ git\ -C\ /tmp/vllm-ascend-formal-fetch-r2-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/jiahaoliang/vllm-ascend.git\ 14beaf161cca6f1e044e20529ca96c6554dbbe50\;\ test\ \"\$\(git\ -C\ /tmp/vllm-ascend-formal-fetch-r2-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 14beaf161cca6f1e044e20529ca96c6554dbbe50 
+[2026-07-30T15:06:10Z] END vllm-ascend-exact-fetchability exit=0 artifact=vllm-ascend-exact-fetchability.log
+[2026-07-30T15:06:14Z] START mooncake-exact-fetchability
+COMMAND bash -lc set\ -e\;\ test\ \!\ -e\ /tmp/mooncake-formal-fetch-r2-20260730T130225Z\;\ git\ init\ /tmp/mooncake-formal-fetch-r2-20260730T130225Z\;\ git\ -C\ /tmp/mooncake-formal-fetch-r2-20260730T130225Z\ fetch\ --depth\ 1\ https://github.com/ascend-direct-dev/Mooncake.git\ 786c77ff7692bed58dd99971afef87d6b690cbe3\;\ test\ \"\$\(git\ -C\ /tmp/mooncake-formal-fetch-r2-20260730T130225Z\ rev-parse\ FETCH_HEAD\)\"\ =\ 786c77ff7692bed58dd99971afef87d6b690cbe3 
+[2026-07-30T15:06:18Z] END mooncake-exact-fetchability exit=0 artifact=mooncake-exact-fetchability.log
+[2026-07-30T15:07:03Z] START image-build
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default nerdctl -n k8s.io build --progress=plain -f features/kv-pool-layerwise-reuse/Dockerfile.a2 -t docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2 features/kv-pool-layerwise-reuse 
+[2026-07-30T15:22:29Z] START failure-classification
+COMMAND jq -n \{schema_version:1\,status:\"failed\"\,classification:\"validation_tooling\"\,source_defect:false\,build_started_at:\"2026-07-30T15:07:03Z\"\,build_terminated_at:\"2026-07-30T15:21:34Z\"\,observed_exit_code:130\,image_loaded:false\,observation:\"vLLM\ generated\ wheel\ version\ 0.1.dev1+g54503ecec.empty\ while\ the\ exact\ allowlist\ expected\ 0.1.dev1+g54503ece.empty\"\,disposition:\"terminated\ the\ inevitably\ failing\ build\ early\;\ preserve\ evidence\;\ repair\ exact\ allowlist\ and\ signal-terminal\ recording\;\ derive\ r3\ tag\"\} 
+[2026-07-30T15:22:29Z] END failure-classification exit=0 artifact=failure-classification.json
+[2026-07-30T15:22:29Z] START image-r2-summary
+COMMAND jq -n \{schema_version:1\,status:\"failed\"\,validated:false\,attempt:2\,run_id:\"20260730T130225Z-image-r2\"\,tooling_commit:\"a674091e09703481a2ec4fdb6a651831cd0108da\"\,source_commit:\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,target_image:\"docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2\"\,image_loaded:false\,build:\{started_at:\"2026-07-30T15:07:03Z\"\,terminated_at:\"2026-07-30T15:21:34Z\"\,observed_exit_code:130\,terminated_early:true\}\,error:\{class:\"validation_tooling\"\,source_defect:false\,reason:\"exact\ vLLM\ wheel\ version\ short\ SHA\ length\ mismatch\"\,observed:\"0.1.dev1+g54503ecec.empty\"\,configured:\"0.1.dev1+g54503ece.empty\"\}\,evidence_limitation:\"SIGINT\ exposed\ that\ the\ recorder\ did\ not\ append\ the\ build\ END/step\ record\;\ outer\ session\ exit\ 130\ and\ this\ classification\ preserve\ the\ terminal\ state\"\} 
+[2026-07-30T15:22:29Z] END image-r2-summary exit=0 artifact=summary.json
+[2026-07-30T15:22:30Z] START summary-assert
+COMMAND jq -e .status\ ==\ \"failed\"\ and\ .validated\ ==\ false\ and\ .attempt\ ==\ 2\ and\ .image_loaded\ ==\ false\ and\ .build.observed_exit_code\ ==\ 130\ and\ .error.class\ ==\ \"validation_tooling\"\ and\ .error.source_defect\ ==\ false features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r2/summary.json 
+[2026-07-30T15:22:30Z] END summary-assert exit=0 artifact=summary-assert.log
+[2026-07-30T15:22:30Z] START image-r2-checksums
+COMMAND bash -lc cd\ features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260730T130225Z/image-r2\ \&\&\ find\ .\ -maxdepth\ 1\ -type\ f\ \!\ -name\ SHA256SUMS\ \!\ -name\ steps.jsonl\ \!\ -name\ command-transcript.log\ \!\ -name\ checksum-generation.log\ -print0\ \|\ sort\ -z\ \|\ xargs\ -0\ sha256sum\ \>\ SHA256SUMS\ \&\&\ sha256sum\ -c\ SHA256SUMS 
+[2026-07-30T15:22:30Z] END image-r2-checksums exit=0 artifact=checksum-generation.log

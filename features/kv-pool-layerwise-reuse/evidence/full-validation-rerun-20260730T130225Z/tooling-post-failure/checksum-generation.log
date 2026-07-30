@@ -1,0 +1,24 @@
+Cannot open netlink socket: Operation not permitted
+./control-diff-check.log: OK
+./create-control-fixture.log: OK
+./deployment-tests-pod-retry1.log: OK
+./deployment-tests-pod-retry2.log: OK
+./deployment-tests-pod.log: OK
+./manifest-dry-run-base-config.log: OK
+./pid-regression-pod-retry2.log: OK
+./pid-regression-pod.log: OK
+./python-compile.log: OK
+./rendered-configmap-compile-retry2.log: OK
+./rendered-configmap-compile.log: OK
+./ruff-check-retry1.log: OK
+./ruff-check-retry2.log: OK
+./ruff-check.log: OK
+./ruff-format-check-retry1.log: OK
+./ruff-format-check-retry2.log: OK
+./ruff-version-retry1.log: OK
+./summary-assert.log: OK
+./summary.json: OK
+./sync-control-fixture-retry1.log: OK
+./sync-control-fixture-retry2.log: OK
+./sync-control-fixture.log: OK
+./ut-pod-contract.json: OK

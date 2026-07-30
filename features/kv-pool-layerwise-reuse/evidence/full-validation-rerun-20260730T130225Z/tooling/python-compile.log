@@ -1,0 +1,14 @@
+bash: line 2: features/kv-pool-layerwise-reuse/deployment/stress-test.py: Permission denied
+bash: line 3: features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py: Permission denied
+bash: line 4: features/kv-pool-layerwise-reuse/deployment/tests/test_stress_test.py: Permission denied
+bash: line 5: features/kv-pool-layerwise-reuse/deployment/tests/test_smoke_oracle_contract.py: Permission denied
+bash: line 6: features/kv-pool-layerwise-reuse/deployment/tests/test_stress_runtime_pid.py: Permission denied
+bash: line 7: features/kv-pool-layerwise-reuse/deployment/tests/test_lease_expiry.py: Permission denied
+bash: line 8: features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py: Permission denied
+bash: line 9: features/kv-pool-layerwise-reuse/deployment/tests/test_check_validation_report.py: Permission denied
+bash: line 10: features/kv-pool-layerwise-reuse/deployment/tests/test_check_stress_log.py: Permission denied
+bash: line 11: features/kv-pool-layerwise-reuse/deployment/lease-expiry-test.py: Permission denied
+bash: line 12: features/kv-pool-layerwise-reuse/deployment/check-stress-log.py: Permission denied
+usage: check-validation-report.py [-h] [--repo-root REPO_ROOT] report
+check-validation-report.py: error: the following arguments are required: report
+bash: line 14: features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py: Permission denied

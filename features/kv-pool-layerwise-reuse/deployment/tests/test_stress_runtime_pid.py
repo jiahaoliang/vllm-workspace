@@ -6,12 +6,15 @@ import time
 from pathlib import Path
 
 
-CONFIG = Path(__file__).resolve().parents[1] / "stress" / "10-runtime-config.yaml"
+BASE_CONFIG = Path(__file__).resolve().parents[1] / "10-runtime-config.yaml"
+STRESS_CONFIG = (
+    Path(__file__).resolve().parents[1] / "stress" / "10-runtime-config.yaml"
+)
 MASTER_CONFIG = Path(__file__).resolve().parents[1] / "30-mooncake-master.yaml"
 
 
-def configmap_script(name: str) -> str:
-    lines = CONFIG.read_text(encoding="utf-8").splitlines()
+def configmap_script(name: str, config: Path = STRESS_CONFIG) -> str:
+    lines = config.read_text(encoding="utf-8").splitlines()
     marker = f"  {name}: |"
     start = lines.index(marker) + 1
     body = []
@@ -57,9 +60,7 @@ def test_pid_state_distinguishes_live_absent_and_zombie(tmp_path):
     try:
         deadline = time.monotonic() + 5
         while time.monotonic() < deadline:
-            process_stat = Path(f"/proc/{child_pid}/stat").read_text(
-                encoding="utf-8"
-            )
+            process_stat = Path(f"/proc/{child_pid}/stat").read_text(encoding="utf-8")
             if process_stat.split()[2] == "Z":
                 break
             time.sleep(0.01)
@@ -71,12 +72,14 @@ def test_pid_state_distinguishes_live_absent_and_zombie(tmp_path):
 
 
 def test_start_and_stop_scripts_use_state_helper_instead_of_kill_zero():
-    config = CONFIG.read_text(encoding="utf-8")
-    assert "kill -0" not in config
-    for name in ("start-prefill.sh", "start-decode.sh", "stop-engine.sh"):
-        script = configmap_script(name)
-        assert "source /opt/vllm-layerwise/pid-state.sh" in script
-        assert "pid_process_state" in script
+    for config_path in (BASE_CONFIG, STRESS_CONFIG):
+        config = config_path.read_text(encoding="utf-8")
+        assert "kill -0" not in config, config_path
+        assert configmap_script("pid-state.sh", config_path)
+        for name in ("start-prefill.sh", "start-decode.sh", "stop-engine.sh"):
+            script = configmap_script(name, config_path)
+            assert "source /opt/vllm-layerwise/pid-state.sh" in script
+            assert "pid_process_state" in script
 
 
 def test_master_lease_covers_long_layerwise_transfer():

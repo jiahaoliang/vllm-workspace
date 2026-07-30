@@ -1,0 +1,9 @@
+{
+  "compiled_python_files": 14,
+  "deployment_tests": 64,
+  "identity_tests": 6,
+  "manifest_dry_runs": 10,
+  "recorded_steps": 29,
+  "rendered_entries": 10,
+  "validated": true
+}

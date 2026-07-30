@@ -1,0 +1,1026 @@
+#1 [internal] load build definition from Dockerfile.a2
+#1 transferring dockerfile: 9.50kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12
+#2 DONE 0.7s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/16] FROM quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12@sha256:678d74de14accc2099fc6f1532990cfd2c7976d7c366fcd8970102234652339a
+#4 resolve quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12@sha256:678d74de14accc2099fc6f1532990cfd2c7976d7c366fcd8970102234652339a done
+#4 DONE 0.0s
+
+#5 [ 3/16] RUN set -euxo pipefail;     apt-get update -y;     apt-get install -y         ca-certificates         git         vim         wget         unzip         net-tools         gcc         g++         cmake         numactl         libnuma-dev         libibverbs-dev         libjemalloc2         libhiredis-dev         clang-15;     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20;     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20;     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [ 7/16] RUN set -euxo pipefail;     cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh         /vllm-workspace/Mooncake/mooncake_installer.sh;     cd /vllm-workspace/Mooncake;     bash mooncake_installer.sh -y;     apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev;     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 4/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/vllm-project/vllm.git" /vllm-workspace/vllm;     git -C /vllm-workspace/vllm fetch --depth 1         origin "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     git -C /vllm-workspace/vllm checkout --detach "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" =         "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5"
+#7 CACHED
+
+#8 [ 5/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/jiahaoliang/vllm-ascend.git" /vllm-workspace/vllm-ascend;     git -C /vllm-workspace/vllm-ascend fetch --depth 1         origin "14beaf161cca6f1e044e20529ca96c6554dbbe50";     git -C /vllm-workspace/vllm-ascend checkout --detach         "14beaf161cca6f1e044e20529ca96c6554dbbe50";     git -C /vllm-workspace/vllm-ascend submodule update         --init --recursive --depth 1;     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" =         "14beaf161cca6f1e044e20529ca96c6554dbbe50"
+#8 CACHED
+
+#9 [ 6/16] RUN set -euxo pipefail;     git clone --depth 1 --no-checkout         "https://github.com/ascend-direct-dev/Mooncake.git" /vllm-workspace/Mooncake;     git -C /vllm-workspace/Mooncake fetch --depth 1         origin "786c77ff7692bed58dd99971afef87d6b690cbe3";     git -C /vllm-workspace/Mooncake checkout --detach         "786c77ff7692bed58dd99971afef87d6b690cbe3";     git -C /vllm-workspace/Mooncake submodule update         --init --recursive --depth 1;     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" =         "786c77ff7692bed58dd99971afef87d6b690cbe3"
+#9 CACHED
+
+#10 [ 2/16] WORKDIR /workspace
+#10 CACHED
+
+#11 [ 8/16] RUN set -euxo pipefail;     cd /vllm-workspace/Mooncake;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     export LD_LIBRARY_PATH="/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:";     cmake -S . -B build         -DUSE_ASCEND_DIRECT=ON         -DBUILD_UNIT_TESTS=OFF         -DBUILD_EXAMPLES=OFF         -DBUILD_BENCHMARK=OFF         -DWITH_STORE_RUST=OFF;     cmake --build build --parallel "32";     cmake --install build;     ldconfig;     rm -rf build
+#11 CACHED
+
+#12 [ 9/16] RUN pip config set global.index-url "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+#12 CACHED
+
+#13 [10/16] RUN set -euxo pipefail;     VLLM_TARGET_DEVICE=empty python3 -m pip install         -e "/vllm-workspace/vllm[audio]"         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton;     python3 -m pip cache purge
+#13 0.116 + VLLM_TARGET_DEVICE=empty
+#13 0.116 + python3 -m pip install -e '/vllm-workspace/vllm[audio]' --extra-index-url https://download.pytorch.org/whl/cpu/
+#13 2.111 Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple, https://download.pytorch.org/whl/cpu/
+#13 2.112 Obtaining file:///vllm-workspace/vllm
+#13 2.117   Installing build dependencies: started
+#13 25.42   Installing build dependencies: finished with status 'done'
+#13 25.43   Checking if build backend supports build_editable: started
+#13 25.93   Checking if build backend supports build_editable: finished with status 'done'
+#13 25.94   Getting requirements to build editable: started
+#13 33.61   Getting requirements to build editable: finished with status 'done'
+#13 33.61   Preparing editable metadata (pyproject.toml): started
+#13 37.67   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#13 40.50 Collecting regex (from vllm==0.1.dev1+g54503ecec.empty)
+#13 40.57   Downloading regex-2026.7.19-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (796 kB)
+#13 40.58      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 796.7/796.7 kB 48.9 MB/s  0:00:00
+#13 41.31 Collecting cachetools (from vllm==0.1.dev1+g54503ecec.empty)
+#13 41.38   Downloading cachetools-7.1.6-py3-none-any.whl (16 kB)
+#13 41.38 Requirement already satisfied: psutil in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (7.2.2)
+#13 42.05 Collecting sentencepiece (from vllm==0.1.dev1+g54503ecec.empty)
+#13 42.12   Downloading sentencepiece-0.2.2-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (1.3 MB)
+#13 42.14      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 55.9 MB/s  0:00:00
+#13 42.15 Requirement already satisfied: numpy in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (2.5.1)
+#13 42.15 Requirement already satisfied: requests>=2.26.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (2.34.2)
+#13 42.28 Collecting tqdm (from vllm==0.1.dev1+g54503ecec.empty)
+#13 42.34   Downloading tqdm-4.70.0-py3-none-any.whl (80 kB)
+#13 42.79 Collecting blake3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 42.85   Downloading blake3-1.0.9-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (373 kB)
+#13 43.59 Collecting py-cpuinfo (from vllm==0.1.dev1+g54503ecec.empty)
+#13 43.65   Downloading py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
+#13 44.00 Collecting transformers>=5.5.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 44.06   Downloading transformers-5.14.1-py3-none-any.whl (11.6 MB)
+#13 44.29      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.6/11.6 MB 50.7 MB/s  0:00:00
+#13 45.40 Collecting tokenizers>=0.21.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 45.46   Downloading tokenizers-0.23.1-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.4 MB)
+#13 45.53      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.4/3.4 MB 47.7 MB/s  0:00:00
+#13 46.48 Collecting safetensors>=0.6.2 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 46.54   Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (502 kB)
+#13 47.58 Collecting protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 47.64   Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_aarch64.whl (328 kB)
+#13 48.00 Collecting fastapi<0.137.0,>=0.133.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 48.06   Downloading fastapi-0.136.3-py3-none-any.whl (117 kB)
+#13 48.84 Collecting starlette>=1.0.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 48.90   Downloading starlette-1.3.1-py3-none-any.whl (73 kB)
+#13 50.73 Collecting aiohttp>=3.13.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 50.80   Downloading aiohttp-3.14.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (1.8 MB)
+#13 50.82      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 81.6 MB/s  0:00:00
+#13 51.63 Collecting openai>=2.0.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 51.69   Downloading openai-2.50.0-py3-none-any.whl (1.7 MB)
+#13 51.72      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 81.5 MB/s  0:00:00
+#13 52.67 Collecting pydantic>=2.12.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 52.73   Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)
+#13 53.06 Collecting prometheus_client>=0.18.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 53.12   Downloading prometheus_client-0.26.0-py3-none-any.whl (64 kB)
+#13 54.08 Collecting pillow (from vllm==0.1.dev1+g54503ecec.empty)
+#13 54.14   Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (6.3 MB)
+#13 54.55      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 15.1 MB/s  0:00:00
+#13 55.27 Collecting prometheus-fastapi-instrumentator>=8.0.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 55.34   Downloading prometheus_fastapi_instrumentator-8.1.0-py3-none-any.whl (19 kB)
+#13 56.11 Collecting tiktoken>=0.6.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 56.18   Downloading tiktoken-0.13.0-cp312-cp312-manylinux_2_28_aarch64.whl (1.1 MB)
+#13 56.20      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 74.8 MB/s  0:00:00
+#13 56.70 Collecting lm-format-enforcer==0.11.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 56.76   Downloading lm_format_enforcer-0.11.3-py3-none-any.whl (45 kB)
+#13 57.55 Collecting llguidance<1.8.0,>=1.7.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 57.61   Downloading llguidance-1.7.6-cp39-abi3-manylinux_2_31_aarch64.whl (2.9 MB)
+#13 57.64      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.9/2.9 MB 88.2 MB/s  0:00:00
+#13 58.37 Collecting outlines_core==0.2.14 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 58.43   Downloading outlines_core-0.2.14-cp312-cp312-manylinux_2_28_aarch64.whl (2.2 MB)
+#13 58.45      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 86.0 MB/s  0:00:00
+#13 59.19 Collecting diskcache==5.6.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 59.25   Downloading diskcache-5.6.3-py3-none-any.whl (45 kB)
+#13 59.55 Collecting lark==1.2.2 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 59.62   Downloading lark-1.2.2-py3-none-any.whl (111 kB)
+#13 60.42 Collecting xgrammar<1.0.0,>=0.2.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 60.49   Downloading xgrammar-0.2.4-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (44.8 MB)
+#13 61.42      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.8/44.8 MB 47.8 MB/s  0:00:00
+#13 62.19 Collecting typing_extensions>=4.10 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 62.26   Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#13 62.39 Collecting filelock>=3.16.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 62.45   Using cached filelock-3.32.2-py3-none-any.whl (98 kB)
+#13 63.16 Collecting partial-json-parser (from vllm==0.1.dev1+g54503ecec.empty)
+#13 63.22   Downloading partial_json_parser-0.2.1.1.post7-py3-none-any.whl (10 kB)
+#13 63.89 Collecting jsonschema>=4.23.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 63.95   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#13 64.74 Collecting pyzmq>=25.0.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 64.81   Downloading pyzmq-27.1.0-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (652 kB)
+#13 64.83      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 652.6/652.6 kB 55.7 MB/s  0:00:00
+#13 65.24 Collecting msgspec (from vllm==0.1.dev1+g54503ecec.empty)
+#13 65.29   Downloading msgspec-0.21.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (218 kB)
+#13 65.60 Collecting mistral_common>=1.11.5 (from mistral_common[image]>=1.11.5->vllm==0.1.dev1+g54503ecec.empty)
+#13 65.67   Downloading mistral_common-1.11.7-py3-none-any.whl (6.6 MB)
+#13 65.81      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 44.4 MB/s  0:00:00
+#13 66.63 Collecting opencv-python-headless>=4.13.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 66.69   Downloading opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_aarch64.whl (39.6 MB)
+#13 67.51      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 39.6/39.6 MB 48.5 MB/s  0:00:00
+#13 67.55 Requirement already satisfied: pyyaml in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (6.0.3)
+#13 67.55 Requirement already satisfied: six>=1.16.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (1.17.0)
+#13 67.78 Collecting setuptools<81.0.0,>=77.0.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 67.83   Using cached setuptools-80.10.2-py3-none-any.whl (1.1 MB)
+#13 68.58 Collecting einops (from vllm==0.1.dev1+g54503ecec.empty)
+#13 68.63   Downloading einops-0.8.2-py3-none-any.whl (65 kB)
+#13 69.45 Collecting compressed-tensors==0.17.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 69.51   Downloading compressed_tensors-0.17.0-py3-none-any.whl (211 kB)
+#13 70.23 Collecting depyf==0.20.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 70.29   Downloading depyf-0.20.0-py3-none-any.whl (39 kB)
+#13 71.02 Collecting cloudpickle (from vllm==0.1.dev1+g54503ecec.empty)
+#13 71.07   Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+#13 71.56 Collecting watchfiles (from vllm==0.1.dev1+g54503ecec.empty)
+#13 71.63   Downloading watchfiles-1.2.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (453 kB)
+#13 72.38 Collecting python-json-logger (from vllm==0.1.dev1+g54503ecec.empty)
+#13 72.44   Downloading python_json_logger-4.1.0-py3-none-any.whl (15 kB)
+#13 73.19 Collecting ninja (from vllm==0.1.dev1+g54503ecec.empty)
+#13 73.26   Using cached ninja-1.13.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (177 kB)
+#13 74.19 Collecting pybase64 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 74.26   Downloading pybase64-1.4.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (59 kB)
+#13 75.09 Collecting cbor2 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 75.16   Downloading cbor2-6.1.3-cp312-cp312-manylinux_2_28_aarch64.whl (457 kB)
+#13 75.99 Collecting ijson (from vllm==0.1.dev1+g54503ecec.empty)
+#13 76.05   Downloading ijson-3.5.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (149 kB)
+#13 76.87 Collecting setproctitle (from vllm==0.1.dev1+g54503ecec.empty)
+#13 76.94   Downloading setproctitle-1.3.7-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (33 kB)
+#13 77.67 Collecting openai-harmony>=0.0.3 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 77.74   Downloading openai_harmony-0.0.8-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (2.9 MB)
+#13 77.78      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.9/2.9 MB 84.5 MB/s  0:00:00
+#13 78.13 Collecting anthropic>=0.71.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 78.18   Downloading anthropic-0.120.2-py3-none-any.whl (1.0 MB)
+#13 78.20      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 65.6 MB/s  0:00:00
+#13 78.84 Collecting model-hosting-container-standards<1.0.0,>=0.1.14 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 78.91   Downloading model_hosting_container_standards-0.1.16-py3-none-any.whl (125 kB)
+#13 79.59 Collecting mcp (from vllm==0.1.dev1+g54503ecec.empty)
+#13 79.67   Downloading mcp-2.0.0-py3-none-any.whl (349 kB)
+#13 80.41 Collecting opentelemetry-sdk>=1.27.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 80.48   Downloading opentelemetry_sdk-1.44.0-py3-none-any.whl (137 kB)
+#13 81.21 Collecting opentelemetry-api>=1.27.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 81.28   Downloading opentelemetry_api-1.44.0-py3-none-any.whl (60 kB)
+#13 82.02 Collecting opentelemetry-exporter-otlp>=1.27.0 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 82.08   Downloading opentelemetry_exporter_otlp-1.44.0-py3-none-any.whl (6.7 kB)
+#13 82.40 Collecting opentelemetry-semantic-conventions-ai>=0.4.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 82.46   Downloading opentelemetry_semantic_conventions_ai-0.5.1-py3-none-any.whl (11 kB)
+#13 83.27 Collecting av (from vllm==0.1.dev1+g54503ecec.empty)
+#13 83.33   Downloading av-18.0.0-cp311-abi3-manylinux_2_28_aarch64.whl (33.4 MB)
+#13 84.03      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 33.4/33.4 MB 47.6 MB/s  0:00:00
+#13 84.07 Requirement already satisfied: scipy in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm==0.1.dev1+g54503ecec.empty) (1.18.0)
+#13 84.80 Collecting soundfile (from vllm==0.1.dev1+g54503ecec.empty)
+#13 84.86   Downloading soundfile-0.14.0-py2.py3-none-manylinux_2_28_aarch64.whl (1.2 MB)
+#13 84.88      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 74.4 MB/s  0:00:00
+#13 85.72 Collecting soxr (from vllm==0.1.dev1+g54503ecec.empty)
+#13 85.78   Downloading soxr-1.1.0-cp312-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (206 kB)
+#13 86.11 Collecting torch>=2.10.0 (from compressed-tensors==0.17.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 86.36   Downloading torch-2.13.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl.metadata (37 kB)
+#13 87.08 Collecting loguru (from compressed-tensors==0.17.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 87.14   Downloading loguru-0.7.3-py3-none-any.whl (61 kB)
+#13 87.87 Collecting astor (from depyf==0.20.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 87.93   Downloading astor-0.8.1-py2.py3-none-any.whl (27 kB)
+#13 88.23 Collecting dill (from depyf==0.20.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 88.29   Downloading dill-0.4.1-py3-none-any.whl (120 kB)
+#13 88.99 Collecting interegular>=0.3.2 (from lm-format-enforcer==0.11.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 89.05   Downloading interegular-0.3.3-py37-none-any.whl (23 kB)
+#13 89.14 Collecting packaging (from lm-format-enforcer==0.11.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 89.21   Using cached packaging-26.2-py3-none-any.whl (100 kB)
+#13 89.95 Collecting typing-inspection>=0.4.2 (from fastapi<0.137.0,>=0.133.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 90.01   Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+#13 90.30 Collecting annotated-doc>=0.0.2 (from fastapi<0.137.0,>=0.133.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 90.36   Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+#13 91.06 Collecting fastapi-cli>=0.0.8 (from fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 91.12   Downloading fastapi_cli-0.0.32-py3-none-any.whl (14 kB)
+#13 92.00 Collecting fastar>=0.9.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 92.07   Downloading fastar-0.11.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (760 kB)
+#13 92.08      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 760.7/760.7 kB 62.8 MB/s  0:00:00
+#13 92.54 Collecting httpx<1.0.0,>=0.23.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 92.61   Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#13 92.71 Collecting jinja2>=3.1.5 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 92.72   Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#13 93.43 Collecting python-multipart>=0.0.18 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 93.49   Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+#13 94.22 Collecting email-validator>=2.0.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 94.28   Downloading email_validator-2.3.0-py3-none-any.whl (35 kB)
+#13 95.04 Collecting uvicorn>=0.12.0 (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 95.10   Downloading uvicorn-0.52.0-py3-none-any.whl (79 kB)
+#13 95.84 Collecting pydantic-settings>=2.0.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 95.90   Downloading pydantic_settings-2.14.2-py3-none-any.whl (61 kB)
+#13 96.61 Collecting pydantic-extra-types>=2.0.0 (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 96.68   Downloading pydantic_extra_types-2.11.1-py3-none-any.whl (79 kB)
+#13 97.49 Collecting anyio (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 97.55   Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+#13 97.56 Requirement already satisfied: certifi in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty) (2026.6.17)
+#13 98.26 Collecting httpcore==1.* (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 98.32   Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#13 98.33 Requirement already satisfied: idna in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty) (3.18)
+#13 99.05 Collecting h11>=0.16 (from httpcore==1.*->httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 99.12   Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#13 99.84 Collecting jmespath (from model-hosting-container-standards<1.0.0,>=0.1.14->vllm==0.1.dev1+g54503ecec.empty)
+#13 99.90   Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
+#13 100.2 Collecting supervisor>=4.2.0 (from model-hosting-container-standards<1.0.0,>=0.1.14->vllm==0.1.dev1+g54503ecec.empty)
+#13 100.3   Downloading supervisor-4.3.0-py2.py3-none-any.whl (320 kB)
+#13 100.7 Collecting apache-tvm-ffi>=0.1.9 (from xgrammar<1.0.0,>=0.2.1->vllm==0.1.dev1+g54503ecec.empty)
+#13 100.8   Downloading apache_tvm_ffi-0.1.12-cp312-abi3-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (2.5 MB)
+#13 100.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.5/2.5 MB 74.9 MB/s  0:00:00
+#13 100.8 INFO: pip is looking at multiple versions of xgrammar to determine which version is compatible with other requirements. This could take a while.
+#13 100.8 Collecting xgrammar<1.0.0,>=0.2.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 100.9   Downloading xgrammar-0.2.3-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (44.3 MB)
+#13 101.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.3/44.3 MB 48.1 MB/s  0:00:00
+#13 102.6 Collecting aiohappyeyeballs>=2.5.0 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 102.6   Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+#13 103.3 Collecting aiosignal>=1.4.0 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 103.4   Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+#13 103.4 Requirement already satisfied: attrs>=17.3.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty) (26.1.0)
+#13 104.2 Collecting frozenlist>=1.1.1 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 104.3   Downloading frozenlist-1.8.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (243 kB)
+#13 105.1 Collecting multidict<7.0,>=4.5 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 105.1   Downloading multidict-6.7.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (258 kB)
+#13 106.0 Collecting propcache>=0.2.0 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 106.0   Downloading propcache-0.5.2-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (59 kB)
+#13 107.0 Collecting yarl<2.0,>=1.17.0 (from aiohttp>=3.13.3->vllm==0.1.dev1+g54503ecec.empty)
+#13 107.1   Downloading yarl-1.24.5-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (107 kB)
+#13 107.8 Collecting distro<2,>=1.7.0 (from anthropic>=0.71.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 107.9   Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#13 108.6 Collecting docstring-parser<1,>=0.15 (from anthropic>=0.71.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 108.6   Downloading docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+#13 109.5 Collecting jiter<1,>=0.4.0 (from anthropic>=0.71.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 109.6   Downloading jiter-0.16.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (335 kB)
+#13 109.9 Collecting sniffio (from anthropic>=0.71.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 110.0   Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#13 110.7 Collecting annotated-types>=0.6.0 (from pydantic>=2.12.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 110.7   Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#13 113.2 Collecting pydantic-core==2.46.4 (from pydantic>=2.12.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 113.2   Downloading pydantic_core-2.46.4-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (2.0 MB)
+#13 113.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 79.4 MB/s  0:00:00
+#13 114.0 Collecting dnspython>=2.0.0 (from email-validator>=2.0.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 114.0   Downloading dnspython-2.8.0-py3-none-any.whl (331 kB)
+#13 114.4 Collecting typer>=0.16.0 (from fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 114.4   Downloading typer-0.27.0-py3-none-any.whl (122 kB)
+#13 114.8 Collecting rich-toolkit>=0.14.8 (from fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 114.8   Downloading rich_toolkit-0.20.3-py3-none-any.whl (36 kB)
+#13 115.5 Collecting fastapi-cloud-cli>=0.1.1 (from fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 115.6   Downloading fastapi_cloud_cli-0.23.0-py3-none-any.whl (78 kB)
+#13 116.5 Collecting rignore>=0.5.1 (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 116.6   Downloading rignore-0.8.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (884 kB)
+#13 116.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 884.1/884.1 kB 59.8 MB/s  0:00:00
+#13 117.4 Collecting sentry-sdk>=2.20.0 (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 117.4   Downloading sentry_sdk-2.66.1-py3-none-any.whl (505 kB)
+#13 118.2 Collecting detect-installer>=0.1.0 (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 118.2   Downloading detect_installer-0.1.0-py3-none-any.whl (4.5 kB)
+#13 118.5 Collecting MarkupSafe>=2.0 (from jinja2>=3.1.5->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 118.5   Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl.metadata (2.7 kB)
+#13 119.2 Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.23.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 119.2   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+#13 119.6 Collecting referencing>=0.28.4 (from jsonschema>=4.23.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 119.6   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+#13 121.0 Collecting rpds-py>=0.25.0 (from jsonschema>=4.23.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 121.1   Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (368 kB)
+#13 122.1 Collecting numpy (from vllm==0.1.dev1+g54503ecec.empty)
+#13 122.3   Downloading numpy-2.3.5-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (62 kB)
+#13 123.2 Collecting opentelemetry-exporter-otlp-proto-grpc==1.44.0 (from opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 123.3   Downloading opentelemetry_exporter_otlp_proto_grpc-1.44.0-py3-none-any.whl (19 kB)
+#13 124.2 Collecting opentelemetry-exporter-otlp-proto-http==1.44.0 (from opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 124.3   Downloading opentelemetry_exporter_otlp_proto_http-1.44.0-py3-none-any.whl (21 kB)
+#13 125.1 Collecting googleapis-common-protos~=1.57 (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 125.1   Downloading googleapis_common_protos-1.75.0-py3-none-any.whl (300 kB)
+#13 127.1 Collecting grpcio<2.0.0,>=1.63.2 (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 127.2   Downloading grpcio-1.83.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (6.9 MB)
+#13 127.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 44.3 MB/s  0:00:00
+#13 128.1 Collecting opentelemetry-exporter-otlp-proto-common==1.44.0 (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 128.1   Downloading opentelemetry_exporter_otlp_proto_common-1.44.0-py3-none-any.whl (17 kB)
+#13 128.8 Collecting opentelemetry-proto==1.44.0 (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 128.9   Downloading opentelemetry_proto-1.44.0-py3-none-any.whl (72 kB)
+#13 129.7 Collecting opentelemetry-semantic-conventions==0.65b0 (from opentelemetry-sdk>=1.27.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 129.7   Downloading opentelemetry_semantic_conventions-0.65b0-py3-none-any.whl (204 kB)
+#13 129.8 Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from requests>=2.26.0->vllm==0.1.dev1+g54503ecec.empty) (3.4.9)
+#13 129.8 Requirement already satisfied: urllib3<3,>=1.26 in /usr/local/python3.12.13/lib/python3.12/site-packages (from requests>=2.26.0->vllm==0.1.dev1+g54503ecec.empty) (2.7.0)
+#13 130.5 Collecting pycountry>=23 (from pydantic-extra-types[pycountry]>=2.10.5->mistral_common>=1.11.5->mistral_common[image]>=1.11.5->vllm==0.1.dev1+g54503ecec.empty)
+#13 130.6   Downloading pycountry-26.2.16-py3-none-any.whl (8.0 MB)
+#13 130.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.0/8.0 MB 51.8 MB/s  0:00:00
+#13 131.5 Collecting python-dotenv>=0.21.0 (from pydantic-settings>=2.0.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 131.5   Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+#13 132.3 Collecting click>=8.1.7 (from rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 132.3   Downloading click-8.4.2-py3-none-any.whl (119 kB)
+#13 133.1 Collecting rich>=13.7.1 (from rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 133.1   Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+#13 133.5 Collecting markdown-it-py>=2.2.0 (from rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 133.5   Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+#13 134.3 Collecting pygments<3.0.0,>=2.13.0 (from rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 134.4   Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+#13 134.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 75.1 MB/s  0:00:00
+#13 135.1 Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 135.2   Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+#13 136.0 Collecting huggingface-hub<2.0,>=0.16.4 (from tokenizers>=0.21.1->vllm==0.1.dev1+g54503ecec.empty)
+#13 136.0   Downloading huggingface_hub-1.26.0-py3-none-any.whl (780 kB)
+#13 136.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 780.4/780.4 kB 67.6 MB/s  0:00:00
+#13 136.2 Collecting fsspec>=2023.5.0 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.21.1->vllm==0.1.dev1+g54503ecec.empty)
+#13 136.3   Using cached fsspec-2026.7.0-py3-none-any.whl (206 kB)
+#13 137.1 Collecting hf-xet<2.0.0,>=1.5.1 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.21.1->vllm==0.1.dev1+g54503ecec.empty)
+#13 137.1   Downloading hf_xet-1.5.2-cp38-abi3-manylinux_2_28_aarch64.whl (4.2 MB)
+#13 137.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 53.4 MB/s  0:00:00
+#13 137.3 Requirement already satisfied: sympy>=1.13.3 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.1.dev1+g54503ecec.empty) (1.14.0)
+#13 137.4 Collecting networkx>=2.5.1 (from torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 137.4   Using cached networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+#13 137.4 Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from sympy>=1.13.3->torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.1.dev1+g54503ecec.empty) (1.3.0)
+#13 137.4 Collecting tokenizers>=0.21.1 (from vllm==0.1.dev1+g54503ecec.empty)
+#13 137.5   Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.3 MB)
+#13 137.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 43.3 MB/s  0:00:00
+#13 137.9 Collecting shellingham>=1.3.0 (from typer>=0.16.0->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 138.0   Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+#13 138.8 Collecting httptools>=0.8.0 (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 138.8   Downloading httptools-0.8.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (518 kB)
+#13 139.6 Collecting uvloop>=0.15.1 (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 139.7   Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.3 MB)
+#13 139.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 50.5 MB/s  0:00:00
+#13 140.7 Collecting websockets>=13.0 (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.1.dev1+g54503ecec.empty)
+#13 140.8   Downloading websockets-17.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (221 kB)
+#13 141.5 Collecting httpx2>=2.5.0 (from mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 141.6   Downloading httpx2-2.9.1-py3-none-any.whl (91 kB)
+#13 142.0 Collecting mcp-types==2.0.0 (from mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 142.0   Downloading mcp_types-2.0.0-py3-none-any.whl (69 kB)
+#13 142.7 Collecting pyjwt>=2.10.1 (from pyjwt[crypto]>=2.10.1->mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 142.8   Downloading pyjwt-2.13.0-py3-none-any.whl (31 kB)
+#13 143.5 Collecting sse-starlette>=3.0.0 (from mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 143.6   Downloading sse_starlette-3.4.6-py3-none-any.whl (16 kB)
+#13 144.3 Collecting httpcore2==2.9.1 (from httpx2>=2.5.0->mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 144.4   Downloading httpcore2-2.9.1-py3-none-any.whl (82 kB)
+#13 145.1 Collecting truststore>=0.10 (from httpx2>=2.5.0->mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 145.1   Downloading truststore-0.10.4-py3-none-any.whl (18 kB)
+#13 146.3 Collecting cryptography>=3.4.0 (from pyjwt[crypto]>=2.10.1->mcp->vllm==0.1.dev1+g54503ecec.empty)
+#13 146.3   Downloading cryptography-49.0.0-cp311-abi3-manylinux_2_34_aarch64.whl (4.7 MB)
+#13 146.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 53.1 MB/s  0:00:00
+#13 146.4 Requirement already satisfied: cffi>=2.0.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp->vllm==0.1.dev1+g54503ecec.empty) (2.1.0)
+#13 146.4 Requirement already satisfied: pycparser in /usr/local/python3.12.13/lib/python3.12/site-packages (from cffi>=2.0.0->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp->vllm==0.1.dev1+g54503ecec.empty) (3.0)
+#13 146.6 Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+#13 146.6 Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+#13 146.6 Downloading numpy-2.3.5-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (14.3 MB)
+#13 147.0    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.3/14.3 MB 45.1 MB/s  0:00:00
+#13 147.0 Downloading torch-2.13.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl (155.0 MB)
+#13 148.6    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 155.0/155.0 MB 96.3 MB/s  0:00:01
+#13 148.6 Using cached networkx-3.6.1-py3-none-any.whl (2.1 MB)
+#13 149.0 Building wheels for collected packages: vllm
+#13 149.0   Building editable for vllm (pyproject.toml): started
+#13 154.4   Building editable for vllm (pyproject.toml): finished with status 'done'
+#13 154.4   Created wheel for vllm: filename=vllm-0.1.dev1+g54503ecec.empty-0.editable-cp312-cp312-linux_aarch64.whl size=11771 sha256=b66c0d204a03e26d859a9db7540b06cda7fa61aac468cf97ad571c729270b47f
+#13 154.4   Stored in directory: /tmp/pip-ephem-wheel-cache-q9nw3x08/wheels/8f/a5/8f/f34522ca87f5aeb30370b9a4f909570eb89104c6d921d24c03
+#13 154.4 Successfully built vllm
+#13 155.2 Installing collected packages: supervisor, py-cpuinfo, websockets, uvloop, typing_extensions, truststore, tqdm, sniffio, shellingham, setuptools, setproctitle, sentry-sdk, sentencepiece, safetensors, rpds-py, rignore, regex, pyzmq, python-multipart, python-json-logger, python-dotenv, pyjwt, pygments, pycountry, pybase64, protobuf, propcache, prometheus_client, pillow, partial-json-parser, packaging, outlines_core, numpy, ninja, networkx, multidict, msgspec, mdurl, MarkupSafe, loguru, llguidance, lark, jmespath, jiter, interegular, ijson, httptools, hf-xet, h11, fsspec, frozenlist, filelock, fastar, einops, docstring-parser, dnspython, distro, diskcache, dill, detect-installer, cloudpickle, click, cbor2, cachetools, blake3, av, astor, annotated-types, annotated-doc, aiohappyeyeballs, yarl, uvicorn, typing-inspection, tiktoken, soxr, soundfile, referencing, pydantic-core, opentelemetry-proto, opentelemetry-api, opencv-python-headless, markdown-it-py, jinja2, httpcore2, httpcore, grpcio, googleapis-common-protos, email-validator, depyf, cryptography, apache-tvm-ffi, anyio, aiosignal, watchfiles, torch, starlette, rich, pydantic, opentelemetry-semantic-conventions, opentelemetry-exporter-otlp-proto-common, jsonschema-specifications, httpx2, httpx, aiohttp, typer, sse-starlette, rich-toolkit, pydantic-settings, pydantic-extra-types, prometheus-fastapi-instrumentator, opentelemetry-sdk, openai-harmony, openai, mcp-types, lm-format-enforcer, jsonschema, huggingface-hub, fastapi, anthropic, tokenizers, opentelemetry-semantic-conventions-ai, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, model-hosting-container-standards, mcp, fastapi-cloud-cli, fastapi-cli, transformers, opentelemetry-exporter-otlp, mistral_common, xgrammar, compressed-tensors, vllm
+#13 160.7   Attempting uninstall: protobuf
+#13 160.7     Found existing installation: protobuf 3.20.0
+#13 160.7     Uninstalling protobuf-3.20.0:
+#13 160.9       Successfully uninstalled protobuf-3.20.0
+#13 162.1   Attempting uninstall: numpy
+#13 162.1     Found existing installation: numpy 2.5.1
+#13 162.2     Uninstalling numpy-2.5.1:
+#13 162.7       Successfully uninstalled numpy-2.5.1
+#13 219.7 
+#13 219.7 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+#13 219.7 ms-service-profiler 26.0.0 requires matplotlib, which is not installed.
+#13 219.7 ms-service-profiler 26.0.0 requires msguard, which is not installed.
+#13 219.7 ms-service-profiler 26.0.0 requires openpyxl, which is not installed.
+#13 219.7 ms-service-profiler 26.0.0 requires pandas~=2.2, which is not installed.
+#13 219.7 te 0.4.0 requires ml-dtypes, which is not installed.
+#13 219.7 te 0.4.0 requires tornado, which is not installed.
+#13 219.7 ms-service-profiler 26.0.0 requires opentelemetry-exporter-otlp-proto-grpc==1.33.1, but you have opentelemetry-exporter-otlp-proto-grpc 1.44.0 which is incompatible.
+#13 219.7 ms-service-profiler 26.0.0 requires opentelemetry-exporter-otlp-proto-http==1.33.1, but you have opentelemetry-exporter-otlp-proto-http 1.44.0 which is incompatible.
+#13 219.7 Successfully installed MarkupSafe-3.0.3 aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aiosignal-1.4.0 annotated-doc-0.0.5 annotated-types-0.8.0 anthropic-0.120.2 anyio-4.14.2 apache-tvm-ffi-0.1.12 astor-0.8.1 av-18.0.0 blake3-1.0.9 cachetools-7.1.6 cbor2-6.1.3 click-8.4.2 cloudpickle-3.1.2 compressed-tensors-0.17.0 cryptography-49.0.0 depyf-0.20.0 detect-installer-0.1.0 dill-0.4.1 diskcache-5.6.3 distro-1.9.0 dnspython-2.8.0 docstring-parser-0.18.0 einops-0.8.2 email-validator-2.3.0 fastapi-0.136.3 fastapi-cli-0.0.32 fastapi-cloud-cli-0.23.0 fastar-0.11.0 filelock-3.32.2 frozenlist-1.8.0 fsspec-2026.7.0 googleapis-common-protos-1.75.0 grpcio-1.83.0 h11-0.16.0 hf-xet-1.5.2 httpcore-1.0.9 httpcore2-2.9.1 httptools-0.8.0 httpx-0.28.1 httpx2-2.9.1 huggingface-hub-1.26.0 ijson-3.5.1 interegular-0.3.3 jinja2-3.1.6 jiter-0.16.0 jmespath-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lark-1.2.2 llguidance-1.7.6 lm-format-enforcer-0.11.3 loguru-0.7.3 markdown-it-py-4.2.0 mcp-2.0.0 mcp-types-2.0.0 mdurl-0.1.2 mistral_common-1.11.7 model-hosting-container-standards-0.1.16 msgspec-0.21.1 multidict-6.7.1 networkx-3.6.1 ninja-1.13.0 numpy-2.3.5 openai-2.50.0 openai-harmony-0.0.8 opencv-python-headless-5.0.0.93 opentelemetry-api-1.44.0 opentelemetry-exporter-otlp-1.44.0 opentelemetry-exporter-otlp-proto-common-1.44.0 opentelemetry-exporter-otlp-proto-grpc-1.44.0 opentelemetry-exporter-otlp-proto-http-1.44.0 opentelemetry-proto-1.44.0 opentelemetry-sdk-1.44.0 opentelemetry-semantic-conventions-0.65b0 opentelemetry-semantic-conventions-ai-0.5.1 outlines_core-0.2.14 packaging-26.2 partial-json-parser-0.2.1.1.post7 pillow-12.3.0 prometheus-fastapi-instrumentator-8.1.0 prometheus_client-0.26.0 propcache-0.5.2 protobuf-7.35.1 py-cpuinfo-9.0.0 pybase64-1.4.3 pycountry-26.2.16 pydantic-2.13.4 pydantic-core-2.46.4 pydantic-extra-types-2.11.1 pydantic-settings-2.14.2 pygments-2.20.0 pyjwt-2.13.0 python-dotenv-1.2.2 python-json-logger-4.1.0 python-multipart-0.0.32 pyzmq-27.1.0 referencing-0.37.0 regex-2026.7.19 rich-15.0.0 rich-toolkit-0.20.3 rignore-0.8.0 rpds-py-2026.6.3 safetensors-0.8.0 sentencepiece-0.2.2 sentry-sdk-2.66.1 setproctitle-1.3.7 setuptools-80.10.2 shellingham-1.5.4 sniffio-1.3.1 soundfile-0.14.0 soxr-1.1.0 sse-starlette-3.4.6 starlette-1.3.1 supervisor-4.3.0 tiktoken-0.13.0 tokenizers-0.22.2 torch-2.13.0+cpu tqdm-4.70.0 transformers-5.14.1 truststore-0.10.4 typer-0.27.0 typing-inspection-0.4.2 typing_extensions-4.16.0 uvicorn-0.52.0 uvloop-0.22.1 vllm-0.1.dev1+g54503ecec.empty watchfiles-1.2.0 websockets-17.0 xgrammar-0.2.3 yarl-1.24.5
+#13 219.7 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#13 219.7 
+#13 219.7 [notice] A new release of pip is available: 26.1.2 -> 26.2
+#13 219.7 [notice] To update, run: pip install --upgrade pip
+#13 221.4 + python3 -m pip uninstall -y triton
+#13 222.0 WARNING: Skipping triton as it is not installed.
+#13 222.0 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#13 222.1 + python3 -m pip cache purge
+#13 222.6 Files removed: 612 (675.7 MB)
+#13 222.6 Directories removed: 0
+#13 DONE 223.1s
+
+#14 [11/16] RUN set -euxo pipefail;     export PIP_EXTRA_INDEX_URL="https://mirrors.huaweicloud.com/ascend/repos/pypi";     export VLLM_BATCH_INVARIANT=1;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     set +u;     source /usr/local/Ascend/nnal/atb/set_env.sh;     set -u;     python3 -m pip install         -e /vllm-workspace/vllm-ascend         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton triton-ascend;     python3 -m pip install         triton-ascend==3.2.1         --extra-index-url         https://mirrors.huaweicloud.com/ascend/repos/pypi;     python3 -m pip cache purge
+#14 0.699 + export PIP_EXTRA_INDEX_URL=https://mirrors.huaweicloud.com/ascend/repos/pypi
+#14 0.699 + PIP_EXTRA_INDEX_URL=https://mirrors.huaweicloud.com/ascend/repos/pypi
+#14 0.699 + export VLLM_BATCH_INVARIANT=1
+#14 0.699 + VLLM_BATCH_INVARIANT=1
+#14 0.699 + source /usr/local/Ascend/ascend-toolkit/set_env.sh
+#14 0.699 ++ setenv_main
+#14 0.699 ++ local version_dirpath install_dirpath my_ld_library_path my_path driver_install_path_param dep_hal_path
+#14 0.699 ++ local dep_hal_name=libascend_hal.so
+#14 0.699 ++ local dep_info_file=/etc/ascend_install.info
+#14 0.699 ++ local is_install_driver=n
+#14 0.699 ++ local architecture remove_regex
+#14 0.699 ++ version_dirpath=/usr/local/Ascend/cann-9.0.1
+#14 0.700 +++ dirname /usr/local/Ascend/cann-9.0.1
+#14 0.702 ++ install_dirpath=/usr/local/Ascend
+#14 0.702 ++ remove_regex='^/usr/local/Ascend/cann[/_-]'
+#14 0.702 ++ remove_env PATH '^/usr/local/Ascend/cann[/_-]'
+#14 0.702 ++ local name=PATH
+#14 0.702 ++ local 'regex=^/usr/local/Ascend/cann[/_-]'
+#14 0.703 +++ eval echo '${PATH}'
+#14 0.703 ++++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 0.703 ++ local env_value=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 0.703 ++ read -r PATH
+#14 0.704 +++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 0.704 +++ tr : '\n'
+#14 0.705 +++ grep -v -E '^/usr/local/Ascend/cann[/_-]'
+#14 0.705 +++ tr '\n' :
+#14 0.705 +++ sed 's/:$//'
+#14 0.714 ++ export PATH
+#14 0.714 ++ remove_env LD_LIBRARY_PATH '^/usr/local/Ascend/cann[/_-]'
+#14 0.714 ++ local name=LD_LIBRARY_PATH
+#14 0.714 ++ local 'regex=^/usr/local/Ascend/cann[/_-]'
+#14 0.715 +++ eval echo '${LD_LIBRARY_PATH}'
+#14 0.715 ++++ echo /usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.716 ++ local env_value=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.716 ++ read -r LD_LIBRARY_PATH
+#14 0.716 +++ echo /usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.716 +++ tr : '\n'
+#14 0.717 +++ grep -v -E '^/usr/local/Ascend/cann[/_-]'
+#14 0.717 +++ tr '\n' :
+#14 0.717 +++ sed 's/:$//'
+#14 0.722 ++ export LD_LIBRARY_PATH
+#14 0.722 ++ remove_env PYTHONPATH '^/usr/local/Ascend/cann[/_-]'
+#14 0.722 ++ local name=PYTHONPATH
+#14 0.722 ++ local 'regex=^/usr/local/Ascend/cann[/_-]'
+#14 0.723 +++ eval echo '${PYTHONPATH}'
+#14 0.723 ++++ echo /usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:
+#14 0.723 ++ local env_value=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:
+#14 0.723 ++ read -r PYTHONPATH
+#14 0.724 +++ echo /usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:
+#14 0.724 +++ tr : '\n'
+#14 0.724 +++ grep -v -E '^/usr/local/Ascend/cann[/_-]'
+#14 0.725 +++ tr '\n' :
+#14 0.725 +++ sed 's/:$//'
+#14 0.732 ++ export PYTHONPATH
+#14 0.732 ++ my_ld_library_path=/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.732 ++ '[' '!' -z /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib: ']'
+#14 0.733 +++ echo /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.734 +++ tr : ' '
+#14 0.736 ++ my_ld_library_path='/usr/local/Ascend/driver/lib64 /usr/local/Ascend/driver/lib64/common /usr/local/Ascend/driver/lib64/driver /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest /usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64 /usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin /usr/local/Ascend/ascend-toolkit/latest/lib64 /usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel /usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling /usr/local/python3.12.13/lib '
+#14 0.736 ++ for my_path in ${my_ld_library_path}
+#14 0.736 ++ echo /usr/local/Ascend/driver/lib64
+#14 0.736 ++ grep -q driver
+#14 0.738 ++ '[' -d /usr/local/Ascend/driver/lib64 ']'
+#14 0.738 ++ for my_path in ${my_ld_library_path}
+#14 0.739 ++ echo /usr/local/Ascend/driver/lib64/common
+#14 0.739 ++ grep -q driver
+#14 0.741 ++ '[' -d /usr/local/Ascend/driver/lib64/common ']'
+#14 0.741 ++ for my_path in ${my_ld_library_path}
+#14 0.741 ++ echo /usr/local/Ascend/driver/lib64/driver
+#14 0.742 ++ grep -q driver
+#14 0.744 ++ '[' -d /usr/local/Ascend/driver/lib64/driver ']'
+#14 0.744 ++ for my_path in ${my_ld_library_path}
+#14 0.744 ++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib
+#14 0.744 ++ grep -q driver
+#14 0.746 ++ for my_path in ${my_ld_library_path}
+#14 0.746 ++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples
+#14 0.746 ++ grep -q driver
+#14 0.749 ++ for my_path in ${my_ld_library_path}
+#14 0.749 ++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest
+#14 0.749 ++ grep -q driver
+#14 0.751 ++ for my_path in ${my_ld_library_path}
+#14 0.751 ++ echo /usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64
+#14 0.751 ++ grep -q driver
+#14 0.754 ++ for my_path in ${my_ld_library_path}
+#14 0.754 ++ echo /usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin
+#14 0.754 ++ grep -q driver
+#14 0.756 ++ for my_path in ${my_ld_library_path}
+#14 0.756 ++ echo /usr/local/Ascend/ascend-toolkit/latest/lib64
+#14 0.756 ++ grep -q driver
+#14 0.758 ++ for my_path in ${my_ld_library_path}
+#14 0.759 ++ echo /usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel
+#14 0.759 ++ grep -q driver
+#14 0.761 ++ for my_path in ${my_ld_library_path}
+#14 0.761 ++ echo /usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine
+#14 0.761 ++ grep -q driver
+#14 0.763 ++ for my_path in ${my_ld_library_path}
+#14 0.764 ++ echo /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling
+#14 0.764 ++ grep -q driver
+#14 0.766 ++ for my_path in ${my_ld_library_path}
+#14 0.766 ++ echo /usr/local/python3.12.13/lib
+#14 0.766 ++ grep -q driver
+#14 0.768 ++ '[' -f /etc/ascend_install.info ']'
+#14 0.768 ++ case ":$PATH:" in
+#14 0.768 ++ command -v ldconfig
+#14 0.769 ++ ldconfig -p
+#14 0.769 ++ grep -q -- libascend_hal.so
+#14 0.772 ++ command -v arch
+#14 0.773 +++ arch
+#14 0.774 ++ architecture=aarch64
+#14 0.774 ++ prepend_env PATH /usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump
+#14 0.775 ++ local name=PATH
+#14 0.775 ++ local value=/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump
+#14 0.775 +++ eval echo '${PATH}'
+#14 0.775 ++++ echo /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 0.775 ++ local env_value=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 0.775 ++ '[' /usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin = '' ']'
+#14 0.775 ++ read -r PATH
+#14 0.776 ++ export PATH
+#14 0.776 ++ prepend_env LD_LIBRARY_PATH /usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver
+#14 0.776 ++ local name=LD_LIBRARY_PATH
+#14 0.776 ++ local value=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver
+#14 0.776 +++ eval echo '${LD_LIBRARY_PATH}'
+#14 0.776 ++++ echo /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.777 ++ local env_value=/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.777 ++ '[' /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib: = '' ']'
+#14 0.777 ++ read -r LD_LIBRARY_PATH
+#14 0.777 ++ export LD_LIBRARY_PATH
+#14 0.777 ++ export PYTHONPATH=/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:
+#14 0.777 ++ PYTHONPATH=/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:
+#14 0.777 ++ '[' n = n ']'
+#14 0.777 ++ append_env LD_LIBRARY_PATH /usr/local/Ascend/cann-9.0.1/devlib
+#14 0.777 ++ local name=LD_LIBRARY_PATH
+#14 0.777 ++ local value=/usr/local/Ascend/cann-9.0.1/devlib
+#14 0.778 +++ eval echo '${LD_LIBRARY_PATH}'
+#14 0.778 ++++ echo /usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.778 ++ local env_value=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:
+#14 0.778 ++ '[' /usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib: = '' ']'
+#14 0.778 ++ read -r LD_LIBRARY_PATH
+#14 0.779 ++ export LD_LIBRARY_PATH
+#14 0.779 ++ export ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp
+#14 0.779 ++ ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp
+#14 0.779 ++ export ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ export TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit
+#14 0.779 ++ TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit
+#14 0.779 ++ export ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ export ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1
+#14 0.779 ++ prepend_env CMAKE_PREFIX_PATH /usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.779 ++ local name=CMAKE_PREFIX_PATH
+#14 0.779 ++ local value=/usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.779 +++ eval echo '${CMAKE_PREFIX_PATH}'
+#14 0.779 ++++ echo /usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.780 ++ local env_value=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.780 ++ '[' /usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake = '' ']'
+#14 0.780 ++ read -r CMAKE_PREFIX_PATH
+#14 0.780 ++ export CMAKE_PREFIX_PATH
+#14 0.780 ++ prepend_env CMAKE_PREFIX_PATH /usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake
+#14 0.780 ++ local name=CMAKE_PREFIX_PATH
+#14 0.780 ++ local value=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake
+#14 0.780 +++ eval echo '${CMAKE_PREFIX_PATH}'
+#14 0.780 ++++ echo /usr/local/Ascend/cann-9.0.1/lib64/cmake:/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.780 ++ local env_value=/usr/local/Ascend/cann-9.0.1/lib64/cmake:/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake
+#14 0.780 ++ '[' /usr/local/Ascend/cann-9.0.1/lib64/cmake:/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake = '' ']'
+#14 0.780 ++ read -r CMAKE_PREFIX_PATH
+#14 0.781 ++ export CMAKE_PREFIX_PATH
+#14 0.781 + set +u
+#14 0.781 + source /usr/local/Ascend/nnal/atb/set_env.sh
+#14 0.781 ++ set_env_path=/usr/local/Ascend/nnal/atb/set_env.sh
+#14 0.781 ++ [[ -n '' ]]
+#14 0.781 ++ [[ -f /usr/local/Ascend/nnal/atb/set_env.sh ]]
+#14 0.781 ++ [[ /usr/local/Ascend/nnal/atb/set_env.sh =~ (^|/)set_env\.sh$ ]]
+#14 0.782 ++++ dirname /usr/local/Ascend/nnal/atb/set_env.sh
+#14 0.785 +++ cd /usr/local/Ascend/nnal/atb
+#14 0.785 +++ pwd
+#14 0.785 ++ atb_path=/usr/local/Ascend/nnal/atb
+#14 0.785 ++ get_cxx_abi_option
+#14 0.785 ++ cxx_abi=
+#14 0.785 ++ [[ -z '' ]]
+#14 0.785 ++ [[ '' == '' ]]
+#14 0.786 +++ python3 -c 'import torch'
+#14 3.539 ++ res=
+#14 3.539 ++ [[ '' == \t\o\r\c\h\_\n\o\t\_\e\x\i\s\t ]]
+#14 3.540 +++ python3 -c 'import torch; print(torch.compiled_with_cxx11_abi())'
+#14 6.233 ++ [[ True == \T\r\u\e ]]
+#14 6.233 ++ cxx_abi=1
+#14 6.233 ++ export ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1
+#14 6.233 ++ ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1
+#14 6.233 ++ export LD_LIBRARY_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib::/usr/local/Ascend/cann-9.0.1/devlib
+#14 6.233 ++ LD_LIBRARY_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib::/usr/local/Ascend/cann-9.0.1/devlib
+#14 6.234 ++ export PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 6.234 ++ PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#14 6.234 ++ export ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0
+#14 6.234 ++ ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0
+#14 6.234 ++ export ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0
+#14 6.234 ++ ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0
+#14 6.234 ++ export ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0
+#14 6.234 ++ ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0
+#14 6.234 ++ export ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1
+#14 6.234 ++ ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1
+#14 6.234 ++ export ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5
+#14 6.234 ++ ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5
+#14 6.234 ++ export ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1
+#14 6.234 ++ ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1
+#14 6.234 ++ export ATB_COMPARE_TILING_EVERY_KERNEL=0
+#14 6.234 ++ ATB_COMPARE_TILING_EVERY_KERNEL=0
+#14 6.234 ++ export ATB_SHARE_MEMORY_NAME_SUFFIX=
+#14 6.234 ++ ATB_SHARE_MEMORY_NAME_SUFFIX=
+#14 6.234 ++ export ATB_MATMUL_SHUFFLE_K_ENABLE=1
+#14 6.234 ++ ATB_MATMUL_SHUFFLE_K_ENABLE=1
+#14 6.234 ++ export LCCL_DETERMINISTIC=0
+#14 6.234 ++ LCCL_DETERMINISTIC=0
+#14 6.234 ++ export LCCL_PARALLEL=0
+#14 6.234 ++ LCCL_PARALLEL=0
+#14 6.234 + set -u
+#14 6.234 + python3 -m pip install -e /vllm-workspace/vllm-ascend --extra-index-url https://download.pytorch.org/whl/cpu/
+#14 6.895 Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple, https://mirrors.huaweicloud.com/ascend/repos/pypi, https://download.pytorch.org/whl/cpu/
+#14 6.896 Obtaining file:///vllm-workspace/vllm-ascend
+#14 6.900   Installing build dependencies: started
+#14 67.76   Installing build dependencies: still running...
+#14 136.8   Installing build dependencies: still running...
+#14 165.4   Installing build dependencies: finished with status 'done'
+#14 165.4   Checking if build backend supports build_editable: started
+#14 165.9   Checking if build backend supports build_editable: finished with status 'done'
+#14 165.9   Getting requirements to build editable: started
+#14 167.8   Getting requirements to build editable: finished with status 'done'
+#14 167.8   Preparing editable metadata (pyproject.toml): started
+#14 169.1   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#14 170.4 Collecting cmake>=3.26 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 170.5   Using cached cmake-4.4.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (30.3 MB)
+#14 170.6 Requirement already satisfied: decorator in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (5.3.1)
+#14 170.6 Requirement already satisfied: einops in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (0.8.2)
+#14 170.6 Requirement already satisfied: numpy in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (2.3.5)
+#14 170.6 Requirement already satisfied: packaging in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (26.2)
+#14 170.6 Requirement already satisfied: pip in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (26.1.2)
+#14 171.4 Collecting pybind11 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 171.5   Using cached pybind11-3.0.4-py3-none-any.whl (314 kB)
+#14 171.5 Requirement already satisfied: pyyaml in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (6.0.3)
+#14 171.5 Requirement already satisfied: regex in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (2026.7.19)
+#14 171.5 Requirement already satisfied: scipy in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (1.18.0)
+#14 172.5 Collecting pandas (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 172.6   Using cached pandas-3.0.5-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (10.5 MB)
+#14 172.6 Requirement already satisfied: psutil in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (7.2.2)
+#14 172.6 Requirement already satisfied: setuptools>=64 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (80.10.2)
+#14 173.4 Collecting setuptools-scm>=8 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 173.5   Using cached setuptools_scm-10.2.1-py3-none-any.whl (29 kB)
+#14 173.9 Collecting torch==2.10.0 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 173.9   Using cached torch-2.10.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl.metadata (29 kB)
+#14 174.8 Collecting torch-npu==2.10.0.post2 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 174.8   Using cached torch_npu-2.10.0.post2-cp312-cp312-manylinux_2_28_aarch64.whl (32.5 MB)
+#14 175.3 Collecting torchvision==0.25.0 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 175.3   Using cached torchvision-0.25.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl.metadata (5.4 kB)
+#14 175.8 Collecting torchaudio==2.10.0 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 176.6   Downloading torchaudio-2.10.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl.metadata (6.9 kB)
+#14 177.4 Collecting triton-ascend==3.2.1 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 177.4   Using cached triton_ascend-3.2.1-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (188.4 MB)
+#14 178.6 Collecting wheel (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 178.7   Using cached wheel-0.47.0-py3-none-any.whl (32 kB)
+#14 178.7 Requirement already satisfied: xgrammar>=0.1.30 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (0.2.3)
+#14 179.5 Collecting pandas-stubs (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 179.5   Using cached pandas_stubs-3.0.5.260730-py3-none-any.whl (174 kB)
+#14 179.5 Requirement already satisfied: compressed_tensors>=0.11.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (0.17.0)
+#14 180.4 Collecting msgpack (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 180.5   Using cached msgpack-1.2.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (410 kB)
+#14 181.3 Collecting quart (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 181.3   Using cached quart-0.21.0-py3-none-any.whl (78 kB)
+#14 182.3 Collecting numba (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 182.4   Using cached numba-0.66.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (3.6 MB)
+#14 183.1 Collecting memfabric_hybrid (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 183.2   Downloading memfabric_hybrid-1.1.3-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (5.5 MB)
+#14 183.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 25.3 MB/s  0:00:00
+#14 183.8 Collecting memcache_hybrid (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 183.9   Downloading memcache_hybrid-1.1.3-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (3.7 MB)
+#14 183.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.7/3.7 MB 53.0 MB/s  0:00:00
+#14 184.7 Collecting arctic-inference==0.1.1 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 184.7   Using cached arctic_inference-0.1.1-cp312-cp312-linux_aarch64.whl
+#14 184.7 Requirement already satisfied: transformers==5.14.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from vllm_ascend==0.1.dev1+g14beaf161) (5.14.1)
+#14 185.6 Collecting fastapi<0.124.0 (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 185.6   Using cached fastapi-0.123.10-py3-none-any.whl (111 kB)
+#14 185.6 Requirement already satisfied: filelock in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (3.32.2)
+#14 185.6 Requirement already satisfied: typing-extensions>=4.10.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (4.16.0)
+#14 185.6 Requirement already satisfied: sympy>=1.13.3 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (1.14.0)
+#14 185.6 Requirement already satisfied: networkx>=2.5.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (3.6.1)
+#14 185.6 Requirement already satisfied: jinja2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (3.1.6)
+#14 185.6 Requirement already satisfied: fsspec>=0.8.5 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (2026.7.0)
+#14 185.6 Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from torchvision==0.25.0->vllm_ascend==0.1.dev1+g14beaf161) (12.3.0)
+#14 185.6 Requirement already satisfied: huggingface-hub<2.0,>=1.5.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (1.26.0)
+#14 185.6 Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.22.2)
+#14 185.6 Requirement already satisfied: typer in /usr/local/python3.12.13/lib/python3.12/site-packages (from transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.27.0)
+#14 185.6 Requirement already satisfied: safetensors>=0.8.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.8.0)
+#14 185.6 Requirement already satisfied: tqdm>=4.60 in /usr/local/python3.12.13/lib/python3.12/site-packages (from transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (4.70.0)
+#14 186.5 Collecting attrs==24.2.0 (from triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 186.5   Using cached attrs-24.2.0-py3-none-any.whl (63 kB)
+#14 187.6 Collecting numpy (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 187.6   Using cached numpy-1.26.4-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (62 kB)
+#14 188.3 Collecting scipy (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 188.4   Using cached scipy-1.13.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (33.4 MB)
+#14 188.9 Collecting decorator (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 188.9   Using cached decorator-5.1.1-py3-none-any.whl (9.1 kB)
+#14 189.5 Collecting psutil (from vllm_ascend==0.1.dev1+g14beaf161)
+#14 189.6   Using cached psutil-6.0.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (292 kB)
+#14 190.0 Collecting pytest==8.3.2 (from triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 190.0   Using cached pytest-8.3.2-py3-none-any.whl (341 kB)
+#14 190.8 Collecting pytest-xdist==3.6.1 (from triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 190.8   Using cached pytest_xdist-3.6.1-py3-none-any.whl (46 kB)
+#14 191.1 Collecting triton==3.5.0 (from triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 191.1   Using cached triton-3.5.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl.metadata (1.7 kB)
+#14 191.4 Collecting iniconfig (from pytest==8.3.2->triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 191.5   Using cached iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+#14 191.8 Collecting pluggy<2,>=1.5 (from pytest==8.3.2->triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 191.9   Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+#14 192.7 Collecting execnet>=2.1 (from pytest-xdist==3.6.1->triton-ascend==3.2.1->vllm_ascend==0.1.dev1+g14beaf161)
+#14 192.7   Using cached execnet-2.1.2-py3-none-any.whl (40 kB)
+#14 193.5 Collecting starlette<0.51.0,>=0.40.0 (from fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161)
+#14 193.6   Using cached starlette-0.50.0-py3-none-any.whl (74 kB)
+#14 193.6 Requirement already satisfied: pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4 in /usr/local/python3.12.13/lib/python3.12/site-packages (from fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161) (2.13.4)
+#14 193.6 Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161) (0.0.5)
+#14 193.6 Requirement already satisfied: click<9.0.0,>=8.4.2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (8.4.2)
+#14 193.6 Requirement already satisfied: hf-xet<2.0.0,>=1.5.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (1.5.2)
+#14 193.6 Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.28.1)
+#14 193.6 Requirement already satisfied: anyio in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (4.14.2)
+#14 193.6 Requirement already satisfied: certifi in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (2026.6.17)
+#14 193.6 Requirement already satisfied: httpcore==1.* in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (1.0.9)
+#14 193.6 Requirement already satisfied: idna in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (3.18)
+#14 193.6 Requirement already satisfied: h11>=0.16 in /usr/local/python3.12.13/lib/python3.12/site-packages (from httpcore==1.*->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.16.0)
+#14 193.6 Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161) (0.8.0)
+#14 193.6 Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161) (2.46.4)
+#14 193.6 Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi<0.124.0->vllm_ascend==0.1.dev1+g14beaf161) (0.4.2)
+#14 193.7 Requirement already satisfied: loguru in /usr/local/python3.12.13/lib/python3.12/site-packages (from compressed_tensors>=0.11.0->vllm_ascend==0.1.dev1+g14beaf161) (0.7.3)
+#14 194.5 Collecting vcs-versioning<3,>=2.0.0.dev0 (from setuptools-scm>=8->vllm_ascend==0.1.dev1+g14beaf161)
+#14 194.6   Using cached vcs_versioning-2.2.3-py3-none-any.whl (108 kB)
+#14 194.6 Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from sympy>=1.13.3->torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (1.3.0)
+#14 194.6 Requirement already satisfied: apache-tvm-ffi>=0.1.9 in /usr/local/python3.12.13/lib/python3.12/site-packages (from xgrammar>=0.1.30->vllm_ascend==0.1.dev1+g14beaf161) (0.1.12)
+#14 194.6 Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from jinja2->torch==2.10.0->vllm_ascend==0.1.dev1+g14beaf161) (3.0.3)
+#14 195.1 Collecting llvmlite<0.49,>=0.48.0dev0 (from numba->vllm_ascend==0.1.dev1+g14beaf161)
+#14 195.2   Using cached llvmlite-0.48.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (58.3 MB)
+#14 195.6 Collecting python-dateutil>=2.8.2 (from pandas->vllm_ascend==0.1.dev1+g14beaf161)
+#14 195.7   Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#14 195.7 Requirement already satisfied: six>=1.5 in /usr/local/python3.12.13/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas->vllm_ascend==0.1.dev1+g14beaf161) (1.17.0)
+#14 196.4 Collecting aiofiles (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 196.5   Using cached aiofiles-25.1.0-py3-none-any.whl (14 kB)
+#14 196.8 Collecting blinker>=1.6 (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 196.9   Using cached blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#14 197.7 Collecting flask>=3.0 (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 197.7   Using cached flask-3.1.3-py3-none-any.whl (103 kB)
+#14 198.5 Collecting hypercorn>=0.11.2 (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 198.5   Using cached hypercorn-0.18.0-py3-none-any.whl (61 kB)
+#14 199.3 Collecting itsdangerous (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 199.4   Using cached itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#14 200.2 Collecting werkzeug>=3.0 (from quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 200.2   Using cached werkzeug-3.1.8-py3-none-any.whl (226 kB)
+#14 201.0 Collecting h2>=4.3.0 (from hypercorn>=0.11.2->quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 201.1   Using cached h2-4.4.0-py3-none-any.whl (62 kB)
+#14 201.4 Collecting priority (from hypercorn>=0.11.2->quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 201.5   Using cached priority-2.0.0-py3-none-any.whl (8.9 kB)
+#14 202.3 Collecting wsproto>=0.14.0 (from hypercorn>=0.11.2->quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 202.4   Using cached wsproto-1.3.2-py3-none-any.whl (24 kB)
+#14 203.1 Collecting hyperframe<7,>=6.1 (from h2>=4.3.0->hypercorn>=0.11.2->quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 203.2   Using cached hyperframe-6.1.0-py3-none-any.whl (13 kB)
+#14 204.0 Collecting hpack<5,>=4.2 (from h2>=4.3.0->hypercorn>=0.11.2->quart->vllm_ascend==0.1.dev1+g14beaf161)
+#14 204.1   Using cached hpack-4.2.0-py3-none-any.whl (34 kB)
+#14 204.1 Requirement already satisfied: shellingham>=1.3.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from typer->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (1.5.4)
+#14 204.1 Requirement already satisfied: rich>=13.8.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from typer->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (15.0.0)
+#14 204.1 Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from rich>=13.8.0->typer->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (4.2.0)
+#14 204.1 Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from rich>=13.8.0->typer->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (2.20.0)
+#14 204.1 Requirement already satisfied: mdurl~=0.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers==5.14.1->vllm_ascend==0.1.dev1+g14beaf161) (0.1.2)
+#14 204.1 Using cached torch-2.10.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl (146.5 MB)
+#14 204.5 Downloading torchaudio-2.10.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl (393 kB)
+#14 204.6 Using cached torchvision-0.25.0%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl (2.3 MB)
+#14 204.6 Using cached numpy-1.26.4-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (13.9 MB)
+#14 204.6 Using cached triton-3.5.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (159.9 MB)
+#14 205.2 Building wheels for collected packages: vllm_ascend
+#14 205.2   Building editable for vllm_ascend (pyproject.toml): started
+#14 278.7   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 343.5   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 451.2   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 732.6   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 1400.5   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2125.8   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2210.8   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2278.0   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2342.0   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2454.1   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2555.7   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2666.9   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2777.0   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2837.4   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2899.4   Building editable for vllm_ascend (pyproject.toml): still running...
+#14 2933.7   Building editable for vllm_ascend (pyproject.toml): finished with status 'done'
+#14 2933.7   Created wheel for vllm_ascend: filename=vllm_ascend-0.1.dev1+g14beaf161-0.editable-cp312-cp312-linux_aarch64.whl size=12027 sha256=3d8c579a4fc52ddd516eba315cbe099c6f34d1ee2f6c4e2e761474d81cab2200
+#14 2933.7   Stored in directory: /tmp/pip-ephem-wheel-cache-bh7_ni5x/wheels/2f/3e/81/f2b8387df4485de4c0a6c7b5dd8f1e028719c45c97e6b95ab3
+#14 2933.8 Successfully built vllm_ascend
+#14 2934.5 Installing collected packages: arctic-inference, wsproto, wheel, werkzeug, vcs-versioning, triton, python-dateutil, pybind11, psutil, priority, pluggy, numpy, msgpack, memfabric_hybrid, llvmlite, itsdangerous, iniconfig, hyperframe, hpack, execnet, decorator, cmake, blinker, attrs, aiofiles, torch, starlette, setuptools-scm, scipy, pytest, pandas-stubs, pandas, numba, memcache_hybrid, h2, flask, torchvision, torchaudio, torch-npu, pytest-xdist, hypercorn, fastapi, triton-ascend, quart, vllm_ascend
+#14 2939.1   Attempting uninstall: psutil
+#14 2939.1     Found existing installation: psutil 7.2.2
+#14 2939.1     Uninstalling psutil-7.2.2:
+#14 2939.1       Successfully uninstalled psutil-7.2.2
+#14 2939.4   Attempting uninstall: numpy
+#14 2939.5     Found existing installation: numpy 2.3.5
+#14 2939.6     Uninstalling numpy-2.3.5:
+#14 2940.1       Successfully uninstalled numpy-2.3.5
+#14 2945.1   Attempting uninstall: decorator
+#14 2945.2     Found existing installation: decorator 5.3.1
+#14 2945.2     Uninstalling decorator-5.3.1:
+#14 2945.2       Successfully uninstalled decorator-5.3.1
+#14 2947.0   Attempting uninstall: attrs
+#14 2947.0     Found existing installation: attrs 26.1.0
+#14 2947.0     Uninstalling attrs-26.1.0:
+#14 2947.0       Successfully uninstalled attrs-26.1.0
+#14 2947.1   Attempting uninstall: torch
+#14 2947.1     Found existing installation: torch 2.13.0+cpu
+#14 2948.1     Uninstalling torch-2.13.0+cpu:
+#14 2953.7       Successfully uninstalled torch-2.13.0+cpu
+#14 2973.4   Attempting uninstall: starlette
+#14 2973.4     Found existing installation: starlette 1.3.1
+#14 2973.4     Uninstalling starlette-1.3.1:
+#14 2973.5       Successfully uninstalled starlette-1.3.1
+#14 2973.6   Attempting uninstall: scipy
+#14 2973.7     Found existing installation: scipy 1.18.0
+#14 2973.9     Uninstalling scipy-1.18.0:
+#14 2974.9       Successfully uninstalled scipy-1.18.0
+#14 3001.6   Attempting uninstall: fastapi
+#14 3001.7     Found existing installation: fastapi 0.136.3
+#14 3001.7     Uninstalling fastapi-0.136.3:
+#14 3001.7       Successfully uninstalled fastapi-0.136.3
+#14 3006.5 
+#14 3006.5 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+#14 3006.5 ms-service-profiler 26.0.0 requires matplotlib, which is not installed.
+#14 3006.5 ms-service-profiler 26.0.0 requires msguard, which is not installed.
+#14 3006.5 ms-service-profiler 26.0.0 requires openpyxl, which is not installed.
+#14 3006.5 te 0.4.0 requires ml-dtypes, which is not installed.
+#14 3006.5 te 0.4.0 requires tornado, which is not installed.
+#14 3006.5 mindstudio-kpp 0.0.0.dev0 requires plotly>=5.11.0, which is not installed.
+#14 3006.5 ms-service-profiler 26.0.0 requires opentelemetry-exporter-otlp-proto-grpc==1.33.1, but you have opentelemetry-exporter-otlp-proto-grpc 1.44.0 which is incompatible.
+#14 3006.5 ms-service-profiler 26.0.0 requires opentelemetry-exporter-otlp-proto-http==1.33.1, but you have opentelemetry-exporter-otlp-proto-http 1.44.0 which is incompatible.
+#14 3006.5 ms-service-profiler 26.0.0 requires pandas~=2.2, but you have pandas 3.0.5 which is incompatible.
+#14 3006.5 prometheus-fastapi-instrumentator 8.1.0 requires starlette<2.0.0,>=1.0.0, but you have starlette 0.50.0 which is incompatible.
+#14 3006.5 opencv-python-headless 5.0.0.93 requires numpy>=2; python_version >= "3.9", but you have numpy 1.26.4 which is incompatible.
+#14 3006.5 vllm 0.1.dev1+g54503ecec.empty requires fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10 which is incompatible.
+#14 3006.5 vllm 0.1.dev1+g54503ecec.empty requires starlette>=1.0.1, but you have starlette 0.50.0 which is incompatible.
+#14 3006.6 Successfully installed aiofiles-25.1.0 arctic-inference-0.1.1 attrs-24.2.0 blinker-1.9.0 cmake-4.4.0 decorator-5.1.1 execnet-2.1.2 fastapi-0.123.10 flask-3.1.3 h2-4.4.0 hpack-4.2.0 hypercorn-0.18.0 hyperframe-6.1.0 iniconfig-2.3.0 itsdangerous-2.2.0 llvmlite-0.48.0 memcache_hybrid-1.1.3 memfabric_hybrid-1.1.3 msgpack-1.2.1 numba-0.66.0 numpy-1.26.4 pandas-3.0.5 pandas-stubs-3.0.5.260730 pluggy-1.6.0 priority-2.0.0 psutil-6.0.0 pybind11-3.0.4 pytest-8.3.2 pytest-xdist-3.6.1 python-dateutil-2.9.0.post0 quart-0.21.0 scipy-1.13.1 setuptools-scm-10.2.1 starlette-0.50.0 torch-2.10.0+cpu torch-npu-2.10.0.post2 torchaudio-2.10.0+cpu torchvision-0.25.0+cpu triton-3.5.0 triton-ascend-3.2.1 vcs-versioning-2.2.3 vllm_ascend-0.1.dev1+g14beaf161 werkzeug-3.1.8 wheel-0.47.0 wsproto-1.3.2
+#14 3006.6 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#14 3006.6 
+#14 3006.6 [notice] A new release of pip is available: 26.1.2 -> 26.2
+#14 3006.6 [notice] To update, run: pip install --upgrade pip
+#14 3009.1 + python3 -m pip uninstall -y triton triton-ascend
+#14 3009.7 Found existing installation: triton 3.5.0
+#14 3009.7 Uninstalling triton-3.5.0:
+#14 3009.7   Successfully uninstalled triton-3.5.0
+#14 3009.8 Found existing installation: triton_ascend 3.2.1
+#14 3009.9 Uninstalling triton_ascend-3.2.1:
+#14 3009.9   Successfully uninstalled triton_ascend-3.2.1
+#14 3010.0 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#14 3010.1 + python3 -m pip install triton-ascend==3.2.1 --extra-index-url https://mirrors.huaweicloud.com/ascend/repos/pypi
+#14 3010.8 Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple, https://mirrors.huaweicloud.com/ascend/repos/pypi, https://mirrors.huaweicloud.com/ascend/repos/pypi
+#14 3012.6 Collecting triton-ascend==3.2.1
+#14 3012.6   Using cached triton_ascend-3.2.1-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (188.4 MB)
+#14 3013.0 Requirement already satisfied: attrs==24.2.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (24.2.0)
+#14 3013.0 Requirement already satisfied: numpy==1.26.4 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (1.26.4)
+#14 3013.0 Requirement already satisfied: scipy==1.13.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (1.13.1)
+#14 3013.0 Requirement already satisfied: decorator==5.1.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (5.1.1)
+#14 3013.0 Requirement already satisfied: psutil==6.0.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (6.0.0)
+#14 3013.0 Requirement already satisfied: pytest==8.3.2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (8.3.2)
+#14 3013.0 Requirement already satisfied: pytest-xdist==3.6.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (3.6.1)
+#14 3013.0 Requirement already satisfied: pyyaml in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (6.0.3)
+#14 3013.0 Requirement already satisfied: pybind11 in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (3.0.4)
+#14 3013.0 Requirement already satisfied: pandas in /usr/local/python3.12.13/lib/python3.12/site-packages (from triton-ascend==3.2.1) (3.0.5)
+#14 3013.2 Collecting triton==3.5.0 (from triton-ascend==3.2.1)
+#14 3013.2   Downloading triton-3.5.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (159.9 MB)
+#14 3016.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 159.9/159.9 MB 50.4 MB/s  0:00:03
+#14 3016.8 Requirement already satisfied: iniconfig in /usr/local/python3.12.13/lib/python3.12/site-packages (from pytest==8.3.2->triton-ascend==3.2.1) (2.3.0)
+#14 3016.8 Requirement already satisfied: packaging in /usr/local/python3.12.13/lib/python3.12/site-packages (from pytest==8.3.2->triton-ascend==3.2.1) (26.2)
+#14 3016.8 Requirement already satisfied: pluggy<2,>=1.5 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pytest==8.3.2->triton-ascend==3.2.1) (1.6.0)
+#14 3016.8 Requirement already satisfied: execnet>=2.1 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pytest-xdist==3.6.1->triton-ascend==3.2.1) (2.1.2)
+#14 3016.8 Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from pandas->triton-ascend==3.2.1) (2.9.0.post0)
+#14 3016.8 Requirement already satisfied: six>=1.5 in /usr/local/python3.12.13/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas->triton-ascend==3.2.1) (1.17.0)
+#14 3017.2 Installing collected packages: triton, triton-ascend
+#14 3025.7 
+#14 3025.8 Successfully installed triton-3.5.0 triton-ascend-3.2.1
+#14 3025.8 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#14 3025.8 
+#14 3025.8 [notice] A new release of pip is available: 26.1.2 -> 26.2
+#14 3025.8 [notice] To update, run: pip install --upgrade pip
+#14 3026.0 + python3 -m pip cache purge
+#14 3026.7 Files removed: 503 (1259.7 MB)
+#14 3026.7 Directories removed: 5
+#14 DONE 3027.6s
+
+#15 [12/16] RUN set -euxo pipefail;     python3 -m pip install         modelscope         'ray>=2.47.1,<=2.48.0'         'protobuf>3.20.0';     python3 -m pip cache purge
+#15 0.613 + python3 -m pip install modelscope 'ray>=2.47.1,<=2.48.0' 'protobuf>3.20.0'
+#15 1.280 Looking in indexes: https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+#15 1.761 Collecting modelscope
+#15 1.823   Downloading modelscope-1.39.0-py3-none-any.whl (6.0 MB)
+#15 2.173      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 24.2 MB/s  0:00:00
+#15 2.632 Collecting ray<=2.48.0,>=2.47.1
+#15 2.691   Downloading ray-2.48.0-cp312-cp312-manylinux2014_aarch64.whl (69.2 MB)
+#15 3.983      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.2/69.2 MB 53.5 MB/s  0:00:01
+#15 4.133 Requirement already satisfied: protobuf>3.20.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (7.35.1)
+#15 4.135 Requirement already satisfied: click>=7.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (8.4.2)
+#15 4.135 Requirement already satisfied: filelock in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (3.32.2)
+#15 4.136 Requirement already satisfied: jsonschema in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (4.26.0)
+#15 4.137 Requirement already satisfied: msgpack<2.0.0,>=1.0.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (1.2.1)
+#15 4.138 Requirement already satisfied: packaging in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (26.2)
+#15 4.139 Requirement already satisfied: pyyaml in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (6.0.3)
+#15 4.139 Requirement already satisfied: requests in /usr/local/python3.12.13/lib/python3.12/site-packages (from ray<=2.48.0,>=2.47.1) (2.34.2)
+#15 4.210 Collecting modelscope-hub>=0.1.8 (from modelscope)
+#15 4.266   Downloading modelscope_hub-0.1.8-py3-none-any.whl (149 kB)
+#15 4.277 Requirement already satisfied: setuptools in /usr/local/python3.12.13/lib/python3.12/site-packages (from modelscope) (80.10.2)
+#15 4.278 Requirement already satisfied: tqdm>=4.64.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from modelscope) (4.70.0)
+#15 4.279 Requirement already satisfied: urllib3>=1.26 in /usr/local/python3.12.13/lib/python3.12/site-packages (from modelscope) (2.7.0)
+#15 4.292 Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/python3.12.13/lib/python3.12/site-packages (from requests->ray<=2.48.0,>=2.47.1) (3.4.9)
+#15 4.293 Requirement already satisfied: idna<4,>=2.5 in /usr/local/python3.12.13/lib/python3.12/site-packages (from requests->ray<=2.48.0,>=2.47.1) (3.18)
+#15 4.294 Requirement already satisfied: certifi>=2023.5.7 in /usr/local/python3.12.13/lib/python3.12/site-packages (from requests->ray<=2.48.0,>=2.47.1) (2026.6.17)
+#15 4.307 Requirement already satisfied: attrs>=22.2.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from jsonschema->ray<=2.48.0,>=2.47.1) (24.2.0)
+#15 4.308 Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/python3.12.13/lib/python3.12/site-packages (from jsonschema->ray<=2.48.0,>=2.47.1) (2025.9.1)
+#15 4.309 Requirement already satisfied: referencing>=0.28.4 in /usr/local/python3.12.13/lib/python3.12/site-packages (from jsonschema->ray<=2.48.0,>=2.47.1) (0.37.0)
+#15 4.310 Requirement already satisfied: rpds-py>=0.25.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from jsonschema->ray<=2.48.0,>=2.47.1) (2026.6.3)
+#15 4.323 Requirement already satisfied: typing-extensions>=4.4.0 in /usr/local/python3.12.13/lib/python3.12/site-packages (from referencing>=0.28.4->jsonschema->ray<=2.48.0,>=2.47.1) (4.16.0)
+#15 4.811 Installing collected packages: modelscope-hub, modelscope, ray
+#15 21.85 
+#15 21.88 Successfully installed modelscope-1.39.0 modelscope-hub-0.1.8 ray-2.48.0
+#15 21.88 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#15 21.88 
+#15 21.88 [notice] A new release of pip is available: 26.1.2 -> 26.2
+#15 21.88 [notice] To update, run: pip install --upgrade pip
+#15 22.04 + python3 -m pip cache purge
+#15 22.49 Files removed: 12 (76.2 MB)
+#15 22.49 Directories removed: 0
+#15 DONE 22.9s
+
+#16 [13/16] RUN set -euo pipefail;     store_modules=(         /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so     );     test -f "${store_modules[0]}";     for api_name in         batch_put_session_start         batch_put_from_multi_buffer_ranges         batch_put_session_end         batch_put_session_revoke         batch_get_session_start         batch_get_into_multi_buffer_ranges         batch_get_session_end;     do         grep -F -q "${api_name}" < <(strings "${store_modules[0]}");     done
+#16 DONE 0.4s
+
+#17 [14/16] RUN set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >"${pip_check_output}" 2>&1; then         cat "${pip_check_output}";     else         cat "${pip_check_output}";         grep -E -v '^(ms-service-profiler 26\.0\.0 requires (matplotlib|msguard|openpyxl), which is not installed\.|te 0\.4\.0 requires (ml-dtypes|tornado), which is not installed\.|mindstudio-kpp 0\.0\.0\.dev0 requires plotly, which is not installed\.|ms-service-profiler 26\.0\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\.33\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\.44\.0\.|ms-service-profiler 26\.0\.0 has requirement pandas~=2\.2, but you have pandas 3\.0\.5\.|prometheus-fastapi-instrumentator 8\.1\.0 has requirement starlette<2\.0\.0,>=1\.0\.0, but you have starlette 0\.50\.0\.|opencv-python-headless 5\.0\.0\.93 has requirement numpy>=2; python_version >= "3\.9", but you have numpy 1\.26\.4\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement fastapi\[standard\]<0\.137\.0,>=0\.133\.0, but you have fastapi 0\.123\.10\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement starlette>=1\.0\.1, but you have starlette 0\.50\.0\.|te 0\.4\.0 is not supported on this platform)$'             "${pip_check_output}" >"${unexpected_pip_check}" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat "${unexpected_pip_check}" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f "${pip_check_output}" "${unexpected_pip_check}";     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "14beaf161cca6f1e044e20529ca96c6554dbbe50";     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "786c77ff7692bed58dd99971afef87d6b690cbe3";     python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "mooncake-transfer-engine", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))';     python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))'
+#17 1.282 ms-service-profiler 26.0.0 requires matplotlib, which is not installed.
+#17 1.282 ms-service-profiler 26.0.0 requires msguard, which is not installed.
+#17 1.282 ms-service-profiler 26.0.0 requires openpyxl, which is not installed.
+#17 1.282 te 0.4.0 requires ml-dtypes, which is not installed.
+#17 1.282 te 0.4.0 requires tornado, which is not installed.
+#17 1.282 mindstudio-kpp 0.0.0.dev0 requires plotly, which is not installed.
+#17 1.282 ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-grpc==1.33.1, but you have opentelemetry-exporter-otlp-proto-grpc 1.44.0.
+#17 1.282 ms-service-profiler 26.0.0 has requirement opentelemetry-exporter-otlp-proto-http==1.33.1, but you have opentelemetry-exporter-otlp-proto-http 1.44.0.
+#17 1.282 ms-service-profiler 26.0.0 has requirement pandas~=2.2, but you have pandas 3.0.5.
+#17 1.282 prometheus-fastapi-instrumentator 8.1.0 has requirement starlette<2.0.0,>=1.0.0, but you have starlette 0.50.0.
+#17 1.282 opencv-python-headless 5.0.0.93 has requirement numpy>=2; python_version >= "3.9", but you have numpy 1.26.4.
+#17 1.282 vllm 0.1.dev1+g54503ecec.empty has requirement fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10.
+#17 1.282 vllm 0.1.dev1+g54503ecec.empty has requirement starlette>=1.0.1, but you have starlette 0.50.0.
+#17 1.282 te 0.4.0 is not supported on this platform
+#17 1.288 pip check reported only frozen known compatibility issues
+#17 1.461 Traceback (most recent call last):
+#17 1.461   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 397, in from_name
+#17 1.462     return next(cls.discover(name=name))
+#17 1.462            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#17 1.462 StopIteration
+#17 1.462 
+#17 1.462 During handling of the above exception, another exception occurred:
+#17 1.462 
+#17 1.462 Traceback (most recent call last):
+#17 1.462   File "<string>", line 1, in <module>
+#17 1.462   File "<string>", line 1, in <genexpr>
+#17 1.462   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 889, in version
+#17 1.462     return distribution(distribution_name).version
+#17 1.462            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#17 1.462   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 862, in distribution
+#17 1.463     return Distribution.from_name(distribution_name)
+#17 1.463            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#17 1.463   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 399, in from_name
+#17 1.463     raise PackageNotFoundError(name)
+#17 1.463 importlib.metadata.PackageNotFoundError: No package metadata was found for mooncake-transfer-engine
+#17 ERROR: process "/bin/bash -c set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >\"${pip_check_output}\" 2>&1; then         cat \"${pip_check_output}\";     else         cat \"${pip_check_output}\";         grep -E -v '^(ms-service-profiler 26\\.0\\.0 requires (matplotlib|msguard|openpyxl), which is not installed\\.|te 0\\.4\\.0 requires (ml-dtypes|tornado), which is not installed\\.|mindstudio-kpp 0\\.0\\.0\\.dev0 requires plotly, which is not installed\\.|ms-service-profiler 26\\.0\\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\\.33\\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\\.44\\.0\\.|ms-service-profiler 26\\.0\\.0 has requirement pandas~=2\\.2, but you have pandas 3\\.0\\.5\\.|prometheus-fastapi-instrumentator 8\\.1\\.0 has requirement starlette<2\\.0\\.0,>=1\\.0\\.0, but you have starlette 0\\.50\\.0\\.|opencv-python-headless 5\\.0\\.0\\.93 has requirement numpy>=2; python_version >= \"3\\.9\", but you have numpy 1\\.26\\.4\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi\\[standard\\]<0\\.137\\.0,>=0\\.133\\.0, but you have fastapi 0\\.123\\.10\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement starlette>=1\\.0\\.1, but you have starlette 0\\.50\\.0\\.|te 0\\.4\\.0 is not supported on this platform)$'             \"${pip_check_output}\" >\"${unexpected_pip_check}\" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat \"${unexpected_pip_check}\" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f \"${pip_check_output}\" \"${unexpected_pip_check}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" = \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" = \"${VLLM_ASCEND_COMMIT}\";     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" = \"${MOONCAKE_COMMIT}\";     python3 -c 'import importlib.metadata as m; packages=(\"vllm\", \"vllm-ascend\", \"mooncake-transfer-engine\", \"torch\", \"torch-npu\", \"triton-ascend\"); print(\"\\n\".join(f\"{name}={m.version(name)}\" for name in packages))';     python3 -c 'import glob; paths=glob.glob(\"/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so\", recursive=True); assert paths, \"vllm-ascend native extension missing\"; print(\"\\n\".join(paths))'" did not complete successfully: exit code: 1
+------
+ > [14/16] RUN set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >"${pip_check_output}" 2>&1; then         cat "${pip_check_output}";     else         cat "${pip_check_output}";         grep -E -v '^(ms-service-profiler 26\.0\.0 requires (matplotlib|msguard|openpyxl), which is not installed\.|te 0\.4\.0 requires (ml-dtypes|tornado), which is not installed\.|mindstudio-kpp 0\.0\.0\.dev0 requires plotly, which is not installed\.|ms-service-profiler 26\.0\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\.33\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\.44\.0\.|ms-service-profiler 26\.0\.0 has requirement pandas~=2\.2, but you have pandas 3\.0\.5\.|prometheus-fastapi-instrumentator 8\.1\.0 has requirement starlette<2\.0\.0,>=1\.0\.0, but you have starlette 0\.50\.0\.|opencv-python-headless 5\.0\.0\.93 has requirement numpy>=2; python_version >= "3\.9", but you have numpy 1\.26\.4\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement fastapi\[standard\]<0\.137\.0,>=0\.133\.0, but you have fastapi 0\.123\.10\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement starlette>=1\.0\.1, but you have starlette 0\.50\.0\.|te 0\.4\.0 is not supported on this platform)$'             "${pip_check_output}" >"${unexpected_pip_check}" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat "${unexpected_pip_check}" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f "${pip_check_output}" "${unexpected_pip_check}";     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5";     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "14beaf161cca6f1e044e20529ca96c6554dbbe50";     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "786c77ff7692bed58dd99971afef87d6b690cbe3";     python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "mooncake-transfer-engine", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))';     python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))':
+1.462   File "<string>", line 1, in <genexpr>
+1.462   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 889, in version
+1.462     return distribution(distribution_name).version
+1.462            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.462   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 862, in distribution
+1.463     return Distribution.from_name(distribution_name)
+1.463            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.463   File "/usr/local/python3.12.13/lib/python3.12/importlib/metadata/__init__.py", line 399, in from_name
+1.463     raise PackageNotFoundError(name)
+1.463 importlib.metadata.PackageNotFoundError: No package metadata was found for mooncake-transfer-engine
+------
+Dockerfile.a2:178
+--------------------
+ 177 |     # return zero in this image.
+ 178 | >>> RUN set -euo pipefail; \
+ 179 | >>>     pip_check_output=/tmp/pip-check.txt; \
+ 180 | >>>     unexpected_pip_check=/tmp/unexpected-pip-check.txt; \
+ 181 | >>>     if python3 -m pip check >"${pip_check_output}" 2>&1; then \
+ 182 | >>>         cat "${pip_check_output}"; \
+ 183 | >>>     else \
+ 184 | >>>         cat "${pip_check_output}"; \
+ 185 | >>>         grep -E -v '^(ms-service-profiler 26\.0\.0 requires (matplotlib|msguard|openpyxl), which is not installed\.|te 0\.4\.0 requires (ml-dtypes|tornado), which is not installed\.|mindstudio-kpp 0\.0\.0\.dev0 requires plotly, which is not installed\.|ms-service-profiler 26\.0\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\.33\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\.44\.0\.|ms-service-profiler 26\.0\.0 has requirement pandas~=2\.2, but you have pandas 3\.0\.5\.|prometheus-fastapi-instrumentator 8\.1\.0 has requirement starlette<2\.0\.0,>=1\.0\.0, but you have starlette 0\.50\.0\.|opencv-python-headless 5\.0\.0\.93 has requirement numpy>=2; python_version >= "3\.9", but you have numpy 1\.26\.4\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement fastapi\[standard\]<0\.137\.0,>=0\.133\.0, but you have fastapi 0\.123\.10\.|vllm 0\.1\.dev1\+g54503ecec\.empty has requirement starlette>=1\.0\.1, but you have starlette 0\.50\.0\.|te 0\.4\.0 is not supported on this platform)$' \
+ 186 | >>>             "${pip_check_output}" >"${unexpected_pip_check}" || true; \
+ 187 | >>>         if [[ -s ${unexpected_pip_check} ]]; then \
+ 188 | >>>             echo 'unexpected pip check issues:' >&2; \
+ 189 | >>>             cat "${unexpected_pip_check}" >&2; \
+ 190 | >>>             exit 1; \
+ 191 | >>>         fi; \
+ 192 | >>>         echo 'pip check reported only frozen known compatibility issues'; \
+ 193 | >>>     fi; \
+ 194 | >>>     rm -f "${pip_check_output}" "${unexpected_pip_check}"; \
+ 195 | >>>     test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "${VLLM_COMMIT}"; \
+ 196 | >>>     test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "${VLLM_ASCEND_COMMIT}"; \
+ 197 | >>>     test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "${MOONCAKE_COMMIT}"; \
+ 198 | >>>     python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "mooncake-transfer-engine", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))'; \
+ 199 | >>>     python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))'
+ 200 |     
+--------------------
+error: failed to solve: process "/bin/bash -c set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >\"${pip_check_output}\" 2>&1; then         cat \"${pip_check_output}\";     else         cat \"${pip_check_output}\";         grep -E -v '^(ms-service-profiler 26\\.0\\.0 requires (matplotlib|msguard|openpyxl), which is not installed\\.|te 0\\.4\\.0 requires (ml-dtypes|tornado), which is not installed\\.|mindstudio-kpp 0\\.0\\.0\\.dev0 requires plotly, which is not installed\\.|ms-service-profiler 26\\.0\\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\\.33\\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\\.44\\.0\\.|ms-service-profiler 26\\.0\\.0 has requirement pandas~=2\\.2, but you have pandas 3\\.0\\.5\\.|prometheus-fastapi-instrumentator 8\\.1\\.0 has requirement starlette<2\\.0\\.0,>=1\\.0\\.0, but you have starlette 0\\.50\\.0\\.|opencv-python-headless 5\\.0\\.0\\.93 has requirement numpy>=2; python_version >= \"3\\.9\", but you have numpy 1\\.26\\.4\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi\\[standard\\]<0\\.137\\.0,>=0\\.133\\.0, but you have fastapi 0\\.123\\.10\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement starlette>=1\\.0\\.1, but you have starlette 0\\.50\\.0\\.|te 0\\.4\\.0 is not supported on this platform)$'             \"${pip_check_output}\" >\"${unexpected_pip_check}\" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat \"${unexpected_pip_check}\" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f \"${pip_check_output}\" \"${unexpected_pip_check}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" = \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" = \"${VLLM_ASCEND_COMMIT}\";     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" = \"${MOONCAKE_COMMIT}\";     python3 -c 'import importlib.metadata as m; packages=(\"vllm\", \"vllm-ascend\", \"mooncake-transfer-engine\", \"torch\", \"torch-npu\", \"triton-ascend\"); print(\"\\n\".join(f\"{name}={m.version(name)}\" for name in packages))';     python3 -c 'import glob; paths=glob.glob(\"/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so\", recursive=True); assert paths, \"vllm-ascend native extension missing\"; print(\"\\n\".join(paths))'" did not complete successfully: exit code: 1
+time="2026-07-31T00:31:06+08:00" level=fatal msg="no image was built"

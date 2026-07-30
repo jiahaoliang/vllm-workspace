@@ -1,0 +1,2 @@
+ID				PLATFORMS
+uu32po35oq7goxkhmz0ujjtfv	linux/arm64

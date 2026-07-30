@@ -1,0 +1,43 @@
+{
+  "classification": "production-code-abi-runtime-defect",
+  "compatibility_release": "v0.25.1",
+  "exact_error": "TypeError: get_kv_cache_coordinator() got an unexpected keyword argument 'max_num_batched_tokens'",
+  "inherited_from_base": true,
+  "mooncake_11_commit_range_changed_wrapper": false,
+  "pinned_vllm_commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+  "pinned_vllm_signature": [
+    "kv_cache_config",
+    "max_model_len",
+    "max_in_flight_tokens",
+    "use_eagle",
+    "enable_caching",
+    "enable_kv_cache_events",
+    "dcp_world_size",
+    "pcp_world_size",
+    "scheduler_block_size",
+    "hash_block_size",
+    "metrics_collector"
+  ],
+  "runtime_reproductions": [
+    "prefill",
+    "decode"
+  ],
+  "validated": true,
+  "validation_disposition": "terminated_before_g1",
+  "vllm_ascend_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "wrapper_signature": [
+    "kv_cache_config",
+    "max_model_len",
+    "max_in_flight_tokens",
+    "use_eagle",
+    "enable_caching",
+    "enable_kv_cache_events",
+    "dcp_world_size",
+    "pcp_world_size",
+    "hash_block_size",
+    "scheduler_block_size",
+    "eagle_attn_layer_names",
+    "metrics_collector",
+    "max_num_batched_tokens"
+  ]
+}

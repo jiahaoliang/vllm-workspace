@@ -1,0 +1,11 @@
+Cannot open netlink socket: Operation not permitted
+./builder-pod.json: OK
+./builder-worker.txt: OK
+./failure-classification.json: OK
+./image-build.log: OK
+./mooncake-exact-fetchability.log: OK
+./summary-assert.log: OK
+./summary.json: OK
+./target-tag-absence.txt: OK
+./vllm-ascend-exact-fetchability.log: OK
+./vllm-exact-fetchability.log: OK

@@ -1,0 +1,68 @@
+............................................................F...F        [100%]
+=================================== FAILURES ===================================
+____ ValidationIdentityTest.test_dockerfile_pip_health_gate_is_fail_closed _____
+
+self = <test_validation_identity.ValidationIdentityTest testMethod=test_dockerfile_pip_health_gate_is_fail_closed>
+
+    def test_dockerfile_pip_health_gate_is_fail_closed(self):
+>       dockerfile = read("Dockerfile.a2")
+
+features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py:17: in read
+    return (FEATURE_DIR / relative).read_text(encoding="utf-8")
+/usr/local/python3.12.13/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/workspace/control-tooling-post-failure-20260730T130225Z/features/kv-pool-layerwise-reuse/Dockerfile.a2')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/workspace/control-tooling-post-failure-20260730T130225Z/features/kv-pool-layerwise-reuse/Dockerfile.a2'
+
+/usr/local/python3.12.13/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_ ValidationIdentityTest.test_workspace_lock_and_dockerfile_match_frozen_source_identity _
+
+self = <test_validation_identity.ValidationIdentityTest testMethod=test_workspace_lock_and_dockerfile_match_frozen_source_identity>
+
+    def test_workspace_lock_and_dockerfile_match_frozen_source_identity(self):
+        lock = json.loads(
+>           (ROOT / "workspace.lock.json").read_text(encoding="utf-8-sig")
+        )
+
+features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/python3.12.13/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/workspace/control-tooling-post-failure-20260730T130225Z/workspace.lock.json')
+mode = 'r', buffering = -1, encoding = 'utf-8-sig', errors = None
+newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/workspace/control-tooling-post-failure-20260730T130225Z/workspace.lock.json'
+
+/usr/local/python3.12.13/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=========================== short test summary info ============================
+FAILED features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py::ValidationIdentityTest::test_dockerfile_pip_health_gate_is_fail_closed
+FAILED features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py::ValidationIdentityTest::test_workspace_lock_and_dockerfile_match_frozen_source_identity
+2 failed, 63 passed in 1.13s
+command terminated with exit code 1

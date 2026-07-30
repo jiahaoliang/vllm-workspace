@@ -1,0 +1,6 @@
+test_interrupt_records_terminal_state (test_run_validation_step.RunValidationStepTest) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.152s
+
+OK

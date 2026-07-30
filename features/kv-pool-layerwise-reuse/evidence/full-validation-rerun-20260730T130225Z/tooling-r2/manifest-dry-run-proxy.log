@@ -1,0 +1,5 @@
+serviceaccount/vllm-proxy-sa created (dry run)
+role.rbac.authorization.k8s.io/vllm-proxy-pod-reader created (dry run)
+rolebinding.rbac.authorization.k8s.io/vllm-proxy-pod-reader created (dry run)
+deployment.apps/proxy-server-deployment created (dry run)
+service/vllm-proxy-service created (dry run)

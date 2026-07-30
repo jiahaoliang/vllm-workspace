@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "attempt": 4,
+  "run_id": "20260730T130225Z",
+  "tooling_commit": "4b296c18472aec46bddeae9974bad24252fd44dc",
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "gates": {
+    "identity_tests": {
+      "passed": 6
+    },
+    "recorder_tests": {
+      "passed": 1,
+      "stability_runs": 50
+    },
+    "deployment_tests": {
+      "passed": 65,
+      "environment": "liangjiahao/vllm-ascend-ut",
+      "pod_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2"
+    },
+    "shell_syntax": true,
+    "python_compile": {
+      "files": 15
+    },
+    "ruff_check": true,
+    "ruff_format": true,
+    "diff_check": true,
+    "source_history": true,
+    "rendered_configmap_entries": 10,
+    "manifest_dry_runs": 10,
+    "remote_identity": true
+  },
+  "limitations": [
+    "pre-build tooling tests used the existing CPU-only UT Pod; formal UT is rerun after the R4 image is built"
+  ],
+  "errors": []
+}

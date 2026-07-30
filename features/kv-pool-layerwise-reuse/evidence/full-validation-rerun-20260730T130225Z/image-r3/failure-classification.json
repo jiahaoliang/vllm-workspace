@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "failed",
+  "classification": "validation_tooling",
+  "source_defect": false,
+  "build_started_at": "2026-07-30T15:36:28Z",
+  "build_ended_at": "2026-07-30T16:31:06Z",
+  "observed_exit_code": 1,
+  "image_loaded": false,
+  "passed_before_failure": {
+    "mooncake_native_build": true,
+    "vllm_ascend_native_build": true,
+    "session_api_symbols": 7,
+    "raw_pip_check_exact_allowlist": true,
+    "source_git_heads": true
+  },
+  "observation": "importlib.metadata lookup failed for mooncake-transfer-engine because the selected CMake install path does not install wheel distribution metadata",
+  "disposition": "preserve r3; validate Mooncake through source HEAD, installed native module path, and API symbols; derive r4 tag and rerun affected gates"
+}

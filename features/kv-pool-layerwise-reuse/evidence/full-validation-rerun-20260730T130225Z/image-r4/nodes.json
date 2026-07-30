@@ -1,0 +1,1720 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "baseDeviceInfos": "{\"Ascend910-0\":{\"IP\":\"192.168.102.17\",\"SuperDeviceID\":4290772992},\"Ascend910-1\":{\"IP\":\"192.168.102.18\",\"SuperDeviceID\":4291035137},\"Ascend910-2\":{\"IP\":\"192.168.102.19\",\"SuperDeviceID\":4291297282},\"Ascend910-3\":{\"IP\":\"192.168.102.20\",\"SuperDeviceID\":4291559427},\"Ascend910-4\":{\"IP\":\"192.168.102.21\",\"SuperDeviceID\":4291821572},\"Ascend910-5\":{\"IP\":\"192.168.102.22\",\"SuperDeviceID\":4292083717},\"Ascend910-6\":{\"IP\":\"192.168.102.23\",\"SuperDeviceID\":4292345862},\"Ascend910-7\":{\"IP\":\"192.168.102.24\",\"SuperDeviceID\":4292608007}}",
+                    "cluster.x-k8s.io/cluster-name": "bke-cluster",
+                    "cluster.x-k8s.io/cluster-namespace": "bke-cluster",
+                    "cluster.x-k8s.io/labels-from-machine": "",
+                    "cluster.x-k8s.io/machine": "bke-cluster-controlplane-4sbxg",
+                    "cluster.x-k8s.io/owner-kind": "KubeadmControlPlane",
+                    "cluster.x-k8s.io/owner-name": "bke-cluster-controlplane",
+                    "csi.volume.kubernetes.io/nodeid": "{\"nfs.csi.k8s.io\":\"m1\"}",
+                    "huawei.com/node-npu-topology": "",
+                    "huawei.com/node-vnpu-handshake": "Reported_2026.07.30 16:49:12",
+                    "huawei.com/node-vnpu-register": "0,707B2A6C-00C0528C-10A8D633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,false,0,soft,20:1,34032A64-00E0EF7A-49005633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:2,C416F66C-01407846-59DC9433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:3,C416F66C-0060AC46-18155433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:4,34032A64-00602E7A-729DD433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:5,C4032A6C-00404BB3-2AA51433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:6,79A12A6C-00E110B3-6E401633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:7,C416F664-0100A346-17955433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:",
+                    "nfd.node.kubernetes.io/feature-labels": "cpu-cpuid.AES,cpu-cpuid.ASIMD,cpu-cpuid.ASIMDDP,cpu-cpuid.ASIMDFHM,cpu-cpuid.ASIMDHP,cpu-cpuid.ASIMDRDM,cpu-cpuid.ATOMICS,cpu-cpuid.CPUID,cpu-cpuid.CRC32,cpu-cpuid.DCPOP,cpu-cpuid.EVTSTRM,cpu-cpuid.FCMA,cpu-cpuid.FP,cpu-cpuid.FPHP,cpu-cpuid.JSCVT,cpu-cpuid.PMULL,cpu-cpuid.SHA1,cpu-cpuid.SHA2,cpu-cpuid.SSBS,cpu-hardware_multithreading,cpu-model.family,cpu-model.id,cpu-model.vendor_id,kernel-config.NO_HZ,kernel-config.NO_HZ_FULL,kernel-selinux.enabled,kernel-version.full,kernel-version.major,kernel-version.minor,kernel-version.revision,memory-numa,network-sriov.capable,openfuyao.com/colocation.feature.cpupreemption,openfuyao.com/colocation.feature.dynmemory,openfuyao.com/colocation.feature.memorypreemption,openfuyao.com/colocation.feature.quotaturbo,pci-0200_15b3_1017.present,pci-0200_15b3_1017.sriov.capable,pci-0200_19e5_a221.present,pci-0200_19e5_a221.sriov.capable,pci-0200_19e5_a222.present,pci-0200_19e5_a222.sriov.capable,pci-0300_19e5_1711.present,pci-1200_19e5_d802.present,pci-1200_19e5_d802.sriov.capable,rdma.available,rdma.capable,storage-nonrotationaldisk,system-os_release.ID,system-os_release.VERSION_ID,system-os_release.VERSION_ID.major,system-os_release.VERSION_ID.minor",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "openfuyao.com/container.runtime.endpoint": "unix:///run/containerd/containerd.sock",
+                    "openfuyao.com/container.runtime.version": "2.1.1",
+                    "product-serial-number": "2102314YYU10R6100008",
+                    "projectcalico.org/IPv4Address": "192.168.200.25/24",
+                    "projectcalico.org/IPv4VXLANTunnelAddr": "10.250.202.0",
+                    "projectcalico.org/Interfaces": "[{\"name\":\"enp189s0f0\"},{\"name\":\"enp189s0f1\"},{\"name\":\"enp189s0f2\"},{\"name\":\"enp189s0f3\"},{\"name\":\"enp195s0f0np0\"},{\"name\":\"enp195s0f1np1\"},{\"name\":\"enp61s0f0\",\"addresses\":[\"192.168.200.25\"]},{\"name\":\"enp61s0f1\"},{\"name\":\"enp61s0f2\"},{\"name\":\"enp61s0f3\"},{\"name\":\"enp67s0f0np0\"},{\"name\":\"enp67s0f1np1\"},{\"name\":\"nerdctl0\",\"addresses\":[\"10.4.0.1\"]}]",
+                    "serverIndex": "1023",
+                    "serverType": "",
+                    "superPodID": "-1",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-06-23T03:19:39Z",
+                "labels": {
+                    "accelerator": "huawei-Ascend910",
+                    "accelerator-type": "module-910b-8",
+                    "beta.kubernetes.io/arch": "arm64",
+                    "beta.kubernetes.io/os": "linux",
+                    "card-side-roce-bandwidth": "200Gbps",
+                    "feature.node.kubernetes.io/cpu-cpuid.AES": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMD": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDDP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDFHM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDRDM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ATOMICS": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CPUID": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CRC32": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.DCPOP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.EVTSTRM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FCMA": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FPHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.JSCVT": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.PMULL": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA1": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA2": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SSBS": "true",
+                    "feature.node.kubernetes.io/cpu-hardware_multithreading": "false",
+                    "feature.node.kubernetes.io/cpu-model.family": "31",
+                    "feature.node.kubernetes.io/cpu-model.id": "53264",
+                    "feature.node.kubernetes.io/cpu-model.vendor_id": "VendorUnknown",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ": "true",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ_FULL": "true",
+                    "feature.node.kubernetes.io/kernel-selinux.enabled": "true",
+                    "feature.node.kubernetes.io/kernel-version.full": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "feature.node.kubernetes.io/kernel-version.major": "5",
+                    "feature.node.kubernetes.io/kernel-version.minor": "10",
+                    "feature.node.kubernetes.io/kernel-version.revision": "0",
+                    "feature.node.kubernetes.io/memory-numa": "true",
+                    "feature.node.kubernetes.io/network-sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0300_19e5_1711.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.sriov.capable": "true",
+                    "feature.node.kubernetes.io/rdma.available": "true",
+                    "feature.node.kubernetes.io/rdma.capable": "true",
+                    "feature.node.kubernetes.io/storage-nonrotationaldisk": "true",
+                    "feature.node.kubernetes.io/system-os_release.ID": "openEuler",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID": "22.03",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.major": "22",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.minor": "03",
+                    "fuyao-harbor-local-install-node": "m1",
+                    "host-arch": "huawei-arm",
+                    "huawei.com/vnpu": "ready",
+                    "katacontainers.io/kata-runtime": "true",
+                    "kubernetes.customized/bocloud_custom_version": "boc4.0",
+                    "kubernetes.io/alert": "elastalert",
+                    "kubernetes.io/arch": "arm64",
+                    "kubernetes.io/hostname": "m1",
+                    "kubernetes.io/os": "linux",
+                    "masterselector": "dls-master-node",
+                    "mco.many-core.io/kata-ready": "true",
+                    "mind-cluster/npu-chip-memory": "32G",
+                    "node-role.kubernetes.io/control-plane": "control-plane",
+                    "node-role.kubernetes.io/master": "",
+                    "node-role.kubernetes.io/node": "",
+                    "node-role.kubernetes.io/worker": "worker",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-cap-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-cap-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-sta-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-sta-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-speed-enp61s0f0": "10000Mbps",
+                    "node-side-rdma-speed-enp67s0f0np0": "10000Mbps",
+                    "node.kubernetes.io/npu.chip.name": "910B4",
+                    "nodeDEnable": "on",
+                    "openfuyao.com/colocation.feature.cpupreemption": "true",
+                    "openfuyao.com/colocation.feature.dynmemory": "true",
+                    "openfuyao.com/colocation.feature.memorypreemption": "true",
+                    "openfuyao.com/colocation.feature.quotaturbo": "true",
+                    "openfuyao.com/container.runtime": "containerd",
+                    "openfuyao.com/npu.present": "",
+                    "openfuyao.io/m1": "m1",
+                    "server-usage": "infer",
+                    "servertype": "Ascend910B-20",
+                    "workerselector": "dls-worker-node"
+                },
+                "name": "m1",
+                "resourceVersion": "26369736",
+                "uid": "715f7775-52c0-4461-aba3-15031159ef09"
+            },
+            "spec": {
+                "podCIDR": "10.250.0.0/24",
+                "podCIDRs": [
+                    "10.250.0.0/24"
+                ],
+                "providerID": "bke://bke-cluster/MTkyLjE2OC4yMDAuMjU="
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "192.168.200.25",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "m1",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "192",
+                    "ephemeral-storage": "4907744220841",
+                    "huawei.com/Ascend910": "8",
+                    "huawei.com/vnpu-number": "140",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112088940Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "192",
+                    "ephemeral-storage": "5325243304Ki",
+                    "huawei.com/Ascend910": "8",
+                    "huawei.com/vnpu-number": "160",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112191340Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-07-03T03:09:05Z",
+                        "lastTransitionTime": "2026-07-03T03:09:05Z",
+                        "message": "Calico is running on this node",
+                        "reason": "CalicoIsUp",
+                        "status": "False",
+                        "type": "NetworkUnavailable"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-30T02:06:59Z",
+                        "message": "kubelet has sufficient memory available",
+                        "reason": "KubeletHasSufficientMemory",
+                        "status": "False",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-30T02:06:59Z",
+                        "message": "kubelet has no disk pressure",
+                        "reason": "KubeletHasNoDiskPressure",
+                        "status": "False",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-30T02:06:59Z",
+                        "message": "kubelet has sufficient PID available",
+                        "reason": "KubeletHasSufficientPID",
+                        "status": "False",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-30T02:06:59Z",
+                        "message": "kubelet is posting ready status",
+                        "reason": "KubeletReady",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_final3"
+                        ],
+                        "sizeBytes": 21158857980
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_final2"
+                        ],
+                        "sizeBytes": 21137856423
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:te_endpoint_v8_restored"
+                        ],
+                        "sizeBytes": 21091788749
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:te_endpoint_rpcport_v1"
+                        ],
+                        "sizeBytes": 21091782093
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:te_endpoint_ip_only_v1"
+                        ],
+                        "sizeBytes": 21091759994
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:te_endpoint_rpcport_deviceid_v1"
+                        ],
+                        "sizeBytes": 21081582133
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v8"
+                        ],
+                        "sizeBytes": 20849085586
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_final"
+                        ],
+                        "sizeBytes": 20616478120
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_fix3"
+                        ],
+                        "sizeBytes": 20482677716
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_fix2"
+                        ],
+                        "sizeBytes": 20482675322
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130_fix"
+                        ],
+                        "sizeBytes": 20461673778
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v7"
+                        ],
+                        "sizeBytes": 20403734206
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v6"
+                        ],
+                        "sizeBytes": 20402277468
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v5"
+                        ],
+                        "sizeBytes": 20400949213
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v4"
+                        ],
+                        "sizeBytes": 20399570955
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_v0130"
+                        ],
+                        "sizeBytes": 20347833010
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:main_redis_latest"
+                        ],
+                        "sizeBytes": 20347777009
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v2"
+                        ],
+                        "sizeBytes": 19683172310
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_v3"
+                        ],
+                        "sizeBytes": 19683172310
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_allowlocalfix_latest"
+                        ],
+                        "sizeBytes": 19676653399
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_epfix2_latest"
+                        ],
+                        "sizeBytes": 19676650016
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_epfix_latest"
+                        ],
+                        "sizeBytes": 19676649131
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segnamefix_latest"
+                        ],
+                        "sizeBytes": 19676645898
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_segfix_latest"
+                        ],
+                        "sizeBytes": 19676641899
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_ipfix2_latest"
+                        ],
+                        "sizeBytes": 19676620544
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_ipfix_latest"
+                        ],
+                        "sizeBytes": 19676616936
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:redis_enabled_latest"
+                        ],
+                        "sizeBytes": 19511177106
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:p2p_dramfix_latest"
+                        ],
+                        "sizeBytes": 19164017526
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:p2p-latest"
+                        ],
+                        "sizeBytes": 18100574524
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:p2p-store-latest"
+                        ],
+                        "sizeBytes": 8119919570
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:p2p_vllm18"
+                        ],
+                        "sizeBytes": 8107151067
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:seperate_test"
+                        ],
+                        "sizeBytes": 7802567614
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:0624_newhixl_main"
+                        ],
+                        "sizeBytes": 7308370868
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:0623_main"
+                        ],
+                        "sizeBytes": 7259111799
+                    },
+                    {
+                        "names": [
+                            "quay.io/ascend/vllm-ascend@sha256:9008b47081282612abfe4d28069ce34436752c980fd06f7599343213205ce64d",
+                            "quay.io/ascend/vllm-ascend:v0.22.1rc1"
+                        ],
+                        "sizeBytes": 6723852051
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:latest"
+                        ],
+                        "sizeBytes": 6670325584
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend@sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend:v0.18.0",
+                            "quay.io/ascend/vllm-ascend:v0.18.0"
+                        ],
+                        "sizeBytes": 5927649156
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie@sha256:dda69546ba6172fae60eb8e22e501bbafa48be1583af5668840349b5fb002189",
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:2.1.RC1-800I-A2-py311-openeuler24.03-lts"
+                        ],
+                        "sizeBytes": 5888497491
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend@sha256:12b4b34f01ffd46294c459ade0c6b9e71519aa695c14c973d0ac8ff5a21876b2",
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend:v0.13.0"
+                        ],
+                        "sizeBytes": 5725553856
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/cann@sha256:a2b8640e70a48216d1124c627abe92b706fbef468080cade309affe56b6b6188",
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-910b-openeuler24.03-py3.11-devel"
+                        ],
+                        "sizeBytes": 4624948089
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix2-260630l"
+                        ],
+                        "sizeBytes": 851341910
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix-260630k"
+                        ],
+                        "sizeBytes": 840707134
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsend-260630j"
+                        ],
+                        "sizeBytes": 830063513
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-backpressurediag-260630i"
+                        ],
+                        "sizeBytes": 819430009
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nocopyguard-260630h"
+                        ],
+                        "sizeBytes": 808802596
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-signaldelay-260630f"
+                        ],
+                        "sizeBytes": 798176471
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-directrecv-260630g"
+                        ],
+                        "sizeBytes": 798174458
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogressguard-260630d"
+                        ],
+                        "sizeBytes": 787546365
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogress-260630c"
+                        ],
+                        "sizeBytes": 787546124
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-drainall-260630b"
+                        ],
+                        "sizeBytes": 776919817
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "arm64",
+                    "bootID": "b191d96a-b310-4deb-9dc9-de10aed71962",
+                    "containerRuntimeVersion": "containerd://2.1.1",
+                    "kernelVersion": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.34.3-of.1",
+                    "machineID": "002e8a4139444e23b775b86b9f513215",
+                    "operatingSystem": "linux",
+                    "osImage": "openEuler 22.03 (LTS-SP3)",
+                    "systemUUID": "3f118ab6-2cda-98d8-f011-6642da4b523d"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu-runtime-rs"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-stratovirt"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "baseDeviceInfos": "{\"Ascend910-0\":{\"IP\":\"192.168.102.25\",\"SuperDeviceID\":4290772992},\"Ascend910-1\":{\"IP\":\"192.168.102.26\",\"SuperDeviceID\":4291035137},\"Ascend910-2\":{\"IP\":\"192.168.102.27\",\"SuperDeviceID\":4291297282},\"Ascend910-3\":{\"IP\":\"192.168.102.28\",\"SuperDeviceID\":4291559427},\"Ascend910-4\":{\"IP\":\"192.168.102.29\",\"SuperDeviceID\":4291821572},\"Ascend910-5\":{\"IP\":\"192.168.102.30\",\"SuperDeviceID\":4292083717},\"Ascend910-6\":{\"IP\":\"192.168.102.31\",\"SuperDeviceID\":4292345862},\"Ascend910-7\":{\"IP\":\"192.168.102.32\",\"SuperDeviceID\":4292608007}}",
+                    "cluster.x-k8s.io/cluster-name": "bke-cluster",
+                    "cluster.x-k8s.io/cluster-namespace": "bke-cluster",
+                    "cluster.x-k8s.io/labels-from-machine": "",
+                    "cluster.x-k8s.io/machine": "bke-cluster-worker-68b48d6cxhcqjj-zzdnq",
+                    "cluster.x-k8s.io/owner-kind": "MachineSet",
+                    "cluster.x-k8s.io/owner-name": "bke-cluster-worker-68b48d6cxhcqjj",
+                    "csi.volume.kubernetes.io/nodeid": "{\"nfs.csi.k8s.io\":\"n1\"}",
+                    "huawei.com/node-npu-topology": "",
+                    "huawei.com/node-vnpu-handshake": "Reported_2026.07.30 16:48:56",
+                    "huawei.com/node-vnpu-register": "0,C9A12A64-0080A78F-3B209633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:1,C416F664-0080A546-659D5433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:2,34032A64-00E0627A-65B85633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:3,C9A12A6C-0040588F-4CC8D633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:4,34032A64-00E0527A-47801633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:5,707B2A64-00602F8C-4BD89633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:6,79A12A6C-00E04EB3-1A601633-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:7,79A12A6C-00E099B3-02BC5433-808080E0-104301E3,20,32768,NPU-ASCEND-910B4,true,0,soft,20:",
+                    "nfd.node.kubernetes.io/feature-labels": "cpu-cpuid.AES,cpu-cpuid.ASIMD,cpu-cpuid.ASIMDDP,cpu-cpuid.ASIMDFHM,cpu-cpuid.ASIMDHP,cpu-cpuid.ASIMDRDM,cpu-cpuid.ATOMICS,cpu-cpuid.CPUID,cpu-cpuid.CRC32,cpu-cpuid.DCPOP,cpu-cpuid.EVTSTRM,cpu-cpuid.FCMA,cpu-cpuid.FP,cpu-cpuid.FPHP,cpu-cpuid.JSCVT,cpu-cpuid.PMULL,cpu-cpuid.SHA1,cpu-cpuid.SHA2,cpu-cpuid.SSBS,cpu-hardware_multithreading,cpu-model.family,cpu-model.id,cpu-model.vendor_id,kernel-config.NO_HZ,kernel-config.NO_HZ_FULL,kernel-selinux.enabled,kernel-version.full,kernel-version.major,kernel-version.minor,kernel-version.revision,memory-numa,network-sriov.capable,openfuyao.com/colocation.feature.cpupreemption,openfuyao.com/colocation.feature.dynmemory,openfuyao.com/colocation.feature.memorypreemption,openfuyao.com/colocation.feature.quotaturbo,pci-0200_15b3_1017.present,pci-0200_15b3_1017.sriov.capable,pci-0200_19e5_a221.present,pci-0200_19e5_a221.sriov.capable,pci-0200_19e5_a222.present,pci-0200_19e5_a222.sriov.capable,pci-0300_19e5_1711.present,pci-1200_19e5_d802.present,pci-1200_19e5_d802.sriov.capable,rdma.available,rdma.capable,storage-nonrotationaldisk,system-os_release.ID,system-os_release.VERSION_ID,system-os_release.VERSION_ID.major,system-os_release.VERSION_ID.minor",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "openfuyao.com/container.runtime.endpoint": "unix:///run/containerd/containerd.sock",
+                    "openfuyao.com/container.runtime.version": "2.1.1",
+                    "product-serial-number": "2102314YYU10R6100007",
+                    "projectcalico.org/IPv4Address": "192.168.200.27/24",
+                    "projectcalico.org/IPv4VXLANTunnelAddr": "10.250.40.128",
+                    "projectcalico.org/Interfaces": "[{\"name\":\"enp189s0f0\"},{\"name\":\"enp189s0f1\"},{\"name\":\"enp189s0f2\"},{\"name\":\"enp189s0f3\"},{\"name\":\"enp195s0f0np0\"},{\"name\":\"enp195s0f1np1\"},{\"name\":\"enp61s0f0\",\"addresses\":[\"192.168.200.27\"]},{\"name\":\"enp61s0f1\"},{\"name\":\"enp61s0f2\"},{\"name\":\"enp61s0f3\"},{\"name\":\"enp67s0f0np0\"},{\"name\":\"enp67s0f1np1\"}]",
+                    "serverIndex": "1023",
+                    "serverType": "",
+                    "superPodID": "-1",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-06-23T03:20:12Z",
+                "labels": {
+                    "accelerator": "huawei-Ascend910",
+                    "accelerator-type": "module-910b-8",
+                    "beta.kubernetes.io/arch": "arm64",
+                    "beta.kubernetes.io/os": "linux",
+                    "card-side-roce-bandwidth": "200Gbps",
+                    "feature.node.kubernetes.io/cpu-cpuid.AES": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMD": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDDP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDFHM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDRDM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ATOMICS": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CPUID": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CRC32": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.DCPOP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.EVTSTRM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FCMA": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FPHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.JSCVT": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.PMULL": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA1": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA2": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SSBS": "true",
+                    "feature.node.kubernetes.io/cpu-hardware_multithreading": "false",
+                    "feature.node.kubernetes.io/cpu-model.family": "31",
+                    "feature.node.kubernetes.io/cpu-model.id": "53264",
+                    "feature.node.kubernetes.io/cpu-model.vendor_id": "VendorUnknown",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ": "true",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ_FULL": "true",
+                    "feature.node.kubernetes.io/kernel-selinux.enabled": "true",
+                    "feature.node.kubernetes.io/kernel-version.full": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "feature.node.kubernetes.io/kernel-version.major": "5",
+                    "feature.node.kubernetes.io/kernel-version.minor": "10",
+                    "feature.node.kubernetes.io/kernel-version.revision": "0",
+                    "feature.node.kubernetes.io/memory-numa": "true",
+                    "feature.node.kubernetes.io/network-sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0300_19e5_1711.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.sriov.capable": "true",
+                    "feature.node.kubernetes.io/rdma.available": "true",
+                    "feature.node.kubernetes.io/rdma.capable": "true",
+                    "feature.node.kubernetes.io/storage-nonrotationaldisk": "true",
+                    "feature.node.kubernetes.io/system-os_release.ID": "openEuler",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID": "22.03",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.major": "22",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.minor": "03",
+                    "host-arch": "huawei-arm",
+                    "huawei.com/vnpu": "ready",
+                    "katacontainers.io/kata-runtime": "true",
+                    "kubernetes.customized/bocloud_custom_version": "boc4.0",
+                    "kubernetes.io/arch": "arm64",
+                    "kubernetes.io/hostname": "n1",
+                    "kubernetes.io/os": "linux",
+                    "mco.many-core.io/kata-ready": "true",
+                    "mind-cluster/npu-chip-memory": "32G",
+                    "node-role.kubernetes.io/node": "",
+                    "node-role.kubernetes.io/worker": "worker",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-cap-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-cap-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-sta-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-sta-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-speed-enp61s0f0": "10000Mbps",
+                    "node-side-rdma-speed-enp67s0f0np0": "10000Mbps",
+                    "node.kubernetes.io/npu.chip.name": "910B4",
+                    "nodeDEnable": "on",
+                    "openfuyao.com/colocation.feature.cpupreemption": "true",
+                    "openfuyao.com/colocation.feature.dynmemory": "true",
+                    "openfuyao.com/colocation.feature.memorypreemption": "true",
+                    "openfuyao.com/colocation.feature.quotaturbo": "true",
+                    "openfuyao.com/container.runtime": "containerd",
+                    "openfuyao.com/npu.present": "",
+                    "server-usage": "infer",
+                    "servertype": "Ascend910B-20",
+                    "vnpu-mode": "soft",
+                    "weight-dispatcher-e2e.openfuyao.com/fit5": "true",
+                    "workerselector": "dls-worker-node"
+                },
+                "name": "n1",
+                "resourceVersion": "26369738",
+                "uid": "3cf90b7c-4c4b-4962-b239-b476261c01db"
+            },
+            "spec": {
+                "podCIDR": "10.250.1.0/24",
+                "podCIDRs": [
+                    "10.250.1.0/24"
+                ],
+                "providerID": "bke://bke-cluster/MTkyLjE2OC4yMDAuMjc="
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "192.168.200.27",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "n1",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "192",
+                    "ephemeral-storage": "5818555534738",
+                    "huawei.com/Ascend910": "8",
+                    "huawei.com/vnpu-number": "160",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112088940Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "192",
+                    "ephemeral-storage": "6313536832Ki",
+                    "huawei.com/Ascend910": "8",
+                    "huawei.com/vnpu-number": "160",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112191340Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-07-13T06:29:59Z",
+                        "lastTransitionTime": "2026-07-13T06:29:59Z",
+                        "message": "Calico is running on this node",
+                        "reason": "CalicoIsUp",
+                        "status": "False",
+                        "type": "NetworkUnavailable"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-15T07:07:28Z",
+                        "message": "kubelet has sufficient memory available",
+                        "reason": "KubeletHasSufficientMemory",
+                        "status": "False",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-15T07:07:28Z",
+                        "message": "kubelet has no disk pressure",
+                        "reason": "KubeletHasNoDiskPressure",
+                        "status": "False",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-15T07:07:28Z",
+                        "message": "kubelet has sufficient PID available",
+                        "reason": "KubeletHasSufficientPID",
+                        "status": "False",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-30T16:49:12Z",
+                        "lastTransitionTime": "2026-07-15T07:07:28Z",
+                        "message": "kubelet is posting ready status",
+                        "reason": "KubeletReady",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "docker.io/library/mooncake-p2p-test:0624_newhixl_main"
+                        ],
+                        "sizeBytes": 7308370868
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729"
+                        ],
+                        "sizeBytes": 6803233667
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2"
+                        ],
+                        "sizeBytes": 6796602346
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4"
+                        ],
+                        "sizeBytes": 6749613728
+                    },
+                    {
+                        "names": [
+                            "quay.io/ascend/vllm-ascend@sha256:9008b47081282612abfe4d28069ce34436752c980fd06f7599343213205ce64d",
+                            "quay.io/ascend/vllm-ascend:v0.22.1rc1"
+                        ],
+                        "sizeBytes": 6723852051
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend@sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+                            "quay.io/ascend/vllm-ascend@sha256:697175418772c65b56afc04a7ccde7c24e7ad15a988a852eb8239fa9b6298e24",
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend:v0.18.0",
+                            "quay.io/ascend/vllm-ascend:v0.18.0"
+                        ],
+                        "sizeBytes": 5927649156
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie@sha256:dda69546ba6172fae60eb8e22e501bbafa48be1583af5668840349b5fb002189",
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:2.1.RC1-800I-A2-py311-openeuler24.03-lts"
+                        ],
+                        "sizeBytes": 5888497491
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend@sha256:12b4b34f01ffd46294c459ade0c6b9e71519aa695c14c973d0ac8ff5a21876b2",
+                            "hub.oepkgs.net/openfuyao/ascend/vllm-ascend:v0.13.0"
+                        ],
+                        "sizeBytes": 5725553856
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.0-300I-Duo-py311-openeuler24.03-lts"
+                        ],
+                        "sizeBytes": 4851031235
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.0-800I-A2-py311-openeuler24.03-lts"
+                        ],
+                        "sizeBytes": 4661009796
+                    },
+                    {
+                        "names": [
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/cann@sha256:a2b8640e70a48216d1124c627abe92b706fbef468080cade309affe56b6b6188",
+                            "swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-910b-openeuler24.03-py3.11-devel"
+                        ],
+                        "sizeBytes": 4624948089
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix2-260630l"
+                        ],
+                        "sizeBytes": 851341910
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix-260630k"
+                        ],
+                        "sizeBytes": 840707134
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsend-260630j"
+                        ],
+                        "sizeBytes": 830063513
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-backpressurediag-260630i"
+                        ],
+                        "sizeBytes": 819430009
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nocopyguard-260630h"
+                        ],
+                        "sizeBytes": 808802596
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-signaldelay-260630f"
+                        ],
+                        "sizeBytes": 798176471
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-directrecv-260630g"
+                        ],
+                        "sizeBytes": 798174458
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogressguard-260630d"
+                        ],
+                        "sizeBytes": 787546365
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogress-260630c"
+                        ],
+                        "sizeBytes": 787546124
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-drainall-260630b"
+                        ],
+                        "sizeBytes": 776919817
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-logicalwindow-260630a"
+                        ],
+                        "sizeBytes": 766294471
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-senddiag-260629ap"
+                        ],
+                        "sizeBytes": 755669526
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-commitpool-260629ao"
+                        ],
+                        "sizeBytes": 745044542
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-subwindow-260629an"
+                        ],
+                        "sizeBytes": 745042590
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/kata-containers/kata-deploy@sha256:b31cf13addbaf49af9e211bf6ab38335299015a754e2bc0341aa4ba47d8cb395",
+                            "hub.oepkgs.net/openfuyao/kata-containers/kata-deploy:3.30.0"
+                        ],
+                        "sizeBytes": 739696333
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-slotdiag-260629am"
+                        ],
+                        "sizeBytes": 734421580
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629aj"
+                        ],
+                        "sizeBytes": 734417690
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629ah"
+                        ],
+                        "sizeBytes": 734417189
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sourcecommit-260629ag"
+                        ],
+                        "sizeBytes": 734417030
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629ai"
+                        ],
+                        "sizeBytes": 734416920
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-windowfirst-260629af"
+                        ],
+                        "sizeBytes": 734409131
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nosessionreuse-260629ac"
+                        ],
+                        "sizeBytes": 734407387
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-forwardpipe-260629ab"
+                        ],
+                        "sizeBytes": 734407035
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sessionreuse-260629aa"
+                        ],
+                        "sizeBytes": 734384925
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nogomarker-260629z"
+                        ],
+                        "sizeBytes": 734374259
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readpipe-260629y"
+                        ],
+                        "sizeBytes": 723800437
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preopen-260629w"
+                        ],
+                        "sizeBytes": 713225244
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preopenoff-260629x"
+                        ],
+                        "sizeBytes": 713225237
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-writebytes-260629v"
+                        ],
+                        "sizeBytes": 702651359
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-writechunk-260629u"
+                        ],
+                        "sizeBytes": 702651316
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-srcbreakdown-260629t"
+                        ],
+                        "sizeBytes": 692084795
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-ownedcommit-260629al"
+                        ],
+                        "sizeBytes": 681572358
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-commitfirst-260629ak"
+                        ],
+                        "sizeBytes": 681571483
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-cqpoller-260629n"
+                        ],
+                        "sizeBytes": 681531311
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-signalbatch-260629p"
+                        ],
+                        "sizeBytes": 681519313
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-chunkledger-260629o"
+                        ],
+                        "sizeBytes": 681518991
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-slotopen-260629q"
+                        ],
+                        "sizeBytes": 681518945
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-cadence-260629s"
+                        ],
+                        "sizeBytes": 681518211
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-tailflush-260629r"
+                        ],
+                        "sizeBytes": 681518185
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "arm64",
+                    "bootID": "fa8967f5-a3c9-4423-b738-f840ce6cf9fc",
+                    "containerRuntimeVersion": "containerd://2.1.1",
+                    "kernelVersion": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.34.3-of.1",
+                    "machineID": "223c80196bcc4c2d809a8b8adc3797f1",
+                    "operatingSystem": "linux",
+                    "osImage": "openEuler 22.03 (LTS-SP3)",
+                    "systemUUID": "3f118b03-2cda-9f19-f011-6642945e61a2"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-stratovirt"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "ascend"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu-runtime-rs"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "baseDeviceInfos": "{\"Ascend310P-0\":{\"IP\":\"\",\"SuperDeviceID\":0}}",
+                    "cluster.x-k8s.io/cluster-name": "bke-cluster",
+                    "cluster.x-k8s.io/cluster-namespace": "bke-cluster",
+                    "cluster.x-k8s.io/labels-from-machine": "",
+                    "cluster.x-k8s.io/machine": "bke-cluster-worker-68b48d6cxhcqjj-p45mr",
+                    "cluster.x-k8s.io/owner-kind": "MachineSet",
+                    "cluster.x-k8s.io/owner-name": "bke-cluster-worker-68b48d6cxhcqjj",
+                    "nfd.node.kubernetes.io/feature-labels": "cpu-cpuid.AES,cpu-cpuid.ASIMD,cpu-cpuid.ASIMDDP,cpu-cpuid.ASIMDFHM,cpu-cpuid.ASIMDHP,cpu-cpuid.ASIMDRDM,cpu-cpuid.ATOMICS,cpu-cpuid.CPUID,cpu-cpuid.CRC32,cpu-cpuid.DCPOP,cpu-cpuid.EVTSTRM,cpu-cpuid.FCMA,cpu-cpuid.FP,cpu-cpuid.FPHP,cpu-cpuid.JSCVT,cpu-cpuid.PMULL,cpu-cpuid.SHA1,cpu-cpuid.SHA2,cpu-hardware_multithreading,cpu-model.family,cpu-model.id,cpu-model.vendor_id,kernel-config.NO_HZ,kernel-config.NO_HZ_FULL,kernel-selinux.enabled,kernel-version.full,kernel-version.major,kernel-version.minor,kernel-version.revision,memory-numa,network-sriov.capable,pci-0300_19e5.present,pci-1200_19e5.present,rdma.available,system-os_release.ID,system-os_release.VERSION_ID,system-os_release.VERSION_ID.major,system-os_release.VERSION_ID.minor",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "openfuyao.com/container.runtime.endpoint": "unix:///run/containerd/containerd.sock",
+                    "openfuyao.com/container.runtime.version": "2.1.1",
+                    "product-serial-number": "2102312UWPN0KC000021",
+                    "projectcalico.org/IPv4Address": "192.168.200.20/24",
+                    "projectcalico.org/IPv4VXLANTunnelAddr": "10.250.217.0",
+                    "projectcalico.org/Interfaces": "[{\"name\":\"endvnic\"},{\"name\":\"enp125s0f0\"},{\"name\":\"enp125s0f1\"},{\"name\":\"enp125s0f2\"},{\"name\":\"enp125s0f3\"},{\"name\":\"enp189s0f0\",\"addresses\":[\"192.168.200.20\"]},{\"name\":\"enp189s0f1\"},{\"name\":\"enp189s0f2\"},{\"name\":\"enp189s0f3\"}]",
+                    "serverIndex": "-2",
+                    "serverType": "",
+                    "superPodID": "-2",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-06-26T07:01:58Z",
+                "labels": {
+                    "beta.kubernetes.io/arch": "arm64",
+                    "beta.kubernetes.io/os": "linux",
+                    "feature.node.kubernetes.io/cpu-cpuid.AES": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMD": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDDP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDFHM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDRDM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ATOMICS": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CPUID": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CRC32": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.DCPOP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.EVTSTRM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FCMA": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FPHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.JSCVT": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.PMULL": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA1": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA2": "true",
+                    "feature.node.kubernetes.io/cpu-hardware_multithreading": "false",
+                    "feature.node.kubernetes.io/cpu-model.family": "31",
+                    "feature.node.kubernetes.io/cpu-model.id": "53264",
+                    "feature.node.kubernetes.io/cpu-model.vendor_id": "VendorUnknown",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ": "true",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ_FULL": "true",
+                    "feature.node.kubernetes.io/kernel-selinux.enabled": "true",
+                    "feature.node.kubernetes.io/kernel-version.full": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "feature.node.kubernetes.io/kernel-version.major": "5",
+                    "feature.node.kubernetes.io/kernel-version.minor": "10",
+                    "feature.node.kubernetes.io/kernel-version.revision": "0",
+                    "feature.node.kubernetes.io/memory-numa": "true",
+                    "feature.node.kubernetes.io/network-sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0300_19e5.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5.present": "true",
+                    "feature.node.kubernetes.io/rdma.available": "true",
+                    "feature.node.kubernetes.io/system-os_release.ID": "openEuler",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID": "22.03",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.major": "22",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.minor": "03",
+                    "katacontainers.io/kata-runtime": "true",
+                    "kubernetes.customized/bocloud_custom_version": "boc4.0",
+                    "kubernetes.io/arch": "arm64",
+                    "kubernetes.io/hostname": "n2",
+                    "kubernetes.io/os": "linux",
+                    "mco.many-core.io/kata-ready": "true",
+                    "node-role.kubernetes.io/node": "",
+                    "node-role.kubernetes.io/worker": "worker",
+                    "node.kubernetes.io/npu.chip.name": "310P3",
+                    "nodeDEnable": "on",
+                    "openfuyao.com/container.runtime": "containerd",
+                    "servertype": "Ascend310P-8",
+                    "vnpu-mode": "soft",
+                    "weight-dispatcher-e2e.openfuyao.com/fit5": "true",
+                    "workerselector": "dls-worker-node"
+                },
+                "name": "n2",
+                "resourceVersion": "14123409",
+                "uid": "40cf0366-bc84-405a-8acc-9b0aa9867ec1"
+            },
+            "spec": {
+                "podCIDR": "10.250.2.0/24",
+                "podCIDRs": [
+                    "10.250.2.0/24"
+                ],
+                "providerID": "bke://bke-cluster/MTkyLjE2OC4yMDAuMjA=",
+                "taints": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/unreachable",
+                        "timeAdded": "2026-07-15T05:18:57Z"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "timeAdded": "2026-07-15T05:18:57Z"
+                    }
+                ]
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "192.168.200.20",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "n2",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "96",
+                    "ephemeral-storage": "2014097777402",
+                    "huawei.com/Ascend310P": "1",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "559695860Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "96",
+                    "ephemeral-storage": "2185435960Ki",
+                    "huawei.com/Ascend310P": "1",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "559798260Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-06-27T02:14:20Z",
+                        "lastTransitionTime": "2026-06-27T02:14:20Z",
+                        "message": "Calico is running on this node",
+                        "reason": "CalicoIsUp",
+                        "status": "False",
+                        "type": "NetworkUnavailable"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-15T05:18:29Z",
+                        "lastTransitionTime": "2026-07-15T05:18:57Z",
+                        "message": "Kubelet stopped posting node status.",
+                        "reason": "NodeStatusUnknown",
+                        "status": "Unknown",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-15T05:18:29Z",
+                        "lastTransitionTime": "2026-07-15T05:18:57Z",
+                        "message": "Kubelet stopped posting node status.",
+                        "reason": "NodeStatusUnknown",
+                        "status": "Unknown",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-15T05:18:29Z",
+                        "lastTransitionTime": "2026-07-15T05:18:57Z",
+                        "message": "Kubelet stopped posting node status.",
+                        "reason": "NodeStatusUnknown",
+                        "status": "Unknown",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-07-15T05:18:29Z",
+                        "lastTransitionTime": "2026-07-15T05:18:57Z",
+                        "message": "Kubelet stopped posting node status.",
+                        "reason": "NodeStatusUnknown",
+                        "status": "Unknown",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix2-260630l"
+                        ],
+                        "sizeBytes": 851341910
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsendfix-260630k"
+                        ],
+                        "sizeBytes": 840707134
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-partialsend-260630j"
+                        ],
+                        "sizeBytes": 830063513
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-backpressurediag-260630i"
+                        ],
+                        "sizeBytes": 819430009
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nocopyguard-260630h"
+                        ],
+                        "sizeBytes": 808802596
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-signaldelay-260630f"
+                        ],
+                        "sizeBytes": 798176471
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-directrecv-260630g"
+                        ],
+                        "sizeBytes": 798174458
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogressguard-260630d"
+                        ],
+                        "sizeBytes": 787546365
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readprogress-260630c"
+                        ],
+                        "sizeBytes": 787546124
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-drainall-260630b"
+                        ],
+                        "sizeBytes": 776919817
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-logicalwindow-260630a"
+                        ],
+                        "sizeBytes": 766294471
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-senddiag-260629ap"
+                        ],
+                        "sizeBytes": 755669526
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-commitpool-260629ao"
+                        ],
+                        "sizeBytes": 745044542
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-subwindow-260629an"
+                        ],
+                        "sizeBytes": 745042590
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/kata-containers/kata-deploy@sha256:b31cf13addbaf49af9e211bf6ab38335299015a754e2bc0341aa4ba47d8cb395",
+                            "hub.oepkgs.net/openfuyao/kata-containers/kata-deploy:3.30.0"
+                        ],
+                        "sizeBytes": 739696333
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-slotdiag-260629am"
+                        ],
+                        "sizeBytes": 734421580
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629aj"
+                        ],
+                        "sizeBytes": 734417690
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629ah"
+                        ],
+                        "sizeBytes": 734417189
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sourcecommit-260629ag"
+                        ],
+                        "sizeBytes": 734417030
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preserve-260629ai"
+                        ],
+                        "sizeBytes": 734416920
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-windowfirst-260629af"
+                        ],
+                        "sizeBytes": 734409131
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nosessionreuse-260629ac"
+                        ],
+                        "sizeBytes": 734407387
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-forwardpipe-260629ab"
+                        ],
+                        "sizeBytes": 734407035
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sessionreuse-260629aa"
+                        ],
+                        "sizeBytes": 734384925
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-nogomarker-260629z"
+                        ],
+                        "sizeBytes": 734374259
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-readpipe-260629y"
+                        ],
+                        "sizeBytes": 723800437
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preopen-260629w"
+                        ],
+                        "sizeBytes": 713225244
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-preopenoff-260629x"
+                        ],
+                        "sizeBytes": 713225237
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-writebytes-260629v"
+                        ],
+                        "sizeBytes": 702651359
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-writechunk-260629u"
+                        ],
+                        "sizeBytes": 702651316
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-srcbreakdown-260629t"
+                        ],
+                        "sizeBytes": 692084795
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-ownedcommit-260629al"
+                        ],
+                        "sizeBytes": 681572358
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-commitfirst-260629ak"
+                        ],
+                        "sizeBytes": 681571483
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-cqpoller-260629n"
+                        ],
+                        "sizeBytes": 681531311
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-signalbatch-260629p"
+                        ],
+                        "sizeBytes": 681519313
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-chunkledger-260629o"
+                        ],
+                        "sizeBytes": 681518991
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-slotopen-260629q"
+                        ],
+                        "sizeBytes": 681518945
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-cadence-260629s"
+                        ],
+                        "sizeBytes": 681518211
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-tailflush-260629r"
+                        ],
+                        "sizeBytes": 681518185
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sendreadslotfix-260629m"
+                        ],
+                        "sizeBytes": 670953269
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sendreadslot-260629l"
+                        ],
+                        "sizeBytes": 670951762
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-drainremote-260629k"
+                        ],
+                        "sizeBytes": 660388183
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-sourcecredit-260629j"
+                        ],
+                        "sizeBytes": 649825499
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-endpointcache-260629i"
+                        ],
+                        "sizeBytes": 639266743
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-transportmark-260629h"
+                        ],
+                        "sizeBytes": 628713366
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-recvpool-260629g"
+                        ],
+                        "sizeBytes": 618159420
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-creditretry-260629f"
+                        ],
+                        "sizeBytes": 607321629
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-forwardack-260629e"
+                        ],
+                        "sizeBytes": 596487934
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-creditwait-260629d"
+                        ],
+                        "sizeBytes": 585653304
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/weight-dispatcher-node-agent:rdma-runtime-v2-mtu-260629b"
+                        ],
+                        "sizeBytes": 574874952
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "arm64",
+                    "bootID": "5104878b-8137-4d46-80fd-cb8360e87c69",
+                    "containerRuntimeVersion": "containerd://2.1.1",
+                    "kernelVersion": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.34.3-of.1",
+                    "machineID": "7e8a676ea62e4791861dc56395aa2b4d",
+                    "operatingSystem": "linux",
+                    "osImage": "openEuler 22.03 (LTS-SP3)",
+                    "systemUUID": "77fdfb5f-cc05-83d2-ea11-e119da22a4d6"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu-runtime-rs"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-stratovirt"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "ascend"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "kata-qemu"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

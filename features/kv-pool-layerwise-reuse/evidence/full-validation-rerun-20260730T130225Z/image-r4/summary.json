@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "attempt": 4,
+  "run_id": "20260730T130225Z-image-r4",
+  "tooling_commit": "4b296c18472aec46bddeae9974bad24252fd44dc",
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "image": {
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+    "platform": "linux/arm64",
+    "manifest_digest": "sha256:d957c3950e54f2b7857b3ddf5e39f81c6e755d41c37bfab178cdcf587a0a8477",
+    "config_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+    "size_gb": 19.08,
+    "blob_size_gb": 6.75
+  },
+  "build": {
+    "started_at": "2026-07-30T16:43:30Z",
+    "ended_at": "2026-07-30T16:47:05Z",
+    "exit_code": 0
+  },
+  "source_commits": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+    "mooncake": "786c77ff7692bed58dd99971afef87d6b690cbe3"
+  },
+  "packages": {
+    "vllm": "0.1.dev1+g54503ecec.empty",
+    "vllm_ascend": "0.1.dev1+g14beaf161",
+    "torch": "2.10.0+cpu",
+    "torch_npu": "2.10.0.post2",
+    "triton_ascend": "3.2.1"
+  },
+  "gates": {
+    "raw_pip_check_exact_allowlist": true,
+    "mooncake_native_path": true,
+    "vllm_ascend_native_extensions": true,
+    "static_session_api_symbols": 7,
+    "npu_dynamic_imports": true,
+    "npu_available": true,
+    "runtime_session_apis": 7,
+    "image_id_matches_config": true,
+    "source_heads": true,
+    "ldd_no_missing": true,
+    "npu_health_ok": true,
+    "cleanup_verified": true
+  },
+  "limitations": [
+    "raw pip check reports 14 exact known CANN/upstream metadata issues recorded in the build log",
+    "Mooncake is source-built by CMake and has no wheel distribution metadata; identity is Git HEAD plus native path, symbols, and runtime APIs"
+  ],
+  "superseded_attempts": [
+    {
+      "step": "wait-image-check-pod-deleted",
+      "exit_code": 143,
+      "classification": "cleanup wait orchestration",
+      "replacement": "cleanup-empty-query",
+      "replacement_passed": true
+    }
+  ],
+  "errors": []
+}

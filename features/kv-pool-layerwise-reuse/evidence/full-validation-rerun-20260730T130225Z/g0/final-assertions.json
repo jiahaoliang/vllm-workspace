@@ -1,0 +1,25 @@
+{
+  "classification": "production-code-abi-runtime-defect",
+  "final_master_empty": {
+    "master_active_clients": 0,
+    "master_allocated_bytes": 0,
+    "master_key_count": 0
+  },
+  "final_n1_npu": {
+    "active_requests": 3,
+    "allocatable": 8,
+    "free": 5,
+    "ready": true
+  },
+  "g0_status": "failed",
+  "protected_remote_unchanged": true,
+  "retained_pods": [
+    "prefill",
+    "decode",
+    "mooncake-master",
+    "proxy",
+    "vllm-ascend-ut"
+  ],
+  "source_remote_equal": true,
+  "validated": true
+}

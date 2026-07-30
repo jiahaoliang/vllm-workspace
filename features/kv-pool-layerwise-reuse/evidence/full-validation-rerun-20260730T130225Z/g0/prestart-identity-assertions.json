@@ -1,0 +1,45 @@
+{
+  "master": {
+    "initial_metrics": {
+      "master_active_clients": 0,
+      "master_allocated_bytes": 0,
+      "master_key_count": 0
+    },
+    "lease_ttl_ms": 30000
+  },
+  "packages": {
+    "torch": "2.10.0+cpu",
+    "torch_npu": "2.10.0.post2",
+    "triton_ascend": "3.2.1",
+    "vllm": "0.1.dev1+g54503ecec.empty",
+    "vllm_ascend": "0.1.dev1+g14beaf161"
+  },
+  "runtime": {
+    "decode": {
+      "api_count": 7,
+      "npu_available": true,
+      "torch": "2.10.0+cpu",
+      "torch_npu": "2.10.0.post2",
+      "triton_ascend": "3.2.1",
+      "vllm": "0.1.dev1+g54503ecec.empty",
+      "vllm_ascend": "0.1.dev1+g14beaf161",
+      "vllm_ascend_path": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"
+    },
+    "prefill": {
+      "api_count": 7,
+      "npu_available": true,
+      "torch": "2.10.0+cpu",
+      "torch_npu": "2.10.0.post2",
+      "triton_ascend": "3.2.1",
+      "vllm": "0.1.dev1+g54503ecec.empty",
+      "vllm_ascend": "0.1.dev1+g14beaf161",
+      "vllm_ascend_path": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"
+    }
+  },
+  "source_heads": [
+    "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+    "786c77ff7692bed58dd99971afef87d6b690cbe3"
+  ],
+  "validated": true
+}

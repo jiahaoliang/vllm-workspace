@@ -1,0 +1,54 @@
+{
+  "engine_hostpaths": [
+    "/etc/ascend_install.info",
+    "/etc/hccn.conf",
+    "/home/llm_cache",
+    "/usr/bin/hccn_tool",
+    "/usr/local/Ascend/driver/lib64",
+    "/usr/local/Ascend/driver/version.info",
+    "/usr/local/bin/npu-smi",
+    "/usr/local/dcmi"
+  ],
+  "engine_npu_request_each": 1,
+  "expected_config_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+  "expected_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+  "pods": {
+    "decode": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+      "image_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "decode-engine-deployment-5c96cd595-qdzds",
+      "ready": "False",
+      "restart_count": 0
+    },
+    "mooncake-master": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+      "image_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "mooncake-master-deployment-645f66d578-bddl2",
+      "ready": "True",
+      "restart_count": 0
+    },
+    "prefill": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4",
+      "image_id": "sha256:60ef6bbf63d353e4d3f06057a8b8eb53233bb4f6942a7f8466c35081cf87a358",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "prefill-engine-deployment-7bf66dd56b-q5mcx",
+      "ready": "False",
+      "restart_count": 0
+    },
+    "proxy": {
+      "image": "cr.openfuyao.cn/openfuyao/proxy-server:latest",
+      "image_id": "cr.openfuyao.cn/openfuyao/proxy-server@sha256:fa8d04696e4bcf04e0e6c2c084bb8ecefa1b85191414d66889a778750ff1e3e0",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "proxy-server-deployment-54bb6c9585-7fzs5",
+      "ready": "True",
+      "restart_count": 0
+    }
+  },
+  "validated": true
+}
