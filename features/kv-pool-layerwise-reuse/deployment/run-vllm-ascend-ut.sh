@@ -5,7 +5,8 @@ readonly namespace=liangjiahao
 readonly pod_name=vllm-ascend-ut
 readonly container_name=ut
 readonly node_name=n1
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
+readonly expected_source_head=08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
 readonly remote_parent=/workspace
 readonly remote_checkout=${remote_parent}/vllm-ascend
 readonly remote_lock=${remote_parent}/.vllm-ascend-ut.lock
@@ -124,6 +125,10 @@ if [[ -n $(git -C "${source_repo}" status --porcelain=v1) ]]; then
   source_dirty=true
 else
   source_dirty=false
+fi
+if [[ ${source_head} != "${expected_source_head}" || ${source_dirty} != false ]]; then
+  echo "source identity mismatch: expected clean ${expected_source_head}, got ${source_head} dirty=${source_dirty}" >&2
+  exit 1
 fi
 synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 

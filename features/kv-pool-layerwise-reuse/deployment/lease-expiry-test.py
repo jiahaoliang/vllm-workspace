@@ -173,8 +173,8 @@ class LeaseExpiryRunner:
         )
 
         put_end = self.base._call(
-            "batch_put_end",
-            self.store.batch_put_end,
+            "batch_put_session_end",
+            self.store.batch_put_session_end,
             keys,
             phase="commit",
             keys=keys,
@@ -220,7 +220,7 @@ class LeaseExpiryRunner:
 
         fresh_get_start = self.base._start_get(keys, "fresh_read_session")
         self._expect_exact_vector(
-            "fresh_batch_get_start_after_expiry_finds_object",
+            "fresh_batch_get_session_start_after_expiry_finds_object",
             fresh_get_start,
             [0],
         )
@@ -238,7 +238,7 @@ class LeaseExpiryRunner:
             recovered_layer_one_get,
             [self.config.page_size],
         )
-        self.base._end_get(keys, "fresh_read_session", "fresh_batch_get_end")
+        self.base._end_get(keys, "fresh_read_session", "fresh_batch_get_session_end")
 
         self.base.dependencies.runtime.synchronize()
         source_bytes = self.base.dependencies.runtime.tensor_bytes(self.base.source)
@@ -254,7 +254,7 @@ class LeaseExpiryRunner:
         self.summary["semantic_result"] = {
             "slow_put_completed_after_read_ttl_gap": True,
             "old_get_session_survives_ttl": False,
-            "fresh_batch_get_start_after_expiry_finds_object": True,
+            "fresh_batch_get_session_start_after_expiry_finds_object": True,
             "expired_session_error_code": LEASE_EXPIRED,
         }
 

@@ -13,10 +13,10 @@ ARG SOC_VERSION="ascend910b1"
 ARG COMPILE_CUSTOM_KERNELS=1
 
 ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
-ARG VLLM_COMMIT="ee0da84ab9e04ac7610e28580af62c365e898389"
+ARG VLLM_COMMIT="d02df748bf9efd99022f1a062597dc3cb3808485"
 
 ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
-ARG VLLM_ASCEND_COMMIT="b5b65d9bbe325d009ad887fb87b8883b7ecee156"
+ARG VLLM_ASCEND_COMMIT="08b4f531d585fbfa5e365fa7d5f5e812bc80ab16"
 
 ARG MOONCAKE_REPO="https://github.com/ascend-direct-dev/Mooncake.git"
 ARG MOONCAKE_COMMIT="786c77ff7692bed58dd99971afef87d6b690cbe3"
@@ -169,6 +169,16 @@ RUN set -euo pipefail; \
     do \
         grep -F -q "${api_name}" < <(strings "${store_modules[0]}"); \
     done
+
+# Fail the build if editable installs, package dependencies, or source pins
+# drift from the image labels used by the runtime validation gates.
+RUN set -euo pipefail; \
+    python3 -m pip check; \
+    test "$(git -C /vllm-workspace/vllm rev-parse HEAD)" = "${VLLM_COMMIT}"; \
+    test "$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)" = "${VLLM_ASCEND_COMMIT}"; \
+    test "$(git -C /vllm-workspace/Mooncake rev-parse HEAD)" = "${MOONCAKE_COMMIT}"; \
+    python3 -c 'import importlib.metadata as m; packages=("vllm", "vllm-ascend", "mooncake-transfer-engine", "torch", "torch-npu", "triton-ascend"); print("\n".join(f"{name}={m.version(name)}" for name in packages))'; \
+    python3 -c 'import glob; paths=glob.glob("/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so", recursive=True); assert paths, "vllm-ascend native extension missing"; print("\n".join(paths))'
 
 LABEL org.opencontainers.image.title="vLLM Ascend layerwise KV pool" \
       org.opencontainers.image.vllm.commit="${VLLM_COMMIT}" \

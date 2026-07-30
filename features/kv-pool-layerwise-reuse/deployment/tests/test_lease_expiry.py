@@ -44,7 +44,7 @@ class FakeLeaseStore(range_test.FakeStore):
         self.lease_ttl_seconds = lease_ttl_ms / 1_000
         self.get_deadlines: dict[str, float] = {}
 
-    def batch_get_start(self, keys: list[str]) -> list[int]:
+    def batch_get_session_start(self, keys: list[str]) -> list[int]:
         self.calls.append(("get_start", (keys,)))
         results = []
         for key in keys:
@@ -81,10 +81,10 @@ class FakeLeaseStore(range_test.FakeStore):
             results.extend(result)
         return results
 
-    def batch_get_end(self, keys: list[str]) -> int:
+    def batch_get_session_end(self, keys: list[str]) -> int:
         for key in keys:
             self.get_deadlines.pop(key, None)
-        return super().batch_get_end(keys)
+        return super().batch_get_session_end(keys)
 
     def remove(self, key: str, force: bool = False) -> int:
         del force
@@ -134,7 +134,7 @@ class TestLeaseExpiry(unittest.TestCase):
             [lease_expiry.LEASE_EXPIRED],
         )
         self.assertEqual(
-            cases["fresh_batch_get_start_after_expiry_finds_object"]["actual"],
+            cases["fresh_batch_get_session_start_after_expiry_finds_object"]["actual"],
             [0],
         )
         self.assertEqual(
@@ -142,7 +142,7 @@ class TestLeaseExpiry(unittest.TestCase):
             {
                 "slow_put_completed_after_read_ttl_gap": True,
                 "old_get_session_survives_ttl": False,
-                "fresh_batch_get_start_after_expiry_finds_object": True,
+                "fresh_batch_get_session_start_after_expiry_finds_object": True,
                 "expired_session_error_code": lease_expiry.LEASE_EXPIRED,
             },
         )
@@ -151,11 +151,11 @@ class TestLeaseExpiry(unittest.TestCase):
             for call in summary["api_calls"]
             if call["operation"].startswith("batch_")
         ]
-        put_end_index = calls.index(("batch_put_end", "commit"))
-        first_get_start_index = calls.index(("batch_get_start", "read_session"))
+        put_end_index = calls.index(("batch_put_session_end", "commit"))
+        first_get_start_index = calls.index(("batch_get_session_start", "read_session"))
         self.assertGreater(first_get_start_index, put_end_index)
         self.assertFalse(
-            any(operation == "batch_get_start" for operation, _ in calls[:put_end_index])
+            any(operation == "batch_get_session_start" for operation, _ in calls[:put_end_index])
         )
         self.assertEqual(len(summary["waits"]), 2)
         self.assertEqual(summary["cleanup"][0]["result"], 0)

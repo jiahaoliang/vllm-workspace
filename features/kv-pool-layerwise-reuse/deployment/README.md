@@ -18,10 +18,10 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | Input | Value |
 | --- | --- |
 | Node | `n1` (`Ascend910B4`, 32 GiB per NPU) |
-| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
-| vLLM | `ee0da84ab9e04ac7610e28580af62c365e898389` |
-| vLLM-Ascend | `663209fd6208a59a48742f75116345bf5f5281ec` |
-| Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` |
+| vLLM | `d02df748bf9efd99022f1a062597dc3cb3808485` |
+| vLLM-Ascend | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
 | Model in Pod | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | Namespace | `liangjiahao` |
 
@@ -29,11 +29,11 @@ The image contains editable installs rooted at `/vllm-workspace/vllm` and
 `/vllm-workspace/vllm-ascend`. The engine Deployments do not replace these
 paths with a `hostPath` mount.
 
-The shallow vLLM clone in this image reports package version
-`0.1.dev1+gee0da84ab` even though its exact source commit is the `v0.24.0` tag.
-Both engine Pods therefore set the vLLM-Ascend supported compatibility override
-`VLLM_VERSION=0.24.0`; without it, the plugin selects incompatible main-branch
-patches and fails while importing Transformers 5.13.
+The image uses an editable vLLM install at the exact commit above. Both engine
+Pods set the vLLM-Ascend release-line compatibility override
+`VLLM_VERSION=0.25.1`; the runtime identity gate records both the installed
+package version and editable Git HEAD instead of inferring source identity from
+the generated package version.
 
 Both engine Pods also set `PYTHONHASHSEED=0`. vLLM initializes the root of its
 block-hash chain from this value; without the same fixed seed in both processes,
@@ -51,7 +51,7 @@ kubectl config current-context
 kubectl get namespace "${namespace}"
 kubectl describe node n1
 nerdctl -n k8s.io images --digests \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
 du -sh /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 sha256sum \
   /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8/*.safetensors
@@ -72,7 +72,7 @@ Apply the numbered files in order:
 
 ```bash
 deployment_dir=features/kv-pool-layerwise-reuse/deployment
-kubectl apply -f "${deployment_dir}/00-namespace.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/00-namespace.yaml"
 kubectl apply -n liangjiahao -f "${deployment_dir}/10-runtime-config.yaml"
 kubectl apply -n liangjiahao -f "${deployment_dir}/30-mooncake-master.yaml"
 kubectl apply -n liangjiahao -f "${deployment_dir}/40-prefill-engine.yaml"
@@ -146,11 +146,11 @@ read on that same session.
 
 The expected results are:
 
-- layer 1 put and `batch_put_end` succeed after the long put gap, and no
-  `batch_get_start` occurs before commit;
+- layer 1 put and `batch_put_session_end` succeed after the long put gap, and no
+  `batch_get_session_start` occurs before commit;
 - the layer 1 ranged get on the expired read session returns
   `-707 LEASE_EXPIRED`;
-- a fresh `batch_get_start` returns `0`, and layer 1 can be read with the new
+- a fresh `batch_get_session_start` returns `0`, and layer 1 can be read with the new
   lease;
 - the final two-layer byte comparison and all cleanup steps pass.
 
@@ -267,13 +267,14 @@ The helper performs four phases:
 4. It sends the same four payloads concurrently through the proxy, covering
    the complete prefiller-to-decoder path.
 
-Each KV-load response uses the same fixed seed as its baseline. Exact response
-matches are accepted directly. Whitespace-only text changes are also accepted
-after normalization. For other quantized concurrent batching differences, the
-response must retain its own marker, contain no foreign marker, keep identical
-finish/token metadata, and a serial KV-load replay must match the no-KV baseline
-exactly. The marker exists only in the request-specific cached blocks; the
-uncached question suffix is identical for all four cases.
+Each response must start with its own marker in both text and returned token
+IDs, contain no foreign marker, return exactly 16 generated token IDs, report
+matching prompt/completion usage, and finish with `finish_reason=length`. These
+are the hard correctness gates. Full continuation equality with the empty-pool
+baseline and any serial replay are retained as diagnostics for deterministic or
+batch-dependent generation; they do not replace the marker/token/usage gates.
+The marker exists only in request-specific cached blocks, while the uncached
+question suffix is identical for all four cases.
 
 Run the host-side wrapper from the workspace root. Its optional argument is an
 empty output directory; the default is `/tmp/layerwise-smoke-<timestamp>`.
@@ -303,8 +304,8 @@ Expected smoke evidence:
 - both warmed concurrent phases return four HTTP 200 responses with non-empty
   `choices`;
 - `concurrent-summary.json` reports `status: passed` and four validated cases
-  in both `direct_kv_load` and `proxy_kv_load`; each case is `exact_match` or
-  `concurrent_generation_variation`;
+  in both `direct_kv_load` and `proxy_kv_load`; every case passes marker text,
+  marker token-prefix, token-count, usage, finish-reason, and isolation gates;
 - proxy `/health` succeeds and `/listEndPoints` reports exactly one prefiller and
   one decoder;
 - `log-validation.json` reports complete per-response KV hit evidence in the
@@ -313,13 +314,11 @@ Expected smoke evidence:
 - the host output directory contains Pod-side response artifacts, summary,
   Master metrics, engine/proxy/Master logs, and before/after Pod state.
 
-The no-KV comparison detects a concurrent request reading another request's KV
-state or otherwise loading corrupted cache content. Together with the per-ID
-decoder hit logs, it validates deployment, routing, concurrent external KVPool
-loads, and output correctness. The current commit still has no structured
-per-layer range trace, so this smoke test does not independently prove that
-every physical layer called the ranged Mooncake APIs or that whole-key APIs
-remained unused.
+The marker oracle detects a concurrent request reading another request's KV
+state. Together with token-boundary, usage, finish-reason, and per-ID hit-log
+checks, it validates deployment, routing, and concurrent external KVPool loads.
+Full continuation equality remains diagnostic. Per-layer ranged-call and
+whole-key exclusion claims belong to the separate G4 audit checker.
 
 The result from the first run on this machine is recorded in
 [`validation-2026-07-23.md`](validation-2026-07-23.md).

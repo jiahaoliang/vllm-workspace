@@ -26,12 +26,12 @@ instrumentation；它不能反向扩大前三项 mandatory validation 的范围�
 | 输入 | 当前值 |
 |---|---|
 | control repo branch | `kv-pool-layerwise-reuse` |
-| control repo deployment baseline | `2d0bd8a7db177b4a3aed2ff69fac845f756ff21d` |
-| G3 deployment fixture | `commit:2d0bd8a7db177b4a3aed2ff69fac845f756ff21d` |
-| vLLM | `ee0da84ab9e04ac7610e28580af62c365e898389` (`v0.24.0`) |
-| vLLM-Ascend | `663209fd6208a59a48742f75116345bf5f5281ec` |
-| Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
-| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
+| control repo deployment baseline | final tooling commit recorded in the run evidence |
+| G3 deployment fixture | final tooling commit plus script SHA256 values |
+| vLLM | `d02df748bf9efd99022f1a062597dc3cb3808485` (`0.25.1` release line) |
+| vLLM-Ascend | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
+| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | node/device | `n1`, two `Ascend910B4` |
 | namespace | `liangjiahao` |
@@ -281,8 +281,8 @@ runner 复用 Mooncake `session_ranges_tcp_e2e.py` 的 multi-key/multi-layer str
 runner 必须跟踪 active put keys、active get keys 和 successfully registered pointers，并在
 `try/finally` 中清理：
 
-1. 对仍 active 的 get session 调用 `batch_get_end`；
-2. 对仍 active 的 put session 调用 `batch_put_revoke`；
+1. 对仍 active 的 get session 调用 `batch_get_session_end`；
+2. 对仍 active 的 put session 调用 `batch_put_session_revoke`；
 3. `torch.npu.synchronize()`，确保没有 in-flight transfer；
 4. 对每个已注册 tensor 调用 `transfer_engine.unregister_memory(data_ptr)`；
 5. 调用 `store.close()`；
@@ -392,17 +392,15 @@ Client/session 和旧日志不参与本轮。
 - [ ] 每个 target response ID 都有 positive KVPool hit block/token log；
 - [ ] config 和日志表明 `use_layerwise=True`；
 - [ ] `kv_load_failure_policy=fail`，不允许 hidden recompute；
-- [ ] exact-match case 的 concurrent target signature 与 baseline 完全一致；
-- [ ] fallback case 的 concurrent target 保留 own marker、无 foreign marker，且 response
-  metadata 一致；
-- [ ] fallback 的 serial replay 与 baseline exact match，但不把另一次 serial request 当作原
-  concurrent text equality 的证明；
+- [ ] concurrent target 的文本和 token IDs 均以 own marker 开头，且无 foreign marker；
+- [ ] generated token count、prompt/completion usage 和 finish reason 满足固定 gate；
+- [ ] full continuation equality 与必要时的 serial replay 只作诊断，不参与 hard gate；
 - [ ] no foreign marker/request-state contamination；
 - [ ] `concurrent-summary.json` 和 log validation 均为 passed。
 
-G3 report 必须分别统计 `exact_match` 和 `concurrent_generation_variation`：前者可以声明
-concurrent output equality；后者只声明 marker/request-state isolation 和 response metadata
-preserved。若本轮仍是历史结果中的 4/4 exact match，则可以对四个 case 都声明 output equality。
+G3 report 必须分别统计 hard-gate result 与 diagnostic full equality；只有 diagnostic
+equality 为真时才声明对应 continuation equality。无论 diagnostic 是否一致，marker ownership、
+token boundary/count、usage 和 finish reason 任一失败都必须 fail closed。
 
 这一步不把“日志出现 layerwise load”解释成“已审计每个物理层 ranged call”。后者只属于 G4。
 

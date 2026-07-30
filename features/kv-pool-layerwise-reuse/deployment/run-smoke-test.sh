@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-namespace=liangjiahao
-remote_artifact_dir=/tmp/layerwise-smoke
+readonly namespace=liangjiahao
+readonly remote_artifact_dir=/tmp/layerwise-smoke
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
+readonly expected_vllm=d02df748bf9efd99022f1a062597dc3cb3808485
+readonly expected_vllm_ascend=08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
+readonly expected_mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3
+readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
 
 usage() {
   echo "usage: $0 [output-directory]" >&2
@@ -13,7 +19,7 @@ if [[ $# -gt 1 ]]; then
   exit 2
 fi
 
-for command_name in kubectl python3; do
+for command_name in git jq kubectl python3; do
   if ! command -v "${command_name}" >/dev/null 2>&1; then
     echo "required command is not available: ${command_name}" >&2
     exit 2
@@ -73,6 +79,19 @@ decode_pod=$(resolve_pod decoder app=decode) || exit 2
 proxy_pod=$(resolve_pod proxy app=proxy) || exit 2
 master_pod=$(resolve_pod Mooncake-Master app=mooncake-master) || exit 2
 
+identity_check() {
+  test "$(git -C "${workspace_root}/repos/vllm" rev-parse HEAD)" = "${expected_vllm}"
+  test "$(git -C "${workspace_root}/repos/vllm-ascend" rev-parse HEAD)" = "${expected_vllm_ascend}"
+  test "$(git -C "${workspace_root}/repos/Mooncake" rev-parse HEAD)" = "${expected_mooncake}"
+  test -z "$(git -C "${workspace_root}/repos/vllm" status --porcelain)"
+  test -z "$(git -C "${workspace_root}/repos/vllm-ascend" status --porcelain)"
+  test -z "$(git -C "${workspace_root}/repos/Mooncake" status --porcelain)"
+}
+if ! identity_check; then
+  echo "source identity gate failed" >&2
+  exit 2
+fi
+
 cat >"${output_dir}/run-context.txt" <<EOF
 captured_at=$(date --iso-8601=seconds)
 namespace=${namespace}
@@ -81,6 +100,10 @@ decode_pod=${decode_pod}
 proxy_pod=${proxy_pod}
 master_pod=${master_pod}
 remote_artifact_dir=${remote_artifact_dir}
+image=${expected_image}
+vllm=${expected_vllm}
+vllm_ascend=${expected_vllm_ascend}
+mooncake=${expected_mooncake}
 EOF
 
 collection_failed=0
@@ -90,6 +113,29 @@ if ! kubectl get pods -n "${namespace}" \
   echo "failed to collect initial Pod state" >&2
   collection_failed=1
 fi
+if ! kubectl get pods -n "${namespace}" "${prefill_pod}" "${decode_pod}" -o json \
+  >"${output_dir}/engine-image-identity.json"; then
+  echo "failed to collect engine image identity" >&2
+  exit 2
+fi
+if ! jq -e --arg image "${expected_image}" '
+  (.items | length) == 2 and all(.items[];
+    .spec.containers[0].image == $image and
+    (.status.containerStatuses[0].imageID | type == "string" and length > 0))
+' "${output_dir}/engine-image-identity.json" >/dev/null; then
+  echo "engine image identity gate failed" >&2
+  exit 2
+fi
+for role in prefill decode; do
+  pod_variable=${role}_pod
+  pod=${!pod_variable}
+  if ! kubectl exec -n "${namespace}" "${pod}" -c "${role}-engine" -- \
+    python3 /opt/vllm-layerwise/check-runtime.py \
+    >"${output_dir}/${role}-runtime-identity.log" 2>&1; then
+    echo "${role} runtime identity gate failed" >&2
+    exit 2
+  fi
+done
 
 echo "artifacts: ${output_dir}"
 echo "prefiller: ${prefill_pod}"

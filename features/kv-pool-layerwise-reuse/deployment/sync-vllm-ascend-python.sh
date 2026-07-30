@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly BASE_COMMIT="663209fd6208a59a48742f75116345bf5f5281ec"
+readonly BASE_COMMIT="08b4f531d585fbfa5e365fa7d5f5e812bc80ab16"
+readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730"
 readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly WORKSPACE_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
@@ -63,6 +64,11 @@ for role in prefill decode; do
   fi
 
   pod="${pods[0]}"
+  actual_image=$(kubectl get pod -n "${NAMESPACE}" "${pod}" -o jsonpath='{.spec.containers[0].image}')
+  if [[ ${actual_image} != "${EXPECTED_IMAGE}" ]]; then
+    echo "refusing source sync into ${pod}: expected ${EXPECTED_IMAGE}, got ${actual_image}" >&2
+    exit 1
+  fi
   kubectl exec -n "${NAMESPACE}" "${pod}" -c "${role}-engine" -- \
     /opt/vllm-layerwise/stop-engine.sh "${role}"
 

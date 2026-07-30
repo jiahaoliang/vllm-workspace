@@ -9,7 +9,7 @@ tests. The Pod must not request an Ascend NPU or reuse a serving engine Pod.
 
 - Namespace: `liangjiahao`.
 - Pod name: `vllm-ascend-ut`.
-- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` with
+- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` with
   `imagePullPolicy: Never`, pinned to `n1` where the image is stored.
 - The container runs `sleep infinity` and keeps an `emptyDir` checkout across
   test commands and container restarts.
@@ -17,7 +17,7 @@ tests. The Pod must not request an Ascend NPU or reuse a serving engine Pod.
   `huawei.com/Ascend910` request, NPU device, driver, `npu-smi`, model cache, or
   host workspace mount.
 - CPU mocks are selected with `TORCH_DEVICE_BACKEND_AUTOLOAD=0`; vLLM-Ascend
-  compatibility is fixed with `VLLM_VERSION=0.24.0`.
+  compatibility is fixed with `VLLM_VERSION=0.25.1`.
 
 ## Source And Command Flow
 
@@ -31,7 +31,8 @@ pytest target. On every invocation it:
 3. streams the current `repos/vllm-ascend` checkout with tar over
    `kubectl exec`, excluding Git metadata and generated caches;
 4. atomically replaces `/workspace/vllm-ascend` only after transfer succeeds;
-5. records the host commit, branch, dirty state, and sync time in the snapshot;
+5. requires clean source `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16`,
+   then records the host commit, branch, dirty state, and sync time;
 6. runs the supplied command from that snapshot with its path first on
    `PYTHONPATH`; and
 7. releases the lock while leaving the Pod running.

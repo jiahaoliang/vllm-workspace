@@ -37,7 +37,7 @@ Pod。如果出现
 nerdctl -n k8s.io build \
   --progress=plain \
   -f features/kv-pool-layerwise-reuse/Dockerfile.a2 \
-  -t vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729 \
+  -t docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730 \
   features/kv-pool-layerwise-reuse
 ```
 
@@ -53,7 +53,7 @@ nerdctl -n k8s.io build \
 本次没有指定 `--platform`。BuildKit 使用 builder 的原生 ARM64 平台，最终镜像检查
 结果为 `linux/arm64`。
 
-## 本次构建结果
+## 2026-07-29 历史构建结果
 
 构建成功后，BuildKit 输出：
 
@@ -87,14 +87,14 @@ containerd 中的实际镜像信息：
 
 ```bash
 nerdctl -n k8s.io images
-nerdctl -n k8s.io images --digests vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
+nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
 ```
 
 检查镜像配置、平台和 labels：
 
 ```bash
 nerdctl -n k8s.io image inspect \
-  vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729
+  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
 ```
 
 删除镜像引用：

@@ -351,8 +351,8 @@ class SmokeRunner:
             if key not in self.active_put_keys:
                 self.active_put_keys.append(key)
         result = self._call(
-            "batch_put_start",
-            self.dependencies.store.batch_put_start,
+            "batch_put_session_start",
+            self.dependencies.store.batch_put_session_start,
             keys,
             sizes,
             phase=phase,
@@ -371,8 +371,8 @@ class SmokeRunner:
             if key not in self.active_get_keys:
                 self.active_get_keys.append(key)
         result = self._call(
-            "batch_get_start",
-            self.dependencies.store.batch_get_start,
+            "batch_get_session_start",
+            self.dependencies.store.batch_get_session_start,
             keys,
             phase=phase,
             keys=keys,
@@ -387,8 +387,8 @@ class SmokeRunner:
     def _revoke_put(self, keys: list[str], phase: str, case_name: str) -> None:
         assert self.dependencies is not None
         result = self._call(
-            "batch_put_revoke",
-            self.dependencies.store.batch_put_revoke,
+            "batch_put_session_revoke",
+            self.dependencies.store.batch_put_session_revoke,
             keys,
             phase=phase,
             keys=keys,
@@ -401,8 +401,8 @@ class SmokeRunner:
     def _end_get(self, keys: list[str], phase: str, case_name: str) -> None:
         assert self.dependencies is not None
         result = self._call(
-            "batch_get_end",
-            self.dependencies.store.batch_get_end,
+            "batch_get_session_end",
+            self.dependencies.store.batch_get_session_end,
             keys,
             phase=phase,
             keys=keys,
@@ -559,8 +559,8 @@ class SmokeRunner:
             )
 
         commit_result = self._call(
-            "batch_put_end",
-            store.batch_put_end,
+            "batch_put_session_end",
+            store.batch_put_session_end,
             keys,
             phase="positive",
             keys=keys,
@@ -697,8 +697,8 @@ class SmokeRunner:
             actual=first,
         )
         duplicate = self._call(
-            "batch_put_start",
-            store.batch_put_start,
+            "batch_put_session_start",
+            store.batch_put_session_start,
             duplicate_key,
             [object_size],
             phase="negative_duplicate",
@@ -789,8 +789,8 @@ class SmokeRunner:
             f"one {object_size}",
         )
         end = self._call(
-            "batch_put_end",
-            store.batch_put_end,
+            "batch_put_session_end",
+            store.batch_put_session_end,
             ended_key,
             phase="negative_after_put_end",
             keys=ended_key,
@@ -892,8 +892,8 @@ class SmokeRunner:
         )
         self._revoke_put(revoke_key, "negative_revoke", "negative_revoke")
         missing = self._call(
-            "batch_get_start",
-            store.batch_get_start,
+            "batch_get_session_start",
+            store.batch_get_session_start,
             revoke_key,
             phase="negative_revoke",
             keys=revoke_key,
@@ -928,16 +928,16 @@ class SmokeRunner:
         if self.active_get_keys:
             keys = list(self.active_get_keys)
             cleanup_step(
-                "batch_get_end",
-                lambda: dependencies.store.batch_get_end(keys),
+                "batch_get_session_end",
+                lambda: dependencies.store.batch_get_session_end(keys),
                 lambda result: int(result) == 0,
             )
             self.active_get_keys.clear()
         if self.active_put_keys:
             keys = list(self.active_put_keys)
             cleanup_step(
-                "batch_put_revoke",
-                lambda: dependencies.store.batch_put_revoke(keys),
+                "batch_put_session_revoke",
+                lambda: dependencies.store.batch_put_session_revoke(keys),
                 lambda result: self._int_results(result, len(keys)) == [0] * len(keys),
             )
             self.active_put_keys.clear()

@@ -136,7 +136,7 @@ class FakeStore:
         self._maybe_fail("setup")
         return 0
 
-    def batch_put_start(self, keys: list[str], sizes: list[int]) -> list[int]:
+    def batch_put_session_start(self, keys: list[str], sizes: list[int]) -> list[int]:
         self.calls.append(("put_start", (keys, sizes)))
         results = []
         if len(keys) != len(sizes):
@@ -173,7 +173,7 @@ class FakeStore:
             results.append(sum(sizes))
         return results
 
-    def batch_put_end(self, keys: list[str]) -> list[int]:
+    def batch_put_session_end(self, keys: list[str]) -> list[int]:
         self.calls.append(("put_end", (keys,)))
         results = []
         for key in keys:
@@ -184,7 +184,7 @@ class FakeStore:
                 results.append(0)
         return results
 
-    def batch_put_revoke(self, keys: list[str]) -> list[int]:
+    def batch_put_session_revoke(self, keys: list[str]) -> list[int]:
         self.events.append("revoke")
         self.calls.append(("put_revoke", (keys,)))
         results = []
@@ -196,7 +196,7 @@ class FakeStore:
                 results.append(0)
         return results
 
-    def batch_get_start(self, keys: list[str]) -> list[int]:
+    def batch_get_session_start(self, keys: list[str]) -> list[int]:
         self.calls.append(("get_start", (keys,)))
         results = []
         for key in keys:
@@ -231,7 +231,7 @@ class FakeStore:
             results.append(sum(sizes))
         return results
 
-    def batch_get_end(self, keys: list[str]) -> int:
+    def batch_get_session_end(self, keys: list[str]) -> int:
         self.events.append("get_end")
         self.calls.append(("get_end", (keys,)))
         for key in keys:

@@ -172,9 +172,9 @@ data:
     from mooncake.store import MooncakeDistributedStore
     from vllm_ascend.utils import vllm_version_is
     methods = (
-        "batch_put_start", "batch_put_from_multi_buffer_ranges",
-        "batch_put_end", "batch_put_revoke", "batch_get_start",
-        "batch_get_into_multi_buffer_ranges", "batch_get_end",
+        "batch_put_session_start", "batch_put_from_multi_buffer_ranges",
+        "batch_put_session_end", "batch_put_session_revoke", "batch_get_session_start",
+        "batch_get_into_multi_buffer_ranges", "batch_get_session_end",
     )
     missing = [name for name in methods if not callable(getattr(MooncakeDistributedStore, name, None))]
     assert not missing, f"missing Mooncake session/range APIs: {missing}"

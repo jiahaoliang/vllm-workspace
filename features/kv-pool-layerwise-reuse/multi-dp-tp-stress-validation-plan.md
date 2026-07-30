@@ -39,10 +39,10 @@ Prefill 每个 chunk 分别执行 final-layer commit；16K case 的 16 次成功
 |---|---|
 | control repo branch | `kv-pool-layerwise-reuse` |
 | plan 编写时 control HEAD | `83ad04821a2ba252a329910d0c407b61b52a3e39` |
-| vLLM | `ee0da84ab9e04ac7610e28580af62c365e898389` |
-| vLLM-Ascend | `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6` |
-| Mooncake | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
-| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
+| vLLM | `d02df748bf9efd99022f1a062597dc3cb3808485` |
+| vLLM-Ascend | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
+| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` |
 | model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | namespace / node | `liangjiahao` / `n1` |
 | model layers | `27` |
@@ -55,7 +55,7 @@ Prefill 每个 chunk 分别执行 final-layer commit；16K case 的 16 次成功
 - host 约有 2 TiB RAM，model cache 约 17 GiB，model-cache filesystem 约有 4 TiB 可用；
 - Prefill 和 Decode Pod 的 `/dev/shm` 均为 24 GiB；
 - 两个 Pod 内现有 `check-runtime.py` 均通过，确认 editable vLLM-Ascend import、
-  vLLM `0.24.0` compatibility gate、固定 `PYTHONHASHSEED=0` 和 Mooncake session/range APIs；
+  vLLM `0.25.1` compatibility gate、固定 `PYTHONHASHSEED=0` 和 Mooncake session/range APIs；
 - 当前 vLLM engine 进程已经停止，Pod 仍为 Running。
 
 这些是 plan 编写时的快照，不是执行时保证。正式执行必须重新完成 preflight，并把实时结果归档。
@@ -130,7 +130,7 @@ workload，且低于模型声明的 163840 positions。
      fail-closed 汇总；
    - 任一 `kubectl`、HTTP、checker、artifact write 或 checksum 失败即返回非零；
    - 不自动删除或修改其他 namespace 的 workload。
-2. `deployment/stress-test.py`
+2. `features/kv-pool-layerwise-reuse/deployment/stress-test.py`
    - 构造 deterministic token-ID prompts；
    - 建立 empty-pool decoder baselines；
    - 支持 direct pinned PD 两段调用以及 proxy concurrent 调用；

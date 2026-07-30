@@ -3,7 +3,7 @@ set -uo pipefail
 
 readonly namespace=liangjiahao
 readonly node_name=n1
-readonly image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+readonly image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
 readonly model_path=/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
@@ -310,9 +310,9 @@ record_step "namespace safety gate" "${output_dir}/namespace.txt" \
 
 identity_check() {
   test "$(git branch --show-current)" = kv-pool-layerwise-reuse
-  test "$(git -C repos/vllm rev-parse HEAD)" = ee0da84ab9e04ac7610e28580af62c365e898389
-  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = 3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6
-  test "$(git -C repos/Mooncake rev-parse HEAD)" = 74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5
+  test "$(git -C repos/vllm rev-parse HEAD)" = d02df748bf9efd99022f1a062597dc3cb3808485
+  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = 08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
+  test "$(git -C repos/Mooncake rev-parse HEAD)" = 786c77ff7692bed58dd99971afef87d6b690cbe3
   test -z "$(git -C repos/vllm status --porcelain)"
   test -z "$(git -C repos/vllm-ascend status --porcelain)"
   test -z "$(git -C repos/Mooncake status --porcelain)"
@@ -327,7 +327,7 @@ record_step "control and source identity" "${output_dir}/identity.txt" identity_
 collect "control repo status" "${output_dir}/git-status.txt" git status --short --branch || { fail_run "Git status capture failed"; exit 1; }
 collect "remote feature HEAD" "${output_dir}/remote-head.txt" git ls-remote origin refs/heads/kv-pool-layerwise-reuse || { fail_run "remote HEAD capture failed"; exit 1; }
 record_step "capture workspace lock" "${output_dir}/workspace-lock-copy.log" cp "${workspace_root}/workspace.lock.json" "${output_dir}/workspace.lock.json" || { fail_run "lock capture failed"; exit 1; }
-for revision in ee0da84ab9e04ac7610e28580af62c365e898389 3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6 74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5; do
+for revision in d02df748bf9efd99022f1a062597dc3cb3808485 08b4f531d585fbfa5e365fa7d5f5e812bc80ab16 786c77ff7692bed58dd99971afef87d6b690cbe3; do
   jq -e --arg revision "${revision}" '.. | strings | select(. == $revision)' "${workspace_root}/workspace.lock.json" >/dev/null || { fail_run "workspace lock is missing ${revision}"; exit 1; }
 done
 collect "node JSON" "${output_dir}/node.json" kubectl get node "${node_name}" -o json || { fail_run "node query failed"; exit 1; }
@@ -383,7 +383,7 @@ for role in prefill decode; do
 done
 
 {
-  git -C "${workspace_root}/repos/vllm-ascend" diff --name-only --diff-filter=ACMRT 663209fd6208a59a48742f75116345bf5f5281ec -- vllm_ascend
+  git -C "${workspace_root}/repos/vllm-ascend" diff --name-only --diff-filter=ACMRT 08b4f531d585fbfa5e365fa7d5f5e812bc80ab16 -- vllm_ascend
   git -C "${workspace_root}/repos/vllm-ascend" ls-files --others --exclude-standard -- vllm_ascend
 } | sort -u | awk '/\.py$/' >"${output_dir}/synced-python-files.txt"
 : >"${output_dir}/source-checksums.tsv"
@@ -543,7 +543,7 @@ capture_role_log decode "${s3_host}/vllm-decode-full.log" || true
 jq -n --slurpfile topology "${output_dir}/topology/check.json" --slurpfile s1 "${s1_host}/artifacts/scenario-summary.json" \
   --slurpfile s2 "${s2_host}/artifacts/scenario-summary.json" --slurpfile s3 "${s3_host}/artifacts/scenario-summary.json" \
   --arg control_commit "$(git rev-parse HEAD)" --arg image "${image}" --arg prefill_pod "${prefill_pod}" --arg decode_pod "${decode_pod}" \
-  '{schema_version:2,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"ee0da84ab9e04ac7610e28580af62c365e898389",vllm_ascend:"3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6",mooncake:"74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
+  '{schema_version:2,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"d02df748bf9efd99022f1a062597dc3cb3808485",vllm_ascend:"08b4f531d585fbfa5e365fa7d5f5e812bc80ab16",mooncake:"786c77ff7692bed58dd99971afef87d6b690cbe3",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
   >"${output_dir}/overall-summary.json" || { fail_run "overall summary creation failed"; exit 1; }
 jq -e '.status == "passed" and .validated == true and .topology.validated == true and .scenarios.s1_pinned_16k.validated == true and .scenarios.s2_concurrent_16x8k.validated == true and .scenarios.s3_concurrent_4x32k.validated == true and (.errors|length)==0' \
   "${output_dir}/overall-summary.json" >/dev/null || { fail_run "overall assertion failed"; exit 1; }

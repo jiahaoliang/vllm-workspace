@@ -16,7 +16,7 @@ spec:
       nodeName: n1
       containers:
         - name: mooncake-master
-          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
           imagePullPolicy: Never
           command: ["/bin/bash", "-lc"]
           args:

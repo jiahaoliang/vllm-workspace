@@ -168,13 +168,13 @@ data:
     from vllm_ascend.utils import vllm_version_is
 
     methods = (
-        "batch_put_start",
+        "batch_put_session_start",
         "batch_put_from_multi_buffer_ranges",
-        "batch_put_end",
-        "batch_put_revoke",
-        "batch_get_start",
+        "batch_put_session_end",
+        "batch_put_session_revoke",
+        "batch_get_session_start",
         "batch_get_into_multi_buffer_ranges",
-        "batch_get_end",
+        "batch_get_session_end",
     )
     missing = [name for name in methods if not callable(getattr(MooncakeDistributedStore, name, None))]
     assert not missing, f"missing Mooncake session/range APIs: {missing}"
@@ -274,6 +274,7 @@ data:
         usage = body.get("usage") or {}
         return {
             "text": choice.get("text"),
+            "token_ids": choice.get("token_ids"),
             "finish_reason": choice.get("finish_reason"),
             "stop_reason": choice.get("stop_reason"),
             "prompt_tokens": usage.get("prompt_tokens"),
@@ -299,6 +300,78 @@ data:
             marker for marker in markers if marker != own_marker and marker in text
         ]
         return own_marker in text and not foreign_markers, foreign_markers
+
+
+    def validate_completion_signature(
+        signature,
+        expected_marker_text,
+        expected_marker_token_ids,
+        own_marker,
+        markers,
+        expected_prompt_tokens,
+        expected_completion_tokens,
+    ):
+        errors = []
+        token_ids = signature.get("token_ids")
+        token_ids_present = isinstance(token_ids, list) and all(
+            type(token_id) is int for token_id in token_ids
+        )
+        generated_token_count = len(token_ids) if token_ids_present else None
+        marker_token_prefix_match = (
+            token_ids_present
+            and token_ids[: len(expected_marker_token_ids)]
+            == expected_marker_token_ids
+        )
+        text = signature.get("text")
+        text_marker_prefix_match = (
+            isinstance(text, str) and text.startswith(expected_marker_text)
+        )
+        isolated, foreign_markers = request_isolation(text, own_marker, markers)
+        if not token_ids_present:
+            errors.append("response token_ids are missing or invalid")
+        elif generated_token_count != expected_completion_tokens:
+            errors.append(
+                f"generated token count expected {expected_completion_tokens}, "
+                f"got {generated_token_count}"
+            )
+        if not marker_token_prefix_match:
+            errors.append("generated token_ids do not start with expected marker token_ids")
+        if not text_marker_prefix_match:
+            errors.append("response text does not start with expected marker text")
+        if foreign_markers:
+            errors.append(f"response text contains foreign markers: {foreign_markers}")
+        if signature.get("prompt_tokens") != expected_prompt_tokens:
+            errors.append(
+                f"usage prompt_tokens expected {expected_prompt_tokens}, "
+                f"got {signature.get('prompt_tokens')}"
+            )
+        if signature.get("completion_tokens") != expected_completion_tokens:
+            errors.append(
+                f"usage completion_tokens expected {expected_completion_tokens}, "
+                f"got {signature.get('completion_tokens')}"
+            )
+        if signature.get("finish_reason") != "length":
+            errors.append(
+                f"finish_reason expected 'length', got "
+                f"{signature.get('finish_reason')!r}"
+            )
+        return {
+            "validated": not errors,
+            "response_token_ids_present": token_ids_present,
+            "generated_token_count": generated_token_count,
+            "generated_token_count_match": generated_token_count
+            == expected_completion_tokens,
+            "marker_token_prefix_match": marker_token_prefix_match,
+            "text_marker_prefix_match": text_marker_prefix_match,
+            "isolated": isolated,
+            "foreign_markers": foreign_markers,
+            "prompt_tokens_match": signature.get("prompt_tokens")
+            == expected_prompt_tokens,
+            "completion_tokens_match": signature.get("completion_tokens")
+            == expected_completion_tokens,
+            "finish_reason_match": signature.get("finish_reason") == "length",
+            "errors": errors,
+        }
 
 
     def wait_for_master_key_count(client, expected, artifact_name):
@@ -430,6 +503,7 @@ data:
                 "temperature": 0,
                 "seed": 2026072300 + index,
                 "stream": False,
+                "return_token_ids": True,
             }
             for index, prompt in enumerate(prompts)
         ]
@@ -441,14 +515,25 @@ data:
             "uncached_suffix_tokens": len(instruction_tokens),
             "uncached_suffix_identical": True,
             "markers": list(markers),
+            "expected_marker_texts": [f" {marker}" for marker in markers],
+            "expected_marker_token_ids": [
+                tokenizer.encode(f" {marker}", add_special_tokens=False)
+                for marker in markers
+            ],
         }
         return payloads, markers, expected_keys, layout
 
 
-    def baseline_case(index, status_code, body, markers, payloads):
+    def baseline_case(index, status_code, body, markers, payloads, layout):
         signature = response_signature(body)
-        isolated, foreign_markers = request_isolation(
-            signature["text"], markers[index], markers
+        checks = validate_completion_signature(
+            signature,
+            layout["expected_marker_texts"][index],
+            layout["expected_marker_token_ids"][index],
+            markers[index],
+            markers,
+            len(payloads[index]["prompt"]),
+            payloads[index]["max_tokens"],
         )
         return {
             "case": index,
@@ -457,14 +542,15 @@ data:
             "http_status": status_code,
             "response_id": body.get("id"),
             "signature": signature,
-            "request_isolation": isolated,
-            "foreign_markers": foreign_markers,
-            "validated": isolated,
-            "classification": "recompute_baseline" if isolated else "invalid",
+            "hard_gate_checks": checks,
+            "request_isolation": checks["isolated"],
+            "foreign_markers": checks["foreign_markers"],
+            "validated": checks["validated"],
+            "classification": "recompute_baseline" if checks["validated"] else "invalid",
         }
 
 
-    def compare_case(index, status_code, body, baseline, markers, payloads):
+    def compare_case(index, status_code, body, baseline, markers, payloads, layout):
         signature = response_signature(body)
         baseline_signature = baseline["signature"]
         exact_match = signature == baseline_signature
@@ -477,8 +563,14 @@ data:
         } == {
             key: value for key, value in baseline_signature.items() if key != "text"
         }
-        isolated, foreign_markers = request_isolation(
-            signature["text"], markers[index], markers
+        checks = validate_completion_signature(
+            signature,
+            layout["expected_marker_texts"][index],
+            layout["expected_marker_token_ids"][index],
+            markers[index],
+            markers,
+            len(payloads[index]["prompt"]),
+            payloads[index]["max_tokens"],
         )
         return {
             "case": index,
@@ -492,8 +584,9 @@ data:
             "exact_match": exact_match,
             "normalized_match": normalized_match,
             "metadata_match": metadata_match,
-            "request_isolation": isolated,
-            "foreign_markers": foreign_markers,
+            "hard_gate_checks": checks,
+            "request_isolation": checks["isolated"],
+            "foreign_markers": checks["foreign_markers"],
             "serial_replay_response_id": None,
             "serial_replay_http_status": None,
             "serial_replay_signature": None,
@@ -503,7 +596,7 @@ data:
         }
 
 
-    def run_concurrent_phase(client, phase_name, url, payloads, markers, baselines):
+    def run_concurrent_phase(client, phase_name, url, payloads, markers, baselines, layout):
         phase = summary["phases"][phase_name]
         phase["status"] = "running"
         write_summary()
@@ -513,7 +606,7 @@ data:
             body = write_response(artifact, status_code, text)
             phase["cases"].append(
                 compare_case(
-                    index, status_code, body, baselines[index], markers, payloads
+                    index, status_code, body, baselines[index], markers, payloads, layout
                 )
             )
             write_summary()
@@ -526,8 +619,14 @@ data:
             artifact = output_dir / f"{phase_name}-serial-replay-{index}.json"
             replay_body = write_response(artifact, replay.status_code, replay.text)
             replay_signature = response_signature(replay_body)
-            replay_isolated, replay_foreign_markers = request_isolation(
-                replay_signature["text"], markers[index], markers
+            replay_checks = validate_completion_signature(
+                replay_signature,
+                layout["expected_marker_texts"][index],
+                layout["expected_marker_token_ids"][index],
+                markers[index],
+                markers,
+                len(payloads[index]["prompt"]),
+                payloads[index]["max_tokens"],
             )
             case["serial_replay_response_id"] = replay_body.get("id")
             case["serial_replay_http_status"] = replay.status_code
@@ -535,25 +634,19 @@ data:
             case["serial_replay_match"] = (
                 replay_signature == case["baseline_signature"]
             )
-            case["serial_replay_isolation"] = replay_isolated
-            case["serial_replay_foreign_markers"] = replay_foreign_markers
+            case["serial_replay_hard_gate_checks"] = replay_checks
+            case["serial_replay_isolation"] = replay_checks["isolated"]
+            case["serial_replay_foreign_markers"] = replay_checks["foreign_markers"]
             write_summary()
 
         for case in phase["cases"]:
-            deterministic_or_replayed = (
-                case["exact_match"] or case["serial_replay_match"] is True
-            )
-            case["validated"] = (
-                case["metadata_match"]
-                and case["request_isolation"]
-                and deterministic_or_replayed
-            )
+            case["validated"] = case["hard_gate_checks"]["validated"]
             if not case["validated"]:
                 case["classification"] = "invalid"
             elif case["exact_match"]:
                 case["classification"] = "exact_match"
             else:
-                case["classification"] = "concurrent_generation_variation"
+                case["classification"] = "hard_gates_passed_with_generation_variation"
 
         phase["validated_cases"] = sum(case["validated"] for case in phase["cases"])
         phase["exact_matches"] = sum(case["exact_match"] for case in phase["cases"])
@@ -612,7 +705,7 @@ data:
                 artifact = output_dir / f"empty-pool-baseline-{index}.json"
                 body = write_response(artifact, status_code, text)
                 baseline_phase["cases"].append(
-                    baseline_case(index, status_code, body, markers, payloads)
+                    baseline_case(index, status_code, body, markers, payloads, layout)
                 )
                 write_summary()
 
@@ -654,8 +747,14 @@ data:
                 artifact = output_dir / f"warmup-case-{index}-{operation}.json"
                 body = write_response(artifact, response.status_code, response.text)
                 signature = response_signature(body)
-                isolated, foreign_markers = request_isolation(
-                    signature["text"], markers[index], markers
+                checks = validate_completion_signature(
+                    signature,
+                    layout["expected_marker_texts"][index],
+                    layout["expected_marker_token_ids"][index],
+                    markers[index],
+                    markers,
+                    len(payloads[index]["prompt"]),
+                    payloads[index]["max_tokens"],
                 )
                 warmup_phase["cases"].append(
                     {
@@ -665,10 +764,11 @@ data:
                         "http_status": response.status_code,
                         "response_id": body.get("id"),
                         "signature": signature,
-                        "request_isolation": isolated,
-                        "foreign_markers": foreign_markers,
-                        "validated": isolated,
-                        "classification": "isolated" if isolated else "invalid",
+                        "hard_gate_checks": checks,
+                        "request_isolation": checks["isolated"],
+                        "foreign_markers": checks["foreign_markers"],
+                        "validated": checks["validated"],
+                        "classification": "hard_gates_passed" if checks["validated"] else "invalid",
                     }
                 )
                 write_summary()
@@ -701,6 +801,7 @@ data:
                 payloads,
                 markers,
                 baselines,
+                layout,
             )
             direct_metrics = client.get(master_metrics_url)
             direct_metrics.raise_for_status()
@@ -723,6 +824,7 @@ data:
                 payloads,
                 markers,
                 baselines,
+                layout,
             )
 
             final_metrics = client.get(master_metrics_url)

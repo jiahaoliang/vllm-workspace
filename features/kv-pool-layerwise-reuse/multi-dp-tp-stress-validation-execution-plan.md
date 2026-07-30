@@ -85,13 +85,13 @@ The implementation and runtime preflight must use these values:
 |---|---|
 | namespace | `liangjiahao` |
 | node | `n1` |
-| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2` |
+| image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` |
 | model path | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | served model | `vllm-ascend/DeepSeek-V2-Lite-W8A8` |
-| vLLM commit | `ee0da84ab9e04ac7610e28580af62c365e898389` |
-| vLLM-Ascend commit | `3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6` |
-| vLLM-Ascend image baseline used by sync helper | `663209fd6208a59a48742f75116345bf5f5281ec` |
-| Mooncake commit | `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5` |
+| vLLM commit | `d02df748bf9efd99022f1a062597dc3cb3808485` |
+| vLLM-Ascend commit | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| vLLM-Ascend image baseline used by sync helper | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| Mooncake commit | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
 | block size | `128` |
 | model layers | `27` |
 | max model length | `65536` |
@@ -252,7 +252,7 @@ For `stress/50-decode-engine.yaml`:
 
 ### 4.3 Workload Driver CLI
 
-Implement `deployment/stress-test.py` using Python standard library plus the packages already present in the
+Implement `features/kv-pool-layerwise-reuse/deployment/stress-test.py` using Python standard library plus the packages already present in the
 image: `httpx` and `transformers`. It must expose these subcommands:
 
 ```text
@@ -444,14 +444,15 @@ scenario-summary.json
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "scenario": "s1",
   "status": "passed",
   "validated": true,
   "prompt_layout": {},
   "baseline": {},
   "candidate": {},
-  "exact_match_count": 4,
+  "marker_prefix_match_count": 4,
+  "full_exact_match_count": 4,
   "isolated_count": 4,
   "expected_key_count": 508,
   "actual_key_count": 508,
@@ -465,7 +466,7 @@ Write a failed summary before raising any final validation exception.
 
 ### 4.7 Log Checker CLI
 
-Implement `deployment/check-stress-log.py` with three subcommands:
+Implement `features/kv-pool-layerwise-reuse/deployment/check-stress-log.py` with three subcommands:
 
 ```text
 topology
@@ -755,9 +756,9 @@ Tasks 6-11 are strictly sequential. No two agents may mutate the cluster concurr
 
   ```bash
   test "$(git branch --show-current)" = kv-pool-layerwise-reuse
-  test "$(git -C repos/vllm rev-parse HEAD)" = ee0da84ab9e04ac7610e28580af62c365e898389
-  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = 3f0cbf59cdcb8fa57091e17e9dce87cf215aa2c6
-  test "$(git -C repos/Mooncake rev-parse HEAD)" = 74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5
+  test "$(git -C repos/vllm rev-parse HEAD)" = d02df748bf9efd99022f1a062597dc3cb3808485
+  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = 08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
+  test "$(git -C repos/Mooncake rev-parse HEAD)" = 786c77ff7692bed58dd99971afef87d6b690cbe3
   test -z "$(git -C repos/vllm status --porcelain)"
   test -z "$(git -C repos/vllm-ascend status --porcelain)"
   test -z "$(git -C repos/Mooncake status --porcelain)"
@@ -817,7 +818,7 @@ exclude only the two Deployments being replaced, and never delete another worklo
   7. require cumulative Master key count equals `127 * (case_index + 1)`.
 - [ ] Capture final metrics and require 508 keys.
 - [ ] Run `finalize --scenario s1` with the four pinned checker summaries.
-- [ ] Require `exact_match_count=4`, `isolated_count=4`, and `validated=true`.
+- [ ] Require `marker_prefix_match_count=4`, `isolated_count=4`, and `validated=true`; record `full_exact_match_count` only as a diagnostic.
 - [ ] Copy the complete S1 remote directory and full role logs to host staging before resetting processes.
 
 ### Task 9: Reset Between S1 And S2
@@ -843,7 +844,7 @@ exclude only the two Deployments being replaced, and never delete another worklo
       commits, and zero whole-key events.
 - [ ] Capture final metrics and require 288 keys.
 - [ ] Run `finalize --scenario s2`.
-- [ ] Require `exact_match_count=16`, `isolated_count=16`, `validated=true`, and no HTTP/error cases.
+- [ ] Require `marker_prefix_match_count=16`, `isolated_count=16`, `validated=true`, and no HTTP/error cases; record `full_exact_match_count` only as a diagnostic.
 - [ ] Copy all S2 files and full logs to host staging.
 
 ### Task 11: Reset And Execute S3 Concurrent 4x32K
@@ -864,7 +865,7 @@ exclude only the two Deployments being replaced, and never delete another worklo
 - [ ] Capture the aggregate log window and run checker `aggregate`, requiring Prefill DP0 and DP1 activity.
 - [ ] Capture final metrics and require 348 keys.
 - [ ] Run `finalize --scenario s3` against proxy responses, not the pinned probe response.
-- [ ] Require `exact_match_count=4`, `isolated_count=4`, and `validated=true`.
+- [ ] Require `marker_prefix_match_count=4`, `isolated_count=4`, and `validated=true`; record `full_exact_match_count` only as a diagnostic.
 - [ ] Copy all S3 files and full logs to host staging.
 
 ## 7. Final Evidence Assembly

@@ -11,9 +11,10 @@ Apply in this order:
 readonly namespace=liangjiahao
 test "${namespace}" = liangjiahao
 kubectl get namespace "${namespace}"
-kubectl apply -n "${namespace}" -f 10-runtime-config.yaml
-kubectl apply -n "${namespace}" -f 40-prefill-engine.yaml
-kubectl apply -n "${namespace}" -f 50-decode-engine.yaml
+stress_dir=features/kv-pool-layerwise-reuse/deployment/stress
+kubectl apply -n "${namespace}" -f "${stress_dir}/10-runtime-config.yaml"
+kubectl apply -n "${namespace}" -f "${stress_dir}/40-prefill-engine.yaml"
+kubectl apply -n "${namespace}" -f "${stress_dir}/50-decode-engine.yaml"
 ```
 
 Applying the two Deployments recreates the old 1+1-card engine Pods once. Their

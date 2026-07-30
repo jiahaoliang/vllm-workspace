@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: decode-engine
-          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.24.0-a2
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
           imagePullPolicy: Never
           command: ["/bin/bash", "-lc"]
           args: ["exec sleep infinity"]
@@ -37,7 +37,7 @@ spec:
             - {name: MOONCAKE_MASTER, value: "mooncake-master-service:30089"}
             - {name: PYTHONUNBUFFERED, value: "1"}
             - {name: PYTHONHASHSEED, value: "0"}
-            - {name: VLLM_VERSION, value: "0.24.0"}
+            - {name: VLLM_VERSION, value: "0.25.1"}
           resources:
             requests: {huawei.com/Ascend910: "2"}
             limits: {huawei.com/Ascend910: "2"}
