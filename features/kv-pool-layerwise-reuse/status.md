@@ -1,23 +1,45 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: Mooncake multi-group layerwise implementation ready for review
+Current Phase: Mooncake multi-group layerwise redesign on current upstream main
 
 ## Baseline
 
-- `repos/vllm`: `v0.24.0` (`ee0da84ab9e04ac7610e28580af62c365e898389`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-kv-pool`
-  (`b5b65d9bbe325d009ad887fb87b8883b7ecee156`)
+- `repos/vllm`: verified main commit
+  `d02df748bf9efd99022f1a062597dc3cb3808485` declared by vLLM-Ascend main
+  (release line `v0.25.1`)
+- `repos/vllm-ascend`: `feature/mooncake-layerwise-redesign`
+  (`4e9bb324613b08e86eaaf95c8d6554ae9ddb5845`), based on
+  `upstream/main` `b2f683ca35a59b4f74f1c29367cb31db4125214e`
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `786c77ff7692bed58dd99971afef87d6b690cbe3` (WIP)
 
 ## Next Steps
 
-- Run the deferred real-model/NPU session API validation with image
-  `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729`.
-- Run the deferred real-model/NPU plan only as a separate validation phase; the
-  current handoff makes CPU/mock correctness claims only.
+- Continue the multi-group failure-contract design against the synchronized
+  vLLM/vLLM-Ascend baseline.
+- Treat `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` as stale;
+  rebuild only after the next approved implementation milestone.
+- Keep real-model/NPU validation as a separate optional phase; the current
+  checkpoint makes CPU/mock correctness claims only.
 
 ## Latest Validation
+
+- On 2026-07-30, rebased the 11 Mooncake layerwise feature commits from
+  vLLM-Ascend base `9dcbeaa2a` onto current `upstream/main` `b2f683ca3` and
+  force-pushed `origin/feature/mooncake-layerwise-redesign` at
+  `4e9bb324613b08e86eaaf95c8d6554ae9ddb5845`. Conflict resolutions preserved
+  upstream Memcache `batch_write_finish`, request bookkeeping, key deduplication,
+  retention, and GVA-hit behavior together with Mooncake session/range state and
+  exception-safe finalization.
+- Updated `repos/vllm` to the exact verified main commit `d02df748b` recorded by
+  vLLM-Ascend main. The local CPU/mock AscendStore suite passed `417` tests and
+  `63` subtests; Python compilation and `git diff --check` passed. Kubernetes was
+  unavailable because no kube context is configured, and local Ruff was not
+  installed, so neither the dedicated UT Pod nor Ruff was run.
+- `scripts/lock-repos.ps1` cannot represent this untagged detached vLLM commit:
+  `Get-GitRefName` treats a failed exact-tag lookup as fatal before its detached
+  fallback. `workspace.lock.json` and `repo-state.md` were refreshed manually
+  with the exact commit.
 
 - On 2026-07-29, vLLM-Ascend commit
   `b5b65d9bbe325d009ad887fb87b8883b7ecee156` adapted the unchanged internal

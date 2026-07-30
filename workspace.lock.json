@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-29T13:06:27+08:00",
+  "updated_at": "2026-07-30T11:49:56+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -9,9 +9,9 @@
         "upstream": "https://github.com/vllm-project/vllm.git",
         "collaborator": "https://github.com/zhangsicheng5/vllm.git"
       },
-      "branch": "tag:v0.24.0",
-      "commit": "ee0da84ab9e04ac7610e28580af62c365e898389",
-      "purpose": "kv-pool-layerwise-reuse feature development; baseline v0.24.0"
+      "branch": "detached:d02df748b",
+      "commit": "d02df748bf9efd99022f1a062597dc3cb3808485",
+      "purpose": "kv-pool-layerwise-reuse feature development; vLLM-Ascend main verified baseline (release line v0.25.1)"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
@@ -20,9 +20,9 @@
         "upstream": "https://github.com/vllm-project/vllm-ascend.git",
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
-      "branch": "feature/mooncake-layerwise-kv-pool",
-      "commit": "b5b65d9bbe325d009ad887fb87b8883b7ecee156",
-      "purpose": "Mooncake multi-group layerwise KVPool implementation; reviewer baseline"
+      "branch": "feature/mooncake-layerwise-redesign",
+      "commit": "4e9bb324613b08e86eaaf95c8d6554ae9ddb5845",
+      "purpose": "Mooncake layerwise KVPool redesign; rebased onto vLLM-Ascend upstream/main b2f683ca3"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

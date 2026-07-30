@@ -278,3 +278,29 @@
   unpacked size is `19.23 GB`, and blob size is `6.803 GB`. Image labels match
   vLLM `ee0da84ab`, vLLM-Ascend `b5b65d9bb`, and Mooncake `786c77ff`; the
   binary symbol gate passed all seven required session/ranged APIs.
+
+## 2026-07-30
+
+- Fetched `vllm-project/vllm-ascend` `upstream/main` at
+  `b2f683ca35a59b4f74f1c29367cb31db4125214e` and rebased the 11 commits on
+  `feature/mooncake-layerwise-redesign` from prior HEAD
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156`.
+- Resolved overlapping backend, metadata, transfer-finalization, ranged-save,
+  and Scheduler conflicts by preserving upstream Memcache finalization and hit
+  semantics alongside the Mooncake layerwise session/range behavior. Added
+  post-rebase fix `4e9bb3246` for the renamed Memcache GVA flag and lightweight
+  CPU test dependencies.
+- Force-pushed the rewritten source branch with an exact lease against
+  `b5b65d9b`; local and `origin/feature/mooncake-layerwise-redesign` now match at
+  `4e9bb324613b08e86eaaf95c8d6554ae9ddb5845`.
+- Updated `repos/vllm` from `v0.24.0` to verified main commit
+  `d02df748bf9efd99022f1a062597dc3cb3808485`, read directly from
+  `upstream/main:.github/vllm-main-verified.commit`; the corresponding release
+  line is `v0.25.1`.
+- Verified the rebased tree with the isolated local CPU/mock AscendStore suite:
+  `417 passed, 63 subtests passed`. Python compilation and `git diff --check`
+  passed. No kube context was configured, so the dedicated `liangjiahao` UT Pod
+  was unavailable; Ruff was also unavailable locally. No NPU workload was run.
+- `scripts/lock-repos.ps1` failed on the untagged detached vLLM commit before its
+  intended detached fallback. Refreshed `workspace.lock.json` and
+  `repo-state.md` manually with the exact SHA; no public tooling change was made.
