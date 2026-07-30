@@ -3,9 +3,9 @@ set -uo pipefail
 
 readonly namespace=liangjiahao
 readonly remote_artifact_dir=/tmp/layerwise-smoke
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z
 readonly expected_vllm=d02df748bf9efd99022f1a062597dc3cb3808485
-readonly expected_vllm_ascend=08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
+readonly expected_vllm_ascend=14beaf161cca6f1e044e20529ca96c6554dbbe50
 readonly expected_mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
@@ -30,7 +30,7 @@ if [[ "${namespace}" != liangjiahao ]]; then
   echo "refusing to run outside the liangjiahao namespace" >&2
   exit 2
 fi
-if ! kubectl get namespace "${namespace}" >/dev/null; then
+if ! kubectl get namespace -n "${namespace}" "${namespace}" >/dev/null; then
   echo "required namespace is unavailable: ${namespace}" >&2
   exit 2
 fi

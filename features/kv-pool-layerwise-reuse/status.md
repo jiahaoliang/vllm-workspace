@@ -1,28 +1,38 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: Mooncake multi-group layerwise redesign on current upstream main
+Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun in progress
 
 ## Baseline
 
 - `repos/vllm`: verified main commit
   `d02df748bf9efd99022f1a062597dc3cb3808485` declared by vLLM-Ascend main
   (release line `v0.25.1`)
-- `repos/vllm-ascend`: `feature/mooncake-layerwise-redesign`
-  (`08b4f531d585fbfa5e365fa7d5f5e812bc80ab16`), based on
-  `upstream/main` `b2f683ca35a59b4f74f1c29367cb31db4125214e`
+- `repos/vllm-ascend`:
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`
+  (`14beaf161cca6f1e044e20529ca96c6554dbbe50`), with exactly 11 linear
+  Mooncake commits on `collaborator/kv_offload_0723`
+  `a46a1dabbc260e8695002969f29528eb555eb583`
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `786c77ff7692bed58dd99971afef87d6b690cbe3` (WIP)
 
 ## Next Steps
 
-- Continue the multi-group failure-contract design against the synchronized
-  vLLM/vLLM-Ascend baseline.
-- Treat `vllm-ascend:kv-pool-layerwise-v0.24.0-a2-session-api-20260729` as stale;
-  rebuild only after the next approved implementation milestone.
-- Keep real-model/NPU validation as a separate optional phase; the current
-  checkpoint makes CPU/mock correctness claims only.
+- Build the unique ARM64 image pinned by `deployment/validation-identity.json`.
+- Execute the complete tooling, image, CPU/mock, G0, G1, lease, G4, smoke, and
+  stress gates in the active full-validation tracker.
+- Keep `repos/*` frozen during validation; terminate with evidence on a
+  production/ABI/runtime defect and repair only control tooling defects.
 
 ## Latest Validation
+
+- On 2026-07-30, completed the requested 11/11 linear integration at
+  `14beaf161cca6f1e044e20529ca96c6554dbbe50`, pushed it normally, and verified
+  source remote equality. The existing CPU-only `liangjiahao/vllm-ascend-ut`
+  Pod passed the complete AscendStore suite with `476 passed`; Ruff 0.14.0
+  lint/format, Python compilation, range `git diff --check`, merge-base/count,
+  subject order, no-merge, protected-ref, and clean-tree gates passed. Full
+  image/runtime validation is tracked separately under run
+  `20260730T130225Z`.
 
 - On 2026-07-30, folded `fix(kv_pool): adapt renamed Mooncake session APIs`
   into rewritten Backend contract commit `700e56cfd`. The remaining 10 commits

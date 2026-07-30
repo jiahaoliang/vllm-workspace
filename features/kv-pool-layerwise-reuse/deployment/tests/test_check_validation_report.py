@@ -100,10 +100,16 @@ class ValidationReportCheckerTest(unittest.TestCase):
         self.temporary.cleanup()
 
     def test_valid_report_passes_contract(self):
-        self.assertEqual(checker.validate_report(self.report, self.root, self.tracked), [])
+        self.assertEqual(
+            checker.validate_report(self.report, self.root, self.tracked), []
+        )
 
     def test_missing_section_and_untracked_link_fail_closed(self):
-        self.report.write_text(valid_report().replace("## Script Provenance\n", "").replace("evidence/summary.json", "evidence/missing.json"))
+        self.report.write_text(
+            valid_report()
+            .replace("## Script Provenance\n", "")
+            .replace("evidence/summary.json", "evidence/missing.json")
+        )
         errors = checker.validate_report(self.report, self.root, self.tracked)
         self.assertTrue(any("Script Provenance" in error for error in errors))
         self.assertTrue(any("not tracked" in error for error in errors))
@@ -121,10 +127,29 @@ class ValidationReportCheckerTest(unittest.TestCase):
         self.assertTrue(any("absolute evidence path" in error for error in errors))
         self.assertTrue(any("credential" in error for error in errors))
 
+    def test_cluster_scoped_commands_still_require_explicit_namespace(self):
+        self.report.write_text(
+            valid_report().replace(
+                'kubectl get pods -n "${REPORT_NAMESPACE}"',
+                "kubectl config current-context\n"
+                "kubectl get node n1\n"
+                "kubectl get namespace liangjiahao",
+            )
+        )
+        errors = checker.validate_report(self.report, self.root, self.tracked)
+        namespace_errors = [error for error in errors if "explicit namespace" in error]
+        self.assertEqual(len(namespace_errors), 3)
+
     def test_cli_returns_nonzero_for_invalid_report(self):
         self.report.write_text("# incomplete\n")
         result = subprocess.run(
-            [sys.executable, str(CHECKER_PATH), str(self.report), "--repo-root", str(self.root)],
+            [
+                sys.executable,
+                str(CHECKER_PATH),
+                str(self.report),
+                "--repo-root",
+                str(self.root),
+            ],
             text=True,
             capture_output=True,
             check=False,

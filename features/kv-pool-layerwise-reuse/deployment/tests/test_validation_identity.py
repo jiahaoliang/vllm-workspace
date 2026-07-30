@@ -18,11 +18,21 @@ def read(relative: str) -> str:
 
 class ValidationIdentityTest(unittest.TestCase):
     def test_workspace_lock_and_dockerfile_match_frozen_source_identity(self):
-        lock = json.loads((ROOT / "workspace.lock.json").read_text(encoding="utf-8-sig"))
+        lock = json.loads(
+            (ROOT / "workspace.lock.json").read_text(encoding="utf-8-sig")
+        )
         dockerfile = read("Dockerfile.a2")
-        self.assertIn(f'FROM {IDENTITY["base_image"]}', dockerfile)
-        arg_names = {"vllm": "VLLM_COMMIT", "vllm_ascend": "VLLM_ASCEND_COMMIT", "mooncake": "MOONCAKE_COMMIT"}
-        lock_names = {"vllm": "vllm", "vllm_ascend": "vllm-ascend", "mooncake": "Mooncake"}
+        self.assertIn(f"FROM {IDENTITY['base_image']}", dockerfile)
+        arg_names = {
+            "vllm": "VLLM_COMMIT",
+            "vllm_ascend": "VLLM_ASCEND_COMMIT",
+            "mooncake": "MOONCAKE_COMMIT",
+        }
+        lock_names = {
+            "vllm": "vllm",
+            "vllm_ascend": "vllm-ascend",
+            "mooncake": "Mooncake",
+        }
         for component, commit in IDENTITY["commits"].items():
             self.assertEqual(lock["repos"][lock_names[component]]["commit"], commit)
             self.assertIn(f'ARG {arg_names[component]}="{commit}"', dockerfile)
@@ -37,7 +47,7 @@ class ValidationIdentityTest(unittest.TestCase):
             "deployment/stress/50-decode-engine.yaml",
         ]
         for manifest in manifests:
-            self.assertIn(f'image: {IDENTITY["image"]}', read(manifest), manifest)
+            self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
         for manifest in [path for path in manifests if "master" not in path]:
             self.assertRegex(
                 read(manifest),
@@ -67,8 +77,43 @@ class ValidationIdentityTest(unittest.TestCase):
         combined = "\n".join(read(path) for path in checked_paths)
         for api in IDENTITY["session_apis"]:
             self.assertIn(api, combined)
-        for old_api in ("batch_put_start", "batch_put_end", "batch_put_revoke", "batch_get_start", "batch_get_end"):
+        for old_api in (
+            "batch_put_start",
+            "batch_put_end",
+            "batch_put_revoke",
+            "batch_get_start",
+            "batch_get_end",
+        ):
             self.assertIsNone(re.search(rf"\b{old_api}\b", combined), old_api)
+
+        for path in (
+            "deployment/10-runtime-config.yaml",
+            "deployment/stress/10-runtime-config.yaml",
+        ):
+            text = read(path)
+            self.assertIn(f'vllm_version_is("{IDENTITY["vllm_version"]}")', text, path)
+            self.assertIn(
+                f"compatibility version: {IDENTITY['vllm_version']}", text, path
+            )
+
+    def test_run_identity_records_model_runtime_and_cluster_contract(self):
+        self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
+        self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
+        self.assertRegex(IDENTITY["tooling_base"]["commit"], r"^[0-9a-f]{40}$")
+        self.assertEqual(IDENTITY["model"]["num_layers"], 27)
+        self.assertGreaterEqual(
+            IDENTITY["model"]["max_position_embeddings"],
+            IDENTITY["runtime"]["stress_max_model_len"],
+        )
+        self.assertEqual(IDENTITY["runtime"]["block_size"], 128)
+        self.assertEqual(IDENTITY["runtime"]["lease_expired_code"], -707)
+        self.assertEqual(
+            IDENTITY["kubernetes"]["context"], "bke-cluster-admin@bke-cluster"
+        )
+        self.assertEqual(IDENTITY["kubernetes"]["node"], "n1")
+        self.assertEqual(
+            IDENTITY["kubernetes"]["builder_platform"], IDENTITY["platform"]
+        )
 
     def test_stress_summary_embeds_exact_source_identity(self):
         runner = read("deployment/run-stress-test.sh")

@@ -5,8 +5,8 @@ readonly namespace=liangjiahao
 readonly pod_name=vllm-ascend-ut
 readonly container_name=ut
 readonly node_name=n1
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
-readonly expected_source_head=08b4f531d585fbfa5e365fa7d5f5e812bc80ab16
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z
+readonly expected_source_head=14beaf161cca6f1e044e20529ca96c6554dbbe50
 readonly remote_parent=/workspace
 readonly remote_checkout=${remote_parent}/vllm-ascend
 readonly remote_lock=${remote_parent}/.vllm-ascend-ut.lock
@@ -42,7 +42,7 @@ if [[ ! -d ${source_repo}/vllm_ascend || ! -d ${source_repo}/tests/ut ]]; then
   exit 2
 fi
 
-current_context=$(kubectl config current-context)
+current_context=$(kubectl -n "${namespace}" config current-context)
 if [[ -z ${current_context} ]]; then
   echo "kubectl has no current context" >&2
   exit 2

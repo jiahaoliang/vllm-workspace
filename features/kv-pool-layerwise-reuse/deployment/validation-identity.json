@@ -1,15 +1,43 @@
 {
   "schema_version": 1,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730",
+  "run_id": "20260730T130225Z",
+  "tooling_base": {
+    "branch": "kv-pool-layerwise-reuse",
+    "commit": "ef0bf08bd3a8536a34b7bc8522ad1806e2700ea6"
+  },
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z",
   "platform": "linux/arm64",
   "vllm_version": "0.25.1",
   "namespace": "liangjiahao",
   "buildkit_namespace": "default",
   "commits": {
     "vllm": "d02df748bf9efd99022f1a062597dc3cb3808485",
-    "vllm_ascend": "08b4f531d585fbfa5e365fa7d5f5e812bc80ab16",
+    "vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
     "mooncake": "786c77ff7692bed58dd99971afef87d6b690cbe3"
+  },
+  "model": {
+    "host_path": "/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "pod_path": "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "served_name": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+    "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669",
+    "num_layers": 27,
+    "max_position_embeddings": 163840
+  },
+  "runtime": {
+    "block_size": 128,
+    "base_max_model_len": 4096,
+    "stress_max_model_len": 65536,
+    "lease_ttl_ms": 30000,
+    "lease_wait_margin_ms": 1500,
+    "lease_expired_code": -707
+  },
+  "kubernetes": {
+    "context": "bke-cluster-admin@bke-cluster",
+    "node": "n1",
+    "builder_node": "n1",
+    "builder_platform": "linux/arm64"
   },
   "session_apis": [
     "batch_put_session_start",

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly BASE_COMMIT="08b4f531d585fbfa5e365fa7d5f5e812bc80ab16"
-readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730"
+readonly BASE_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
+readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z"
 readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly WORKSPACE_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
@@ -13,7 +13,7 @@ if [[ "${NAMESPACE}" != liangjiahao ]]; then
   echo "refusing to sync outside the liangjiahao namespace" >&2
   exit 2
 fi
-kubectl get namespace "${NAMESPACE}" >/dev/null
+kubectl get namespace -n "${NAMESPACE}" "${NAMESPACE}" >/dev/null
 
 git -C "${SOURCE_REPO}" cat-file -e "${BASE_COMMIT}^{commit}"
 

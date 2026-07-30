@@ -22,7 +22,9 @@ REQUIRED_SECTIONS = (
 )
 LINK_RE = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 BASH_RE = re.compile(r"```bash\s*\n(.*?)```", re.DOTALL)
-ASSIGNMENT_RE = re.compile(r"(?m)^\s*(?:export\s+|readonly\s+)?([A-Z][A-Z0-9_]*)=(?:[^\n]+)$")
+ASSIGNMENT_RE = re.compile(
+    r"(?m)^\s*(?:export\s+|readonly\s+)?([A-Z][A-Z0-9_]*)=(?:[^\n]+)$"
+)
 VARIABLE_RE = re.compile(r"\$(?:\{([A-Z][A-Z0-9_]*)[^}]*\}|([A-Z][A-Z0-9_]*))")
 CREDENTIAL_RE = re.compile(
     r"(?i)\b(?:API[_-]?KEY|ACCESS[_-]?TOKEN|PASSWORD|SECRET)\s*=\s*(?!\$|<redacted>)[^\s`]+"
@@ -43,9 +45,7 @@ def _tracked_files(repo_root: Path) -> set[str]:
 
 
 def _section(text: str, heading: str) -> str:
-    match = re.search(
-        rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)", text
-    )
+    match = re.search(rf"(?ms)^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)", text)
     return match.group(1) if match else ""
 
 
@@ -69,11 +69,13 @@ def _check_kubectl_namespaces(bash: str, errors: list[str]) -> None:
         line = raw_line.strip()
         if not line.startswith("kubectl "):
             continue
-        if re.match(r"kubectl\s+(?:config\b|get\s+(?:node|nodes|namespace|namespaces)\b)", line):
-            continue
-        namespace_match = re.search(r"(?:^|\s)(?:-n|--namespace(?:=|\s))\s*([^\s]+)", line)
+        namespace_match = re.search(
+            r"(?:^|\s)(?:-n|--namespace(?:=|\s))\s*([^\s]+)", line
+        )
         if namespace_match is None:
-            errors.append(f"bash line {number}: kubectl command lacks an explicit namespace")
+            errors.append(
+                f"bash line {number}: kubectl command lacks an explicit namespace"
+            )
             continue
         actual = _resolve_namespace(namespace_match.group(1), assignments)
         expected = "default" if "buildkitd" in line else "liangjiahao"
@@ -100,7 +102,9 @@ def validate_report(
         errors.append("report contains a placeholder token")
     if CREDENTIAL_RE.search(text):
         errors.append("report contains a credential-like assignment")
-    if re.search(r"(?m)(?:curl|Evidence(?: path)?\s*:)\s+(?:/tmp|/workspace|/root)/", text):
+    if re.search(
+        r"(?m)(?:curl|Evidence(?: path)?\s*:)\s+(?:/tmp|/workspace|/root)/", text
+    ):
         errors.append("report contains an absolute evidence path")
 
     report_parent = report_path.parent.resolve()
@@ -132,7 +136,10 @@ def validate_report(
     if not bash_blocks:
         errors.append("Live Reproduction Runbook must contain a Bash command block")
     all_bash = "\n".join(bash_blocks)
-    if "BUILDKIT_HOST" in all_bash and "kube-pod://buildkitd?namespace=default" not in all_bash:
+    if (
+        "BUILDKIT_HOST" in all_bash
+        and "kube-pod://buildkitd?namespace=default" not in all_bash
+    ):
         errors.append("BUILDKIT_HOST must name the default namespace explicitly")
     _check_kubectl_namespaces(all_bash, errors)
 
@@ -158,7 +165,9 @@ def validate_report(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Fail-closed validation report checker")
+    parser = argparse.ArgumentParser(
+        description="Fail-closed validation report checker"
+    )
     parser.add_argument("report", type=Path)
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     return parser.parse_args()

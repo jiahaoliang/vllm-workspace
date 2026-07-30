@@ -60,6 +60,8 @@
   [implementation-plans/full-validation-guide.md](implementation-plans/full-validation-guide.md)
 - Historical interrupted run tracker:
   [implementation-plans/2026-07-30-full-validation-rerun.md](implementation-plans/2026-07-30-full-validation-rerun.md)
+- Active run tracker:
+  [implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md](implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 

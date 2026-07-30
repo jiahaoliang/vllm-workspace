@@ -10,7 +10,7 @@ Apply in this order:
 ```bash
 readonly namespace=liangjiahao
 test "${namespace}" = liangjiahao
-kubectl get namespace "${namespace}"
+kubectl get namespace -n "${namespace}" "${namespace}"
 stress_dir=features/kv-pool-layerwise-reuse/deployment/stress
 kubectl apply -n "${namespace}" -f "${stress_dir}/10-runtime-config.yaml"
 kubectl apply -n "${namespace}" -f "${stress_dir}/40-prefill-engine.yaml"

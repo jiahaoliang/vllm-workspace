@@ -182,8 +182,8 @@ data:
     expected = Path("/vllm-workspace/vllm-ascend").resolve()
     assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
     assert os.environ.get("PYTHONHASHSEED") == "0", "PYTHONHASHSEED must be fixed"
-    assert vllm_version_is("0.24.0"), f"wrong compatibility line: {vllm.__version__}"
+    assert vllm_version_is("0.25.1"), f"wrong compatibility line: {vllm.__version__}"
     print(f"vllm-ascend source: {source}")
-    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.24.0")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.25.1")
     print("cross-process block hash seed: 0")
     print("Mooncake session/range APIs: OK")

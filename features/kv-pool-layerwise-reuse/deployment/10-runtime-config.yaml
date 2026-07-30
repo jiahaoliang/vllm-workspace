@@ -185,11 +185,11 @@ data:
     assert os.environ.get("PYTHONHASHSEED") == "0", (
         "PYTHONHASHSEED must have the same fixed value in every engine Pod"
     )
-    assert vllm_version_is("0.24.0"), (
+    assert vllm_version_is("0.25.1"), (
         f"vLLM compatibility gate selected the wrong source line; installed version={vllm.__version__}"
     )
     print(f"vllm-ascend source: {source}")
-    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.24.0")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.25.1")
     print("cross-process block hash seed: 0")
     print("Mooncake session/range APIs: OK")
   smoke-test.py: |

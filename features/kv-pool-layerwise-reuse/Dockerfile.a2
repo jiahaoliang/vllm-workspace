@@ -16,7 +16,7 @@ ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
 ARG VLLM_COMMIT="d02df748bf9efd99022f1a062597dc3cb3808485"
 
 ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
-ARG VLLM_ASCEND_COMMIT="08b4f531d585fbfa5e365fa7d5f5e812bc80ab16"
+ARG VLLM_ASCEND_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
 
 ARG MOONCAKE_REPO="https://github.com/ascend-direct-dev/Mooncake.git"
 ARG MOONCAKE_COMMIT="786c77ff7692bed58dd99971afef87d6b690cbe3"

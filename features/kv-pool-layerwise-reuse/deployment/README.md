@@ -18,9 +18,9 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | Input | Value |
 | --- | --- |
 | Node | `n1` (`Ascend910B4`, 32 GiB per NPU) |
-| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z` |
 | vLLM | `d02df748bf9efd99022f1a062597dc3cb3808485` |
-| vLLM-Ascend | `08b4f531d585fbfa5e365fa7d5f5e812bc80ab16` |
+| vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
 | Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
 | Model in Pod | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | Namespace | `liangjiahao` |
@@ -47,11 +47,11 @@ Run these checks from the workspace root:
 ```bash
 readonly namespace=liangjiahao
 test "${namespace}" = liangjiahao
-kubectl config current-context
-kubectl get namespace "${namespace}"
-kubectl describe node n1
+kubectl -n liangjiahao config current-context
+kubectl get namespace -n liangjiahao "${namespace}"
+kubectl describe node -n liangjiahao n1
 nerdctl -n k8s.io images --digests \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-08b4f531-20260730
+  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z
 du -sh /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 sha256sum \
   /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8/*.safetensors
@@ -200,7 +200,7 @@ Create the namespace and Pod from the workspace root:
 
 ```bash
 deployment_dir=features/kv-pool-layerwise-reuse/deployment
-kubectl apply -f "${deployment_dir}/00-namespace.yaml"
+kubectl apply -n liangjiahao -f "${deployment_dir}/00-namespace.yaml"
 kubectl apply -n liangjiahao \
   -f "${deployment_dir}/60-vllm-ascend-ut-pod.yaml"
 kubectl wait -n liangjiahao --for=jsonpath='{.status.phase}'=Running \
