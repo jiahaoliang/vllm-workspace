@@ -169,7 +169,7 @@ python3 -m unittest discover \
 - [ ] Run `bash -n`, Python compilation, `git diff --check`, and changed-file Ruff.
 - [ ] Run Kubernetes client-side dry-run for every base, stress, and UT manifest with explicit namespace.
 - [ ] Render ConfigMap data and compile the actual Python files mounted into Pods.
-- [ ] Record every command through `deployment/run-validation-step.sh`; checksum the completed tooling evidence.
+- [ ] Record every command through `deployment/run-validation-step.sh`; require terminal END/exit records for normal completion, failure, SIGINT, and SIGTERM; checksum the completed tooling evidence.
 
 Expected: all current tests pass without relying on a historical test count, every manifest parses, and all Pod-side scripts compile.
 

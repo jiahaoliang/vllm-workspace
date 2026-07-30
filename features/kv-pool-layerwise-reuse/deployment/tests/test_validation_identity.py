@@ -99,7 +99,7 @@ class ValidationIdentityTest(unittest.TestCase):
 
     def test_run_identity_records_model_runtime_and_cluster_contract(self):
         self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
-        self.assertEqual(IDENTITY["attempt"], 2)
+        self.assertEqual(IDENTITY["attempt"], 3)
         self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
         self.assertRegex(IDENTITY["tooling_base"]["commit"], r"^[0-9a-f]{40}$")
         self.assertEqual(IDENTITY["model"]["num_layers"], 27)
@@ -127,7 +127,7 @@ class ValidationIdentityTest(unittest.TestCase):
             "ms-service-profiler 26\\.0\\.0",
             "prometheus-fastapi-instrumentator 8\\.1\\.0",
             "opencv-python-headless 5\\.0\\.0\\.93",
-            "vllm 0\\.1\\.dev1\\+g54503ece\\.empty has requirement fastapi",
+            "vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi",
             "te 0\\.4\\.0 is not supported on this platform",
         ):
             self.assertIn(expected_known_issue, dockerfile)
@@ -147,8 +147,8 @@ class ValidationIdentityTest(unittest.TestCase):
             "ms-service-profiler 26.0.0 has requirement pandas~=2.2, but you have pandas 3.0.5.",
             "prometheus-fastapi-instrumentator 8.1.0 has requirement starlette<2.0.0,>=1.0.0, but you have starlette 0.50.0.",
             'opencv-python-headless 5.0.0.93 has requirement numpy>=2; python_version >= "3.9", but you have numpy 1.26.4.',
-            "vllm 0.1.dev1+g54503ece.empty has requirement fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10.",
-            "vllm 0.1.dev1+g54503ece.empty has requirement starlette>=1.0.1, but you have starlette 0.50.0.",
+            "vllm 0.1.dev1+g54503ecec.empty has requirement fastapi[standard]<0.137.0,>=0.133.0, but you have fastapi 0.123.10.",
+            "vllm 0.1.dev1+g54503ecec.empty has requirement starlette>=1.0.1, but you have starlette 0.50.0.",
             "te 0.4.0 is not supported on this platform",
         )
         for issue in known_issues:

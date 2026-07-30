@@ -34,6 +34,14 @@ Current Phase: 11/11 Mooncake linear integration frozen; full validation rerun i
   image/runtime validation is tracked separately under run
   `20260730T130225Z`.
 
+- Full-validation attempts r1 and r2 exposed control-tooling identity defects,
+  not source failures. R1 used a stale vLLM commit and reached the final raw
+  `pip check` after both native builds; r2 proved the corrected vLLM wheel uses
+  the exact version `0.1.dev1+g54503ecec.empty`, then was terminated before its
+  8-character allowlist assumption could fail. Neither attempt loaded an
+  image. Attempt r3 pins the observed 9-character version and adds signal-safe
+  terminal recording to `run-validation-step.sh`.
+
 - On 2026-07-30, folded `fix(kv_pool): adapt renamed Mooncake session APIs`
   into rewritten Backend contract commit `700e56cfd`. The remaining 10 commits
   were replayed without conflicts; final source HEAD `08b4f531d` has the exact

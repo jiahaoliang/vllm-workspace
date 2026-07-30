@@ -386,3 +386,19 @@
   attempt. The Dockerfile still executes `pip check`; its wrapper permits only
   the exact known CANN-base and official vLLM/vLLM-Ascend compatibility lines
   and fails on every unexpected dependency issue.
+- Formal r2 tooling passed with identity `6/6`, deployment `64/64`, shell,
+  Python, Ruff, rendered ConfigMap, source-history, remote-identity, and ten
+  manifest dry-run gates. During the r2 build, package metadata proved the
+  generated wheel version is `0.1.dev1+g54503ecec.empty`, not the assumed
+  8-character `g54503ece` form. The build was terminated with exit 130 before
+  its inevitable final-gate failure, and the r2 tag remained absent.
+- The r2 interruption also showed that `run-validation-step.sh` did not record
+  an END entry when its process group received SIGINT. Attempt r3 fixes the
+  exact wheel allowlist and signal terminal recording in the control repo,
+  adds regression coverage, selects a new `-r3` image tag, and requires all
+  affected tooling/image gates to rerun. No `repos/*` source was modified.
+- The first signal regression used the recorder START line as its synchronization
+  point and reproduced one timeout in ten runs because the child was not always
+  ready. The test now waits for a child-written artifact marker; it passed 50
+  consecutive host runs and the complete dedicated-Pod deployment collection
+  passed `65` tests with cache and bytecode disabled.

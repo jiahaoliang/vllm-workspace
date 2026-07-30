@@ -18,7 +18,7 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | Input | Value |
 | --- | --- |
 | Node | `n1` (`Ascend910B4`, 32 GiB per NPU) |
-| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3` |
 | vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
 | Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
@@ -51,7 +51,7 @@ kubectl -n liangjiahao config current-context
 kubectl get namespace -n liangjiahao "${namespace}"
 kubectl describe node -n liangjiahao n1
 nerdctl -n k8s.io images --digests \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r2
+  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r3
 du -sh /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 sha256sum \
   /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8/*.safetensors
