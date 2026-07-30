@@ -13,6 +13,7 @@
 | 在长期 CPU-only Pod 中运行 vLLM-Ascend UT | [UT Pod design](ut-pod-design.md) 与 [run-vllm-ascend-ut.sh](deployment/run-vllm-ascend-ut.sh) |
 | 运行 Multi-DP/TP stress test | [deployment/stress/README.md](deployment/stress/README.md) 与 [run-stress-test.sh](deployment/run-stress-test.sh) |
 | 运行 lease-expiry validation | [lease-expiry validation report 与完整 runbook](lease-expiry-validation-2026-07-27.md) |
+| 代码或依赖变化后执行完整 validation | [Reusable full validation guide](implementation-plans/full-validation-guide.md) |
 | 查看正式结果和校验 checksum | [evidence/README.md](evidence/README.md) |
 | 构建或检查 feature image | [nerdctl-build.md](nerdctl-build.md) |
 | 阅读设计、RFC 和外部实现快照 | [references/sources.md](references/sources.md) |
@@ -52,6 +53,19 @@
 | Original 1P1D validation report | [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md) |
 
 ## Validation 索引
+
+### Reusable Full Validation
+
+- Stable guide:
+  [implementation-plans/full-validation-guide.md](implementation-plans/full-validation-guide.md)
+- Historical interrupted run tracker:
+  [implementation-plans/2026-07-30-full-validation-rerun.md](implementation-plans/2026-07-30-full-validation-rerun.md)
+- Per-run machine-readable identity:
+  [deployment/validation-identity.json](deployment/validation-identity.json)
+
+Stable guide 不携带历史 run 的默认 SHA、image tag、model dimensions 或 key counts。
+每次执行必须新建 dated tracker，并优先采用用户显式指定的版本；未指定字段从当次 clean
+checkout、lock、model 和 live runtime 派生后冻结。
 
 ### 1P1D Smoke
 
