@@ -1,0 +1,1152 @@
+{
+  "cases": [
+    1,
+    2
+  ],
+  "iterations": 10,
+  "decoder_url": "http://10.250.40.223:8200/v1/completions",
+  "passed": true,
+  "failed_rounds": 0,
+  "rounds": [
+    {
+      "iteration": 0,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-9a9db34644808b67",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-9ab9a05e5625fac4",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-be576aadbe0fec7d",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-9def5db427bf5bfe",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-b5b3117a8d4266b5",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-b174ffc4027ed548",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-927d1868cd62b3e0",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-9f7c307f74f45819",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 4,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-9e0ccbc217392666",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-8c767fa9823b76bc",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 5,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-9125059d11d5231a",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-9b1cf4c419b6fc62",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 6,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-8fcd37c8a25983cf",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-8dd73b4e3d828562",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 7,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-b070f239c70ee278",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-8b45c50d3744b310",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 8,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-917e28e90535ecd1",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-95d04e45e40ede2f",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    },
+    {
+      "iteration": 9,
+      "passed": true,
+      "results": [
+        {
+          "case": 1,
+          "http_status": 200,
+          "response_id": "cmpl-b8326a7bbd11d688",
+          "passed": true,
+          "actual": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_ONE\nQuestion: What is the private cache branch identity marker?\n",
+            "token_ids": [
+              35170,
+              62,
+              12359,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30,
+              185
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        },
+        {
+          "case": 2,
+          "http_status": 200,
+          "response_id": "cmpl-b187c33c35331994",
+          "passed": true,
+          "actual": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          },
+          "expected": {
+            "text": " CASE_TWO\nQuestion: What is the private cache branch identity marker?",
+            "token_ids": [
+              35170,
+              62,
+              51,
+              29257,
+              185,
+              23853,
+              25,
+              2461,
+              317,
+              254,
+              2751,
+              10045,
+              10592,
+              9845,
+              23543,
+              30
+            ],
+            "finish_reason": "length",
+            "prompt_tokens": 3215,
+            "completion_tokens": 16
+          }
+        }
+      ]
+    }
+  ]
+}

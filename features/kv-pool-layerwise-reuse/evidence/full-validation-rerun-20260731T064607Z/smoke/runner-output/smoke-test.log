@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/opt/vllm-layerwise/smoke-test.py", line 684, in <module>
+    run()
+  File "/opt/vllm-layerwise/smoke-test.py", line 666, in run
+    raise RuntimeError(
+RuntimeError: concurrent KV-load correctness validation failed; diagnosis=decoder_concurrent_kv_load_failure; summary=/tmp/layerwise-smoke/concurrent-summary.json
+[ERROR] 2026-07-31-11:24:40 (PID:5550, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+command terminated with exit code 1

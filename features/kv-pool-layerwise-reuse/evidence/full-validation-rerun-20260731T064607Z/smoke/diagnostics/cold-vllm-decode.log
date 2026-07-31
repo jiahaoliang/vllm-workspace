@@ -1,0 +1,392 @@
+INFO 07-31 11:41:53 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 07-31 11:41:53 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 07-31 11:41:53 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-31 11:41:53 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-31 11:41:53 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-31 11:42:04 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 07-31 11:42:04 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345] 
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345]        █     █     █▄   ▄█
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.1.dev1+g54503ecec
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345]   █▄█▀ █     █     █     █  model   /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:345] 
+(APIServer pid=4702) INFO 07-31 11:42:04 [api_utils.py:273] non-default args: {'host': '0.0.0.0', 'port': 8200, 'model': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'trust_remote_code': True, 'max_model_len': 4096, 'quantization': 'ascend', 'enforce_eager': True, 'served_model_name': ['vllm-ascend/DeepSeek-V2-Lite-W8A8'], 'block_size': 128, 'gpu_memory_utilization': 0.9, 'enable_prefix_caching': False, 'max_num_batched_tokens': 1024, 'max_num_seqs': 4, 'enable_chunked_prefill': True, 'kv_transfer_config': KVTransferConfig(kv_connector='AscendStoreConnector', engine_id='4ce97db0-d80c-4b85-9e9a-78a271556631', kv_buffer_device='npu', kv_buffer_size=1000000000.0, kv_role='kv_consumer', kv_rank=None, kv_parallel_size=1, kv_ip='127.0.0.1', kv_port=14579, kv_connector_extra_config={'backend': 'mooncake', 'use_layerwise': True, 'layerwise_prefetch_layers': 1, 'lookup_rpc_port': 0, 'consumer_is_to_load': True}, kv_connector_module_path=None, enable_permute_local_kv=False, kv_load_failure_policy='fail')}
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_HOST
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PORT
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PROTO
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_ADDR
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT_HTTP_API
+(APIServer pid=4702) WARNING 07-31 11:42:04 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_USE_V1
+(APIServer pid=4702) INFO 07-31 11:42:04 [model.py:619] Resolved architecture: DeepseekV2ForCausalLM
+(APIServer pid=4702) INFO 07-31 11:42:04 [model.py:1776] Using max model len 4096
+(APIServer pid=4702) INFO 07-31 11:42:04 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=1024.
+(APIServer pid=4702) INFO 07-31 11:42:05 [vllm.py:1090] Asynchronous scheduling is enabled.
+(APIServer pid=4702) WARNING 07-31 11:42:05 [vllm.py:1144] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=4702) WARNING 07-31 11:42:05 [vllm.py:1192] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=4702) INFO 07-31 11:42:05 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=4702) INFO 07-31 11:42:05 [vllm.py:1371] Cudagraph is disabled under eager mode
+(APIServer pid=4702) WARNING 07-31 11:42:05 [platform.py:1045] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=4702) INFO 07-31 11:42:05 [ascend_config.py:843] Dynamic EPLB is False
+(APIServer pid=4702) INFO 07-31 11:42:05 [ascend_config.py:844] The number of redundant experts is 0
+(APIServer pid=4702) INFO 07-31 11:42:05 [platform.py:486] Compilation disabled, using eager mode by default
+(APIServer pid=4702) INFO 07-31 11:42:05 [platform.py:772] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=4702) INFO 07-31 11:42:05 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+INFO 07-31 11:42:16 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 07-31 11:42:16 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 07-31 11:42:16 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-31 11:42:16 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-31 11:42:16 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=4754) INFO 07-31 11:42:27 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore pid=4754) INFO 07-31 11:42:27 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore pid=4754) INFO 07-31 11:42:27 [core.py:114] Initializing a V1 LLM engine (v0.1.dev1+g54503ecec) with config: model='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', speculative_config=None, tokenizer='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=4096, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=ascend, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=npu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=vllm-ascend/DeepSeek-V2-Lite-W8A8, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'vllm_ascend.compilation.compiler_interface.AscendCompiler', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [1024], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=4754) INFO 07-31 11:42:30 [ascend_config.py:843] Dynamic EPLB is False
+(EngineCore pid=4754) INFO 07-31 11:42:30 [ascend_config.py:844] The number of redundant experts is 0
+(EngineCore pid=4754) INFO 07-31 11:42:32 [parallel_state.py:1607] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://10.250.40.223:36849 backend=hccl
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+(EngineCore pid=4754) INFO 07-31 11:42:32 [parallel_state.py:1942] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+(EngineCore pid=4754) INFO 07-31 11:42:32 [model_runner_v1.py:3860] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(EngineCore pid=4754) INFO 07-31 11:42:33 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+(EngineCore pid=4754) INFO 07-31 11:42:35 [weight_utils.py:857] Filesystem type for checkpoints: EXT4. Checkpoint size: 16.03 GiB. Available RAM: 1915.66 GiB.
+(EngineCore pid=4754) INFO 07-31 11:42:35 [weight_utils.py:880] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=4754) Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+(EngineCore pid=4754) Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:02<00:08,  2.75s/it]
+(EngineCore pid=4754) Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:05<00:05,  2.76s/it]
+(EngineCore pid=4754) Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:08<00:02,  2.80s/it]
+(EngineCore pid=4754) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:09<00:00,  2.03s/it]
+(EngineCore pid=4754) Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:09<00:00,  2.31s/it]
+(EngineCore pid=4754) 
+(EngineCore pid=4754) INFO 07-31 11:42:44 [default_loader.py:430] Loading weights took 9.28 seconds
+INFO 07-31 11:42:54 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 07-31 11:42:54 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 07-31 11:42:54 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 07-31 11:42:54 [__init__.py:237] Platform plugin ascend is activated
+INFO 07-31 11:42:54 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=4754) WARNING 07-31 11:43:06 [mla_v1.py:955] mlapo only supports W8A8 quantization in MLA. Some layers not W8A8 quantized, mlapo disabled for these layers.
+(EngineCore pid=4754) INFO 07-31 11:43:07 [model_runner_v1.py:3936] Loading model weights took 15.2958 GB
+(EngineCore pid=4754) INFO 07-31 11:43:07 [model_runner_v1.py:3962] Model runner load_model total time: 35.10 seconds
+(EngineCore pid=4754) INFO 07-31 11:43:12 [worker.py:616] Available KV cache memory: 11.09 GiB
+(EngineCore pid=4754) INFO 07-31 11:43:12 [kv_cache_utils.py:2168] GPU KV cache size: 382,976 tokens
+(EngineCore pid=4754) INFO 07-31 11:43:12 [kv_cache_utils.py:2169] Maximum concurrency for 4,096 tokens per request: 93.50x
+(EngineCore pid=4754) INFO 07-31 11:43:12 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: 4ce97db0-d80c-4b85-9e9a-78a271556631-bbe1da41f11944b595e31f6a19cb1818
+(EngineCore pid=4754) WARNING 07-31 11:43:12 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:180] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0731 11:43:12.514873  4754 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0731 11:43:12.515004  4754 transfer_engine_impl.cpp:971] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0731 11:43:12.515027  4754 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.223 port: 12001
+I0731 11:43:12.515228  4754 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.223:15119
+I0731 11:43:12.515455  4754 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.223:15119
+I0731 11:43:12.515470  4754 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0731 11:43:12.515478  4754 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0731 11:43:12.515483  4754 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0731 11:43:12.515525  4754 utils.cpp:219] Find available between 20600 and 20700
+I0731 11:43:12.516522  4754 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0731 11:43:12.516551  4754 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0731 11:43:12.516559  4754 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0731 11:43:12.524766  4754 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.223:20630, pid:4754
+I0731 11:43:12.545017  4754 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0731 11:43:12.545065  4754 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0731 11:43:12.548106  4754 client_service.cpp:287] client_id=18036773510954282495-12493080434886660017
+I0731 11:43:12.548136  4754 client_service.cpp:289] client_id=18036773510954282495-12493080434886660017, host_id=10.250.40.223
+I0731 11:43:12.548144  4754 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0731 11:43:12.550994  4754 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0731 11:43:12.551041  4754 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0731 11:43:12.552942  4754 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0731 11:43:12.552977  4754 real_client.cpp:821] Local buffer size is 0, skip registering local memory
+I0731 11:43:12.552985  4754 real_client.cpp:880] Mounting segment: 1073741824 bytes, 1073741824 of 1073741824
+I0731 11:43:12.558713  4754 ascend_allocator.cpp:173] aclrtMallocHost suc, addr: 0x12d2c0000000
+I0731 11:43:12.558831  4754 transfer_executor_base.cpp:427] Ignore register host mem:0x12d2c0000000 when buffer pool is enabled.
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:417] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:804] num_blocks: 2992
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:809] block_shape: torch.Size([128, 1, 512])
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:809] block_shape: torch.Size([128, 1, 64])
+(EngineCore pid=4754) INFO 07-31 11:43:12 [pool_worker.py:824] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([2992, 128, 1, 512])
+I0731 11:43:12.911731  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce13c00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.911813  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2b400000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.911859  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce2e400000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.911908  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce45c00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.911950  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce48e00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.911991  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce60600000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912036  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce63600000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912079  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce7ae00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912118  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce7de00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912158  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce95600000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912197  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce98800000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912240  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceb0000000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912285  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceb3000000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912326  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceca800000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912364  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cecd800000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912407  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cee5000000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912447  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cee8200000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912485  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceffa00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912524  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf02a00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912585  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1a200000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912623  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1d400000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912665  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf34c00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912705  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf37c00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912745  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf4f400000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912801  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf52400000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912842  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf69c00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912881  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf6ce00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.912925  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf84600000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.912962  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf87600000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913002  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9ee00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913046  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfa2000000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913087  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfb9800000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913126  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfbc800000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913172  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfd4000000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913213  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfd7000000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913252  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfee800000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913290  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff1a00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913331  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d009200000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913369  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d00c200000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913416  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d023a00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913458  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d026c00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913497  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d03e400000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913540  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d041400000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913582  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d058c00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913636  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d05bc00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913684  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d073400000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913725  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d076600000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913765  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d08de00000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913806  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d090e00000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913847  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a8600000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913885  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0ab800000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.913931  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c3000000, length:49020928, mem type:device, engine index:0
+I0731 11:43:12.913973  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0c6000000, length:392167424, mem type:device, engine index:0
+I0731 11:43:12.914014  4754 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0dd800000, length:49020928, mem type:device, engine index:0
+(EngineCore pid=4754) INFO 07-31 11:43:12 [worker.py:811] Free memory on device (29.13/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 15.3 GiB for weights, 0.11 GiB for peak activation, 0.04 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=11755339366` (10.95 GiB) to fit into requested memory, or `--kv-cache-memory=14538868736` (13.54 GiB) to fully utilize NPU free memory. Current KV cache memory: 11.09 GiB. After warmup: torch reserved memory 26.59 GiB, torch allocated memory 26.53 GiB.
+(EngineCore pid=4754) INFO 07-31 11:43:14 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=0 visible_npus=[0]
+(EngineCore pid=4754) WARNING 07-31 11:43:14 [worker.py:823] Bind cpus failed in rank0: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(EngineCore pid=4754) INFO 07-31 11:43:14 [core.py:344] init engine (profile, create kv cache, warmup model) took 6.49 s
+(EngineCore pid=4754) INFO 07-31 11:43:15 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: 4ce97db0-d80c-4b85-9e9a-78a271556631-bbe1da41f11944b595e31f6a19cb1818
+(EngineCore pid=4754) WARNING 07-31 11:43:15 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore pid=4754) INFO 07-31 11:43:15 [pool_scheduler.py:165] KV pool page_size_bytes: 147456
+I0731 11:43:15.358305  4754 client_metric.cpp:114] Client metrics enabled (default enabled)
+I0731 11:43:15.358381  4754 client_metric.cpp:115] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0731 11:43:15.366319  4754 client_service.cpp:287] client_id=17460012483751517329-16249787586070983566
+I0731 11:43:15.366384  4754 client_service.cpp:289] client_id=17460012483751517329-16249787586070983566, host_id=10.250.40.223
+I0731 11:43:15.366390  4754 client_service.cpp:298] Client metrics enabled but reporting disabled (interval=0)
+I0731 11:43:15.368592  4754 client_service.cpp:929] Storage root directory is not set. persisting data is disabled.
+I0731 11:43:15.368608  4754 client_service.cpp:969] Use existing transfer engine instance. Skip its initialization.
+I0731 11:43:15.369436  4754 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0731 11:43:15.369457  4754 real_client.cpp:821] Local buffer size is 0, skip registering local memory
+I0731 11:43:15.369489  4754 real_client.cpp:967] Global segment size is 0, skip mounting segment
+(EngineCore pid=4754) INFO 07-31 11:43:15 [vllm.py:1090] Asynchronous scheduling is enabled.
+(EngineCore pid=4754) WARNING 07-31 11:43:15 [vllm.py:1144] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore pid=4754) WARNING 07-31 11:43:15 [vllm.py:1192] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore pid=4754) INFO 07-31 11:43:15 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore pid=4754) INFO 07-31 11:43:15 [vllm.py:1371] Cudagraph is disabled under eager mode
+(EngineCore pid=4754) INFO 07-31 11:43:15 [platform.py:486] Compilation disabled, using eager mode by default
+(EngineCore pid=4754) INFO 07-31 11:43:15 [platform.py:772] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(EngineCore pid=4754) INFO 07-31 11:43:15 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+(APIServer pid=4702) INFO 07-31 11:43:15 [api_server.py:673] Supported tasks: ['generate']
+(APIServer pid=4702) WARNING 07-31 11:43:16 [model.py:1528] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.3, 'top_p': 0.95}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`.
+(APIServer pid=4702) INFO 07-31 11:43:17 [hf.py:540] Detected the chat template content format to be 'string'. You can set `--chat-template-content-format` to override this.
+(APIServer pid=4702) INFO 07-31 11:43:17 [api_server.py:677] Starting vLLM server on http://0.0.0.0:8200
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:37] Available routes are:
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /docs, Methods: GET, HEAD
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /load, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /version, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /health, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /metrics, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /tokenize, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /detokenize, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/models, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /ping, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /ping, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /invocations, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/chat/completions/batch, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/responses, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/responses/{response_id}, Methods: GET
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/completions, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/messages, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/messages/count_tokens, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /generative_scoring, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /scale_elastic_ep, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /is_scaling_elastic_ep, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/chat/completions/render, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/completions/render, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/chat/completions/derender, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /v1/completions/derender, Methods: POST
+(APIServer pid=4702) INFO 07-31 11:43:17 [launcher.py:46] Route: /inference/v1/generate, Methods: POST
+(APIServer pid=4702) INFO:     Started server process [4702]
+(APIServer pid=4702) INFO:     Waiting for application startup.
+(APIServer pid=4702) INFO:     Application startup complete.
+(APIServer pid=4702) INFO:     192.168.200.27:35050 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     127.0.0.1:47610 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:35060 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:59230 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:59234 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:53580 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:53584 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:43 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8eaf832d0244db28-0-9e091e16 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:43:44 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9be1586c905f61ba-0-b0d962bf hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:46 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9af31dfdbad18db2-0-909d89f0 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:43:47 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8e4888caa937305d-0-92de4d48 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:43:47 [loggers.py:273] Engine 000: Avg prompt throughput: 964.4 tokens/s, Avg generation throughput: 3.4 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.6%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:57296 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:49 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-bb44a489fb163260-0-a15f7eec hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:43:50 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b1e71ef59fad662e-0-9637307e hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:52 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8385a10127bc6b86-0-aa1a57e8 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:57298 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:53 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9a020ec506961f90-0-ad8d3f71 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:55 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b74c096c06d32c24-0-93fdf318 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:43:55 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-90935b120c3f48f7-0-b6d743d5 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:43:57 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.4 tokens/s, Avg generation throughput: 11.5 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.7%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:39786 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:43:58 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a40edb9e0cb7df23-0-8f47e6a6 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:43:58 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9b8ab6a73b7c5c57-0-b1eaedf2 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:01 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9c890125b4f55fd6-0-a6e17a91 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:01 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8d6ca46083263eab-0-baee7374 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:39794 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:04 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b9911707a33e1892-0-8667acd3 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:04 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-af072ca7912f8bf3-0-b9a1a7ac hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:06 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8e0c84cdf2038679-0-a93c1fa9 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:07 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-933cb51e05d9f06d-0-a493a18b hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:07 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.5 tokens/s, Avg generation throughput: 10.8 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:33760 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:09 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9c2a9c577922d71e-0-b6bea400 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:10 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8102d66e13f97e81-0-bbb82385 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:12 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-950d579168b66636-0-a476a32d hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:33762 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:13 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9665b28bc1e6ae46-0-a290cb7c hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:15 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a379d41ba4966406-0-afd18e1e hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:15 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8607a4d3164a9993-0-8ec39dbb hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:17 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.5 tokens/s, Avg generation throughput: 11.8 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.7%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:40792 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:18 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b61f0221a959b2cd-0-9728fb45 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:18 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8f64264bef5e082a-0-a097a213 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:21 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-bf2561432f3039cb-0-b7f0580d hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:21 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ab361913ec0babbc-0-88f0b51d hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:40796 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:23 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-96c48d01b92c00a8-0-aa3c8822 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:24 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-be099c91fd25cc96-0-ad845f03 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-af3b4496661cb429-0-93a8afb6 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:27 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8de4323f43c4222f-0-9732adbf hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:27 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.4 tokens/s, Avg generation throughput: 10.7 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.6%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:53052 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8a2ba5b9b7f67332-0-a30902a3 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:30 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a7bcfbe991023b66-0-88b0f012 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:32 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8b9159241bcbb4f3-0-9db49491 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:53060 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:32 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8122421cd52cfb86-0-ad2e3721 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:35 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-91a8bcc04bb8c8f7-0-816c4838 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:35 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-aa52af5e5356110c-0-a38f9bd9 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:37 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.3 tokens/s, Avg generation throughput: 11.9 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.7%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:44262 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:38 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a670db6ac0d35ad2-0-8d0cfeeb hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:38 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9d4ecd092b88a13f-0-aa116511 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:40 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-87e9831dbb1865be-0-a82c5943 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:41 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b62117e544d848d7-0-9dde3960 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:44266 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:43 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9d90ff777b01b7f8-0-9ff74679 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:44 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-abf6674b798673ae-0-a707598c hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:46 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b42ae8797220fe43-0-8bc8295d hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:46 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9563c951889a5c8f-0-9fabf3a0 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:47 [loggers.py:273] Engine 000: Avg prompt throughput: 2571.2 tokens/s, Avg generation throughput: 10.8 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.7%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:57612 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:49 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-95bee2f6332b630a-0-b5a49efd hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:49 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9de038d99021b76e-0-9578d8ce hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:52 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-af4688fd1f2917fc-0-93f2dcef hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:52 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ac7ca6087b639071-0-90bab32d hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:57626 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:54 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-aaece5f95b57e681-0-ac1957a3 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:44:55 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-90e603eb874b3e45-0-a3421841 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:57 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b829c1b71dd516f0-0-8b18f96c hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:44:57 [loggers.py:273] Engine 000: Avg prompt throughput: 1928.8 tokens/s, Avg generation throughput: 12.3 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:43914 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:44:58 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-aed20f42634802dd-0-85ecdb27 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:45:00 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9230025d7c35e6dc-0-b2c5809f hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:45:01 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a2bf4b85144fb5bd-0-922cafbc hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     192.168.200.27:43920 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:45:03 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a8d205fb7aef2944-0-b2b80e66 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:45:04 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-95f323926a688def-0-a294a589 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=4754) INFO 07-31 11:45:06 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9d64fb7792795cfb-0-a96cc16e hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(EngineCore pid=4754) INFO 07-31 11:45:07 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-986cfff34c3f68ae-0-9ef6f793 hit_blocks=0/25 states_sample=[0, 0, 0, 0, 0, 0, 0, 0]
+(APIServer pid=4702) INFO 07-31 11:45:07 [loggers.py:273] Engine 000: Avg prompt throughput: 2250.4 tokens/s, Avg generation throughput: 9.7 tokens/s, Running: 2 reqs, Waiting: 0 reqs, GPU KV cache usage: 1.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:57850 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56304 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     10.250.40.140:56306 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:57854 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO 07-31 11:45:17 [loggers.py:273] Engine 000: Avg prompt throughput: 321.5 tokens/s, Avg generation throughput: 3.1 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:44628 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:44636 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO 07-31 11:45:27 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=4702) INFO:     192.168.200.27:38148 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:38154 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=4702) INFO:     192.168.200.27:36690 - "GET /v1/models HTTP/1.1" 200 OK

@@ -1,0 +1,21 @@
+[2026-07-31T11:20:45Z] START preflight-processes
+COMMAND bash -lc set\ -e\;\ for\ spec\ in\ \'prefill-engine-deployment-7f4fc6ddc7-n884l\ prefill-engine\ prefill\'\ \'decode-engine-deployment-f6f4b9988-gxlwd\ decode-engine\ decode\'\;\ do\ set\ --\ \$spec\;\ kubectl\ exec\ -n\ liangjiahao\ \"\$1\"\ -c\ \"\$2\"\ --\ bash\ -lc\ \"test\ \!\ -e\ /tmp/vllm-\$3.pid\;\ \!\ pgrep\ -f\ \'\[v\]llm.entrypoints.openai.api_server\'\"\;\ done\;\ printf\ \'engines_stopped=true\\n\'
+[2026-07-31T11:20:47Z] END preflight-processes exit=0 artifact=preflight-processes.txt
+[2026-07-31T11:20:53Z] START preflight-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T11:20:54Z] END preflight-metrics exit=0 artifact=preflight.metrics
+[2026-07-31T11:20:59Z] START start-prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
+[2026-07-31T11:21:03Z] END start-prefill exit=0 artifact=start-prefill.log
+[2026-07-31T11:21:10Z] START start-decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- /opt/vllm-layerwise/start-decode.sh
+[2026-07-31T11:21:13Z] END start-decode exit=0 artifact=start-decode.log
+[2026-07-31T11:21:29Z] START wait-prefill-http
+COMMAND bash -lc for\ _\ in\ \$\(seq\ 1\ 240\)\;\ do\ if\ kubectl\ exec\ -n\ liangjiahao\ prefill-engine-deployment-7f4fc6ddc7-n884l\ -c\ prefill-engine\ --\ python3\ -c\ \'import\ sys\,urllib.request\;\ response=urllib.request.urlopen\(sys.argv\[1\]\,timeout=5\)\;\ assert\ response.status==200\;\ sys.stdout.buffer.write\(response.read\(\)\)\'\ http://127.0.0.1:8100/v1/models\ 2\>/dev/null\;\ then\ exit\ 0\;\ fi\;\ sleep\ 5\;\ done\;\ exit\ 1
+[2026-07-31T11:22:34Z] END wait-prefill-http exit=0 artifact=prefill-models.json
+[2026-07-31T11:22:50Z] START wait-decode-http
+COMMAND bash -lc for\ _\ in\ \$\(seq\ 1\ 240\)\;\ do\ if\ kubectl\ exec\ -n\ liangjiahao\ decode-engine-deployment-f6f4b9988-gxlwd\ -c\ decode-engine\ --\ python3\ -c\ \'import\ sys\,urllib.request\;\ response=urllib.request.urlopen\(sys.argv\[1\]\,timeout=5\)\;\ assert\ response.status==200\;\ sys.stdout.buffer.write\(response.read\(\)\)\'\ http://127.0.0.1:8200/v1/models\ 2\>/dev/null\;\ then\ exit\ 0\;\ fi\;\ sleep\ 5\;\ done\;\ exit\ 1
+[2026-07-31T11:22:52Z] END wait-decode-http exit=0 artifact=decode-models.json
+[2026-07-31T11:23:12Z] START smoke-runner
+COMMAND env PYTHONDONTWRITEBYTECODE=1 features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/smoke/runner-output
+[2026-07-31T11:24:43Z] END smoke-runner exit=1 artifact=runner.log

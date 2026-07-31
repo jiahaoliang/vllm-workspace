@@ -1,0 +1,15 @@
+artifacts: features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/smoke/runner-output
+prefiller: prefill-engine-deployment-7f4fc6ddc7-n884l
+decoder: decode-engine-deployment-f6f4b9988-gxlwd
+running concurrent KV cache smoke test
+Traceback (most recent call last):
+  File "/opt/vllm-layerwise/smoke-test.py", line 684, in <module>
+    run()
+  File "/opt/vllm-layerwise/smoke-test.py", line 666, in run
+    raise RuntimeError(
+RuntimeError: concurrent KV-load correctness validation failed; diagnosis=decoder_concurrent_kv_load_failure; summary=/tmp/layerwise-smoke/concurrent-summary.json
+[ERROR] 2026-07-31-11:24:40 (PID:5550, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+command terminated with exit code 1
+KV hit log validation passed: 12 role/case checks
+smoke test failed with exit code 1
+concurrent KV cache smoke test failed; artifacts retained at features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/smoke/runner-output

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "run_id": "20260731T064607Z",
+  "family": "smoke",
+  "status": "failed",
+  "classification": "production_concurrent_layerwise_kv_load_defect",
+  "source_modified": false,
+  "formal_runner": {
+    "exit_code": 1,
+    "failed_phase": "direct_kv_load",
+    "failed_case": 2,
+    "marker": "CASE_TWO",
+    "response_id": "cmpl-b4925b9042a7f091",
+    "hit_blocks": "25/25",
+    "hit_tokens": 3200,
+    "use_layerwise": true,
+    "serial_replay_passed": true,
+    "proxy_phase_passed": true,
+    "log_correlations_passed": 12
+  },
+  "focused_warm_replay": {
+    "single_case_2": {
+      "iterations": 10,
+      "failed_rounds": 0
+    },
+    "pair_0_2": {
+      "iterations": 10,
+      "failed_rounds": 0
+    },
+    "pair_1_2": {
+      "iterations": 10,
+      "failed_rounds": 0
+    },
+    "pair_2_3_first": {
+      "iterations": 10,
+      "failed_rounds": 1
+    },
+    "pair_2_3_repeat": {
+      "iterations": 30,
+      "failed_rounds": 9,
+      "failed_case_counts": {
+        "2": 9,
+        "3": 0
+      }
+    }
+  },
+  "focused_cold_control": {
+    "master_was_empty": true,
+    "cases": [
+      2,
+      3
+    ],
+    "iterations": 30,
+    "failed_rounds": 0,
+    "responses": 60,
+    "responses_with_hit_blocks_0_of_25": 60,
+    "responses_with_unexpected_hit_state": 0
+  },
+  "falsified_test_hypotheses": [
+    "asyncio_gather_response_order",
+    "response_to_case_mapping",
+    "marker_oracle",
+    "fixed_seed_variation",
+    "generic_concurrent_generation"
+  ],
+  "cleanup": {
+    "prefill_engine_stopped": true,
+    "decode_engine_stopped": true,
+    "master_key_count": 0,
+    "master_allocated_bytes": 0,
+    "master_active_clients": 0
+  },
+  "stress": {
+    "status": "not_run",
+    "reason": "terminal production defect at smoke gate"
+  },
+  "frozen_identity": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+    "mooncake": "786c77ff7692bed58dd99971afef87d6b690cbe3",
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
+  }
+}

@@ -12,3 +12,5 @@ image-*/image-inspect*.json binary
 g0/*-engine.log binary
 g0/*-process-state.txt binary
 g4/vllm-*.log binary
+smoke/runner-output/vllm-*.log binary
+smoke/diagnostics/cold-vllm-decode.log binary

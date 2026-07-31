@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "assertions": {
+    "formal_runner_exit_code_is_1": true,
+    "formal_direct_case_2_hard_gate_failed": true,
+    "formal_direct_case_2_serial_replay_passed": true,
+    "formal_proxy_phase_passed": true,
+    "formal_log_correlations_passed_12_of_12": true,
+    "warm_pair_2_3_failed_9_of_30": true,
+    "warm_repeat_failures_only_affected_case_2": true,
+    "cold_pair_2_3_passed_30_of_30": true,
+    "cold_response_ids_correlated_60_of_60_with_0_of_25_hits": true,
+    "final_master_key_count_is_zero": true,
+    "final_master_allocated_bytes_is_zero": true,
+    "final_master_active_clients_is_zero": true
+  }
+}
