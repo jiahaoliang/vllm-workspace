@@ -1,0 +1,174 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-07-31T07:44:05Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{buildkitd}",
+                "kind": "Pod",
+                "name": "buildkitd",
+                "namespace": "default",
+                "resourceVersion": "26871876",
+                "uid": "63c9ab1c-6c9e-4744-9b7c-4ce713ab21ad"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-07-31T07:44:05Z",
+            "message": "Container image \"moby/buildkit:master\" already present on machine",
+            "metadata": {
+                "creationTimestamp": "2026-07-31T07:44:05Z",
+                "name": "buildkitd.18c75018e91af5e9",
+                "namespace": "default",
+                "resourceVersion": "26871887",
+                "uid": "0d493e1b-ce43-4d5c-94bc-bdea63ae9217"
+            },
+            "reason": "Pulled",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "n1",
+            "source": {
+                "component": "kubelet",
+                "host": "n1"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-07-31T07:44:05Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{buildkitd}",
+                "kind": "Pod",
+                "name": "buildkitd",
+                "namespace": "default",
+                "resourceVersion": "26871876",
+                "uid": "63c9ab1c-6c9e-4744-9b7c-4ce713ab21ad"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-07-31T07:44:05Z",
+            "message": "Created container: buildkitd",
+            "metadata": {
+                "creationTimestamp": "2026-07-31T07:44:05Z",
+                "name": "buildkitd.18c75018ea5f396d",
+                "namespace": "default",
+                "resourceVersion": "26871888",
+                "uid": "cec55d3b-c5e7-4a46-bf86-10cd6e56d806"
+            },
+            "reason": "Created",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "n1",
+            "source": {
+                "component": "kubelet",
+                "host": "n1"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-07-31T07:44:05Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{buildkitd}",
+                "kind": "Pod",
+                "name": "buildkitd",
+                "namespace": "default",
+                "resourceVersion": "26871876",
+                "uid": "63c9ab1c-6c9e-4744-9b7c-4ce713ab21ad"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-07-31T07:44:05Z",
+            "message": "Started container buildkitd",
+            "metadata": {
+                "creationTimestamp": "2026-07-31T07:44:05Z",
+                "name": "buildkitd.18c75018f2f08c6d",
+                "namespace": "default",
+                "resourceVersion": "26871896",
+                "uid": "bff83d11-c917-41e9-ad07-644e97ac6480"
+            },
+            "reason": "Started",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "n1",
+            "source": {
+                "component": "kubelet",
+                "host": "n1"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-07-31T08:36:07Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{buildkitd}",
+                "kind": "Pod",
+                "name": "buildkitd",
+                "namespace": "default",
+                "resourceVersion": "26871876",
+                "uid": "63c9ab1c-6c9e-4744-9b7c-4ce713ab21ad"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-07-31T08:36:07Z",
+            "message": "Stopping container buildkitd",
+            "metadata": {
+                "creationTimestamp": "2026-07-31T08:36:07Z",
+                "name": "buildkitd.18c752efeededd52",
+                "namespace": "default",
+                "resourceVersion": "26900841",
+                "uid": "a2867ba1-18fe-491e-b861-31825680677b"
+            },
+            "reason": "Killing",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "n1",
+            "source": {
+                "component": "kubelet",
+                "host": "n1"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-07-31T08:36:37Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "fieldPath": "spec.containers{buildkitd}",
+                "kind": "Pod",
+                "name": "buildkitd",
+                "namespace": "default",
+                "resourceVersion": "26871876",
+                "uid": "63c9ab1c-6c9e-4744-9b7c-4ce713ab21ad"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-07-31T08:36:37Z",
+            "message": "Readiness probe failed: error: failed to list workers: Unavailable: connection error: desc = \"transport: Error while dialing: dial unix /run/buildkit/buildkitd.sock: connect: no such file or directory\"\n",
+            "metadata": {
+                "creationTimestamp": "2026-07-31T08:36:37Z",
+                "name": "buildkitd.18c752f6ca468117",
+                "namespace": "default",
+                "resourceVersion": "26901430",
+                "uid": "e35e2a6e-3a36-4a0d-bc28-1b980f8cadd2"
+            },
+            "reason": "Unhealthy",
+            "reportingComponent": "kubelet",
+            "reportingInstance": "n1",
+            "source": {
+                "component": "kubelet",
+                "host": "n1"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

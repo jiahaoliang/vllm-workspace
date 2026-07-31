@@ -71,8 +71,8 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Main-lane control fix, recorder regression, and checksummed formal `tooling-r4` evidence are green |
-| Active build or formal validation | None |
+| Current tracked WIP | Tooling r4 is green; image r1 ended as checksummed transient infrastructure failure; image r2 retry is next |
+| Active build or formal validation | None; `default/buildkitd` recovered on `n1`, Ready, `linux/arm64` |
 
 The target source branch contains:
 
@@ -369,7 +369,7 @@ Stage only the control files listed in Tasks 1-3 and this plan. Verify the live 
 **Files:**
 
 - Build: `features/kv-pool-layerwise-reuse/Dockerfile.a2`
-- Evidence: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/image-r1/`
+- Evidence: failed attempt `image-r1/`; unchanged-identity retry `image-r2/`
 
 **Interfaces:**
 
@@ -543,7 +543,7 @@ If the failure is control tooling, repair it with a regression test and rerun Ta
 | Diagnosis | PASSED | interactive diagnostic record, to be summarized in tooling evidence | red with override; green without override |
 | Regression red | PASSED | tooling | focused test failed on missing lane field |
 | Tooling green | PASSED | `tooling-r4/` | 20/20 gate steps, 67 tests, recorder regression, static/dry-run/checksums passed |
-| Image r1 | NOT RUN | `image-r1/` | build plus static/dynamic identity pass |
+| Image | RETRYING | `image-r1/` failed infrastructure; `image-r2/` next | build plus static/dynamic identity pass |
 | CPU/mock UT | NOT RUN | `ut/` | AscendStore, deployment, Ruff, compile, history pass |
 | G0 | NOT RUN | `g0/` | exact identity, engines Ready, empty reset |
 | G1 | NOT RUN | `g1/` | direct ranged contract and cleanup pass |
@@ -567,6 +567,8 @@ If the failure is control tooling, repair it with a regression test and rerun Ta
 | Recorder whitespace regression | expected red then green | before the fix, `COMMAND printf %s hello\\ world ` ended in a space; after trimming the final separator, the focused test passed | retain the regression in the full deployment collection and rerun the complete tooling family |
 | Tooling r3 | validation scope defect | deployment `67 passed` and Ruff lint passed, but Ruff format was accidentally broadened to four unchanged historical test files | preserve the checksummed failed attempt; do not rewrite unrelated files; restore changed-file scope |
 | Tooling r4 | passed | 20 of 20 gate steps passed; deployment `67 passed`; two changed tests passed Ruff; transcript has no trailing whitespace; ten dry-runs, compile, history, identity, diff, and checksum replay passed | freeze and push this tooling tree before image build; `SHA256SUMS` digest `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506` |
+| Builder recovery from `/root/buildkitd.yaml` | recovered infrastructure | the user-provided historical manifest recreated `default/buildkitd` but, because it has no node pin, scheduled it on `m1` | delete only that new Pod and reapply the same definition with `nodeName: n1`; Ready, restart 0, worker `linux/arm64` |
+| Image r1 | transient infrastructure | after about 50 minutes of successful cold-cache compilation, `default/buildkitd` and the other default-namespace platform Pods received `Killing` at `2026-07-31T08:36:07Z`; BuildKit transport exited 137 and no image was loaded | preserve `image-r1/`; target tag remains absent; unchanged identity and source permit retry as `image-r2/`; checksum digest `8a80443d4f2f4603c528ec653deb386ab689ab9f2c33107bcf9baa7b9c243b33` |
 
 Append every later failed or superseded attempt here immediately. Never erase an attempt after a retry passes.
 

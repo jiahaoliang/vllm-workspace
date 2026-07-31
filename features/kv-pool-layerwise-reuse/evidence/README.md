@@ -17,8 +17,10 @@ current test entry points.
   [full-validation-rerun-20260731T064607Z](full-validation-rerun-20260731T064607Z/README.md)
 - Current result: the validation-only main/release compatibility mismatch and
   the recorder trailing-whitespace defect are regression-tested and corrected.
-  Formal `tooling-r4` passed all 20 recorded gates with `67` deployment tests;
-  image and runtime families are not yet run.
+  Formal `tooling-r4` passed all 20 recorded gates with `67` deployment tests.
+  Image r1 was interrupted by a default-namespace platform Pod recycle and is
+  preserved as checksummed transient-infrastructure evidence; image r2 is the
+  unchanged-identity retry. Runtime families are not yet run.
 - Passing tooling `SHA256SUMS` digest:
   `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
 

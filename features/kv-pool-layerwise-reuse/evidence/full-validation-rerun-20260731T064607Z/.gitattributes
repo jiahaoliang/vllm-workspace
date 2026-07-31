@@ -1,3 +1,6 @@
 # These pre-fix transcripts are immutable byte evidence with trailing spaces.
 tooling/command-transcript.log binary
 tooling-r2/command-transcript.log binary
+
+# BuildKit preserves terminal progress bytes that are not normalized text.
+image-*/build.log binary

@@ -1,0 +1,13 @@
+00969cf069f23274f65c4c7c3ad9c8280cbe6e1c534b2cebace193cce3799e00  ./build.log
+c9415c9c2819e86127bee08cdb1baa1097fdbe5b52c7631b8cf9709d4db30456  ./builder-logs.log
+3d838cebef7e8f69e7ecc106c010e29f40fcca3975b6eb9439a2988cef5b3b60  ./builder-pod.json
+92e1390f602007598abe43075f1933fbcee0c19fe3e55f45df7eed870ec7c325  ./builder-recovery-replay.log
+6b8ae4dd0515a2ab56677456faf223dbb2bb25cf1230b8f75d19cb6c2b6fd1ab  ./builder-worker.txt
+acc281263a7cfeec5009c7cf185f5e7f2f196b2eb35ecceb8daeea260da5d986  ./command-transcript.log
+145726fd8a05e1baa32927aad4801e3c1cc33deb9d423a3da248db92dd7f3866  ./post-failure-builder-events.json
+bd74ebdfa0b2d88e5bcbcfa3fe902781522d2e673364f8a0f4bc71d2f6852620  ./post-failure-default-pods.json
+c82541d7798a3541b6a7fa6eb74767dbce14e33358ca24e2d7246bb0b192a1a5  ./post-failure-node.json
+91a56612f6d41a02c345b02446913e75f3235fb93acc82dc9efb91b591f64116  ./post-failure-target-absent.log
+a3838d6aa0b7345c6038909b509334419d09e6df2337c4c506e23fb407e00fe4  ./steps.jsonl
+1e94a5f48a0ccae90c61b6d3653002903a4cfbc971a2fb2fd77bd2768e991766  ./summary.json
+0a2f8905ed347f183990c0e17b391a579ec0a55983e1d77e821ed39aafd12c68  ./target-tag-preflight.log

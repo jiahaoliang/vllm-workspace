@@ -1,0 +1,33 @@
+[2026-07-31T07:45:15Z] START builder-recovery-replay
+COMMAND kubectl apply -n default -f /tmp/buildkitd-pod-20260731.yaml
+[2026-07-31T07:45:16Z] END builder-recovery-replay exit=0 artifact=builder-recovery-replay.log
+[2026-07-31T07:45:23Z] START builder-pod
+COMMAND kubectl get pod -n default buildkitd -o json
+[2026-07-31T07:45:23Z] END builder-pod exit=0 artifact=builder-pod.json
+[2026-07-31T07:45:32Z] START builder-logs
+COMMAND kubectl logs -n default buildkitd --tail=100
+[2026-07-31T07:45:32Z] END builder-logs exit=0 artifact=builder-logs.log
+[2026-07-31T07:45:37Z] START builder-worker
+COMMAND kubectl exec -n default buildkitd -- buildctl debug workers
+[2026-07-31T07:45:37Z] END builder-worker exit=0 artifact=builder-worker.txt
+[2026-07-31T07:45:41Z] START target-tag-preflight
+COMMAND bash -c set\ -euo\ pipefail\;\ target=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1\;\ if\ nerdctl\ -n\ k8s.io\ image\ inspect\ \"\$target\"\;\ then\ echo\ target_tag_already_exists\ \>\&2\;\ exit\ 1\;\ fi\;\ printf\ \"target_tag_absent=%s\\n\"\ \"\$target\"
+[2026-07-31T07:45:41Z] END target-tag-preflight exit=0 artifact=target-tag-preflight.log
+[2026-07-31T07:46:08Z] START image-build
+COMMAND env BUILDKIT_HOST=kube-pod://buildkitd\?namespace=default CONTAINERD_NAMESPACE=k8s.io nerdctl -n k8s.io build --progress=plain -f features/kv-pool-layerwise-reuse/Dockerfile.a2 -t docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1 features/kv-pool-layerwise-reuse
+[2026-07-31T08:36:37Z] END image-build exit=1 artifact=build.log
+[2026-07-31T08:38:59Z] START post-failure-builder-events
+COMMAND kubectl get events -n default --field-selector involvedObject.name=buildkitd -o json
+[2026-07-31T08:38:59Z] END post-failure-builder-events exit=0 artifact=post-failure-builder-events.json
+[2026-07-31T08:39:04Z] START post-failure-node
+COMMAND kubectl get node n1 -n default -o json
+[2026-07-31T08:39:04Z] END post-failure-node exit=0 artifact=post-failure-node.json
+[2026-07-31T08:39:08Z] START post-failure-default-pods
+COMMAND kubectl get pods -n default -o json
+[2026-07-31T08:39:09Z] END post-failure-default-pods exit=0 artifact=post-failure-default-pods.json
+[2026-07-31T08:39:17Z] START post-failure-target-absent
+COMMAND bash -c set\ -euo\ pipefail\;\ target=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1\;\ if\ nerdctl\ -n\ k8s.io\ image\ inspect\ \"\$target\"\;\ then\ echo\ unexpected_image_loaded\ \>\&2\;\ exit\ 1\;\ fi\;\ printf\ \"target_tag_absent_after_failure=%s\\n\"\ \"\$target\"
+[2026-07-31T08:39:17Z] END post-failure-target-absent exit=0 artifact=post-failure-target-absent.log
+[2026-07-31T08:46:18Z] START summarize-failed-attempt
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/image-r1\"\)\;\ steps=\[json.loads\(line\)\ for\ line\ in\ \(root/\"steps.jsonl\"\).read_text\(\).splitlines\(\)\]\;\ failures=\[step\ for\ step\ in\ steps\ if\ step\[\"exit_code\"\]\ \!=\ 0\]\;\ assert\ len\(steps\)\ ==\ 10\ and\ len\(failures\)\ ==\ 1\ and\ failures\[0\]\[\"name\"\]\ ==\ \"image-build\"\;\ log=\(root/\"build.log\"\).read_text\(\)\;\ assert\ \"exit\ status\ 137\"\ in\ log\ and\ \"no\ image\ was\ built\"\ in\ log\ and\ \"command\ terminated\ with\ exit\ code\ 137\"\ in\ log\;\ events=json.loads\(\(root/\"post-failure-builder-events.json\"\).read_text\(\)\)\;\ assert\ any\(item.get\(\"reason\"\)\ ==\ \"Killing\"\ and\ item.get\(\"lastTimestamp\"\)\ ==\ \"2026-07-31T08:36:07Z\"\ for\ item\ in\ events\[\"items\"\]\)\;\ print\(json.dumps\(\{\"schema_version\":1\,\"status\":\"failed\"\,\"validated\":False\,\"run_id\":\"20260731T064607Z-image-r1\"\,\"tooling_commit\":\"e97b41a046c03f1926f096740765ae13a56329e9\"\,\"source_commit\":\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,\"target_image\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1\"\,\"recorded_steps\":len\(steps\)\,\"classification\":\"transient-infrastructure\"\,\"production_source_modified\":False\,\"image_loaded\":False\,\"builder_killed_at\":\"2026-07-31T08:36:07Z\"\,\"build_exit_code\":1\,\"transport_exit_code\":137\,\"errors\":\[\"default/buildkitd\ was\ externally\ killed\ during\ a\ namespace-wide\ Pod\ recycle\"\]\}\,\ sort_keys=True\,\ indent=2\)\)
+[2026-07-31T08:46:18Z] END summarize-failed-attempt exit=0 artifact=summary.json

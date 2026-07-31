@@ -1,6 +1,7 @@
 # Full Validation Rerun 20260731T064607Z Evidence
 
-Status: tooling gate passed in `tooling-r4`; image and runtime families are not yet run.
+Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
+infrastructure failure and image r2 is the unchanged-identity retry.
 
 ## Frozen Identity
 
@@ -43,5 +44,17 @@ Status: tooling gate passed in `tooling-r4`; image and runtime families are not 
 All checksum manifests replay successfully from their own directories. The
 run-local `.gitattributes` marks only the two pre-fix command transcripts as
 binary so their exact bytes and original manifests remain intact; the r4
-transcript is ordinary text. No file under `repos/*` changed. Continue with
-`image-r1/` only after the tooling checkpoint is committed and pushed.
+transcript is ordinary text. No file under `repos/*` changed. The frozen
+tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
+
+## Image Attempts
+
+- [`image-r1/`](image-r1/summary.json): failed as transient infrastructure.
+  The cold-cache build had compiled Mooncake and was compiling vLLM-Ascend
+  without a source error when `default/buildkitd` and the other platform Pods
+  in `default` were killed together at `2026-07-31T08:36:07Z`. The BuildKit
+  transport ended with exit `137`; the target tag remained absent. Its
+  `SHA256SUMS` digest is
+  `8a80443d4f2f4603c528ec653deb386ab689ab9f2c33107bcf9baa7b9c243b33`.
+- `image-r2/`: next unchanged-source, unchanged-tag retry. The recovered
+  builder is explicitly pinned to `n1` and reports `linux/arm64`.
