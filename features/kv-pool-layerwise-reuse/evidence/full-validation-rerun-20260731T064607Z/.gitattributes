@@ -11,3 +11,4 @@ image-*/image-inspect*.json binary
 # vLLM banners contain CR bytes and ps uses fixed-width trailing padding.
 g0/*-engine.log binary
 g0/*-process-state.txt binary
+g4/vllm-*.log binary

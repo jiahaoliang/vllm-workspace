@@ -22,8 +22,8 @@ current test entry points.
   image r2 passed the complete static and NPU-backed image identity proof, and
   the corrected-image CPU-only UT family passed. G0 also passed under the main
   lane, including both engine startups and final empty-Master reset. G1 direct
-  ranged validation and the lease-expiry boundary also passed. G4 and later
-  runtime families are not yet run.
+  ranged validation, lease-expiry boundary, and G4 production ranged-call
+  audit also passed. Smoke and stress are not yet run.
 - Passing tooling `SHA256SUMS` digest:
   `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
 - Passing image r2 `SHA256SUMS` digest:
@@ -36,6 +36,8 @@ current test entry points.
   `637c2451583a108228d67c589b785c35884d29aa323bf1f29dc2b63f2035eee9`.
 - Passing lease `SHA256SUMS` digest:
   `5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
+- Passing G4 `SHA256SUMS` digest:
+  `bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.
 
 ## Full Validation Rerun 20260730T130225Z
 

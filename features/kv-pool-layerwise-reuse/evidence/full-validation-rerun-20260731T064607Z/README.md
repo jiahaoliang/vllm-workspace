@@ -2,7 +2,7 @@
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
 infrastructure failure, the unchanged-identity image r2 retry passed, and the
-corrected-image CPU-only UT, G0, G1, and lease families passed.
+corrected-image CPU-only UT, G0, G1, lease, and G4 families passed.
 
 ## Frozen Identity
 
@@ -110,3 +110,13 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   remaining layer with exact full-object bytes. Cleanup and the independent
   reset both ended with zero Master metrics. Its `SHA256SUMS` digest is
   `5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
+
+## G4 Production Ranged Audit
+
+- [`g4/`](g4/summary.json): passed for one clean request. Prefill ranged saves
+  and Decode ranged loads each covered exactly layers `0..26`; one successful
+  Prefill commit followed its final save, every result matched fragment bytes,
+  and neither role emitted a whole-key event. The request/response, one-POST
+  windows, 512 hit tokens, Master counters, engine cleanup, and zero-metric
+  reset are all archived. Its `SHA256SUMS` digest is
+  `bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.

@@ -71,7 +71,7 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4, image r2, UT, G0, G1, and lease are green; G4 is next |
+| Current tracked WIP | Tooling r4, image r2, UT, G0, G1, lease, and G4 are green; smoke is next |
 | Active build or formal validation | Base Pods and CPU-only UT Pod are retained on `n1`; both vLLM child processes are stopped and Master is empty |
 
 The target source branch contains:
@@ -515,8 +515,8 @@ bare-name retry passed. No source changed. Evidence `SHA256SUMS` digest:
 - [x] **Step 2: Reset proof** - stop engines, restart Master, and require all three metrics zero.
 - [x] **Step 3: Lease expiry** - derive waits from live `30000 ms` TTL, require stale read `-707`, fresh-session exact recovery, cleanup, and zero final metrics.
 - [x] **Step 4: Reset proof** - repeat stopped-engine and empty-Master gates.
-- [ ] **Step 5: G4 audit** - require Prefill save/load and Decode load across exactly layers `0..26`, byte sums, final-layer commit order, and zero whole-key calls.
-- [ ] **Step 6: Reset proof** - repeat stopped-engine and empty-Master gates.
+- [x] **Step 5: G4 audit** - require Prefill save and Decode load across exactly layers `0..26`, byte sums, final-layer commit order, and zero whole-key calls.
+- [x] **Step 6: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [ ] **Step 7: Smoke** - execute `run-smoke-test.sh` with a new empty output directory and require HTTP, marker ownership/isolation, token boundary/count, usage, finish reason, routing, and per-request hit correlation.
 - [ ] **Step 8: Generate and replay checksums for each family before starting the next family**
 
@@ -538,6 +538,16 @@ the full two-layer source bytes. Cleanup and the independent Master reset ended
 with all three metrics zero. No failed or superseded step and no source change.
 Evidence `SHA256SUMS` digest:
 `5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
+
+G4 passed for one clean 525-token proxy request. Prefill produced exactly 27
+ranged saves and one commit after layer 26; Decode produced exactly 27 ranged
+loads. Both covered `0..26`, every result equaled its fragment-byte sum, and
+whole-key calls were zero. The response used 16 completion tokens; each engine
+logged exactly one completion POST and Decode reported 512 hit tokens. Master
+reported four keys and 15,925,248 allocated bytes before cleanup. Engines were
+stopped and the reset returned all three metrics to zero. No failed or
+superseded step and no source change. Evidence `SHA256SUMS` digest:
+`bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.
 
 ### Task 8: Run Stress S1-S3
 
