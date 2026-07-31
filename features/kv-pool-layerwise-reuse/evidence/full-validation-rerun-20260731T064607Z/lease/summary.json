@@ -1,0 +1,61 @@
+{
+  "drivers": {
+    "lease_expiry_sha256": "8de8030fd0566c71aad5fd2f8f02c5d5f4eda2e9a8eeb701e6ab5296c3468875",
+    "range_api_smoke_sha256": "b10fbc18f59ff442390c6cebef0855a53fbf8a22eb3b91fef371941df3f1b125"
+  },
+  "errors": [],
+  "gates": {
+    "cleanup": true,
+    "engines_stopped": true,
+    "final_active_clients": 0,
+    "final_allocated_bytes": 0,
+    "final_key_count": 0,
+    "fresh_layer_bytes": 4096,
+    "fresh_session_start": 0,
+    "lease_ttl_ms": 30000,
+    "master_initial_empty": true,
+    "master_reset": true,
+    "no_precommit_get": true,
+    "npu_health": true,
+    "post_driver_empty": true,
+    "requested_wait_ms": 31500,
+    "slow_put_after_ttl_gap": true,
+    "stale_read_error_code": -707,
+    "two_layer_bytes_equal": true,
+    "wait_margin_ms": 1500,
+    "waits": [
+      {
+        "elapsed_ms": 31500.110435998067,
+        "phase": "between_put_layers",
+        "requested_ms": 31500
+      },
+      {
+        "elapsed_ms": 31500.13466598466,
+        "phase": "between_get_layers",
+        "requested_ms": 31500
+      }
+    ]
+  },
+  "image_config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "retained": {
+    "decode_pod": true,
+    "engine_processes_running": false,
+    "master_pod": true,
+    "prefill_pod": true,
+    "proxy_pod": true,
+    "ut_pod": true
+  },
+  "run_id": "20260731T064607Z-lease",
+  "schema_version": 1,
+  "semantic_result": {
+    "expired_session_error_code": -707,
+    "fresh_batch_get_session_start_after_expiry_finds_object": true,
+    "old_get_session_survives_ttl": false,
+    "slow_put_completed_after_read_ttl_gap": true
+  },
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "status": "passed",
+  "superseded_steps": [],
+  "tooling_commit": "c21089d4a5fb4bfb28beed316e89cfbe17dc288f",
+  "validated": true
+}

@@ -71,7 +71,7 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4, image r2, UT, G0, and G1 are green; lease is next |
+| Current tracked WIP | Tooling r4, image r2, UT, G0, G1, and lease are green; G4 is next |
 | Active build or formal validation | Base Pods and CPU-only UT Pod are retained on `n1`; both vLLM child processes are stopped and Master is empty |
 
 The target source branch contains:
@@ -513,8 +513,8 @@ bare-name retry passed. No source changed. Evidence `SHA256SUMS` digest:
 
 - [x] **Step 1: G1 direct ranged API** - require multi-key/multi-layer bytes, non-zero offsets, negative session/range cases, cleanup, and zero final metrics.
 - [x] **Step 2: Reset proof** - stop engines, restart Master, and require all three metrics zero.
-- [ ] **Step 3: Lease expiry** - derive waits from live `30000 ms` TTL, require stale read `-707`, fresh-session exact recovery, cleanup, and zero final metrics.
-- [ ] **Step 4: Reset proof** - repeat stopped-engine and empty-Master gates.
+- [x] **Step 3: Lease expiry** - derive waits from live `30000 ms` TTL, require stale read `-707`, fresh-session exact recovery, cleanup, and zero final metrics.
+- [x] **Step 4: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [ ] **Step 5: G4 audit** - require Prefill save/load and Decode load across exactly layers `0..26`, byte sums, final-layer commit order, and zero whole-key calls.
 - [ ] **Step 6: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [ ] **Step 7: Smoke** - execute `run-smoke-test.sh` with a new empty output directory and require HTTP, marker ownership/isolation, token boundary/count, usage, finish reason, routing, and per-request hit correlation.
@@ -529,6 +529,15 @@ artifact checker used a Python 3.10-only `zip(strict=...)` option on host Python
 3.9; both failures and passing replacements are preserved. No source changed.
 Evidence `SHA256SUMS` digest:
 `637c2451583a108228d67c589b785c35884d29aa323bf1f29dc2b63f2035eee9`.
+
+Lease validation passed with the live `30000 ms` TTL and `1500 ms` margin.
+Actual waits were `31500.110 ms` and `31500.135 ms`. Slow put committed after
+the first wait without a pre-commit get; the stale read session returned exact
+`-707`, a fresh session started with `0`, recovered 4096 bytes, and reproduced
+the full two-layer source bytes. Cleanup and the independent Master reset ended
+with all three metrics zero. No failed or superseded step and no source change.
+Evidence `SHA256SUMS` digest:
+`5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
 
 ### Task 8: Run Stress S1-S3
 

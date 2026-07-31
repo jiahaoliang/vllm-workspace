@@ -1,0 +1,36 @@
+{
+  "contract": {
+    "cleanup": true,
+    "fresh_read_bytes": 4096,
+    "fresh_read_start": 0,
+    "lease_ttl_ms": 30000,
+    "no_precommit_get": true,
+    "post_driver_empty": true,
+    "slow_put_after_gap": true,
+    "stale_read_code": -707,
+    "two_layer_bytes_equal": true,
+    "validated": true,
+    "wait_margin_ms": 1500,
+    "waits": [
+      {
+        "elapsed_ms": 31500.110435998067,
+        "phase": "between_put_layers",
+        "requested_ms": 31500
+      },
+      {
+        "elapsed_ms": 31500.13466598466,
+        "phase": "between_get_layers",
+        "requested_ms": 31500
+      }
+    ]
+  },
+  "final_metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "master_reset": true,
+  "pods_retained": true,
+  "recorded_steps": 19,
+  "validated": true
+}

@@ -2,7 +2,7 @@
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
 infrastructure failure, the unchanged-identity image r2 retry passed, and the
-corrected-image CPU-only UT, G0, and G1 families passed.
+corrected-image CPU-only UT, G0, G1, and lease families passed.
 
 ## Frozen Identity
 
@@ -101,3 +101,12 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   both ended with zero keys, zero allocated bytes, and zero active clients. Its
   `SHA256SUMS` digest is
   `637c2451583a108228d67c589b785c35884d29aa323bf1f29dc2b63f2035eee9`.
+
+## Lease Expiry Boundary
+
+- [`lease/`](lease/summary.json): passed with live TTL `30000 ms` and two
+  requested `31500 ms` waits. A slow put committed after the first gap, the
+  stale get session returned exact `-707`, and a fresh session recovered the
+  remaining layer with exact full-object bytes. Cleanup and the independent
+  reset both ended with zero Master metrics. Its `SHA256SUMS` digest is
+  `5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
