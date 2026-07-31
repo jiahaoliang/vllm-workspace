@@ -1,0 +1,47 @@
+# Full Validation Rerun 20260731T064607Z Evidence
+
+Status: tooling gate passed in `tooling-r4`; image and runtime families are not yet run.
+
+## Frozen Identity
+
+- vLLM lane: `main-verified`
+- vLLM: `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`
+- vLLM-Ascend: `14beaf161cca6f1e044e20529ca96c6554dbbe50`
+- Mooncake: `786c77ff7692bed58dd99971afef87d6b690cbe3`
+- `VLLM_VERSION` override: unset
+- Coordinator keyword: `max_in_flight_tokens`
+- Target image:
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1`
+
+## Tooling Attempts
+
+- [`tooling/`](tooling/summary.json): failed as a validation formatting defect.
+  Nineteen of twenty recorded gate steps passed; Ruff 0.14.0 found two
+  line-wrap deltas in the new identity regression. The attempt is preserved,
+  and its `SHA256SUMS` digest is
+  `aa18caf875dcca86934d03faf1622afe026cbcea4d6a37078dd4f7fce51a141f`.
+- [`tooling-r2/`](tooling-r2/summary.json): passed after applying the exact Ruff
+  diff. All 20 gate steps passed, but the later staged diff check exposed a
+  validation-recorder defect: every transcript `COMMAND` line ended in the
+  separator space emitted by `printf -v command_text '%q '`. Its original
+  `SHA256SUMS` digest remains
+  `628a9b9bcbec4b077b8b41d95a745f7d34e6135b017e09deb5ba4294fbc7f8c4`.
+- [`tooling-r3/`](tooling-r3/summary.json): failed as a validation scope defect.
+  The complete collection passed `67` tests, but Ruff format was accidentally
+  broadened to four unchanged historical test files. Those files were not
+  modified. Its `SHA256SUMS` digest is
+  `bac9d285b042f7c1d7c31ff5aee2942e089aee0bd0c98995ef09d83765f5aa55`.
+- [`tooling-r4/`](tooling-r4/summary.json): passed after adding a focused
+  recorder regression, trimming only the final command separator, and
+  restoring Ruff to the two changed Python tests. All 20 gate steps passed,
+  including `67` deployment tests, Ruff, shell/Python checks, three rendered
+  ConfigMap Python files, ten manifest dry-runs, source identity/history/diff
+  checks, and a transcript trailing-whitespace assertion. Its `SHA256SUMS`
+  digest is
+  `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
+
+All checksum manifests replay successfully from their own directories. The
+run-local `.gitattributes` marks only the two pre-fix command transcripts as
+binary so their exact bytes and original manifests remain intact; the r4
+transcript is ordinary text. No file under `repos/*` changed. Continue with
+`image-r1/` only after the tooling checkpoint is committed and pushed.

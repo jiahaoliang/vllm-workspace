@@ -28,6 +28,7 @@ readonly transcript="${output_dir}/command-transcript.log"
 readonly steps="${output_dir}/steps.jsonl"
 started=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 printf -v command_text '%q ' "$@"
+command_text=${command_text% }
 printf '[%s] START %s\nCOMMAND %s\n' "${started}" "${step_name}" "${command_text}" >>"${transcript}"
 
 result_recorded=0

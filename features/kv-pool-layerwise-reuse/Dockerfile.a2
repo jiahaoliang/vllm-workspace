@@ -14,6 +14,7 @@ ARG COMPILE_CUSTOM_KERNELS=1
 
 ARG VLLM_REPO="https://github.com/vllm-project/vllm.git"
 ARG VLLM_COMMIT="54503ecec0f3ac31e5ecfc5f28652e4cc42307b5"
+ARG VLLM_COMPATIBILITY_LANE="main-verified"
 
 ARG VLLM_ASCEND_REPO="https://github.com/jiahaoliang/vllm-ascend.git"
 ARG VLLM_ASCEND_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
@@ -201,6 +202,7 @@ RUN set -euo pipefail; \
 
 LABEL org.opencontainers.image.title="vLLM Ascend layerwise KV pool" \
       org.opencontainers.image.vllm.commit="${VLLM_COMMIT}" \
+      org.opencontainers.image.vllm.compatibility-lane="${VLLM_COMPATIBILITY_LANE}" \
       org.opencontainers.image.vllm-ascend.commit="${VLLM_ASCEND_COMMIT}" \
       org.opencontainers.image.mooncake.commit="${MOONCAKE_COMMIT}"
 

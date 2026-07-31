@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: prefill-engine
-          image: docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
           imagePullPolicy: Never
           command: ["/bin/bash", "-lc"]
           args: ["exec sleep infinity"]
@@ -39,7 +39,6 @@ spec:
             - {name: MOONCAKE_MASTER, value: "mooncake-master-service:30089"}
             - {name: PYTHONUNBUFFERED, value: "1"}
             - {name: PYTHONHASHSEED, value: "0"}
-            - {name: VLLM_VERSION, value: "0.25.1"}
           resources:
             requests: {huawei.com/Ascend910: "4"}
             limits: {huawei.com/Ascend910: "4"}

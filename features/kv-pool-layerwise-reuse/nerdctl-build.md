@@ -37,7 +37,7 @@ Pod。如果出现
 nerdctl -n k8s.io build \
   --progress=plain \
   -f features/kv-pool-layerwise-reuse/Dockerfile.a2 \
-  -t docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4 \
+  -t docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1 \
   features/kv-pool-layerwise-reuse
 ```
 
@@ -87,14 +87,14 @@ containerd 中的实际镜像信息：
 
 ```bash
 nerdctl -n k8s.io images
-nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
+nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
 ```
 
 检查镜像配置、平台和 labels：
 
 ```bash
 nerdctl -n k8s.io image inspect \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
+  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
 ```
 
 删除镜像引用：

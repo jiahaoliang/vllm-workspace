@@ -18,7 +18,7 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | Input | Value |
 | --- | --- |
 | Node | `n1` (`Ascend910B4`, 32 GiB per NPU) |
-| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1` |
 | vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
 | Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
@@ -29,11 +29,10 @@ The image contains editable installs rooted at `/vllm-workspace/vllm` and
 `/vllm-workspace/vllm-ascend`. The engine Deployments do not replace these
 paths with a `hostPath` mount.
 
-The image uses an editable vLLM install at the exact commit above. Both engine
-Pods set the vLLM-Ascend release-line compatibility override
-`VLLM_VERSION=0.25.1`; the runtime identity gate records both the installed
-package version and editable Git HEAD instead of inferring source identity from
-the generated package version.
+The image uses an editable vLLM install at the exact verified-main commit above.
+Engine Pods leave `VLLM_VERSION` unset so vLLM-Ascend selects the main lane from
+the installed development package. The runtime identity gate records the
+installed package version, editable Git HEAD, lane, and coordinator signature.
 
 Both engine Pods also set `PYTHONHASHSEED=0`. vLLM initializes the root of its
 block-hash chain from this value; without the same fixed seed in both processes,
@@ -51,7 +50,7 @@ kubectl -n liangjiahao config current-context
 kubectl get namespace -n liangjiahao "${namespace}"
 kubectl describe node -n liangjiahao n1
 nerdctl -n k8s.io images --digests \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4
+  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
 du -sh /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 sha256sum \
   /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8/*.safetensors

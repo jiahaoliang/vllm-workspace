@@ -14,6 +14,27 @@ RUNNER = Path(__file__).resolve().parents[1] / "run-validation-step.sh"
 
 
 class RunValidationStepTest(unittest.TestCase):
+    def test_transcript_lines_do_not_end_in_whitespace(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir) / "evidence"
+            subprocess.run(
+                [
+                    RUNNER,
+                    output_dir,
+                    "successful-step",
+                    "artifact.log",
+                    "--",
+                    "printf",
+                    "%s",
+                    "hello world",
+                ],
+                check=True,
+            )
+
+            lines = (output_dir / "command-transcript.log").read_text().splitlines()
+            self.assertTrue(lines)
+            self.assertEqual(lines, [line.rstrip() for line in lines])
+
     def test_interrupt_records_terminal_state(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             output_dir = Path(temp_dir) / "evidence"

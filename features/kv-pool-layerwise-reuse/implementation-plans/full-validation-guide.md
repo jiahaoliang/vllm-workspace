@@ -4,7 +4,7 @@
 
 **Goal:** Re-run the complete layerwise KVPool validation after source, dependency, image, model, or validation-tooling changes without carrying version assumptions from an earlier run.
 
-**Architecture:** This document is the stable validation contract. Exact source commits, compatibility versions, images, model identity, runtime dimensions, and run IDs belong to a new dated run record and `deployment/validation-identity.json`; manifests, runners, checkers, reports, and evidence must agree with that frozen identity before runtime testing begins.
+**Architecture:** This document is the stable validation contract. Exact source commits, compatibility lanes and optional version overrides, images, model identity, runtime dimensions, and run IDs belong to a new dated run record and `deployment/validation-identity.json`; manifests, runners, checkers, reports, and evidence must agree with that frozen identity before runtime testing begins.
 
 **Tech Stack:** Bash, Python, pytest, Kubernetes, nerdctl/BuildKit, Ascend NPU, vLLM, vLLM-Ascend, Mooncake, JSON/JSONL evidence, Markdown reports.
 
@@ -33,7 +33,7 @@
 | `implementation-plans/${RUN_DATE}-full-validation-rerun.md` | One run's frozen inputs, tracker, attempts, and final disposition | Create for every run; never reuse a prior tracker |
 | `deployment/validation-identity.json` | Machine-readable current validation identity | Update to the exact selected run inputs before tooling tests |
 | `Dockerfile.a2` | Remote-clone build and exact source pins | Keep pins consistent with identity JSON |
-| `deployment/*.yaml`, `deployment/stress/*.yaml` | Current executable workload definitions | Keep image, compatibility version, namespace, topology, and model contract consistent |
+| `deployment/*.yaml`, `deployment/stress/*.yaml` | Current executable workload definitions | Keep image, compatibility lane/override, namespace, topology, and model contract consistent |
 | `deployment/run-*.sh`, drivers, and checkers | Identity gates, execution, evidence, and hard oracles | Update when API/runtime/report contracts change |
 | `deployment/tests/` | Regression tests for validation tooling | Add coverage before fixing a tooling defect |
 | `evidence/` | Immutable raw output, transcript, structured summaries, and checksums | New directory for every attempt/family |
@@ -60,7 +60,7 @@ Before editing tooling or starting a build, resolve every field below. Explicit 
 | vLLM | User-specified ref or `repos/vllm` | Full commit SHA and remote containing it |
 | vLLM-Ascend | User-specified ref or `repos/vllm-ascend` | Full commit SHA, branch, and remote containing it |
 | Mooncake | User-specified ref or `repos/Mooncake` | Full commit SHA and remote containing it |
-| Compatibility version | User specification or vLLM-Ascend release contract | Exact `VLLM_VERSION` value |
+| Compatibility lane | User specification or the selected vLLM-Ascend main/release contract | Exact lane plus an optional `VLLM_VERSION` override; verified-main normally leaves it unset |
 | Base image | User specification or approved platform baseline | Registry-qualified immutable tag or digest |
 | Target image | Derived after all identities are known | Registry-qualified unique tag; record digest/config ID after build |
 | Platform | Builder and node inspection | Exact OS/architecture, normally `linux/arm64` for this workflow |
@@ -78,7 +78,9 @@ jq -e '
   .schema_version >= 1 and
   (.base_image | type == "string" and length > 0) and
   (.image | type == "string" and length > 0) and
-  (.vllm_version | type == "string" and length > 0) and
+  (.vllm_lane | type == "string" and length > 0) and
+  ((.vllm_version_override == null) or
+    (.vllm_version_override | type == "string" and length > 0)) and
   (.commits.vllm | test("^[0-9a-f]{40}$")) and
   (.commits.vllm_ascend | test("^[0-9a-f]{40}$")) and
   (.commits.mooncake | test("^[0-9a-f]{40}$")) and
@@ -89,10 +91,15 @@ VLLM_ASCEND_COMMIT=$(jq -er '.commits.vllm_ascend' "${IDENTITY_FILE}")
 MOONCAKE_COMMIT=$(jq -er '.commits.mooncake' "${IDENTITY_FILE}")
 TARGET_IMAGE=$(jq -er '.image' "${IDENTITY_FILE}")
 BASE_IMAGE=$(jq -er '.base_image' "${IDENTITY_FILE}")
-VLLM_VERSION=$(jq -er '.vllm_version' "${IDENTITY_FILE}")
+VLLM_LANE=$(jq -er '.vllm_lane' "${IDENTITY_FILE}")
+VLLM_VERSION_OVERRIDE=$(jq -r '.vllm_version_override // "unset"' "${IDENTITY_FILE}")
 ```
 
-The dated tracker must record whether each value was user-specified or derived. A user-specified version does not remove the requirement to resolve it to a full fetchable SHA.
+The dated tracker must record whether each value was user-specified or derived.
+A main-verified commit normally uses its installed development version and an
+unset override. A release-tag lane records the exact release override. Either
+lane still requires a full fetchable source SHA and a prestart API-signature
+check.
 
 ## Version-Independent Hard Gates
 
@@ -182,7 +189,7 @@ Expected: all current tests pass without relying on a historical test count, eve
 
 **Interfaces:**
 
-- Consumes: exact base image, source SHAs, API symbol list, compatibility version, and unique target image tag
+- Consumes: exact base image, source SHAs, API symbol list, compatibility lane/optional override, and unique target image tag
 - Produces: one immutable image digest/config ID used by UT and all runtime gates
 
 - [ ] Confirm `default/buildkitd` is Running and the target tag is absent or resolves to the exact intended digest.
@@ -236,7 +243,7 @@ nerdctl -n "${CONTAINERD_NAMESPACE}" build \
 
 - [ ] Re-query live NPU capacity from Ready-node allocatable minus active Pod requests.
 - [ ] Apply every object with explicit `-n liangjiahao` and wait for the exact named rollouts/Pods.
-- [ ] Verify device injection, `npu-smi`, imageID/digest, editable paths and HEADs, compatibility version, dynamic imports, native libraries, model config, driver mounts, and selected Mooncake APIs.
+- [ ] Verify device injection, `npu-smi`, imageID/digest, editable paths and HEADs, compatibility lane/override, upstream API signatures, dynamic imports, native libraries, model config, driver mounts, and selected Mooncake APIs.
 - [ ] Start each engine with one physical NPU, verify endpoints, then stop child processes before resetting Master.
 - [ ] Verify the configured lease TTL from Deployment args and Master startup logs.
 - [ ] Capture empty-pool metrics: key count, allocated bytes, and active clients must all be zero.

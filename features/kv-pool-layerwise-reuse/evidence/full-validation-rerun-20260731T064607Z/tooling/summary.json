@@ -1,0 +1,21 @@
+{
+  "classification": "validation-formatting-defect",
+  "disposition": "preserve tooling attempt, apply exact Ruff 0.14.0 format, rerun complete family as tooling-r2",
+  "failed_steps": [
+    {
+      "artifact": "ruff-format-check.log",
+      "command": "kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff format --check /workspace/control-validation-20260731T064607Z-green/features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py ",
+      "ended_at": "2026-07-31T07:18:32Z",
+      "exit_code": 1,
+      "name": "ruff-format-check",
+      "started_at": "2026-07-31T07:18:32Z"
+    }
+  ],
+  "passed_steps": 19,
+  "production_source_modified": false,
+  "recorded_steps": 20,
+  "run_id": "20260731T064607Z-tooling",
+  "schema_version": 1,
+  "status": "failed",
+  "validated": true
+}

@@ -1,0 +1,6 @@
+Would reformat: control-validation-20260731T064607Z-green/features/kv-pool-layerwise-reuse/deployment/tests/test_check_stress_log.py
+Would reformat: control-validation-20260731T064607Z-green/features/kv-pool-layerwise-reuse/deployment/tests/test_lease_expiry.py
+Would reformat: control-validation-20260731T064607Z-green/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+Would reformat: control-validation-20260731T064607Z-green/features/kv-pool-layerwise-reuse/deployment/tests/test_stress_test.py
+4 files would be reformatted, 5 files already formatted
+command terminated with exit code 1

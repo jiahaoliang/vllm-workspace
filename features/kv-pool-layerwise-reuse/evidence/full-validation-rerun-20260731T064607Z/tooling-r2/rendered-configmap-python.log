@@ -1,0 +1,4 @@
+features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml:check-runtime.py
+features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml:smoke-test.py
+features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml:check-runtime.py
+compiled=3

@@ -1,0 +1,16 @@
+{
+  "classification": "validation-scope-defect",
+  "deployment_tests": 67,
+  "errors": [
+    "Ruff format scope included four pre-existing unchanged test files"
+  ],
+  "production_source_modified": false,
+  "recorded_gate_steps": 3,
+  "run_id": "20260731T064607Z-tooling-r3",
+  "schema_version": 1,
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "status": "failed",
+  "supersedes": "20260731T064607Z-tooling-r2",
+  "tooling_base": "e20e79c5032fccb02e3bcf8209179b4f6162fc37",
+  "validated": false
+}

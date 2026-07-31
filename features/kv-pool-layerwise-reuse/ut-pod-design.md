@@ -9,15 +9,16 @@ tests. The Pod must not request an Ascend NPU or reuse a serving engine Pod.
 
 - Namespace: `liangjiahao`.
 - Pod name: `vllm-ascend-ut`.
-- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` with
+- Image: `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1` with
   `imagePullPolicy: Never`, pinned to `n1` where the image is stored.
 - The container runs `sleep infinity` and keeps an `emptyDir` checkout across
   test commands and container restarts.
 - The Pod has CPU and memory resources only. It has no
   `huawei.com/Ascend910` request, NPU device, driver, `npu-smi`, model cache, or
   host workspace mount.
-- CPU mocks are selected with `TORCH_DEVICE_BACKEND_AUTOLOAD=0`; vLLM-Ascend
-  compatibility is fixed with `VLLM_VERSION=0.25.1`.
+- CPU mocks are selected with `TORCH_DEVICE_BACKEND_AUTOLOAD=0`; the verified
+  vLLM main development package selects the main compatibility lane naturally,
+  with no `VLLM_VERSION` release override.
 
 ## Source And Command Flow
 

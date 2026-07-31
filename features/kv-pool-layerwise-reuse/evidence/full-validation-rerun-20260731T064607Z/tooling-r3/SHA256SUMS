@@ -1,0 +1,6 @@
+0dbfa8438af4479ecc85ae872a9247fac4303cd6a07ff2501c46b775c6f05480  ./command-transcript.log
+f08b47ec78f6a2b62a8bdaee21e041fb4bb76d55a295a519f4689a404bb4ca1a  ./deployment-tests.log
+82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18  ./ruff-check.log
+fd17174d153b1c819baa7420cdd1a80057dfe0bf1240292ebff90579cd59e0b7  ./ruff-format-check.log
+137dd9a8a21ca82fc64b90fa8e78e56315391b592418b90f56847fb3bf05cc91  ./steps.jsonl
+f4ccf09d61a5980a21db2b6b4ffeda0949fb01a42ae7eae2418983fd01c6c2e0  ./summary.json

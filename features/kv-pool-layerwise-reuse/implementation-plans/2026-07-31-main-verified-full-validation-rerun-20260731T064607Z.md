@@ -63,7 +63,7 @@ Captured after diagnosis on 2026-07-31:
 
 | Item | Exact state |
 | --- | --- |
-| Control HEAD before tooling fix | `8c34cfce1c4ac6f5ce9acd0f9e481ecb340cae5b` |
+| Control HEAD before tooling fix | `e20e79c5032fccb02e3bcf8209179b4f6162fc37` |
 | Control remote | `origin/kv-pool-layerwise-reuse` at the same SHA |
 | Frozen vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | Frozen vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
@@ -71,7 +71,7 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | One intentionally failing regression test in `deployment/tests/test_validation_identity.py` |
+| Current tracked WIP | Main-lane control fix, recorder regression, and checksummed formal `tooling-r4` evidence are green |
 | Active build or formal validation | None |
 
 The target source branch contains:
@@ -173,7 +173,7 @@ No file under `repos/*` is in the modification set.
 - Consumes: frozen main commit `54503ece`, its coordinator signature, and the red test already present.
 - Produces: explicit `main-verified` identity with no release override and prestart signature enforcement.
 
-- [ ] **Step 1: Replace the ambiguous version field in validation identity**
+- [x] **Step 1: Replace the ambiguous version field in validation identity**
 
 Set these exact fields while preserving all other frozen inputs:
 
@@ -190,11 +190,11 @@ Set these exact fields while preserving all other frozen inputs:
 
 Remove the old `"vllm_version": "0.25.1"` field so no consumer can mistake it for an override.
 
-- [ ] **Step 2: Remove the release override from every vLLM workload**
+- [x] **Step 2: Remove the release override from every vLLM workload**
 
 Delete the `VLLM_VERSION` environment entry from the five Prefill, Decode, stress, and UT manifests listed above. Do not remove `TORCH_DEVICE_BACKEND_AUTOLOAD`, `PYTHONDONTWRITEBYTECODE`, `PYTEST_ADDOPTS`, `PYTHONHASHSEED`, or other deterministic settings.
 
-- [ ] **Step 3: Add a fail-fast runtime signature gate to both ConfigMaps**
+- [x] **Step 3: Add a fail-fast runtime signature gate to both ConfigMaps**
 
 Each `check-runtime.py` must import `inspect` and the upstream function, then enforce:
 
@@ -209,7 +209,7 @@ assert os.environ.get("VLLM_VERSION") is None
 
 Retain the existing source-path, hash-seed, Mooncake API, and native runtime checks.
 
-- [ ] **Step 4: Sync the corrected control fixture to the CPU-only Pod**
+- [x] **Step 4: Sync the corrected control fixture to the CPU-only Pod**
 
 Use a new Pod-side directory so the red fixture remains distinguishable:
 
@@ -224,7 +224,7 @@ tar --exclude='features/kv-pool-layerwise-reuse/evidence' \
   tar -C /workspace/control-validation-20260731T064607Z-green -xf -
 ```
 
-- [ ] **Step 5: Run the focused regression and require green**
+- [x] **Step 5: Run the focused regression and require green**
 
 ```bash
 kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- \
@@ -256,7 +256,7 @@ Expected: `1 passed`.
 - Consumes: exact machine-readable identity from Task 1.
 - Produces: one image/lane contract shared by every executable consumer.
 
-- [ ] **Step 1: Replace only current executable references to the R4 tag**
+- [x] **Step 1: Replace only current executable references to the R4 tag**
 
 Use this exact new tag:
 
@@ -266,7 +266,7 @@ docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-202607
 
 Do not rewrite historical reports or evidence that correctly name R4.
 
-- [ ] **Step 2: Add an image compatibility-lane label**
+- [x] **Step 2: Add an image compatibility-lane label**
 
 Add an exact Dockerfile argument and OCI label:
 
@@ -276,15 +276,15 @@ ARG VLLM_COMPATIBILITY_LANE="main-verified"
 
 The final label set must include the three source SHAs and `org.opencontainers.image.vllm.compatibility-lane=main-verified`.
 
-- [ ] **Step 3: Update the stable guide schema**
+- [x] **Step 3: Update the stable guide schema**
 
 Require non-empty `.vllm_lane` and allow `.vllm_version_override` to be either `null` or a non-empty string. Replace the unconditional `VLLM_VERSION=$(...)` example with separate lane and optional-override reads. State that main-verified commits normally leave the override unset, while release-tag validation records the exact release override.
 
-- [ ] **Step 4: Update identity tests for the new schema and attempt number**
+- [x] **Step 4: Update identity tests for the new schema and attempt number**
 
 Rename the old image/version test so it asserts the pinned image and lane. Remove assertions that every manifest contains `VLLM_VERSION`. Require `attempt == 1`, the new Dockerfile label, and exact agreement between identity, runners, and manifests.
 
-- [ ] **Step 5: Scan for stale current references**
+- [x] **Step 5: Scan for stale current references**
 
 ```bash
 rg -n 'kv-pool-layerwise-v0\.25\.1-a2-14beaf16-20260730T130225Z-r4|VLLM_VERSION.*0\.25\.1' \
@@ -300,8 +300,10 @@ Expected: no current executable reference. Historical documents outside this tar
 
 **Files:**
 
+- Modify: `features/kv-pool-layerwise-reuse/deployment/run-validation-step.sh`
 - Test: `features/kv-pool-layerwise-reuse/deployment/tests/`
-- Evidence: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/tooling/`
+- Evidence: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/tooling-r4/`
+- Preserve: the byte-exact pre-fix `tooling/` and `tooling-r2/` transcripts through the run-local `.gitattributes`
 - Update: this plan's gate tracker and attempts ledger
 
 **Interfaces:**
@@ -309,7 +311,7 @@ Expected: no current executable reference. Historical documents outside this tar
 - Consumes: corrected but uncommitted control tooling.
 - Produces: one pushed tooling commit used by all image/runtime evidence.
 
-- [ ] **Step 1: Run the complete deployment test collection in the UT Pod**
+- [x] **Step 1: Run the complete deployment test collection in the UT Pod**
 
 ```bash
 kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- \
@@ -320,11 +322,14 @@ kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- \
 
 Expected: the complete current collection passes; record the observed count instead of enforcing `65`.
 
-- [ ] **Step 2: Run static gates**
+Observed in the final tooling family: `67 passed`, including the recorder
+trailing-whitespace regression.
 
-Run `bash -n` on every executable shell file, compile Python and rendered ConfigMap Python with `compile()` rather than writing bytecode, run Ruff lint/format with the Pod's pinned Ruff 0.14.0, and run `git diff --check` in both control and source repositories.
+- [x] **Step 2: Run static gates**
 
-- [ ] **Step 3: Dry-run every current manifest**
+Run `bash -n` on every executable shell file, compile Python and rendered ConfigMap Python with `compile()` rather than writing bytecode, run Ruff lint/format with the Pod's pinned Ruff 0.14.0 on the two changed Python tests, and run `git diff --check` in both control and source repositories. Do not format unrelated historical test files merely because a validation command accidentally broadened its scope.
+
+- [x] **Step 3: Dry-run every current manifest**
 
 For base, stress, and UT YAML, run this exact list:
 
@@ -345,9 +350,15 @@ do
 done
 ```
 
-- [ ] **Step 4: Create checksummed tooling evidence**
+- [x] **Step 4: Create checksummed tooling evidence**
 
 Record every command with `deployment/run-validation-step.sh`, create a structured `summary.json`, generate `SHA256SUMS` after terminal records exist, and replay `sha256sum -c SHA256SUMS` from the tooling family directory.
+
+The original `tooling/` and `tooling-r2/` command transcripts contain the
+recorder's trailing separator and remain byte-for-byte checksummable. Their
+path-scoped `binary` attribute prevents Git from normalizing or rejecting that
+historical byte evidence. The corrected `tooling-r4/` transcript remains a
+normal text file and has no trailing whitespace.
 
 - [ ] **Step 5: Commit and push the tooling checkpoint narrowly**
 
@@ -531,7 +542,7 @@ If the failure is control tooling, repair it with a regression test and rerun Ta
 | --- | --- | --- | --- |
 | Diagnosis | PASSED | interactive diagnostic record, to be summarized in tooling evidence | red with override; green without override |
 | Regression red | PASSED | tooling | focused test failed on missing lane field |
-| Tooling green | NOT RUN | `tooling/` | complete current tests/static/dry-run/checksums pass |
+| Tooling green | PASSED | `tooling-r4/` | 20/20 gate steps, 67 tests, recorder regression, static/dry-run/checksums passed |
 | Image r1 | NOT RUN | `image-r1/` | build plus static/dynamic identity pass |
 | CPU/mock UT | NOT RUN | `ut/` | AscendStore, deployment, Ruff, compile, history pass |
 | G0 | NOT RUN | `g0/` | exact identity, engines Ready, empty reset |
@@ -551,6 +562,11 @@ If the failure is control tooling, repair it with a regression test and rerun Ta
 | AST loop with override | expected red | selected `max_num_batched_tokens`, absent from pinned main signature | accepted exact reproduction |
 | AST loop without override | expected green | selected `max_in_flight_tokens`, present in pinned main signature | validates the control-only fix direction |
 | Focused identity regression | expected red | `KeyError: 'vllm_lane'` | implement Task 1, then require green |
+| Tooling r1 | validation formatting defect | 19 of 20 recorded steps passed; Ruff 0.14.0 found two line-wrap deltas in the new identity regression | preserve `tooling/`; apply the exact Ruff diff; rerun the complete family as `tooling-r2/` |
+| Tooling r2 | superseded after a passed gate | 20 of 20 gate steps passed and deployment `66 passed`, but staging exposed a trailing space on every transcript `COMMAND` line | preserve byte-exact evidence; add a focused recorder regression and repair the validation runner only |
+| Recorder whitespace regression | expected red then green | before the fix, `COMMAND printf %s hello\\ world ` ended in a space; after trimming the final separator, the focused test passed | retain the regression in the full deployment collection and rerun the complete tooling family |
+| Tooling r3 | validation scope defect | deployment `67 passed` and Ruff lint passed, but Ruff format was accidentally broadened to four unchanged historical test files | preserve the checksummed failed attempt; do not rewrite unrelated files; restore changed-file scope |
+| Tooling r4 | passed | 20 of 20 gate steps passed; deployment `67 passed`; two changed tests passed Ruff; transcript has no trailing whitespace; ten dry-runs, compile, history, identity, diff, and checksum replay passed | freeze and push this tooling tree before image build; `SHA256SUMS` digest `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506` |
 
 Append every later failed or superseded attempt here immediately. Never erase an attempt after a retry passes.
 

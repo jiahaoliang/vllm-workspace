@@ -194,12 +194,14 @@ data:
     echo "${role} vLLM PID ${pid} remains live after SIGKILL" >&2
     exit 1
   check-runtime.py: |
+    import inspect
     import os
     from pathlib import Path
 
     import vllm
     import vllm_ascend
     from mooncake.store import MooncakeDistributedStore
+    from vllm.v1.core.kv_cache_coordinator import get_kv_cache_coordinator
     from vllm_ascend.utils import vllm_version_is
 
     methods = (
@@ -220,11 +222,17 @@ data:
     assert os.environ.get("PYTHONHASHSEED") == "0", (
         "PYTHONHASHSEED must have the same fixed value in every engine Pod"
     )
-    assert vllm_version_is("0.25.1"), (
-        f"vLLM compatibility gate selected the wrong source line; installed version={vllm.__version__}"
+    assert os.environ.get("VLLM_VERSION") is None, (
+        "main-verified lane must not force a release VLLM_VERSION override"
     )
+    assert not vllm_version_is("0.25.1"), (
+        f"main-verified lane selected the v0.25.1 release path; installed version={vllm.__version__}"
+    )
+    coordinator_parameters = inspect.signature(get_kv_cache_coordinator).parameters
+    assert "max_in_flight_tokens" in coordinator_parameters, coordinator_parameters
     print(f"vllm-ascend source: {source}")
-    print(f"installed vLLM package version: {vllm.__version__}; compatibility version: 0.25.1")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility lane: main-verified")
+    print("coordinator keyword: max_in_flight_tokens")
     print("cross-process block hash seed: 0")
     print("Mooncake session/range APIs: OK")
   smoke-test.py: |

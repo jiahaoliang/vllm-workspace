@@ -1,0 +1,5 @@
+serviceaccount/vllm-proxy-sa configured (dry run)
+role.rbac.authorization.k8s.io/vllm-proxy-pod-reader configured (dry run)
+rolebinding.rbac.authorization.k8s.io/vllm-proxy-pod-reader configured (dry run)
+deployment.apps/proxy-server-deployment configured (dry run)
+service/vllm-proxy-service configured (dry run)

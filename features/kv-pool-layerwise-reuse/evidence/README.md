@@ -9,6 +9,19 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
+## Full Validation Rerun 20260731T064607Z
+
+- Plan:
+  [main-verified rerun](../implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md)
+- Evidence:
+  [full-validation-rerun-20260731T064607Z](full-validation-rerun-20260731T064607Z/README.md)
+- Current result: the validation-only main/release compatibility mismatch and
+  the recorder trailing-whitespace defect are regression-tested and corrected.
+  Formal `tooling-r4` passed all 20 recorded gates with `67` deployment tests;
+  image and runtime families are not yet run.
+- Passing tooling `SHA256SUMS` digest:
+  `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
+
 ## Full Validation Rerun 20260730T130225Z
 
 - Report:

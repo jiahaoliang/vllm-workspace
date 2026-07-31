@@ -18,12 +18,44 @@ def read(relative: str) -> str:
 
 
 class ValidationIdentityTest(unittest.TestCase):
+    def test_main_verified_vllm_lane_does_not_force_release_compatibility(self):
+        self.assertEqual(IDENTITY["vllm_lane"], "main-verified")
+        self.assertIsNone(IDENTITY["vllm_version_override"])
+        self.assertEqual(IDENTITY["vllm_coordinator_keyword"], "max_in_flight_tokens")
+
+        manifests = (
+            "deployment/40-prefill-engine.yaml",
+            "deployment/50-decode-engine.yaml",
+            "deployment/60-vllm-ascend-ut-pod.yaml",
+            "deployment/stress/40-prefill-engine.yaml",
+            "deployment/stress/50-decode-engine.yaml",
+        )
+        for manifest in manifests:
+            self.assertNotIn("VLLM_VERSION", read(manifest), manifest)
+
+        for config in (
+            "deployment/10-runtime-config.yaml",
+            "deployment/stress/10-runtime-config.yaml",
+        ):
+            text = read(config)
+            self.assertIn('assert not vllm_version_is("0.25.1")', text, config)
+            self.assertIn("inspect.signature(get_kv_cache_coordinator)", text, config)
+            self.assertIn(IDENTITY["vllm_coordinator_keyword"], text, config)
+
     def test_workspace_lock_and_dockerfile_match_frozen_source_identity(self):
         lock = json.loads(
             (ROOT / "workspace.lock.json").read_text(encoding="utf-8-sig")
         )
         dockerfile = read("Dockerfile.a2")
         self.assertIn(f"FROM {IDENTITY['base_image']}", dockerfile)
+        self.assertIn(
+            f'ARG VLLM_COMPATIBILITY_LANE="{IDENTITY["vllm_lane"]}"',
+            dockerfile,
+        )
+        self.assertIn(
+            'org.opencontainers.image.vllm.compatibility-lane="${VLLM_COMPATIBILITY_LANE}"',
+            dockerfile,
+        )
         arg_names = {
             "vllm": "VLLM_COMMIT",
             "vllm_ascend": "VLLM_ASCEND_COMMIT",
@@ -38,7 +70,7 @@ class ValidationIdentityTest(unittest.TestCase):
             self.assertEqual(lock["repos"][lock_names[component]]["commit"], commit)
             self.assertIn(f'ARG {arg_names[component]}="{commit}"', dockerfile)
 
-    def test_all_feature_manifests_use_the_pinned_image_and_vllm_version(self):
+    def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
         manifests = [
             "deployment/30-mooncake-master.yaml",
             "deployment/40-prefill-engine.yaml",
@@ -49,12 +81,6 @@ class ValidationIdentityTest(unittest.TestCase):
         ]
         for manifest in manifests:
             self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
-        for manifest in [path for path in manifests if "master" not in path]:
-            self.assertRegex(
-                read(manifest),
-                rf'VLLM_VERSION(?:, value:|\n\s+value:) "{re.escape(IDENTITY["vllm_version"])}"',
-                manifest,
-            )
 
     def test_runners_and_runtime_checkers_match_identity_and_new_session_api(self):
         runner_paths = [
@@ -92,14 +118,14 @@ class ValidationIdentityTest(unittest.TestCase):
             "deployment/stress/10-runtime-config.yaml",
         ):
             text = read(path)
-            self.assertIn(f'vllm_version_is("{IDENTITY["vllm_version"]}")', text, path)
-            self.assertIn(
-                f"compatibility version: {IDENTITY['vllm_version']}", text, path
-            )
+            self.assertIn('assert not vllm_version_is("0.25.1")', text, path)
+            self.assertIn("inspect.signature(get_kv_cache_coordinator)", text, path)
+            self.assertIn(IDENTITY["vllm_coordinator_keyword"], text, path)
+            self.assertIn(f"compatibility lane: {IDENTITY['vllm_lane']}", text, path)
 
     def test_run_identity_records_model_runtime_and_cluster_contract(self):
         self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
-        self.assertEqual(IDENTITY["attempt"], 4)
+        self.assertEqual(IDENTITY["attempt"], 1)
         self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
         self.assertRegex(IDENTITY["tooling_base"]["commit"], r"^[0-9a-f]{40}$")
         self.assertEqual(IDENTITY["model"]["num_layers"], 27)
