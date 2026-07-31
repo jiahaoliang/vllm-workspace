@@ -1,0 +1,60 @@
+{
+  "driver": {
+    "path": "features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py",
+    "sha256": "b10fbc18f59ff442390c6cebef0855a53fbf8a22eb3b91fef371941df3f1b125"
+  },
+  "errors": [],
+  "gates": {
+    "api_calls": 40,
+    "cases": 43,
+    "cleanup": true,
+    "engines_stopped": true,
+    "final_active_clients": 0,
+    "final_allocated_bytes": 0,
+    "final_key_count": 0,
+    "fragment_byte_sums": true,
+    "master_initial_empty": true,
+    "master_reset": true,
+    "multi_key_multi_layer": true,
+    "negative_cases": 24,
+    "negative_session_range_cases": true,
+    "nonzero_object_offsets": true,
+    "npu_health": true,
+    "num_keys": 3,
+    "num_layers": 4,
+    "page_size": 4096,
+    "post_driver_empty": true,
+    "source_destination_equal": true
+  },
+  "image_config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "retained": {
+    "decode_pod": true,
+    "engine_processes_running": false,
+    "master_pod": true,
+    "prefill_pod": true,
+    "proxy_pod": true,
+    "ut_pod": true
+  },
+  "run_id": "20260731T064607Z-g1",
+  "schema_version": 1,
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "classification": "pgrep pattern matched the checker shell itself",
+      "exit_code": 1,
+      "replacement": "preflight-processes-r2 uses the bracketed process-name pattern",
+      "replacement_passed": true,
+      "step": "preflight-processes"
+    },
+    {
+      "classification": "host Python 3.9 does not support zip strict keyword",
+      "exit_code": 1,
+      "replacement": "explicit length assertion plus ordinary zip",
+      "replacement_passed": true,
+      "step": "g1-contract-assertions"
+    }
+  ],
+  "tooling_commit": "4b3dc927f7c606887c60a58646c716a7d7f09a98",
+  "validated": true
+}

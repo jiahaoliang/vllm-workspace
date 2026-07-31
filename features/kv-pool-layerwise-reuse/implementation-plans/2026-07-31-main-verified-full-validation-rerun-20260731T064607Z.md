@@ -71,7 +71,7 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4, image r2, UT, and corrected main-lane G0 are green; G1 is next |
+| Current tracked WIP | Tooling r4, image r2, UT, G0, and G1 are green; lease is next |
 | Active build or formal validation | Base Pods and CPU-only UT Pod are retained on `n1`; both vLLM child processes are stopped and Master is empty |
 
 The target source branch contains:
@@ -511,14 +511,24 @@ bare-name retry passed. No source changed. Evidence `SHA256SUMS` digest:
 - Consumes: G0 identity only; every family starts from stopped engines and an empty Master.
 - Produces: direct ranged, lease, production ranged-audit, and request-level correctness evidence.
 
-- [ ] **Step 1: G1 direct ranged API** - require multi-key/multi-layer bytes, non-zero offsets, negative session/range cases, cleanup, and zero final metrics.
-- [ ] **Step 2: Reset proof** - stop engines, restart Master, and require all three metrics zero.
+- [x] **Step 1: G1 direct ranged API** - require multi-key/multi-layer bytes, non-zero offsets, negative session/range cases, cleanup, and zero final metrics.
+- [x] **Step 2: Reset proof** - stop engines, restart Master, and require all three metrics zero.
 - [ ] **Step 3: Lease expiry** - derive waits from live `30000 ms` TTL, require stale read `-707`, fresh-session exact recovery, cleanup, and zero final metrics.
 - [ ] **Step 4: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [ ] **Step 5: G4 audit** - require Prefill save/load and Decode load across exactly layers `0..26`, byte sums, final-layer commit order, and zero whole-key calls.
 - [ ] **Step 6: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [ ] **Step 7: Smoke** - execute `run-smoke-test.sh` with a new empty output directory and require HTTP, marker ownership/isolation, token boundary/count, usage, finish reason, routing, and per-request hit correlation.
 - [ ] **Step 8: Generate and replay checksums for each family before starting the next family**
+
+G1 passed with three keys, four layers, 4096-byte pages, 40 API calls, 43
+cases, 24 negative cases, non-zero object offsets, exact fragment/result sums,
+and equal source/destination checksums. Driver cleanup returned Master to zero;
+the independent reset repeated zero keys, allocated bytes, and active clients.
+The first process checker self-matched its `pgrep` command, and the first
+artifact checker used a Python 3.10-only `zip(strict=...)` option on host Python
+3.9; both failures and passing replacements are preserved. No source changed.
+Evidence `SHA256SUMS` digest:
+`637c2451583a108228d67c589b785c35884d29aa323bf1f29dc2b63f2035eee9`.
 
 ### Task 8: Run Stress S1-S3
 

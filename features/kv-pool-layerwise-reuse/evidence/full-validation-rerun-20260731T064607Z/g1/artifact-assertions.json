@@ -1,0 +1,42 @@
+{
+  "final_metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "g1_contract": {
+    "api_calls": 40,
+    "bytes_equal": true,
+    "cases": 43,
+    "cleanup": true,
+    "keys": 3,
+    "layers": 4,
+    "negative_cases": 24,
+    "nonzero_offsets": true,
+    "page_size": 4096,
+    "post_driver_empty": true,
+    "validated": true
+  },
+  "master_reset": true,
+  "pods_retained": true,
+  "recorded_steps": 18,
+  "superseded_nonzero_steps": [
+    {
+      "artifact": "preflight-processes.txt",
+      "command": "bash -lc set\\ -e\\;\\ for\\ spec\\ in\\ \\'prefill-engine-deployment-7f4fc6ddc7-n884l\\ prefill-engine\\ prefill\\'\\ \\'decode-engine-deployment-f6f4b9988-gxlwd\\ decode-engine\\ decode\\'\\;\\ do\\ set\\ --\\ \\$spec\\;\\ kubectl\\ exec\\ -n\\ liangjiahao\\ \\\"\\$1\\\"\\ -c\\ \\\"\\$2\\\"\\ --\\ bash\\ -lc\\ \\\"test\\ \\!\\ -e\\ /tmp/vllm-\\$3.pid\\;\\ \\!\\ pgrep\\ -f\\ \\'vllm.entrypoints.openai.api_server\\'\\\"\\;\\ done\\;\\ printf\\ \\'engines_stopped=true\\\\n\\'",
+      "ended_at": "2026-07-31T10:51:41Z",
+      "exit_code": 1,
+      "name": "preflight-processes",
+      "started_at": "2026-07-31T10:51:40Z"
+    },
+    {
+      "artifact": "g1-contract-assertions.json",
+      "command": "env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json,re\\nfrom pathlib import Path\\nroot=Path(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g1\")\\nsummary=json.loads((root/\"range-api-summary.json\").read_text())\\nassert summary[\"passed\"] is True and not summary[\"errors\"]\\nassert summary[\"config\"]=={\"num_keys\":3,\"num_layers\":4,\"object_size\":16384,\"page_size\":4096,\"run_negative\":True,\"total_size\":49152}\\nassert summary[\"source_checksum\"]==summary[\"destination_checksum_after\"] and summary[\"source_checksum\"]!=summary[\"destination_checksum_before\"]\\nassert all(case[\"passed\"] for case in summary[\"cases\"]) and all(item[\"passed\"] for item in summary[\"cleanup\"])\\nnames={case[\"name\"] for case in summary[\"cases\"]}\\nrequired={\"positive_nonzero_object_offset\",\"positive_byte_compare\",\"negative_no_put_session\",\"negative_no_get_session\",\"negative_duplicate_put_start\",\"negative_offset_overflow\",\"negative_put_arity_mismatch\",\"negative_ranged_put_after_end\",\"negative_ranged_get_after_end\",\"negative_get_arity_mismatch\",\"negative_revoke_not_gettable\"}\\nassert required<=names,required-names\\npositive=[call for call in summary[\"api_calls\"] if call[\"operation\"] in {\"batch_put_from_multi_buffer_ranges\",\"batch_get_into_multi_buffer_ranges\"} and call[\"phase\"]==\"positive\"]\\nassert len(positive)==8,len(positive)\\nassert any(any(any(offset>0 for offset in row) for row in call[\"object_offsets\"]) for call in positive)\\nfor call in positive:\\n    assert len(call[\"result\"])==3\\n    for result,sizes in zip(call[\"result\"],call[\"sizes\"],strict=True):\\n        assert result==sum(sizes)==4096,(result,sizes)\\nfor metric_file in (\"preflight.metrics\",\"post-driver.metrics\"):\\n    text=(root/metric_file).read_text()\\n    for name in (\"master_key_count\",\"master_allocated_bytes\",\"master_active_clients\"):\\n        match=re.search(rf\"^{name} ([0-9.eE+-]+)$\",text,re.M); assert match and float(match.group(1))==0,(metric_file,name)\\nsha=(root/\"driver-sha256.txt\").read_text().splitlines(); assert len(sha)==2 and sha[0].split(\"=\",1)[1]==sha[1].split(\"=\",1)[1]\\nassert \"| OK\" in (root/\"npu-after-g1.txt\").read_text()\\nprint(json.dumps({\"validated\":True,\"keys\":3,\"layers\":4,\"page_size\":4096,\"api_calls\":len(summary[\"api_calls\"]),\"cases\":len(summary[\"cases\"]),\"negative_cases\":len([name for name in names if name.startswith(\"negative_\")]),\"nonzero_offsets\":True,\"bytes_equal\":True,\"cleanup\":True,\"post_driver_empty\":True},sort_keys=True,indent=2))'",
+      "ended_at": "2026-07-31T10:54:20Z",
+      "exit_code": 1,
+      "name": "g1-contract-assertions",
+      "started_at": "2026-07-31T10:54:20Z"
+    }
+  ],
+  "validated": true
+}

@@ -1,0 +1,236 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cni.projectcalico.org/containerID": "612be2ccc7d692ce688503322420f27e9a792478b410d3577eb36d8c590ce339",
+            "cni.projectcalico.org/podIP": "10.250.40.149/32",
+            "cni.projectcalico.org/podIPs": "10.250.40.149/32",
+            "kubectl.kubernetes.io/restartedAt": "2026-07-31T18:55:13+08:00"
+        },
+        "creationTimestamp": "2026-07-31T10:55:13Z",
+        "generateName": "mooncake-master-deployment-5857694484-",
+        "generation": 1,
+        "labels": {
+            "app": "mooncake-master",
+            "pod-template-hash": "5857694484"
+        },
+        "name": "mooncake-master-deployment-5857694484-fgckl",
+        "namespace": "liangjiahao",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ReplicaSet",
+                "name": "mooncake-master-deployment-5857694484",
+                "uid": "2e51af5c-7eb7-4119-ab6b-95c28aaf27f8"
+            }
+        ],
+        "resourceVersion": "26982083",
+        "uid": "a4e3bc1b-f144-4e84-91bd-7b3fcf6e716b"
+    },
+    "spec": {
+        "containers": [
+            {
+                "args": [
+                    "exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s --enable_offload=false --logtostderr=true"
+                ],
+                "command": [
+                    "/bin/bash",
+                    "-lc"
+                ],
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+                "imagePullPolicy": "Never",
+                "name": "mooncake-master",
+                "ports": [
+                    {
+                        "containerPort": 50001,
+                        "name": "master-rpc",
+                        "protocol": "TCP"
+                    },
+                    {
+                        "containerPort": 9003,
+                        "name": "metrics",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "failureThreshold": 20,
+                    "initialDelaySeconds": 2,
+                    "periodSeconds": 3,
+                    "successThreshold": 1,
+                    "tcpSocket": {
+                        "port": "master-rpc"
+                    },
+                    "timeoutSeconds": 1
+                },
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-sq7z4",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "nodeName": "n1",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 30,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            }
+        ],
+        "volumes": [
+            {
+                "name": "kube-api-access-sq7z4",
+                "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ],
+                                "name": "kube-root-ca.crt"
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        },
+                                        "path": "namespace"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:55:15Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:55:13Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:55:16Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:55:16Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:55:13Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "containerID": "containerd://35c0ce85f86a6b4c19063dfac10e3aac85060e9639dce272a9892a330be61587",
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+                "imageID": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+                "lastState": {},
+                "name": "mooncake-master",
+                "ready": true,
+                "resources": {},
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-31T10:55:14Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 0,
+                        "supplementalGroups": [
+                            0
+                        ],
+                        "uid": 0
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-sq7z4",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.200.27",
+        "hostIPs": [
+            {
+                "ip": "192.168.200.27"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.250.40.149",
+        "podIPs": [
+            {
+                "ip": "10.250.40.149"
+            }
+        ],
+        "qosClass": "BestEffort",
+        "startTime": "2026-07-31T10:55:13Z"
+    }
+}

@@ -2,7 +2,7 @@
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
 infrastructure failure, the unchanged-identity image r2 retry passed, and the
-corrected-image CPU-only UT and G0 families passed.
+corrected-image CPU-only UT, G0, and G1 families passed.
 
 ## Frozen Identity
 
@@ -91,3 +91,13 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   stopped afterward and the restarted Master reported zero keys, zero
   allocated bytes, and zero active clients. Its `SHA256SUMS` digest is
   `6416863ddba50d3e716cf6f765869c79488c70707adb78b0b6c1a0a28662524c`.
+
+## G1 Direct Ranged API
+
+- [`g1/`](g1/summary.json): passed in the stopped-engine Prefill Pod against an
+  empty Master. Three keys across four layers verified non-zero ranged object
+  offsets, exact fragment/result byte sums, equal source/destination content,
+  and 24 negative session/range cases. Cleanup and an independent Master reset
+  both ended with zero keys, zero allocated bytes, and zero active clients. Its
+  `SHA256SUMS` digest is
+  `637c2451583a108228d67c589b785c35884d29aa323bf1f29dc2b63f2035eee9`.

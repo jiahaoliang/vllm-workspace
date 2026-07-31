@@ -1,0 +1,22 @@
+Cannot open netlink socket: Operation not permitted
+./artifact-assertions.json: OK
+./create-driver-dir.log: OK
+./driver-sha256.txt: OK
+./final-empty.metrics: OK
+./final-pods.json: OK
+./g1-contract-assertions-failed.log: OK
+./g1-contract-assertions.json: OK
+./npu-after-g1.txt: OK
+./post-driver.metrics: OK
+./preflight-processes-r2.txt: OK
+./preflight-processes.txt: OK
+./preflight.metrics: OK
+./range-api-summary.json: OK
+./range-api.log: OK
+./reset-master-pod.json: OK
+./reset-master.log: OK
+./restart-master.log: OK
+./summary-assert.log: OK
+./summary.json: OK
+./sync-driver.log: OK
+./wait-master-reset.log: OK
