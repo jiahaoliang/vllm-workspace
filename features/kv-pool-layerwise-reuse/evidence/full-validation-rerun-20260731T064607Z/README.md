@@ -1,7 +1,8 @@
 # Full Validation Rerun 20260731T064607Z Evidence
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
-infrastructure failure and the unchanged-identity image r2 retry passed.
+infrastructure failure, the unchanged-identity image r2 retry passed, and the
+corrected-image CPU-only UT family passed.
 
 ## Frozen Identity
 
@@ -68,3 +69,14 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   are retained and classified in the structured summary. Its `SHA256SUMS`
   digest is
   `c4cac6d81d0887153f63046f3111cf76eebec60b90b30cc45171ae229e0a98db`.
+
+## Unit Test Gate
+
+- [`ut/`](ut/summary.json): passed in the recreated dedicated CPU-only
+  `liangjiahao/vllm-ascend-ut` Pod. The Pod used the exact image config ID,
+  requested no NPU, mounted no host path, driver, or model cache, and was
+  retained Running with restart count zero. The complete AscendStore suite
+  passed `476` tests, deployment tooling passed `67`, Ruff lint/format and
+  Python compilation passed, and the frozen 11-commit source history remained
+  clean. Its `SHA256SUMS` digest is
+  `9fe25f229eddd594ee0fbe15ebc80539a96b71c2665be54160fce2c4d2e27426`.

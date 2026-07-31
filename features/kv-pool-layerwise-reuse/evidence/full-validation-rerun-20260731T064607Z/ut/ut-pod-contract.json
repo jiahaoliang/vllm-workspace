@@ -1,0 +1,16 @@
+{
+  "driver_mount": false,
+  "host_path": false,
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+  "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "main_verified_lane": true,
+  "model_mount": false,
+  "name": "vllm-ascend-ut",
+  "namespace": "liangjiahao",
+  "node": "n1",
+  "npu_resources": false,
+  "restarts": 0,
+  "validated": true,
+  "vllm_version_override": null,
+  "workspace_empty_dir": true
+}

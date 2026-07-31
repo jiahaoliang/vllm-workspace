@@ -71,8 +71,8 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4 and image r2 are green; the corrected-image UT gate is next |
-| Active build or formal validation | No active build; image-check Prefill was cleaned up and only the UT phase is pending |
+| Current tracked WIP | Tooling r4, image r2, and corrected-image UT are green; G0 is next |
+| Active build or formal validation | No active build or serving gate; the CPU-only UT Pod is retained Running on `n1` |
 
 The target source branch contains:
 
@@ -432,15 +432,15 @@ summary generation superseded them. No production source changed.
 - Consumes: proved image and frozen clean source.
 - Produces: source-freeze confirmation under the corrected main lane.
 
-- [ ] **Step 1: Recreate only `vllm-ascend-ut` if its image differs**
+- [x] **Step 1: Recreate only `vllm-ascend-ut` if its image differs**
 
 Capture the old Pod JSON, delete only `pod/vllm-ascend-ut` in `liangjiahao`, apply the exact UT manifest, and wait for Running/Ready. Do not delete the namespace or serving Pods.
 
-- [ ] **Step 2: Prove the CPU-only Pod contract**
+- [x] **Step 2: Prove the CPU-only Pod contract**
 
 Require CPU/memory-only resources, no `huawei.com/Ascend910`, no driver/device/model mount, no `hostPath`, `emptyDir` workspace, exact new image, node `n1`, and restart count zero.
 
-- [ ] **Step 3: Run complete AscendStore tests**
+- [x] **Step 3: Run complete AscendStore tests**
 
 ```bash
 features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- \
@@ -448,13 +448,23 @@ features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- \
   python3 -m pytest -q tests/ut/distributed/ascend_store
 ```
 
-- [ ] **Step 4: Run deployment tests and source static gates**
+- [x] **Step 4: Run deployment tests and source static gates**
 
 Run the complete deployment collection from the synced control fixture, changed-file Ruff lint/format, Python `compile()` checks, source history assertions, source clean-tree check, and `git diff --check`.
 
-- [ ] **Step 5: Classify any failure**
+- [x] **Step 5: Classify any failure**
 
 If the failure is control tooling, repair it with a regression test and rerun Tasks 3-5 as invalidated. If it is production source behavior, capture a minimum reproduction and terminate without editing `repos/*`.
+
+The recreated Pod reported config ID
+`sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57`,
+restart count zero, CPU/memory-only resources, `emptyDir` workspace, and no NPU,
+driver, model, or `hostPath` access. The complete AscendStore collection passed
+`476` tests with `14` warnings; deployment tests passed `67`; Ruff 0.14.0 lint
+and format passed for `19` source/test files; `28` Python files compiled; source
+history, clean-tree, and diff checks passed. No UT failure required source or
+tooling changes. Evidence is in `ut/` with `SHA256SUMS` digest
+`9fe25f229eddd594ee0fbe15ebc80539a96b71c2665be54160fce2c4d2e27426`.
 
 ### Task 6: Establish G0 With The Corrected Main Lane
 

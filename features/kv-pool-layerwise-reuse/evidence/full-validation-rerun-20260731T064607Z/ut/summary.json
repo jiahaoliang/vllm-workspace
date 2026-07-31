@@ -1,0 +1,53 @@
+{
+  "errors": [],
+  "gates": {
+    "ascendstore_tests": {
+      "duration_seconds": 4.07,
+      "passed": 476,
+      "warnings": 14
+    },
+    "bytecode_disabled": true,
+    "deployment_tests": {
+      "duration_seconds": 1.17,
+      "passed": 67
+    },
+    "diff_check": true,
+    "main_verified_lane": true,
+    "pytest_cache_disabled": true,
+    "python_compile": {
+      "files": 28
+    },
+    "ruff_format": {
+      "files": 19
+    },
+    "ruff_lint": true,
+    "source_clean": true,
+    "source_history": {
+      "commits": 11,
+      "merge_base": "a46a1dabbc260e8695002969f29528eb555eb583",
+      "merge_commits": 0
+    },
+    "vllm_version_override": null
+  },
+  "image": {
+    "config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+    "manifest_digest": "sha256:866ba89f897464a1e38893a57f6e5c3a035c7aba7dfa196fce9646498eaf6d97",
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
+  },
+  "pod": {
+    "cpu_only": true,
+    "host_path": false,
+    "name": "vllm-ascend-ut",
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "npu_resources": false,
+    "restarts": 0,
+    "retained_running": true
+  },
+  "run_id": "20260731T064607Z-ut",
+  "schema_version": 1,
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "status": "passed",
+  "tooling_commit": "6591a8bca23f860dc2258b2d6cb175cee95b4eb8",
+  "validated": true
+}
