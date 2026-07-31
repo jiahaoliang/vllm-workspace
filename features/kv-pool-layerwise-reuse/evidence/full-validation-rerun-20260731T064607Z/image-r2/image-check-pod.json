@@ -1,0 +1,474 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "ascend.kubectl.kubernetes.io/ascend-910-configuration": "{\"pod_name\":\"prefill-engine-deployment-7f4fc6ddc7-qrp7w\",\"server_id\":\"9e3dec84-fd93-4e55-afca-54e50eced47a\",\"host_ip\":\"192.168.200.27\",\"super_pod_id\":-1,\"devices\":[{\"device_id\":\"7\",\"device_ip\":\"192.168.102.32\",\"super_device_id\":\"4292608007\"}]}",
+            "cni.projectcalico.org/containerID": "a8c0d33353a13197aa9008772ed730b1dfaa4edbaadad91cda29a2e6991a488c",
+            "cni.projectcalico.org/podIP": "10.250.40.149/32",
+            "cni.projectcalico.org/podIPs": "10.250.40.149/32",
+            "huawei.com/Ascend910": "Ascend910-7",
+            "huawei.com/AscendReal": "Ascend910-7",
+            "huawei.com/kltDev": "Ascend910-7"
+        },
+        "creationTimestamp": "2026-07-31T10:11:10Z",
+        "generateName": "prefill-engine-deployment-7f4fc6ddc7-",
+        "generation": 1,
+        "labels": {
+            "app": "prefill",
+            "pod-template-hash": "7f4fc6ddc7"
+        },
+        "name": "prefill-engine-deployment-7f4fc6ddc7-qrp7w",
+        "namespace": "liangjiahao",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ReplicaSet",
+                "name": "prefill-engine-deployment-7f4fc6ddc7",
+                "uid": "cec275a1-a1ec-4537-9c48-9e00dfd43beb"
+            }
+        ],
+        "resourceVersion": "26956042",
+        "uid": "9e3dec84-fd93-4e55-afca-54e50eced47a"
+    },
+    "spec": {
+        "containers": [
+            {
+                "args": [
+                    "exec sleep infinity"
+                ],
+                "command": [
+                    "/bin/bash",
+                    "-lc"
+                ],
+                "env": [
+                    {
+                        "name": "POD_NAME",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.name"
+                            }
+                        }
+                    },
+                    {
+                        "name": "POD_IP",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "status.podIP"
+                            }
+                        }
+                    },
+                    {
+                        "name": "HCCL_IF_IP",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "status.podIP"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GLOO_SOCKET_IFNAME",
+                        "value": "eth0"
+                    },
+                    {
+                        "name": "TP_SOCKET_IFNAME",
+                        "value": "eth0"
+                    },
+                    {
+                        "name": "HCCL_SOCKET_IFNAME",
+                        "value": "eth0"
+                    },
+                    {
+                        "name": "HCCL_INTRA_ROCE_ENABLE",
+                        "value": "1"
+                    },
+                    {
+                        "name": "ASCEND_BUFFER_POOL",
+                        "value": "4:8"
+                    },
+                    {
+                        "name": "MOONCAKE_CONFIG_PATH",
+                        "value": "/opt/vllm-layerwise/mooncake.json"
+                    },
+                    {
+                        "name": "MOONCAKE_MASTER",
+                        "value": "mooncake-master-service:30089"
+                    },
+                    {
+                        "name": "PYTHONUNBUFFERED",
+                        "value": "1"
+                    },
+                    {
+                        "name": "PYTHONHASHSEED",
+                        "value": "0"
+                    }
+                ],
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+                "imagePullPolicy": "Never",
+                "name": "prefill-engine",
+                "ports": [
+                    {
+                        "containerPort": 8100,
+                        "name": "prefill-port",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "failureThreshold": 120,
+                    "httpGet": {
+                        "path": "/v1/models",
+                        "port": "prefill-port",
+                        "scheme": "HTTP"
+                    },
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "huawei.com/Ascend910": "1"
+                    },
+                    "requests": {
+                        "huawei.com/Ascend910": "1"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/dev/shm",
+                        "name": "shm"
+                    },
+                    {
+                        "mountPath": "/usr/local/dcmi",
+                        "name": "dcmi"
+                    },
+                    {
+                        "mountPath": "/usr/local/bin/npu-smi",
+                        "name": "npusmi"
+                    },
+                    {
+                        "mountPath": "/usr/local/Ascend/driver/lib64",
+                        "name": "driver-lib64"
+                    },
+                    {
+                        "mountPath": "/usr/local/Ascend/driver/version.info",
+                        "name": "driver-version"
+                    },
+                    {
+                        "mountPath": "/etc/ascend_install.info",
+                        "name": "ascend-install-info"
+                    },
+                    {
+                        "mountPath": "/root/.cache",
+                        "name": "model-cache"
+                    },
+                    {
+                        "mountPath": "/usr/bin/hccn_tool",
+                        "name": "hccn-tool"
+                    },
+                    {
+                        "mountPath": "/etc/hccn.conf",
+                        "name": "hccn-conf"
+                    },
+                    {
+                        "mountPath": "/opt/vllm-layerwise",
+                        "name": "runtime-config",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-w5rfs",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "nodeName": "n1",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 120,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            }
+        ],
+        "volumes": [
+            {
+                "emptyDir": {
+                    "medium": "Memory",
+                    "sizeLimit": "24Gi"
+                },
+                "name": "shm"
+            },
+            {
+                "hostPath": {
+                    "path": "/usr/local/dcmi",
+                    "type": "Directory"
+                },
+                "name": "dcmi"
+            },
+            {
+                "hostPath": {
+                    "path": "/usr/local/bin/npu-smi",
+                    "type": "File"
+                },
+                "name": "npusmi"
+            },
+            {
+                "hostPath": {
+                    "path": "/usr/local/Ascend/driver/lib64",
+                    "type": "Directory"
+                },
+                "name": "driver-lib64"
+            },
+            {
+                "hostPath": {
+                    "path": "/usr/local/Ascend/driver/version.info",
+                    "type": "File"
+                },
+                "name": "driver-version"
+            },
+            {
+                "hostPath": {
+                    "path": "/etc/ascend_install.info",
+                    "type": "File"
+                },
+                "name": "ascend-install-info"
+            },
+            {
+                "hostPath": {
+                    "path": "/home/llm_cache",
+                    "type": "Directory"
+                },
+                "name": "model-cache"
+            },
+            {
+                "hostPath": {
+                    "path": "/usr/bin/hccn_tool",
+                    "type": "File"
+                },
+                "name": "hccn-tool"
+            },
+            {
+                "hostPath": {
+                    "path": "/etc/hccn.conf",
+                    "type": "File"
+                },
+                "name": "hccn-conf"
+            },
+            {
+                "configMap": {
+                    "defaultMode": 365,
+                    "name": "layerwise-runtime-config"
+                },
+                "name": "runtime-config"
+            },
+            {
+                "name": "kube-api-access-w5rfs",
+                "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ],
+                                "name": "kube-root-ca.crt"
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        },
+                                        "path": "namespace"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:11:12Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:11:10Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:11:10Z",
+                "message": "containers with unready status: [prefill-engine]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:11:10Z",
+                "message": "containers with unready status: [prefill-engine]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-31T10:11:10Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "huawei.com/Ascend910": "1"
+                },
+                "containerID": "containerd://607d7b112a0d0c658de80eee8ada82496fbc8c7f732259992ce6b2388a75fac6",
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+                "imageID": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+                "lastState": {},
+                "name": "prefill-engine",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "huawei.com/Ascend910": "1"
+                    },
+                    "requests": {
+                        "huawei.com/Ascend910": "1"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-31T10:11:11Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 0,
+                        "supplementalGroups": [
+                            0
+                        ],
+                        "uid": 0
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/dev/shm",
+                        "name": "shm"
+                    },
+                    {
+                        "mountPath": "/usr/local/dcmi",
+                        "name": "dcmi"
+                    },
+                    {
+                        "mountPath": "/usr/local/bin/npu-smi",
+                        "name": "npusmi"
+                    },
+                    {
+                        "mountPath": "/usr/local/Ascend/driver/lib64",
+                        "name": "driver-lib64"
+                    },
+                    {
+                        "mountPath": "/usr/local/Ascend/driver/version.info",
+                        "name": "driver-version"
+                    },
+                    {
+                        "mountPath": "/etc/ascend_install.info",
+                        "name": "ascend-install-info"
+                    },
+                    {
+                        "mountPath": "/root/.cache",
+                        "name": "model-cache"
+                    },
+                    {
+                        "mountPath": "/usr/bin/hccn_tool",
+                        "name": "hccn-tool"
+                    },
+                    {
+                        "mountPath": "/etc/hccn.conf",
+                        "name": "hccn-conf"
+                    },
+                    {
+                        "mountPath": "/opt/vllm-layerwise",
+                        "name": "runtime-config",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-w5rfs",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.200.27",
+        "hostIPs": [
+            {
+                "ip": "192.168.200.27"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.250.40.149",
+        "podIPs": [
+            {
+                "ip": "10.250.40.149"
+            }
+        ],
+        "qosClass": "BestEffort",
+        "startTime": "2026-07-31T10:11:10Z"
+    }
+}

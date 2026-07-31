@@ -71,8 +71,8 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4 is green; image r1 ended as checksummed transient infrastructure failure; image r2 retry is next |
-| Active build or formal validation | None; `default/buildkitd` recovered on `n1`, Ready, `linux/arm64` |
+| Current tracked WIP | Tooling r4 and image r2 are green; the corrected-image UT gate is next |
+| Active build or formal validation | No active build; image-check Prefill was cleaned up and only the UT phase is pending |
 
 The target source branch contains:
 
@@ -376,7 +376,7 @@ Stage only the control files listed in Tasks 1-3 and this plan. Verify the live 
 - Consumes: pushed tooling checkpoint and exact target tag.
 - Produces: immutable ARM64 manifest digest/config ID accepted by every later family.
 
-- [ ] **Step 1: Verify builder identity and target-tag absence**
+- [x] **Step 1: Verify builder identity and target-tag absence**
 
 ```bash
 kubectl get pod buildkitd -n default -o wide
@@ -386,7 +386,7 @@ nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-
 
 The inspect command should report that the unique tag is absent before build. If it exists, compare complete identity; do not overwrite an unrelated image silently.
 
-- [ ] **Step 2: Build with the existing remote-clone workflow**
+- [x] **Step 2: Build with the existing remote-clone workflow**
 
 ```bash
 export BUILDKIT_HOST='kube-pod://buildkitd?namespace=default'
@@ -398,13 +398,26 @@ nerdctl -n "${CONTAINERD_NAMESPACE}" build \
   features/kv-pool-layerwise-reuse
 ```
 
-- [ ] **Step 3: Prove image identity**
+- [x] **Step 3: Prove image identity**
 
 Require `linux/arm64`, exact source labels, main-verified lane label, raw fail-closed `pip check`, expected editable Git HEADs, native vLLM-Ascend and Mooncake libraries, no missing `ldd` dependency, seven Mooncake APIs, NPU availability, healthy `npu-smi`, and Pod `imageID` equal to the recorded config ID.
 
-- [ ] **Step 4: Checksum image evidence**
+- [x] **Step 4: Checksum image evidence**
 
-Write the actual manifest digest and config ID into `summary.json`, generate `SHA256SUMS`, and replay it from `image-r1/`.
+Write the actual manifest digest and config ID into `summary.json`, generate `SHA256SUMS`, and replay it from `image-r2/`.
+
+Image r2 completed from `2026-07-31T08:50:59Z` through
+`2026-07-31T10:04:30Z`. The accepted identity is manifest
+`sha256:866ba89f897464a1e38893a57f6e5c3a035c7aba7dfa196fce9646498eaf6d97`
+and config
+`sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57`.
+The NPU Pod proof passed the main lane, coordinator keyword, seven Mooncake
+APIs, exact source HEADs, dynamic imports, `npu-smi`, `ldd`, imageID, and
+cleanup gates. A label-based wait first matched the terminating old ReplicaSet
+Pod, an attempted JSONPath null predicate selected no Pod, and the first
+summary generator embedded JSON booleans as Python. All three validation-step
+issues are preserved in `steps.jsonl`; explicit Pod identity and argv-based
+summary generation superseded them. No production source changed.
 
 ### Task 5: Recreate The CPU-Only UT Pod And Run Full UT
 

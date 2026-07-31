@@ -1,0 +1,7 @@
+time="2026-07-31T08:45:02Z" level=info msg="auto snapshotter: using overlayfs"
+time="2026-07-31T08:45:02Z" level=warning msg="using host network as the default"
+time="2026-07-31T08:45:02Z" level=info msg="found worker \"6nks6kc66zxi02hpb7e4tgjap\", labels=map[org.mobyproject.buildkit.worker.executor:oci org.mobyproject.buildkit.worker.hostname:buildkitd org.mobyproject.buildkit.worker.network:host org.mobyproject.buildkit.worker.oci.process-mode:sandbox org.mobyproject.buildkit.worker.selinux.enabled:false org.mobyproject.buildkit.worker.snapshotter:overlayfs], platforms=[linux/arm64]"
+time="2026-07-31T08:45:02Z" level=warning msg="skipping containerd worker, as \"/run/containerd/containerd.sock\" does not exist"
+time="2026-07-31T08:45:02Z" level=info msg="found 1 workers, default=\"6nks6kc66zxi02hpb7e4tgjap\""
+time="2026-07-31T08:45:02Z" level=warning msg="currently, only the default worker can be used."
+time="2026-07-31T08:45:02Z" level=info msg="running server on /run/buildkit/buildkitd.sock"

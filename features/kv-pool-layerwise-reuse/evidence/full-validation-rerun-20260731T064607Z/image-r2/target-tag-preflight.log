@@ -1,0 +1,2 @@
+time="2026-07-31T16:50:24+08:00" level=fatal msg="1 errors:\nno such image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
+target_tag_absent=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1

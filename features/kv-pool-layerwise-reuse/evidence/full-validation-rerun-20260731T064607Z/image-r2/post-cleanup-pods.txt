@@ -1,0 +1,5 @@
+NAME                                          READY   STATUS    RESTARTS   AGE   IP              NODE   NOMINATED NODE   READINESS GATES
+decode-engine-deployment-5c96cd595-qdzds      0/1     Running   0          17h   10.250.40.210   n1     <none>           <none>
+mooncake-master-deployment-5445f6b5c5-j2fzn   1/1     Running   0          16h   10.250.40.212   n1     <none>           <none>
+proxy-server-deployment-54bb6c9585-7fzs5      1/1     Running   0          17h   10.250.40.211   n1     <none>           <none>
+vllm-ascend-ut                                1/1     Running   0          17h   10.250.40.140   n1     <none>           <none>

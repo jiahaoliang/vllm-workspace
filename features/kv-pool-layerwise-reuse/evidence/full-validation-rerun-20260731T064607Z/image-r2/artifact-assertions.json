@@ -1,0 +1,20 @@
+{
+  "api_count": 7,
+  "cleanup_verified": true,
+  "config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "manifest_digest": "sha256:866ba89f897464a1e38893a57f6e5c3a035c7aba7dfa196fce9646498eaf6d97",
+  "npu_available": true,
+  "platform": "linux/arm64",
+  "recorded_steps": 27,
+  "superseded_nonzero_steps": [
+    {
+      "artifact": "wait-new-image-check-pod.log",
+      "command": "bash -lc set\\ -e\\;\\ pod=\\$\\(kubectl\\ get\\ pod\\ -n\\ liangjiahao\\ -l\\ app=prefill\\ -o\\ jsonpath=\\'\\{range\\ .items\\[\\?\\(@.metadata.deletionTimestamp==null\\)\\]\\}\\{.metadata.name\\}\\{\\\"\\\\n\\\"\\}\\{end\\}\\'\\)\\;\\ test\\ -n\\ \\\"\\$pod\\\"\\;\\ phase=\\$\\(kubectl\\ get\\ pod\\ -n\\ liangjiahao\\ \\\"\\$pod\\\"\\ -o\\ jsonpath=\\'\\{.status.phase\\}\\'\\)\\;\\ test\\ \\\"\\$phase\\\"\\ =\\ Running\\;\\ printf\\ \\'pod=%s\\ phase=%s\\\\n\\'\\ \\\"\\$pod\\\"\\ \\\"\\$phase\\\"",
+      "ended_at": "2026-07-31T10:11:40Z",
+      "exit_code": 1,
+      "name": "wait-new-image-check-pod",
+      "started_at": "2026-07-31T10:11:38Z"
+    }
+  ],
+  "validated": true
+}

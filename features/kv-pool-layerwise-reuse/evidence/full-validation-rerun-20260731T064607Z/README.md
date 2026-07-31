@@ -1,7 +1,7 @@
 # Full Validation Rerun 20260731T064607Z Evidence
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
-infrastructure failure and image r2 is the unchanged-identity retry.
+infrastructure failure and the unchanged-identity image r2 retry passed.
 
 ## Frozen Identity
 
@@ -56,5 +56,15 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   transport ended with exit `137`; the target tag remained absent. Its
   `SHA256SUMS` digest is
   `8a80443d4f2f4603c528ec653deb386ab689ab9f2c33107bcf9baa7b9c243b33`.
-- `image-r2/`: next unchanged-source, unchanged-tag retry. The recovered
-  builder is explicitly pinned to `n1` and reports `linux/arm64`.
+- [`image-r2/`](image-r2/summary.json): passed. The recovered builder was
+  explicitly pinned to `n1`; the image is `linux/arm64`, manifest
+  `sha256:866ba89f897464a1e38893a57f6e5c3a035c7aba7dfa196fce9646498eaf6d97`,
+  and config
+  `sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57`.
+  Static build gates and the short-lived NPU Prefill proof verified the exact
+  source labels and HEADs, main compatibility lane, coordinator signature,
+  seven Mooncake APIs, dynamic imports, native libraries, NPU health, Pod
+  imageID, and cleanup. Superseded Pod-selection and summary-generation steps
+  are retained and classified in the structured summary. Its `SHA256SUMS`
+  digest is
+  `c4cac6d81d0887153f63046f3111cf76eebec60b90b30cc45171ae229e0a98db`.
