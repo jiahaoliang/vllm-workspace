@@ -71,8 +71,8 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4, image r2, UT, G0, G1, lease, and G4 are green; smoke is next |
-| Active build or formal validation | Base Pods and CPU-only UT Pod are retained on `n1`; both vLLM child processes are stopped and Master is empty |
+| Current tracked WIP | Tooling r4, image r2, UT, G0, G1, lease, and G4 are green; smoke terminated the run on a confirmed concurrent warm-load production defect |
+| Active build or formal validation | Validation is terminal; Stress S1-S3 will not run; both vLLM child processes are stopped and the final Master reset is empty |
 
 The target source branch contains:
 
@@ -517,8 +517,8 @@ bare-name retry passed. No source changed. Evidence `SHA256SUMS` digest:
 - [x] **Step 4: Reset proof** - repeat stopped-engine and empty-Master gates.
 - [x] **Step 5: G4 audit** - require Prefill save and Decode load across exactly layers `0..26`, byte sums, final-layer commit order, and zero whole-key calls.
 - [x] **Step 6: Reset proof** - repeat stopped-engine and empty-Master gates.
-- [ ] **Step 7: Smoke** - execute `run-smoke-test.sh` with a new empty output directory and require HTTP, marker ownership/isolation, token boundary/count, usage, finish reason, routing, and per-request hit correlation.
-- [ ] **Step 8: Generate and replay checksums for each family before starting the next family**
+- [x] **Step 7: Smoke** - FAILED with a confirmed production defect. The formal runner lost the case 2 marker during a four-way direct concurrent warm load while the response reported `25/25` blocks, `3200` hit tokens, and `use_layerwise=True`; the identical serial replay passed.
+- [x] **Step 8: Generate and replay checksums for each family before starting the next family** - smoke replay passed for 70 artifacts; `SHA256SUMS` digest `b781d2598c1d7a397a11d650abb9b7448b8354bf20f46762a15844164e35bffb`. Stress was not started.
 
 G1 passed with three keys, four layers, 4096-byte pages, 40 API calls, 43
 cases, 24 negative cases, non-zero object offsets, exact fragment/result sums,
@@ -549,6 +549,21 @@ stopped and the reset returned all three metrics to zero. No failed or
 superseded step and no source change. Evidence `SHA256SUMS` digest:
 `bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.
 
+Smoke is terminally failed. The original four-way direct concurrent phase
+returned response `cmpl-b4925b9042a7f091` for case 2 with the exact case 2
+prompt token digest, correct usage and finish reason, but without `CASE_TWO`.
+The same request immediately passed a serial replay. A focused driver reduced
+the reproducer to the case 2/case 3 pair: case 2 alone, pair 0/2, and pair 1/2
+passed 10/10 each; pair 2/3 failed 1/10 and then 9/30, always on case 2 with
+the same shared-prefix-derived wrong continuation while case 3 stayed correct.
+After both engines were stopped and Master was reset to zero, the identical
+pair passed 30/30 cold-compute rounds; all 60 response IDs correlated with
+`hit_blocks=0/25`. This warm `9/30` versus cold `0/30` differential rules out
+the runner response ordering, marker oracle, fixed seed, and generic concurrent
+generation. Frozen production source was not modified. The final cleanup
+stopped both engines and reset Master to zero keys, zero allocated bytes, and
+zero active clients.
+
 ### Task 8: Run Stress S1-S3
 
 **Files:**
@@ -564,14 +579,14 @@ superseded step and no source change. Evidence `SHA256SUMS` digest:
 - Consumes: six free physical NPUs on the selected Ready node and the proved image.
 - Produces: DP/TP, concurrency, long-context, chunked-prefill, ranged-audit, and isolation evidence.
 
-- [ ] **Step 1: Re-query six-card availability immediately before applying stress manifests**
-- [ ] **Step 2: Prove Prefill DP2/TP2 and Decode DP1/TP2 from Pod resources, process trees, logs, and active device processes**
-- [ ] **Step 3: Run S1 and require configured long-context, chunk-bound, all-layer, commit-order, marker/token/usage, key-count, and whole-key exclusion gates**
-- [ ] **Step 4: Stop engines, reset Master, prove empty metrics, and restart before S2**
-- [ ] **Step 5: Run S2 and require all concurrent cases plus activity on both Prefill DP ranks**
-- [ ] **Step 6: Stop engines, reset Master, prove empty metrics, and restart before S3**
-- [ ] **Step 7: Run S3 and require cold long-context, minimum context iterations, concurrent proxy cases, derived key count, and hard isolation gates**
-- [ ] **Step 8: Stop all stress engines and checksum the complete stress family**
+- [x] **Step 1: NOT RUN** - the smoke production-defect stop condition was reached before the stress capacity query.
+- [x] **Step 2: NOT RUN** - no stress manifests or engines were applied.
+- [x] **Step 3: NOT RUN** - S1 is blocked by the terminal smoke correctness failure.
+- [x] **Step 4: NOT RUN** - no stress engine existed to reset after S1.
+- [x] **Step 5: NOT RUN** - S2 is blocked by the terminal smoke correctness failure.
+- [x] **Step 6: NOT RUN** - no stress engine existed to reset after S2.
+- [x] **Step 7: NOT RUN** - S3 is blocked by the terminal smoke correctness failure.
+- [x] **Step 8: NOT RUN** - there is no stress family to checksum; final base-engine cleanup is recorded in `smoke/`.
 
 ### Task 9: Finalize Evidence, Reports, And Publication
 
@@ -586,16 +601,16 @@ superseded step and no source change. Evidence `SHA256SUMS` digest:
 - Consumes: immutable checksummed family evidence.
 - Produces: auditable final state and matching source/control remotes.
 
-- [ ] **Step 1: Capture final Pods, processes, logs, metrics, images, and active NPU requests**
-- [ ] **Step 2: Stop every live vLLM child process started by this run and require Master empty**
-- [ ] **Step 3: Record the reclassification of the old G0 failure as a validation identity defect**
-- [ ] **Step 4: List every test/tooling issue, exact control files changed, regression coverage, and affected gates rerun**
-- [ ] **Step 5: Run checksum replay, credential scan, link/Git tracking checks, report checker, JSON checks, and `git diff --check`**
-- [ ] **Step 6: Run `pwsh -File` workspace scripts if `pwsh` exists; otherwise run and document Linux-equivalent lock/status/validation checks without claiming PowerShell execution**
-- [ ] **Step 7: Commit and push immutable evidence before the report/state commit**
+- [x] **Step 1: Capture final Pods, processes, logs, metrics, images, and active NPU requests** - base Pods were retained on `n1`; stopped engine containers are intentionally not Ready, Master/proxy/UT are Ready, and Prefill/Decode retain one NPU request each while UT retains zero.
+- [x] **Step 2: Stop every live vLLM child process started by this run and require Master empty** - both PID files/API servers are absent; live and archived final metrics are zero keys, bytes, and clients.
+- [x] **Step 3: Record the reclassification of the old G0 failure as a validation identity defect** - the main-lane correction and successful G0 are recorded in the report and run index.
+- [x] **Step 4: List every test/tooling issue, exact control files changed, regression coverage, and affected gates rerun** - recorded in the failure report and `sync-log.md`; no `repos/*` file changed.
+- [x] **Step 5: Run checksum replay, credential scan, link/Git tracking checks, report checker, JSON checks, and `git diff --check`** - all eight family manifests replayed; report schema passed; final static checks passed before publication.
+- [x] **Step 6: Run `pwsh -File` workspace scripts if `pwsh` exists; otherwise run and document Linux-equivalent lock/status/validation checks without claiming PowerShell execution** - neither `pwsh` nor `powershell` exists; corrected Linux equivalents passed for three clean lock-matched repos, one tracked feature, and ten snapshots.
+- [x] **Step 7: Commit and push immutable evidence before the report/state commit** - commit `25bc3f55546de727fcdddfba0110b3d1d2b93614` pushed and verified `0 0`.
 - [ ] **Step 8: Verify the control remote has not advanced, push normally, and require live `ls-remote` plus left/right count `0 0`**
-- [ ] **Step 9: Re-run final source history, protected-branch, remote, and clean-tree checks**
-- [ ] **Step 10: Preserve every user-owned untracked path exactly as found at finalization**
+- [x] **Step 9: Re-run final source history, protected-branch, remote, and clean-tree checks** - all three remotes fetched; merge-base/count/order/no-merge, live source target/protected refs, source `0 0`, and clean tree passed.
+- [x] **Step 10: Preserve every user-owned untracked path exactly as found at finalization** - `deployment_yaml/` and `dockerfile.vllm23` remain untracked and untouched.
 
 ## Gate Tracker
 
@@ -604,15 +619,15 @@ superseded step and no source change. Evidence `SHA256SUMS` digest:
 | Diagnosis | PASSED | interactive diagnostic record, to be summarized in tooling evidence | red with override; green without override |
 | Regression red | PASSED | tooling | focused test failed on missing lane field |
 | Tooling green | PASSED | `tooling-r4/` | 20/20 gate steps, 67 tests, recorder regression, static/dry-run/checksums passed |
-| Image | RETRYING | `image-r1/` failed infrastructure; `image-r2/` next | build plus static/dynamic identity pass |
-| CPU/mock UT | NOT RUN | `ut/` | AscendStore, deployment, Ruff, compile, history pass |
-| G0 | NOT RUN | `g0/` | exact identity, engines Ready, empty reset |
-| G1 | NOT RUN | `g1/` | direct ranged contract and cleanup pass |
-| Lease | NOT RUN | `lease/` | stale expiry, fresh recovery, cleanup pass |
-| G4 | NOT RUN | `g4/` | exact 27-layer ranged audit and whole-key exclusion pass |
-| Smoke | NOT RUN | `smoke/` | hard marker/token/usage/routing oracles pass |
-| Stress S1-S3 | NOT RUN | `stress/` | all topology, ranged, isolation, and reset gates pass |
-| Reports/publication | NOT RUN | reports and Git refs | replay/checker/push/remote equality pass |
+| Image | PASSED | `image-r1/` failed infrastructure; `image-r2/` passed | exact ARM64 identity and dynamic runtime proof passed |
+| CPU/mock UT | PASSED | `ut/` | AscendStore `476 passed`; deployment `67 passed`; Ruff, compile, history passed |
+| G0 | PASSED | `g0/` | exact identity, both engines Ready, and empty reset passed |
+| G1 | PASSED | `g1/` | 43 cases, 24 negative cases, cleanup passed |
+| Lease | PASSED | `lease/` | stale `-707`, fresh recovery, cleanup passed |
+| G4 | PASSED | `g4/` | exact 27-layer ranged audit and whole-key exclusion passed |
+| Smoke | FAILED - PRODUCTION DEFECT | `smoke/` | direct concurrent warm load violated marker ownership; focused warm/cold differential confirmed |
+| Stress S1-S3 | NOT RUN - BLOCKED | none | intentionally terminated after confirmed smoke production defect |
+| Reports/publication | IN PROGRESS | report, state files, evidence commit `25bc3f5` | report/state push and final remote equality remain |
 
 ## Attempts And Failure Ledger
 
@@ -630,6 +645,10 @@ superseded step and no source change. Evidence `SHA256SUMS` digest:
 | Tooling r4 | passed | 20 of 20 gate steps passed; deployment `67 passed`; two changed tests passed Ruff; transcript has no trailing whitespace; ten dry-runs, compile, history, identity, diff, and checksum replay passed | freeze and push this tooling tree before image build; `SHA256SUMS` digest `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506` |
 | Builder recovery from `/root/buildkitd.yaml` | recovered infrastructure | the user-provided historical manifest recreated `default/buildkitd` but, because it has no node pin, scheduled it on `m1` | delete only that new Pod and reapply the same definition with `nodeName: n1`; Ready, restart 0, worker `linux/arm64` |
 | Image r1 | transient infrastructure | after about 50 minutes of successful cold-cache compilation, `default/buildkitd` and the other default-namespace platform Pods received `Killing` at `2026-07-31T08:36:07Z`; BuildKit transport exited 137 and no image was loaded | preserve `image-r1/`; target tag remains absent; unchanged identity and source permit retry as `image-r2/`; checksum digest `8a80443d4f2f4603c528ec653deb386ab689ab9f2c33107bcf9baa7b9c243b33` |
+| Formal smoke runner | production correctness failure | direct concurrent case 2 response `cmpl-b4925b9042a7f091` omitted `CASE_TWO` despite `25/25` blocks, `3200` hit tokens, `use_layerwise=True`; serial replay passed | preserve full runner output; do not weaken marker hard gate; construct focused warm/cold differential without changing source |
+| Focused driver r1 | diagnostic test-step defect | hard-coded `decode-engine-service` did not exist and failed DNS before reaching the target code path | change only the evidence driver to discover the live Decode endpoint from proxy `/listEndPoints`; retain in final issue list |
+| Focused warm replay | confirmed production defect | single case 2, pair 0/2, and pair 1/2 passed 10/10; pair 2/3 failed 1/10 then 9/30, always case 2 with the same wrong continuation | freeze warm evidence; response mapping and oracle hypotheses falsified |
+| Focused cold differential | passed control | after stopped-engine empty-Master reset, identical pair 2/3 passed 30/30 and all 60 response IDs had `hit_blocks=0/25` | classify the defect as concurrent warm KV load; terminate stress, clean runtime, publish detailed failure report |
 
 Append every later failed or superseded attempt here immediately. Never erase an attempt after a retry passes.
 

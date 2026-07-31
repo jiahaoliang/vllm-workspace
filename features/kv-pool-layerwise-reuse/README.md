@@ -60,17 +60,23 @@
   [implementation-plans/full-validation-guide.md](implementation-plans/full-validation-guide.md)
 - Historical interrupted run tracker:
   [implementation-plans/2026-07-30-full-validation-rerun.md](implementation-plans/2026-07-30-full-validation-rerun.md)
-- Terminated run tracker:
+- Historical terminated run tracker:
   [implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md](implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md)
-- Termination report:
+- Historical termination report:
   [full-validation-rerun-2026-07-30.md](full-validation-rerun-2026-07-30.md)
+- Current terminated run tracker:
+  [implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md](implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md)
+- Current failure report:
+  [full-validation-rerun-2026-07-31.md](full-validation-rerun-2026-07-31.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 
 Stable guide 不携带历史 run 的默认 SHA、image tag、model dimensions 或 key counts。
 每次执行必须新建 dated tracker，并优先采用用户显式指定的版本；未指定字段从当次 clean
-checkout、lock、model 和 live runtime 派生后冻结。Run `20260730T130225Z` 已在 G0
-因 production ABI defect 终止，修复源码后必须新建 run identity，不得从 G1 续跑。
+checkout、lock、model 和 live runtime 派生后冻结。Run `20260731T064607Z` 修正了
+旧 G0 compatibility-lane 问题，并通过 UT、G0、G1、lease 与 G4；随后在 smoke 确认
+concurrent warm layerwise KV-load production defect 并终止。修复源码后必须新建 run
+identity，不得从 stress 续跑。
 
 ### 1P1D Smoke
 

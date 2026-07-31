@@ -2,7 +2,9 @@
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
 infrastructure failure, the unchanged-identity image r2 retry passed, and the
-corrected-image CPU-only UT, G0, G1, lease, and G4 families passed.
+corrected-image CPU-only UT, G0, G1, lease, and G4 families passed. Smoke then
+confirmed a concurrent warm layerwise KV-load production defect. Stress S1-S3
+was not run.
 
 ## Frozen Identity
 
@@ -120,3 +122,20 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   windows, 512 hit tokens, Master counters, engine cleanup, and zero-metric
   reset are all archived. Its `SHA256SUMS` digest is
   `bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.
+
+## 1P1D Smoke
+
+- [`smoke/`](smoke/README.md): failed and terminated the run. The formal
+  direct concurrent case 2 response omitted `CASE_TWO` despite `25/25` blocks,
+  3200 hit tokens, and `use_layerwise=True`; serial replay passed. A focused
+  case 2/case 3 warm replay reproduced 9 failures in 30 rounds, always case 2.
+  After an empty-Master reset, the identical cold pair passed 30/30 and all 60
+  response IDs correlated with `hit_blocks=0/25`. Both engines were stopped
+  and the final Master reset reported zero keys, zero allocated bytes, and zero
+  active clients. Its `SHA256SUMS` digest is
+  `b781d2598c1d7a397a11d650abb9b7448b8354bf20f46762a15844164e35bffb`.
+
+## Stress S1-S3
+
+Not run. The source-freeze contract requires termination after a confirmed
+production correctness defect; no stress manifests were applied.

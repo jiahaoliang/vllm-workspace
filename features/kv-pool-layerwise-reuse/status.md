@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: 11/11 Mooncake linear integration frozen; full validation terminated at G0 on a production ABI defect
+Current Phase: 11/11 Mooncake linear integration frozen; main-lane full validation terminated at smoke on a concurrent warm layerwise KV-load defect
 
 ## Baseline
 
@@ -17,15 +17,30 @@ Current Phase: 11/11 Mooncake linear integration frozen; full validation termina
 
 ## Next Steps
 
-- Resolve the vLLM-Ascend/vLLM coordinator signature mismatch in a separate,
-  explicitly authorized source change. The terminated run did not modify
-  `repos/*`.
+- Diagnose and fix the concurrent Mooncake layerwise ranged-load request/key/
+  local-block mapping in a separately authorized source change. The terminated
+  validation did not modify `repos/*`.
 - After a source fix, create a new validation identity and run ID, rebuild the
-  complete image, and restart the full sequence from tooling/image/UT through
-  G0, G1, lease, G4, smoke, and stress. Do not resume this failed run at G1.
-- Preserve run `20260730T130225Z` as immutable failure evidence.
+  complete image, and restart the full sequence from tooling/image/UT. Do not
+  resume run `20260731T064607Z` at Stress S1.
+- Preserve both terminated runs and their checksummed evidence.
 
 ## Latest Validation
+
+- Full validation run `20260731T064607Z` used the corrected `main-verified`
+  lane and exact ARM64 image at vLLM-Ascend `14beaf161`. AscendStore passed
+  `476` tests, deployment tooling passed `67`, and G0, G1, lease, and G4 all
+  passed. The old coordinator keyword `TypeError` did not recur.
+- Formal smoke failed direct concurrent case 2 despite `25/25` blocks, 3200
+  hit tokens, and `use_layerwise=True`; serial replay passed. The minimal warm
+  case 2/case 3 pair failed 9/30, always case 2, while the identical empty-
+  Master cold control passed 30/30 and all 60 response IDs logged `0/25` hits.
+  This confirmed a production warm-load correctness defect, not a runner or
+  marker-oracle problem.
+- Stress S1-S3 was not run. Both engines were stopped, Master was reset to zero
+  keys/bytes/clients, and frozen source remained clean. The self-contained
+  report is `full-validation-rerun-2026-07-31.md`; smoke evidence commit is
+  `25bc3f55546de727fcdddfba0110b3d1d2b93614`.
 
 - Full validation run `20260730T130225Z` built and proved the exact R4 ARM64
   image, then passed the CPU-only UT gate (`476` AscendStore and `65`

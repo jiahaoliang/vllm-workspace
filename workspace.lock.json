@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-31T01:37:56+08:00",
+  "updated_at": "2026-07-31T19:56:19+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -11,7 +11,7 @@
       },
       "branch": "detached:54503ecec",
       "commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-      "purpose": "Frozen validation dependency declared by the integrated vLLM-Ascend branch (release line v0.25.1); coordinator signature mismatch captured by terminated G0 validation"
+      "purpose": "Frozen main-verified validation dependency; the corrected lane passed startup and cold concurrent controls in run 20260731T064607Z"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
@@ -22,7 +22,7 @@
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
       "commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
-      "purpose": "Completed 11/11 Mooncake linear integration onto collaborator/kv_offload_0723 a46a1dabb; source frozen after full validation terminated at G0 on an inherited coordinator ABI mismatch"
+      "purpose": "Completed 11/11 Mooncake linear integration onto collaborator/kv_offload_0723 a46a1dabb; frozen source passed UT, G0, G1, lease, and G4 before validation terminated on a concurrent warm layerwise KV-load defect"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

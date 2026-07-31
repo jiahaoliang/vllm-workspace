@@ -462,6 +462,57 @@
   lock refresh corrected Mooncake's checkout label from the stale local branch
   name to actual clean detached state `detached:786c77ff`; no Mooncake ref or
   source file was changed.
+
+## 2026-07-31
+
+- Corrected the full-validation compatibility identity to the source branch's
+  `main-verified` vLLM commit `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`
+  with no `VLLM_VERSION` release override. Rebuilt exact native ARM64 image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1`;
+  manifest is
+  `sha256:866ba89f897464a1e38893a57f6e5c3a035c7aba7dfa196fce9646498eaf6d97`
+  and config is
+  `sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57`.
+- The dedicated CPU-only `liangjiahao/vllm-ascend-ut` Pod passed the complete
+  AscendStore suite (`476 passed`) and deployment tests (`67 passed`). G0
+  started both engines without the historical coordinator `TypeError`; G1
+  passed 43 direct ranged cases including 24 negative cases; lease validation
+  returned exact stale-session `-707` and recovered with a fresh session; G4
+  proved ranged save/load layers `0..26` and zero whole-key calls.
+- Formal smoke failed only direct concurrent case 2. Response
+  `cmpl-b4925b9042a7f091` had the exact case 2 prompt digest, usage, and finish
+  reason but omitted `CASE_TWO` while Decode logged `25/25`, 3200 hit tokens,
+  and `use_layerwise=True`. Its serial replay passed; proxy concurrency and
+  the 12/12 response-log correlation checker passed.
+- An evidence-only focused replay reduced the trigger to warm pair 2/3. Case 2
+  alone, pair 0/2, and pair 1/2 each passed 10/10; pair 2/3 failed 1/10 and then
+  9/30, always case 2. After stopping both engines and resetting Master, the
+  identical cold pair passed 30/30, with all 60 response IDs correlated to
+  `hit_blocks=0/25`. This warm/cold differential falsified response ordering,
+  marker checker, fixed seed, and generic concurrent-generation explanations.
+- Classified the result as a production concurrent layerwise warm-load defect
+  and terminated before Stress S1-S3. No `repos/*` file changed. Final cleanup
+  stopped both vLLM children and reset Master to zero keys, zero allocated
+  bytes, and zero active clients.
+- Validation-only issues repaired during the run were: terminating-old-Pod
+  image wait selection, unsupported JSONPath null predicate, summary
+  JSON/Python quoting, raw binary evidence attributes, duplicate G0 `pod`
+  resource type, self-matching G1 `pgrep`, host Python 3.9
+  `zip(strict=True)`, and the focused driver's nonexistent Decode service DNS.
+  The final issue was corrected to proxy `/listEndPoints` discovery. No
+  production behavior or hard oracle was weakened.
+- Finalization also corrected execution-only assumptions: using the fixed
+  `/workspace/tools/ruff` binary instead of a missing Python module, removing
+  an early `py_compile` bytecode directory before checksumming, placing the
+  report's script digest on the checker-required line, matching Git's default
+  detached abbreviation in the Linux status equivalent, limiting workspace
+  feature enumeration to direct children, and replacing one shell search that
+  had unescaped backticks. All corrected checks passed afterward.
+- Checksummed smoke evidence has manifest digest
+  `b781d2598c1d7a397a11d650abb9b7448b8354bf20f46762a15844164e35bffb`.
+  Evidence commit `25bc3f55546de727fcdddfba0110b3d1d2b93614` was pushed normally from
+  remote checkpoint `456726bcda5bbce6e73d5a36672f308b82765435`;
+  post-push `git ls-remote` matched and left/right count was `0 0`.
 - Published evidence commit `dfe99a1fa7c246f9d84320deac2f143033cec12b`
   and final report/state commit
   `2895913410272e4b93c8aadc20940959915f4039` by a normal fast-forward from

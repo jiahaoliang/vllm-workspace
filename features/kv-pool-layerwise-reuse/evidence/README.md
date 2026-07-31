@@ -15,7 +15,9 @@ current test entry points.
   [main-verified rerun](../implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md)
 - Evidence:
   [full-validation-rerun-20260731T064607Z](full-validation-rerun-20260731T064607Z/README.md)
-- Current result: the validation-only main/release compatibility mismatch and
+- Report:
+  [full-validation-rerun-2026-07-31.md](../full-validation-rerun-2026-07-31.md)
+- Result: the validation-only main/release compatibility mismatch and
   the recorder trailing-whitespace defect are regression-tested and corrected.
   Formal `tooling-r4` passed all 20 recorded gates with `67` deployment tests.
   Image r1 is preserved as checksummed transient-infrastructure evidence;
@@ -23,7 +25,10 @@ current test entry points.
   the corrected-image CPU-only UT family passed. G0 also passed under the main
   lane, including both engine startups and final empty-Master reset. G1 direct
   ranged validation, lease-expiry boundary, and G4 production ranged-call
-  audit also passed. Smoke and stress are not yet run.
+  audit also passed. Smoke confirmed a concurrent warm layerwise KV-load
+  production defect through a warm `9/30` versus cold `0/30` focused
+  differential. Stress S1-S3 was intentionally not run after the terminal
+  correctness failure.
 - Passing tooling `SHA256SUMS` digest:
   `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
 - Passing image r2 `SHA256SUMS` digest:
@@ -38,6 +43,10 @@ current test entry points.
   `5027b79d7453f14c8dbb71e71788f69c5ed3310246c114fe3bf9cf8c36753650`.
 - Passing G4 `SHA256SUMS` digest:
   `bf34acfcb48358613a7a3931443e737444d19c6f14770f02e7c10aaa0d872999`.
+- Failed smoke `SHA256SUMS` digest:
+  `b781d2598c1d7a397a11d650abb9b7448b8354bf20f46762a15844164e35bffb`.
+- Smoke evidence commit:
+  `25bc3f55546de727fcdddfba0110b3d1d2b93614`.
 
 ## Full Validation Rerun 20260730T130225Z
 
