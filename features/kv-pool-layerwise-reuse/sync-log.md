@@ -513,6 +513,18 @@
   Evidence commit `25bc3f55546de727fcdddfba0110b3d1d2b93614` was pushed normally from
   remote checkpoint `456726bcda5bbce6e73d5a36672f308b82765435`;
   post-push `git ls-remote` matched and left/right count was `0 0`.
+- `pwsh` and `powershell` were unavailable. Linux equivalents of
+  `lock-repos.ps1`, `status-all.ps1`, and `validate-workspace.ps1` passed after
+  the documented equivalence corrections: all three nested repos matched the
+  lock and were clean; one tracked feature and ten snapshots passed workspace
+  validation.
+- Published the self-contained failure report and final state as
+  `7b3d0a991fcf91bbc6d008d7b4ab361414e2aeb3` by normal fast-forward from
+  evidence checkpoint `25bc3f55546de727fcdddfba0110b3d1d2b93614`.
+  Post-push live `git ls-remote` returned `7b3d0a991fcf91bbc6d008d7b4ab361414e2aeb3`
+  and `git rev-list --left-right --count` returned `0 0`. This metadata-only
+  follow-up records the completed publication check; its own remote equality
+  is verified independently after push.
 - Published evidence commit `dfe99a1fa7c246f9d84320deac2f143033cec12b`
   and final report/state commit
   `2895913410272e4b93c8aadc20940959915f4039` by a normal fast-forward from

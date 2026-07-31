@@ -608,7 +608,7 @@ zero active clients.
 - [x] **Step 5: Run checksum replay, credential scan, link/Git tracking checks, report checker, JSON checks, and `git diff --check`** - all eight family manifests replayed; report schema passed; final static checks passed before publication.
 - [x] **Step 6: Run `pwsh -File` workspace scripts if `pwsh` exists; otherwise run and document Linux-equivalent lock/status/validation checks without claiming PowerShell execution** - neither `pwsh` nor `powershell` exists; corrected Linux equivalents passed for three clean lock-matched repos, one tracked feature, and ten snapshots.
 - [x] **Step 7: Commit and push immutable evidence before the report/state commit** - commit `25bc3f55546de727fcdddfba0110b3d1d2b93614` pushed and verified `0 0`.
-- [ ] **Step 8: Verify the control remote has not advanced, push normally, and require live `ls-remote` plus left/right count `0 0`**
+- [x] **Step 8: Verify the control remote has not advanced, push normally, and require live `ls-remote` plus left/right count `0 0`** - report/state commit `7b3d0a991fcf91bbc6d008d7b4ab361414e2aeb3` was a normal fast-forward from evidence checkpoint `25bc3f5`; live remote matched and left/right was `0 0`.
 - [x] **Step 9: Re-run final source history, protected-branch, remote, and clean-tree checks** - all three remotes fetched; merge-base/count/order/no-merge, live source target/protected refs, source `0 0`, and clean tree passed.
 - [x] **Step 10: Preserve every user-owned untracked path exactly as found at finalization** - `deployment_yaml/` and `dockerfile.vllm23` remain untracked and untouched.
 
@@ -627,7 +627,7 @@ zero active clients.
 | G4 | PASSED | `g4/` | exact 27-layer ranged audit and whole-key exclusion passed |
 | Smoke | FAILED - PRODUCTION DEFECT | `smoke/` | direct concurrent warm load violated marker ownership; focused warm/cold differential confirmed |
 | Stress S1-S3 | NOT RUN - BLOCKED | none | intentionally terminated after confirmed smoke production defect |
-| Reports/publication | IN PROGRESS | report, state files, evidence commit `25bc3f5` | report/state push and final remote equality remain |
+| Reports/publication | PASSED | evidence `25bc3f5`, report/state `7b3d0a9`, final metadata follow-up | checksum/report/workspace/source gates and normal push verification passed |
 
 ## Attempts And Failure Ledger
 
