@@ -64,7 +64,7 @@ Captured after diagnosis on 2026-07-31:
 | Item | Exact state |
 | --- | --- |
 | Control HEAD before tooling fix | `e20e79c5032fccb02e3bcf8209179b4f6162fc37` |
-| Control remote | `origin/kv-pool-layerwise-reuse` at the same SHA |
+| Control tooling checkpoint | `e97b41a046c03f1926f096740765ae13a56329e9`, pushed and verified `0 0` |
 | Frozen vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | Frozen vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
 | Frozen Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
@@ -360,7 +360,7 @@ path-scoped `binary` attribute prevents Git from normalizing or rejecting that
 historical byte evidence. The corrected `tooling-r4/` transcript remains a
 normal text file and has no trailing whitespace.
 
-- [ ] **Step 5: Commit and push the tooling checkpoint narrowly**
+- [x] **Step 5: Commit and push the tooling checkpoint narrowly**
 
 Stage only the control files listed in Tasks 1-3 and this plan. Verify the live remote is still the expected ancestor, commit with a message describing the main/release identity correction, push normally, then require live `git ls-remote` equality and `git rev-list --left-right --count` equal to `0 0`.
 
