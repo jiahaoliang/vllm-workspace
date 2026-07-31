@@ -1,0 +1,69 @@
+{
+  "errors": [],
+  "gates": {
+    "capacity_preflight": true,
+    "coordinator_keyword": "max_in_flight_tokens",
+    "decode_http_ready": true,
+    "engines_stopped": true,
+    "final_active_clients": 0,
+    "final_allocated_bytes": 0,
+    "final_key_count": 0,
+    "lease_ttl_ms": 30000,
+    "main_verified_lane": true,
+    "master_initial_empty": true,
+    "master_reset": true,
+    "model_identity": true,
+    "native_libraries": true,
+    "npu_health": true,
+    "old_coordinator_type_error_reproduced": false,
+    "pod_identity": true,
+    "prefill_http_ready": true,
+    "proxy_routing": true,
+    "session_apis": 7,
+    "source_clean": true,
+    "source_history_commits": 11,
+    "vllm_version_override": null
+  },
+  "image": {
+    "config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
+  },
+  "retained": {
+    "decode_pod": true,
+    "engine_processes_running": false,
+    "master_pod": true,
+    "prefill_pod": true,
+    "proxy_pod": true,
+    "ut_pod": true
+  },
+  "run_id": "20260731T064607Z-g0",
+  "schema_version": 1,
+  "source_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "classification": "kubectl resource type was specified twice",
+      "exit_code": 1,
+      "replacement": "prefill-pod-yaml-r2 with bare Pod name",
+      "replacement_passed": true,
+      "step": "prefill-pod-yaml"
+    }
+  ],
+  "tooling_commit": "cb313156c0d8f40fcf92a0273aea98caf5910cf6",
+  "topology": {
+    "decode": {
+      "dp": 1,
+      "npu": 1,
+      "tp": 1
+    },
+    "node": "n1",
+    "prefill": {
+      "dp": 1,
+      "npu": 1,
+      "tp": 1
+    },
+    "proxy_decode_nodes": 1,
+    "proxy_prefill_nodes": 1
+  },
+  "validated": true
+}

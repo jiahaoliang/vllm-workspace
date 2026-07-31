@@ -71,8 +71,8 @@ Captured after diagnosis on 2026-07-31:
 | Source integration | 11/11 linear commits, clean, pushed, no merge commit |
 | Historical failed image | `docker.io/library/vllm-ascend:kv-pool-layerwise-v0.25.1-a2-14beaf16-20260730T130225Z-r4` |
 | Historical G0 failure | `max_num_batched_tokens` was selected for a pinned signature that accepts `max_in_flight_tokens` |
-| Current tracked WIP | Tooling r4, image r2, and corrected-image UT are green; G0 is next |
-| Active build or formal validation | No active build or serving gate; the CPU-only UT Pod is retained Running on `n1` |
+| Current tracked WIP | Tooling r4, image r2, UT, and corrected main-lane G0 are green; G1 is next |
+| Active build or formal validation | Base Pods and CPU-only UT Pod are retained on `n1`; both vLLM child processes are stopped and Master is empty |
 
 The target source branch contains:
 
@@ -478,14 +478,23 @@ tooling changes. Evidence is in `ut/` with `SHA256SUMS` digest
 - Consumes: proved image, corrected manifests, live capacity, and clean Master.
 - Produces: exact healthy base 1P1D suitable for independent runtime gates.
 
-- [ ] **Step 1: Re-query context, Ready nodes, physical NPU capacity, active requests, and model checksums**
-- [ ] **Step 2: Apply every base object with explicit `-n liangjiahao`**
-- [ ] **Step 3: Require each Pod to report the new imageID and exact editable source HEADs**
-- [ ] **Step 4: Run both mounted `check-runtime.py` scripts before engine startup**
-- [ ] **Step 5: Require main lane, unset override, `max_in_flight_tokens`, seven APIs, NPU health, native libraries, model identity, and hash seed**
-- [ ] **Step 6: Start Prefill and Decode, wait for HTTP/Ready, and fail immediately on the prior coordinator TypeError**
-- [ ] **Step 7: Stop engines, reset Master, and require keys, allocated bytes, and active clients all equal zero**
-- [ ] **Step 8: Checksum G0 evidence and write a terminal structured summary**
+- [x] **Step 1: Re-query context, Ready nodes, physical NPU capacity, active requests, and model checksums**
+- [x] **Step 2: Apply every base object with explicit `-n liangjiahao`**
+- [x] **Step 3: Require each Pod to report the new imageID and exact editable source HEADs**
+- [x] **Step 4: Run both mounted `check-runtime.py` scripts before engine startup**
+- [x] **Step 5: Require main lane, unset override, `max_in_flight_tokens`, seven APIs, NPU health, native libraries, model identity, and hash seed**
+- [x] **Step 6: Start Prefill and Decode, wait for HTTP/Ready, and fail immediately on the prior coordinator TypeError**
+- [x] **Step 7: Stop engines, reset Master, and require keys, allocated bytes, and active clients all equal zero**
+- [x] **Step 8: Checksum G0 evidence and write a terminal structured summary**
+
+G0 passed on `n1` with the exact image config ID and source HEADs. Both
+Prefill and Decode initialized `AscendStoreConnector`, reached HTTP readiness,
+and were discovered by the proxy; the old coordinator `TypeError` did not
+recur. The child processes were then stopped and Master was reset to zero keys,
+zero allocated bytes, and zero active clients. One Pod snapshot command
+specified the resource type twice; its failed output is preserved and the
+bare-name retry passed. No source changed. Evidence `SHA256SUMS` digest:
+`6416863ddba50d3e716cf6f765869c79488c70707adb78b0b6c1a0a28662524c`.
 
 ### Task 7: Run G1, Lease, G4, And 1P1D Smoke Independently
 

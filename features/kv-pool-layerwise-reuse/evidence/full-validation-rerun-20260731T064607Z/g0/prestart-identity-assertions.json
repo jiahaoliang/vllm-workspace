@@ -1,0 +1,117 @@
+{
+  "lease_ttl_ms": 30000,
+  "master_empty": {
+    "active_clients": 0,
+    "allocated_bytes": 0,
+    "keys": 0
+  },
+  "pod_contract": {
+    "engine_hostpaths": [
+      "/etc/ascend_install.info",
+      "/etc/hccn.conf",
+      "/home/llm_cache",
+      "/usr/bin/hccn_tool",
+      "/usr/local/Ascend/driver/lib64",
+      "/usr/local/Ascend/driver/version.info",
+      "/usr/local/bin/npu-smi",
+      "/usr/local/dcmi"
+    ],
+    "engine_npu_request_each": 1,
+    "expected_config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+    "expected_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+    "pods": {
+      "decode": {
+        "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+        "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+        "node": "n1",
+        "phase": "Running",
+        "pod": "decode-engine-deployment-f6f4b9988-gxlwd",
+        "ready": "False",
+        "restart_count": 0
+      },
+      "mooncake-master": {
+        "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+        "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+        "node": "n1",
+        "phase": "Running",
+        "pod": "mooncake-master-deployment-99874945f-5w58h",
+        "ready": "True",
+        "restart_count": 0
+      },
+      "prefill": {
+        "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+        "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+        "node": "n1",
+        "phase": "Running",
+        "pod": "prefill-engine-deployment-7f4fc6ddc7-n884l",
+        "ready": "False",
+        "restart_count": 0
+      },
+      "proxy": {
+        "image": "cr.openfuyao.cn/openfuyao/proxy-server:latest",
+        "image_id": "cr.openfuyao.cn/openfuyao/proxy-server@sha256:fa8d04696e4bcf04e0e6c2c084bb8ecefa1b85191414d66889a778750ff1e3e0",
+        "node": "n1",
+        "phase": "Running",
+        "pod": "proxy-server-deployment-54bb6c9585-7fzs5",
+        "ready": "True",
+        "restart_count": 0
+      }
+    },
+    "validated": true,
+    "vllm_lane": "main-verified",
+    "vllm_version_override": null
+  },
+  "roles": {
+    "decode": {
+      "model": {
+        "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+        "max_position_embeddings": 163840,
+        "num_layers": 27,
+        "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669"
+      },
+      "packages": {
+        "api_count": 7,
+        "coordinator_keyword": "max_in_flight_tokens",
+        "npu_available": true,
+        "torch": "2.10.0+cpu",
+        "torch_npu": "2.10.0.post2",
+        "triton_ascend": "3.2.1",
+        "vllm": "0.1.dev1+g54503ecec.empty",
+        "vllm_ascend": "0.1.dev1+g14beaf161",
+        "vllm_ascend_path": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py",
+        "vllm_version_override": null
+      },
+      "source_heads": [
+        "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+        "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+        "786c77ff7692bed58dd99971afef87d6b690cbe3"
+      ]
+    },
+    "prefill": {
+      "model": {
+        "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+        "max_position_embeddings": 163840,
+        "num_layers": 27,
+        "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669"
+      },
+      "packages": {
+        "api_count": 7,
+        "coordinator_keyword": "max_in_flight_tokens",
+        "npu_available": true,
+        "torch": "2.10.0+cpu",
+        "torch_npu": "2.10.0.post2",
+        "triton_ascend": "3.2.1",
+        "vllm": "0.1.dev1+g54503ecec.empty",
+        "vllm_ascend": "0.1.dev1+g14beaf161",
+        "vllm_ascend_path": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py",
+        "vllm_version_override": null
+      },
+      "source_heads": [
+        "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+        "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+        "786c77ff7692bed58dd99971afef87d6b690cbe3"
+      ]
+    }
+  },
+  "validated": true
+}

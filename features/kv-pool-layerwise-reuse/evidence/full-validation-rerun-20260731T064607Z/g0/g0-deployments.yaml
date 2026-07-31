@@ -1,0 +1,527 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"mooncake-master-deployment","namespace":"liangjiahao"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mooncake-master"}},"template":{"metadata":{"labels":{"app":"mooncake-master"}},"spec":{"containers":[{"args":["exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s --enable_offload=false --logtostderr=true"],"command":["/bin/bash","-lc"],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1","imagePullPolicy":"Never","name":"mooncake-master","ports":[{"containerPort":50001,"name":"master-rpc"},{"containerPort":9003,"name":"metrics"}],"readinessProbe":{"failureThreshold":20,"initialDelaySeconds":2,"periodSeconds":3,"tcpSocket":{"port":"master-rpc"}}}],"nodeName":"n1"}}}}
+    creationTimestamp: "2026-07-30T17:08:15Z"
+    generation: 3
+    name: mooncake-master-deployment
+    namespace: liangjiahao
+    resourceVersion: "26968402"
+    uid: b189a6fa-6c71-476f-96b0-0062512c98aa
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mooncake-master
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-07-31T01:26:29+08:00"
+        labels:
+          app: mooncake-master
+      spec:
+        containers:
+        - args:
+          - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s
+            --enable_offload=false --logtostderr=true
+          command:
+          - /bin/bash
+          - -lc
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+          imagePullPolicy: Never
+          name: mooncake-master
+          ports:
+          - containerPort: 50001
+            name: master-rpc
+            protocol: TCP
+          - containerPort: 9003
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 20
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            tcpSocket:
+              port: master-rpc
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-30T17:08:17Z"
+      lastUpdateTime: "2026-07-30T17:08:17Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-30T17:08:15Z"
+      lastUpdateTime: "2026-07-31T10:32:01Z"
+      message: ReplicaSet "mooncake-master-deployment-99874945f" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"prefill-engine-deployment","namespace":"liangjiahao"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"prefill"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"prefill"}},"spec":{"containers":[{"args":["exec sleep infinity"],"command":["/bin/bash","-lc"],"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"HCCL_IF_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"GLOO_SOCKET_IFNAME","value":"eth0"},{"name":"TP_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_INTRA_ROCE_ENABLE","value":"1"},{"name":"ASCEND_BUFFER_POOL","value":"4:8"},{"name":"MOONCAKE_CONFIG_PATH","value":"/opt/vllm-layerwise/mooncake.json"},{"name":"MOONCAKE_MASTER","value":"mooncake-master-service:30089"},{"name":"PYTHONUNBUFFERED","value":"1"},{"name":"PYTHONHASHSEED","value":"0"}],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1","imagePullPolicy":"Never","name":"prefill-engine","ports":[{"containerPort":8100,"name":"prefill-port"}],"readinessProbe":{"failureThreshold":120,"httpGet":{"path":"/v1/models","port":"prefill-port"},"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"huawei.com/Ascend910":"1"},"requests":{"huawei.com/Ascend910":"1"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm"},{"mountPath":"/usr/local/dcmi","name":"dcmi"},{"mountPath":"/usr/local/bin/npu-smi","name":"npusmi"},{"mountPath":"/usr/local/Ascend/driver/lib64","name":"driver-lib64"},{"mountPath":"/usr/local/Ascend/driver/version.info","name":"driver-version"},{"mountPath":"/etc/ascend_install.info","name":"ascend-install-info"},{"mountPath":"/root/.cache","name":"model-cache"},{"mountPath":"/usr/bin/hccn_tool","name":"hccn-tool"},{"mountPath":"/etc/hccn.conf","name":"hccn-conf"},{"mountPath":"/opt/vllm-layerwise","name":"runtime-config","readOnly":true}]}],"nodeName":"n1","terminationGracePeriodSeconds":120,"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"24Gi"},"name":"shm"},{"hostPath":{"path":"/usr/local/dcmi","type":"Directory"},"name":"dcmi"},{"hostPath":{"path":"/usr/local/bin/npu-smi","type":"File"},"name":"npusmi"},{"hostPath":{"path":"/usr/local/Ascend/driver/lib64","type":"Directory"},"name":"driver-lib64"},{"hostPath":{"path":"/usr/local/Ascend/driver/version.info","type":"File"},"name":"driver-version"},{"hostPath":{"path":"/etc/ascend_install.info","type":"File"},"name":"ascend-install-info"},{"hostPath":{"path":"/home/llm_cache","type":"Directory"},"name":"model-cache"},{"hostPath":{"path":"/usr/bin/hccn_tool","type":"File"},"name":"hccn-tool"},{"hostPath":{"path":"/etc/hccn.conf","type":"File"},"name":"hccn-conf"},{"configMap":{"defaultMode":365,"name":"layerwise-runtime-config"},"name":"runtime-config"}]}}}}
+    creationTimestamp: "2026-07-31T10:32:03Z"
+    generation: 1
+    name: prefill-engine-deployment
+    namespace: liangjiahao
+    resourceVersion: "26968450"
+    uid: 7528c113-90b6-460e-8a1a-f58c1eb9dbf8
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: prefill
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: prefill
+      spec:
+        containers:
+        - args:
+          - exec sleep infinity
+          command:
+          - /bin/bash
+          - -lc
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: HCCL_IF_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: GLOO_SOCKET_IFNAME
+            value: eth0
+          - name: TP_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_INTRA_ROCE_ENABLE
+            value: "1"
+          - name: ASCEND_BUFFER_POOL
+            value: "4:8"
+          - name: MOONCAKE_CONFIG_PATH
+            value: /opt/vllm-layerwise/mooncake.json
+          - name: MOONCAKE_MASTER
+            value: mooncake-master-service:30089
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: PYTHONHASHSEED
+            value: "0"
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+          imagePullPolicy: Never
+          name: prefill-engine
+          ports:
+          - containerPort: 8100
+            name: prefill-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /v1/models
+              port: prefill-port
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              huawei.com/Ascend910: "1"
+            requests:
+              huawei.com/Ascend910: "1"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+          - mountPath: /usr/local/dcmi
+            name: dcmi
+          - mountPath: /usr/local/bin/npu-smi
+            name: npusmi
+          - mountPath: /usr/local/Ascend/driver/lib64
+            name: driver-lib64
+          - mountPath: /usr/local/Ascend/driver/version.info
+            name: driver-version
+          - mountPath: /etc/ascend_install.info
+            name: ascend-install-info
+          - mountPath: /root/.cache
+            name: model-cache
+          - mountPath: /usr/bin/hccn_tool
+            name: hccn-tool
+          - mountPath: /etc/hccn.conf
+            name: hccn-conf
+          - mountPath: /opt/vllm-layerwise
+            name: runtime-config
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 120
+        volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 24Gi
+          name: shm
+        - hostPath:
+            path: /usr/local/dcmi
+            type: Directory
+          name: dcmi
+        - hostPath:
+            path: /usr/local/bin/npu-smi
+            type: File
+          name: npusmi
+        - hostPath:
+            path: /usr/local/Ascend/driver/lib64
+            type: Directory
+          name: driver-lib64
+        - hostPath:
+            path: /usr/local/Ascend/driver/version.info
+            type: File
+          name: driver-version
+        - hostPath:
+            path: /etc/ascend_install.info
+            type: File
+          name: ascend-install-info
+        - hostPath:
+            path: /home/llm_cache
+            type: Directory
+          name: model-cache
+        - hostPath:
+            path: /usr/bin/hccn_tool
+            type: File
+          name: hccn-tool
+        - hostPath:
+            path: /etc/hccn.conf
+            type: File
+          name: hccn-conf
+        - configMap:
+            defaultMode: 365
+            name: layerwise-runtime-config
+          name: runtime-config
+  status:
+    conditions:
+    - lastTransitionTime: "2026-07-31T10:32:03Z"
+      lastUpdateTime: "2026-07-31T10:32:03Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2026-07-31T10:32:03Z"
+      lastUpdateTime: "2026-07-31T10:32:03Z"
+      message: ReplicaSet "prefill-engine-deployment-7f4fc6ddc7" is progressing.
+      reason: ReplicaSetUpdated
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"decode-engine-deployment","namespace":"liangjiahao"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"decode"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"decode"}},"spec":{"containers":[{"args":["exec sleep infinity"],"command":["/bin/bash","-lc"],"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"HCCL_IF_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"GLOO_SOCKET_IFNAME","value":"eth0"},{"name":"TP_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_SOCKET_IFNAME","value":"eth0"},{"name":"HCCL_INTRA_ROCE_ENABLE","value":"1"},{"name":"ASCEND_BUFFER_POOL","value":"4:8"},{"name":"MOONCAKE_CONFIG_PATH","value":"/opt/vllm-layerwise/mooncake.json"},{"name":"MOONCAKE_MASTER","value":"mooncake-master-service:30089"},{"name":"PYTHONUNBUFFERED","value":"1"},{"name":"PYTHONHASHSEED","value":"0"}],"image":"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1","imagePullPolicy":"Never","name":"decode-engine","ports":[{"containerPort":8200,"name":"decode-port"}],"readinessProbe":{"failureThreshold":120,"httpGet":{"path":"/v1/models","port":"decode-port"},"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"huawei.com/Ascend910":"1"},"requests":{"huawei.com/Ascend910":"1"}},"volumeMounts":[{"mountPath":"/dev/shm","name":"shm"},{"mountPath":"/usr/local/dcmi","name":"dcmi"},{"mountPath":"/usr/local/bin/npu-smi","name":"npusmi"},{"mountPath":"/usr/local/Ascend/driver/lib64","name":"driver-lib64"},{"mountPath":"/usr/local/Ascend/driver/version.info","name":"driver-version"},{"mountPath":"/etc/ascend_install.info","name":"ascend-install-info"},{"mountPath":"/root/.cache","name":"model-cache"},{"mountPath":"/usr/bin/hccn_tool","name":"hccn-tool"},{"mountPath":"/etc/hccn.conf","name":"hccn-conf"},{"mountPath":"/opt/vllm-layerwise","name":"runtime-config","readOnly":true}]}],"nodeName":"n1","terminationGracePeriodSeconds":120,"volumes":[{"emptyDir":{"medium":"Memory","sizeLimit":"24Gi"},"name":"shm"},{"hostPath":{"path":"/usr/local/dcmi","type":"Directory"},"name":"dcmi"},{"hostPath":{"path":"/usr/local/bin/npu-smi","type":"File"},"name":"npusmi"},{"hostPath":{"path":"/usr/local/Ascend/driver/lib64","type":"Directory"},"name":"driver-lib64"},{"hostPath":{"path":"/usr/local/Ascend/driver/version.info","type":"File"},"name":"driver-version"},{"hostPath":{"path":"/etc/ascend_install.info","type":"File"},"name":"ascend-install-info"},{"hostPath":{"path":"/home/llm_cache","type":"Directory"},"name":"model-cache"},{"hostPath":{"path":"/usr/bin/hccn_tool","type":"File"},"name":"hccn-tool"},{"hostPath":{"path":"/etc/hccn.conf","type":"File"},"name":"hccn-conf"},{"configMap":{"defaultMode":365,"name":"layerwise-runtime-config"},"name":"runtime-config"}]}}}}
+    creationTimestamp: "2026-07-30T17:08:32Z"
+    generation: 2
+    name: decode-engine-deployment
+    namespace: liangjiahao
+    resourceVersion: "26969774"
+    uid: 9966130b-46b8-4869-b849-65108b8c2893
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: decode
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: decode
+      spec:
+        containers:
+        - args:
+          - exec sleep infinity
+          command:
+          - /bin/bash
+          - -lc
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: HCCL_IF_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: GLOO_SOCKET_IFNAME
+            value: eth0
+          - name: TP_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_SOCKET_IFNAME
+            value: eth0
+          - name: HCCL_INTRA_ROCE_ENABLE
+            value: "1"
+          - name: ASCEND_BUFFER_POOL
+            value: "4:8"
+          - name: MOONCAKE_CONFIG_PATH
+            value: /opt/vllm-layerwise/mooncake.json
+          - name: MOONCAKE_MASTER
+            value: mooncake-master-service:30089
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: PYTHONHASHSEED
+            value: "0"
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+          imagePullPolicy: Never
+          name: decode-engine
+          ports:
+          - containerPort: 8200
+            name: decode-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /v1/models
+              port: decode-port
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              huawei.com/Ascend910: "1"
+            requests:
+              huawei.com/Ascend910: "1"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+          - mountPath: /usr/local/dcmi
+            name: dcmi
+          - mountPath: /usr/local/bin/npu-smi
+            name: npusmi
+          - mountPath: /usr/local/Ascend/driver/lib64
+            name: driver-lib64
+          - mountPath: /usr/local/Ascend/driver/version.info
+            name: driver-version
+          - mountPath: /etc/ascend_install.info
+            name: ascend-install-info
+          - mountPath: /root/.cache
+            name: model-cache
+          - mountPath: /usr/bin/hccn_tool
+            name: hccn-tool
+          - mountPath: /etc/hccn.conf
+            name: hccn-conf
+          - mountPath: /opt/vllm-layerwise
+            name: runtime-config
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 120
+        volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 24Gi
+          name: shm
+        - hostPath:
+            path: /usr/local/dcmi
+            type: Directory
+          name: dcmi
+        - hostPath:
+            path: /usr/local/bin/npu-smi
+            type: File
+          name: npusmi
+        - hostPath:
+            path: /usr/local/Ascend/driver/lib64
+            type: Directory
+          name: driver-lib64
+        - hostPath:
+            path: /usr/local/Ascend/driver/version.info
+            type: File
+          name: driver-version
+        - hostPath:
+            path: /etc/ascend_install.info
+            type: File
+          name: ascend-install-info
+        - hostPath:
+            path: /home/llm_cache
+            type: Directory
+          name: model-cache
+        - hostPath:
+            path: /usr/bin/hccn_tool
+            type: File
+          name: hccn-tool
+        - hostPath:
+            path: /etc/hccn.conf
+            type: File
+          name: hccn-conf
+        - configMap:
+            defaultMode: 365
+            name: layerwise-runtime-config
+          name: runtime-config
+  status:
+    conditions:
+    - lastTransitionTime: "2026-07-30T17:08:32Z"
+      lastUpdateTime: "2026-07-30T17:08:32Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2026-07-31T10:32:09Z"
+      lastUpdateTime: "2026-07-31T10:34:10Z"
+      message: ReplicaSet "decode-engine-deployment-f6f4b9988" is progressing.
+      reason: ReplicaSetUpdated
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"proxy-server-deployment","namespace":"liangjiahao"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"proxy"}},"template":{"metadata":{"labels":{"app":"proxy"}},"spec":{"containers":[{"args":["exec python3 /app/k8s_proxy_server_example.py --host 0.0.0.0 --port 8000 --prefiller-labels app=prefill --decoder-labels app=decode --prefiller-container prefill-engine --decoder-container decode-engine --prefiller-port-name prefill-port --decoder-port-name decode-port --namespace liangjiahao"],"command":["/bin/bash","-lc"],"image":"cr.openfuyao.cn/openfuyao/proxy-server:latest","imagePullPolicy":"IfNotPresent","name":"proxy-server","ports":[{"containerPort":8000,"name":"proxy-port"}],"resources":{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}}}],"nodeName":"n1","serviceAccountName":"vllm-proxy-sa"}}}}
+    creationTimestamp: "2026-07-30T17:08:38Z"
+    generation: 1
+    name: proxy-server-deployment
+    namespace: liangjiahao
+    resourceVersion: "26380803"
+    uid: 6dfb038e-338f-44d5-8d94-89a5e8adb812
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: proxy
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: proxy
+      spec:
+        containers:
+        - args:
+          - exec python3 /app/k8s_proxy_server_example.py --host 0.0.0.0 --port 8000
+            --prefiller-labels app=prefill --decoder-labels app=decode --prefiller-container
+            prefill-engine --decoder-container decode-engine --prefiller-port-name
+            prefill-port --decoder-port-name decode-port --namespace liangjiahao
+          command:
+          - /bin/bash
+          - -lc
+          image: cr.openfuyao.cn/openfuyao/proxy-server:latest
+          imagePullPolicy: IfNotPresent
+          name: proxy-server
+          ports:
+          - containerPort: 8000
+            name: proxy-port
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeName: n1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: vllm-proxy-sa
+        serviceAccountName: vllm-proxy-sa
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-07-30T17:08:39Z"
+      lastUpdateTime: "2026-07-30T17:08:39Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-07-30T17:08:38Z"
+      lastUpdateTime: "2026-07-30T17:08:39Z"
+      message: ReplicaSet "proxy-server-deployment-54bb6c9585" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,1 @@
+mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s --enable_offload=false --logtostderr=true

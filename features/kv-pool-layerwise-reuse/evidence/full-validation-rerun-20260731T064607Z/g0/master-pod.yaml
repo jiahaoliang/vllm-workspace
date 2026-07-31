@@ -1,0 +1,163 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/containerID: d048bf272c994968dbccacd7a3161348bf9734e727ae3e56510cfddfb0f53672
+      cni.projectcalico.org/podIP: 10.250.40.149/32
+      cni.projectcalico.org/podIPs: 10.250.40.149/32
+      kubectl.kubernetes.io/restartedAt: "2026-07-31T01:26:29+08:00"
+    creationTimestamp: "2026-07-31T10:31:58Z"
+    generateName: mooncake-master-deployment-99874945f-
+    generation: 1
+    labels:
+      app: mooncake-master
+      pod-template-hash: 99874945f
+    name: mooncake-master-deployment-99874945f-5w58h
+    namespace: liangjiahao
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: mooncake-master-deployment-99874945f
+      uid: 37c2ef14-a2bb-4160-a131-c23cc93c6f83
+    resourceVersion: "26968387"
+    uid: 147318a0-5ba5-4a7a-8e93-1b8cfd1eb584
+  spec:
+    containers:
+    - args:
+      - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s
+        --enable_offload=false --logtostderr=true
+      command:
+      - /bin/bash
+      - -lc
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+      imagePullPolicy: Never
+      name: mooncake-master
+      ports:
+      - containerPort: 50001
+        name: master-rpc
+        protocol: TCP
+      - containerPort: 9003
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 20
+        initialDelaySeconds: 2
+        periodSeconds: 3
+        successThreshold: 1
+        tcpSocket:
+          port: master-rpc
+        timeoutSeconds: 1
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gcld4
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: n1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 30
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 30
+    volumes:
+    - name: kube-api-access-gcld4
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-31T10:32:00Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-31T10:31:58Z"
+      observedGeneration: 1
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-31T10:32:01Z"
+      observedGeneration: 1
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-31T10:32:01Z"
+      observedGeneration: 1
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2026-07-31T10:31:58Z"
+      observedGeneration: 1
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://a8375966ee3ee68644b529a940d7be47706431330c6d5fc52e283a8f9e85fc39
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+      imageID: sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57
+      lastState: {}
+      name: mooncake-master
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2026-07-31T10:31:59Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 0
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gcld4
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.200.27
+    hostIPs:
+    - ip: 192.168.200.27
+    observedGeneration: 1
+    phase: Running
+    podIP: 10.250.40.149
+    podIPs:
+    - ip: 10.250.40.149
+    qosClass: BestEffort
+    startTime: "2026-07-31T10:31:58Z"
+kind: List
+metadata:
+  resourceVersion: ""

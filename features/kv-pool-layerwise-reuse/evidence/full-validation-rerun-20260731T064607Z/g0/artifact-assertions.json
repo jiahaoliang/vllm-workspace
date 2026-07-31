@@ -1,0 +1,29 @@
+{
+  "decode_ready": true,
+  "engines_stopped": true,
+  "final_metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "master_reset": true,
+  "old_coordinator_type_error_reproduced": false,
+  "pods_retained": true,
+  "prefill_ready": true,
+  "prestart_identity": true,
+  "proxy_routing": true,
+  "recorded_steps": 71,
+  "source_commits": 11,
+  "source_head": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "superseded_nonzero_steps": [
+    {
+      "artifact": "prefill-pod.yaml",
+      "command": "kubectl get pod -n liangjiahao pod/prefill-engine-deployment-7f4fc6ddc7-n884l -o yaml",
+      "ended_at": "2026-07-31T10:35:17Z",
+      "exit_code": 1,
+      "name": "prefill-pod-yaml",
+      "started_at": "2026-07-31T10:35:17Z"
+    }
+  ],
+  "validated": true
+}

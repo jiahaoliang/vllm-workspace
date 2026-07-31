@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: 88fb232ac204cacd4dd9dcb1de63d000d3a1d2e5042e76ed29aa8cf1c4831efb
+    cni.projectcalico.org/podIP: 10.250.40.224/32
+    cni.projectcalico.org/podIPs: 10.250.40.224/32
+    kubectl.kubernetes.io/restartedAt: "2026-07-31T18:46:09+08:00"
+  creationTimestamp: "2026-07-31T10:46:09Z"
+  generateName: mooncake-master-deployment-6d8b6b6d77-
+  generation: 1
+  labels:
+    app: mooncake-master
+    pod-template-hash: 6d8b6b6d77
+  name: mooncake-master-deployment-6d8b6b6d77-7mqsv
+  namespace: liangjiahao
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: mooncake-master-deployment-6d8b6b6d77
+    uid: fd43551b-40db-42d1-9253-14cc031f77c5
+  resourceVersion: "26976965"
+  uid: adac9e29-0347-418a-a358-acd3c064e974
+spec:
+  containers:
+  - args:
+    - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s
+      --enable_offload=false --logtostderr=true
+    command:
+    - /bin/bash
+    - -lc
+    image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+    imagePullPolicy: Never
+    name: mooncake-master
+    ports:
+    - containerPort: 50001
+      name: master-rpc
+      protocol: TCP
+    - containerPort: 9003
+      name: metrics
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 20
+      initialDelaySeconds: 2
+      periodSeconds: 3
+      successThreshold: 1
+      tcpSocket:
+        port: master-rpc
+      timeoutSeconds: 1
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-t74fr
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: n1
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 30
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 30
+  volumes:
+  - name: kube-api-access-t74fr
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-31T10:46:11Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-31T10:46:09Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-31T10:46:12Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-31T10:46:12Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-31T10:46:09Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://dc0414900fc2635b1ad286675d69f1144fd1f3d6d0d0dc0ef12fb1eb9ae57b9c
+    image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+    imageID: sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57
+    lastState: {}
+    name: mooncake-master
+    ready: true
+    resources: {}
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-07-31T10:46:10Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-t74fr
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.200.27
+  hostIPs:
+  - ip: 192.168.200.27
+  observedGeneration: 1
+  phase: Running
+  podIP: 10.250.40.224
+  podIPs:
+  - ip: 10.250.40.224
+  qosClass: BestEffort
+  startTime: "2026-07-31T10:46:09Z"

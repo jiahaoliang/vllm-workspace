@@ -1,0 +1,56 @@
+{
+  "engine_hostpaths": [
+    "/etc/ascend_install.info",
+    "/etc/hccn.conf",
+    "/home/llm_cache",
+    "/usr/bin/hccn_tool",
+    "/usr/local/Ascend/driver/lib64",
+    "/usr/local/Ascend/driver/version.info",
+    "/usr/local/bin/npu-smi",
+    "/usr/local/dcmi"
+  ],
+  "engine_npu_request_each": 1,
+  "expected_config_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "expected_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+  "pods": {
+    "decode": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+      "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "decode-engine-deployment-f6f4b9988-gxlwd",
+      "ready": "False",
+      "restart_count": 0
+    },
+    "mooncake-master": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+      "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "mooncake-master-deployment-99874945f-5w58h",
+      "ready": "True",
+      "restart_count": 0
+    },
+    "prefill": {
+      "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+      "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "prefill-engine-deployment-7f4fc6ddc7-n884l",
+      "ready": "False",
+      "restart_count": 0
+    },
+    "proxy": {
+      "image": "cr.openfuyao.cn/openfuyao/proxy-server:latest",
+      "image_id": "cr.openfuyao.cn/openfuyao/proxy-server@sha256:fa8d04696e4bcf04e0e6c2c084bb8ecefa1b85191414d66889a778750ff1e3e0",
+      "node": "n1",
+      "phase": "Running",
+      "pod": "proxy-server-deployment-54bb6c9585-7fzs5",
+      "ready": "True",
+      "restart_count": 0
+    }
+  },
+  "validated": true,
+  "vllm_lane": "main-verified",
+  "vllm_version_override": null
+}

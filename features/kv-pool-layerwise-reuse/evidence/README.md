@@ -20,14 +20,17 @@ current test entry points.
   Formal `tooling-r4` passed all 20 recorded gates with `67` deployment tests.
   Image r1 is preserved as checksummed transient-infrastructure evidence;
   image r2 passed the complete static and NPU-backed image identity proof, and
-  the corrected-image CPU-only UT family passed. Runtime families are not yet
-  run.
+  the corrected-image CPU-only UT family passed. G0 also passed under the main
+  lane, including both engine startups and final empty-Master reset. G1 and
+  later runtime families are not yet run.
 - Passing tooling `SHA256SUMS` digest:
   `1b57584e8626d8f2afab7edc0b0d261a1cdf9624f555cc004f83293e76b25506`.
 - Passing image r2 `SHA256SUMS` digest:
   `c4cac6d81d0887153f63046f3111cf76eebec60b90b30cc45171ae229e0a98db`.
 - Passing UT `SHA256SUMS` digest:
   `9fe25f229eddd594ee0fbe15ebc80539a96b71c2665be54160fce2c4d2e27426`.
+- Passing G0 `SHA256SUMS` digest:
+  `6416863ddba50d3e716cf6f765869c79488c70707adb78b0b6c1a0a28662524c`.
 
 ## Full Validation Rerun 20260730T130225Z
 

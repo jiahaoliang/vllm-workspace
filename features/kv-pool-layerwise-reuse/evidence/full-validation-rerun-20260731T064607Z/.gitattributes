@@ -7,3 +7,7 @@ image-*/build.log binary
 
 # nerdctl inspect emits a trailing blank line; preserve the raw JSON bytes.
 image-*/image-inspect*.json binary
+
+# vLLM banners contain CR bytes and ps uses fixed-width trailing padding.
+g0/*-engine.log binary
+g0/*-process-state.txt binary

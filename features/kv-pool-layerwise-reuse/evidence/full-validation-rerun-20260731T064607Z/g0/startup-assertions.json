@@ -1,0 +1,22 @@
+{
+  "coordinator_type_error": false,
+  "http_models": true,
+  "master_metrics": {
+    "master_active_clients": 2.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "proxy_decode_nodes": 1,
+  "proxy_prefill_nodes": 1,
+  "ready_pods": {
+    "decode": {
+      "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+      "pod": "decode-engine-deployment-f6f4b9988-gxlwd"
+    },
+    "prefill": {
+      "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+      "pod": "prefill-engine-deployment-7f4fc6ddc7-n884l"
+    }
+  },
+  "validated": true
+}

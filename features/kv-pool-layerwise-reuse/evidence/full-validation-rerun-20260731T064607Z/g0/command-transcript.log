@@ -1,0 +1,225 @@
+[2026-07-31T10:31:03Z] START kube-context
+COMMAND kubectl -n liangjiahao config current-context
+[2026-07-31T10:31:03Z] END kube-context exit=0 artifact=kube-context.txt
+[2026-07-31T10:31:07Z] START nodes-snapshot
+COMMAND kubectl get nodes -n liangjiahao -o json
+[2026-07-31T10:31:07Z] END nodes-snapshot exit=0 artifact=nodes.json
+[2026-07-31T10:31:11Z] START all-pods-snapshot
+COMMAND kubectl get --raw /api/v1/pods -n liangjiahao
+[2026-07-31T10:31:12Z] END all-pods-snapshot exit=0 artifact=all-pods.json
+[2026-07-31T10:31:29Z] START npu-capacity
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json\nfrom pathlib import Path\nroot=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0")\nnodes=json.loads((root/"nodes.json").read_text())["items"]\npods=json.loads((root/"all-pods.json").read_text())["items"]\nresource="huawei.com/Ascend910"\nactive={}\ndetails=[]\nfor pod in pods:\n    node=pod.get("spec",{}).get("nodeName"); phase=pod.get("status",{}).get("phase")\n    if not node or phase in {"Succeeded","Failed"}: continue\n    regular=sum(int(c.get("resources",{}).get("requests",{}).get(resource,"0")) for c in pod.get("spec",{}).get("containers",[]))\n    init=max([int(c.get("resources",{}).get("requests",{}).get(resource,"0")) for c in pod.get("spec",{}).get("initContainers",[])]+[0])\n    request=max(regular,init)\n    if request:\n        active[node]=active.get(node,0)+request\n        details.append({"namespace":pod["metadata"]["namespace"],"name":pod["metadata"]["name"],"node":node,"phase":phase,"request":request})\nresult={}\nfor node in nodes:\n    name=node["metadata"]["name"]; ready=any(c["type"]=="Ready" and c["status"]=="True" for c in node["status"].get("conditions",[])); alloc=int(node["status"].get("allocatable",{}).get(resource,"0")); used=active.get(name,0); result[name]={"ready":ready,"allocatable":alloc,"active_requests":used,"free":alloc-used if ready else 0}\nassert result["n1"]["free"]>=2,result\nprint(json.dumps({"resource":resource,"required_on_n1":2,"nodes":result,"requesting_pods":details},sort_keys=True,indent=2))'
+[2026-07-31T10:31:29Z] END npu-capacity exit=0 artifact=npu-capacity.json
+[2026-07-31T10:31:49Z] START apply-namespace
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/00-namespace.yaml
+[2026-07-31T10:31:49Z] END apply-namespace exit=0 artifact=apply-namespace.log
+[2026-07-31T10:31:52Z] START apply-runtime-config
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml
+[2026-07-31T10:31:53Z] END apply-runtime-config exit=0 artifact=apply-runtime-config.log
+[2026-07-31T10:31:58Z] START apply-master
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/30-mooncake-master.yaml
+[2026-07-31T10:31:58Z] END apply-master exit=0 artifact=apply-master.log
+[2026-07-31T10:32:03Z] START apply-prefill
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml
+[2026-07-31T10:32:03Z] END apply-prefill exit=0 artifact=apply-prefill.log
+[2026-07-31T10:32:09Z] START apply-decode
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/50-decode-engine.yaml
+[2026-07-31T10:32:09Z] END apply-decode exit=0 artifact=apply-decode.log
+[2026-07-31T10:32:14Z] START apply-proxy
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/20-proxy-server.yaml
+[2026-07-31T10:32:15Z] END apply-proxy exit=0 artifact=apply-proxy.log
+[2026-07-31T10:32:40Z] START wait-master-rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=600s
+[2026-07-31T10:32:41Z] END wait-master-rollout exit=0 artifact=wait-master-rollout.log
+[2026-07-31T10:32:44Z] START wait-proxy-rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/proxy-server-deployment --timeout=600s
+[2026-07-31T10:32:44Z] END wait-proxy-rollout exit=0 artifact=wait-proxy-rollout.log
+[2026-07-31T10:32:49Z] START wait-prefill-running
+COMMAND kubectl wait -n liangjiahao --for=jsonpath=\{.status.phase\}=Running pod/prefill-engine-deployment-7f4fc6ddc7-n884l --timeout=600s
+[2026-07-31T10:32:49Z] END wait-prefill-running exit=0 artifact=wait-prefill-running.log
+[2026-07-31T10:33:11Z] START wait-old-decode-deleted
+COMMAND kubectl wait -n liangjiahao --for=delete pod/decode-engine-deployment-5c96cd595-qdzds --timeout=300s
+[2026-07-31T10:34:10Z] END wait-old-decode-deleted exit=0 artifact=wait-old-decode-deleted.log
+[2026-07-31T10:34:33Z] START wait-decode-running
+COMMAND kubectl wait -n liangjiahao --for=jsonpath=\{.status.phase\}=Running pod/decode-engine-deployment-f6f4b9988-gxlwd --timeout=600s
+[2026-07-31T10:34:33Z] END wait-decode-running exit=0 artifact=wait-decode-running.log
+[2026-07-31T10:34:53Z] START g0-pods-json
+COMMAND kubectl get pods -n liangjiahao -o json
+[2026-07-31T10:34:53Z] END g0-pods-json exit=0 artifact=g0-pods.json
+[2026-07-31T10:34:56Z] START g0-deployments-yaml
+COMMAND kubectl get deployments -n liangjiahao mooncake-master-deployment prefill-engine-deployment decode-engine-deployment proxy-server-deployment -o yaml
+[2026-07-31T10:34:56Z] END g0-deployments-yaml exit=0 artifact=g0-deployments.yaml
+[2026-07-31T10:35:01Z] START g0-services-yaml
+COMMAND kubectl get services -n liangjiahao mooncake-master-service vllm-proxy-service -o yaml
+[2026-07-31T10:35:01Z] END g0-services-yaml exit=0 artifact=g0-services.yaml
+[2026-07-31T10:35:06Z] START runtime-config-yaml
+COMMAND kubectl get configmap -n liangjiahao layerwise-runtime-config -o yaml
+[2026-07-31T10:35:07Z] END runtime-config-yaml exit=0 artifact=runtime-config.yaml
+[2026-07-31T10:35:13Z] START master-pod-yaml
+COMMAND kubectl get pod -n liangjiahao -l app=mooncake-master -o yaml
+[2026-07-31T10:35:13Z] END master-pod-yaml exit=0 artifact=master-pod.yaml
+[2026-07-31T10:35:17Z] START prefill-pod-yaml
+COMMAND kubectl get pod -n liangjiahao pod/prefill-engine-deployment-7f4fc6ddc7-n884l -o yaml
+[2026-07-31T10:35:17Z] END prefill-pod-yaml exit=1 artifact=prefill-pod.yaml
+[2026-07-31T10:35:46Z] START prefill-pod-yaml-r2
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -o yaml
+[2026-07-31T10:35:46Z] END prefill-pod-yaml-r2 exit=0 artifact=prefill-pod.yaml
+[2026-07-31T10:35:50Z] START decode-pod-yaml
+COMMAND kubectl get pod -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -o yaml
+[2026-07-31T10:35:50Z] END decode-pod-yaml exit=0 artifact=decode-pod.yaml
+[2026-07-31T10:35:55Z] START proxy-pod-yaml
+COMMAND kubectl get pod -n liangjiahao -l app=proxy -o yaml
+[2026-07-31T10:35:55Z] END proxy-pod-yaml exit=0 artifact=proxy-pod.yaml
+[2026-07-31T10:36:18Z] START pod-identity-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json\nfrom pathlib import Path\nroot=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0")\npods=json.loads((root/"g0-pods.json").read_text())["items"]\nby_app={}\nfor pod in pods:\n    by_app.setdefault(pod["metadata"].get("labels",{}).get("app"),[]).append(pod)\nrequired=("prefill","decode","mooncake-master","proxy")\nassert all(len(by_app.get(app,[]))==1 for app in required),{app:len(by_app.get(app,[])) for app in required}\nimage="docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"\nconfig="sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57"\nexpected_hostpaths={"/usr/local/dcmi","/usr/local/bin/npu-smi","/usr/local/Ascend/driver/lib64","/usr/local/Ascend/driver/version.info","/etc/ascend_install.info","/home/llm_cache","/usr/bin/hccn_tool","/etc/hccn.conf"}\nresult={}\nfor app in required:\n    pod=by_app[app][0]\n    container=pod["spec"]["containers"][0]\n    status=pod["status"]["containerStatuses"][0]\n    ready=next((x["status"] for x in pod["status"].get("conditions",[]) if x["type"]=="Ready"),None)\n    item={"pod":pod["metadata"]["name"],"node":pod["spec"]["nodeName"],"phase":pod["status"]["phase"],"ready":ready,"image":container["image"],"image_id":status["imageID"],"restart_count":status["restartCount"]}\n    assert item["node"]=="n1" and item["phase"]=="Running" and item["restart_count"]==0,item\n    if app in {"prefill","decode"}:\n        req=container["resources"]["requests"]["huawei.com/Ascend910"]; lim=container["resources"]["limits"]["huawei.com/Ascend910"]\n        paths={v["hostPath"]["path"] for v in pod["spec"].get("volumes",[]) if "hostPath" in v}\n        env={e["name"]:e.get("value") for e in container.get("env",[]) if "value" in e}\n        assert container["image"]==image and item["image_id"]==config and req==lim=="1" and paths==expected_hostpaths\n        assert env["PYTHONHASHSEED"]=="0" and "VLLM_VERSION" not in env,(item,env)\n    if app=="mooncake-master":\n        assert container["image"]==image and item["image_id"]==config and ready=="True",item\n    if app=="proxy":\n        assert ready=="True",item\n    result[app]=item\nprint(json.dumps({"validated":True,"expected_image":image,"expected_config_id":config,"vllm_lane":"main-verified","vllm_version_override":None,"engine_npu_request_each":1,"engine_hostpaths":sorted(expected_hostpaths),"pods":result},sort_keys=True,indent=2))'
+[2026-07-31T10:36:18Z] END pod-identity-assertions exit=0 artifact=pod-identity-assertions.json
+[2026-07-31T10:36:52Z] START prefill-runtime-check
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /opt/vllm-layerwise/check-runtime.py
+[2026-07-31T10:37:13Z] END prefill-runtime-check exit=0 artifact=prefill-runtime-check.log
+[2026-07-31T10:37:18Z] START prefill-dynamic-identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import importlib.metadata as m,json,torch_npu,vllm_ascend\nfrom mooncake.store import MooncakeDistributedStore\nfrom vllm.v1.core.kv_cache_coordinator import get_kv_cache_coordinator\nimport inspect,os\nmethods=("batch_put_session_start","batch_put_from_multi_buffer_ranges","batch_put_session_end","batch_put_session_revoke","batch_get_session_start","batch_get_into_multi_buffer_ranges","batch_get_session_end")\nmissing=[name for name in methods if not callable(getattr(MooncakeDistributedStore,name,None))]\nassert not missing,missing\navailable=torch_npu.npu.is_available(); assert available\nparameters=inspect.signature(get_kv_cache_coordinator).parameters\nassert "max_in_flight_tokens" in parameters and "max_num_batched_tokens" not in parameters,parameters\nassert os.environ.get("VLLM_VERSION") is None\nprint(json.dumps({"torch":m.version("torch"),"torch_npu":m.version("torch-npu"),"triton_ascend":m.version("triton-ascend"),"vllm":m.version("vllm"),"vllm_ascend":m.version("vllm-ascend"),"vllm_ascend_path":vllm_ascend.__file__,"api_count":len(methods),"npu_available":available,"coordinator_keyword":"max_in_flight_tokens","vllm_version_override":None},sort_keys=True,indent=2))'
+[2026-07-31T10:37:38Z] END prefill-dynamic-identity exit=0 artifact=prefill-dynamic-identity.json
+[2026-07-31T10:37:42Z] START prefill-source-heads
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- bash -lc git\ -C\ /vllm-workspace/vllm\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/vllm-ascend\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/Mooncake\ rev-parse\ HEAD
+[2026-07-31T10:37:43Z] END prefill-source-heads exit=0 artifact=prefill-source-heads.txt
+[2026-07-31T10:37:48Z] START prefill-npu-smi
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- npu-smi info
+[2026-07-31T10:37:49Z] END prefill-npu-smi exit=0 artifact=prefill-npu-smi.txt
+[2026-07-31T10:37:53Z] START prefill-mooncake-ldd
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- bash -lc ldd\ /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store\*.so
+[2026-07-31T10:37:53Z] END prefill-mooncake-ldd exit=0 artifact=prefill-mooncake-ldd.txt
+[2026-07-31T10:37:57Z] START prefill-model-identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import hashlib,json\nfrom pathlib import Path\nroot=Path("/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8")\ndigest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()\nconfig=json.loads((root/"config.json").read_text())\nresult={"config_sha256":digest(root/"config.json"),"tokenizer_sha256":digest(root/"tokenizer.json"),"num_layers":config["num_hidden_layers"],"max_position_embeddings":config["max_position_embeddings"]}\nassert result=={"config_sha256":"229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75","tokenizer_sha256":"41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669","num_layers":27,"max_position_embeddings":163840},result\nprint(json.dumps(result,sort_keys=True,indent=2))'
+[2026-07-31T10:37:58Z] END prefill-model-identity exit=0 artifact=prefill-model-identity.json
+[2026-07-31T10:38:02Z] START decode-runtime-check
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /opt/vllm-layerwise/check-runtime.py
+[2026-07-31T10:38:24Z] END decode-runtime-check exit=0 artifact=decode-runtime-check.log
+[2026-07-31T10:38:27Z] START decode-dynamic-identity
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import importlib.metadata as m,json,torch_npu,vllm_ascend\nfrom mooncake.store import MooncakeDistributedStore\nfrom vllm.v1.core.kv_cache_coordinator import get_kv_cache_coordinator\nimport inspect,os\nmethods=("batch_put_session_start","batch_put_from_multi_buffer_ranges","batch_put_session_end","batch_put_session_revoke","batch_get_session_start","batch_get_into_multi_buffer_ranges","batch_get_session_end")\nmissing=[name for name in methods if not callable(getattr(MooncakeDistributedStore,name,None))]\nassert not missing,missing\navailable=torch_npu.npu.is_available(); assert available\nparameters=inspect.signature(get_kv_cache_coordinator).parameters\nassert "max_in_flight_tokens" in parameters and "max_num_batched_tokens" not in parameters,parameters\nassert os.environ.get("VLLM_VERSION") is None\nprint(json.dumps({"torch":m.version("torch"),"torch_npu":m.version("torch-npu"),"triton_ascend":m.version("triton-ascend"),"vllm":m.version("vllm"),"vllm_ascend":m.version("vllm-ascend"),"vllm_ascend_path":vllm_ascend.__file__,"api_count":len(methods),"npu_available":available,"coordinator_keyword":"max_in_flight_tokens","vllm_version_override":None},sort_keys=True,indent=2))'
+[2026-07-31T10:38:48Z] END decode-dynamic-identity exit=0 artifact=decode-dynamic-identity.json
+[2026-07-31T10:38:52Z] START decode-source-heads
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- bash -lc git\ -C\ /vllm-workspace/vllm\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/vllm-ascend\ rev-parse\ HEAD\;\ git\ -C\ /vllm-workspace/Mooncake\ rev-parse\ HEAD
+[2026-07-31T10:38:53Z] END decode-source-heads exit=0 artifact=decode-source-heads.txt
+[2026-07-31T10:38:58Z] START decode-npu-smi
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- npu-smi info
+[2026-07-31T10:38:59Z] END decode-npu-smi exit=0 artifact=decode-npu-smi.txt
+[2026-07-31T10:39:03Z] START decode-mooncake-ldd
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- bash -lc ldd\ /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store\*.so
+[2026-07-31T10:39:03Z] END decode-mooncake-ldd exit=0 artifact=decode-mooncake-ldd.txt
+[2026-07-31T10:39:08Z] START decode-model-identity
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import hashlib,json\nfrom pathlib import Path\nroot=Path("/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8")\ndigest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()\nconfig=json.loads((root/"config.json").read_text())\nresult={"config_sha256":digest(root/"config.json"),"tokenizer_sha256":digest(root/"tokenizer.json"),"num_layers":config["num_hidden_layers"],"max_position_embeddings":config["max_position_embeddings"]}\nassert result=={"config_sha256":"229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75","tokenizer_sha256":"41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669","num_layers":27,"max_position_embeddings":163840},result\nprint(json.dumps(result,sort_keys=True,indent=2))'
+[2026-07-31T10:39:08Z] END decode-model-identity exit=0 artifact=decode-model-identity.json
+[2026-07-31T10:39:25Z] START master-deployment-args
+COMMAND kubectl get deployment -n liangjiahao mooncake-master-deployment -o jsonpath=\{.spec.template.spec.containers\[\?\(@.name==\"mooncake-master\"\)\].args\}
+[2026-07-31T10:39:25Z] END master-deployment-args exit=0 artifact=master-deployment-args.txt
+[2026-07-31T10:39:28Z] START master-process-args
+COMMAND kubectl exec -n liangjiahao mooncake-master-deployment-99874945f-5w58h -c mooncake-master -- ps -o args= -p 1
+[2026-07-31T10:39:28Z] END master-process-args exit=0 artifact=master-process-args.txt
+[2026-07-31T10:39:33Z] START master-startup-log
+COMMAND kubectl logs -n liangjiahao mooncake-master-deployment-99874945f-5w58h -c mooncake-master
+[2026-07-31T10:39:33Z] END master-startup-log exit=0 artifact=master-startup.log
+[2026-07-31T10:39:37Z] START master-initial-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:39:38Z] END master-initial-metrics exit=0 artifact=master-initial.metrics
+[2026-07-31T10:40:10Z] START prestart-identity-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json,re\nfrom pathlib import Path\nroot=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0")\nexpected_heads=["54503ecec0f3ac31e5ecfc5f28652e4cc42307b5","14beaf161cca6f1e044e20529ca96c6554dbbe50","786c77ff7692bed58dd99971afef87d6b690cbe3"]\nexpected_packages={"torch":"2.10.0+cpu","torch_npu":"2.10.0.post2","triton_ascend":"3.2.1","vllm":"0.1.dev1+g54503ecec.empty","vllm_ascend":"0.1.dev1+g14beaf161"}\nidentities={}\nfor role in ("prefill","decode"):\n    dynamic=(root/f"{role}-dynamic-identity.json").read_text()\n    data=json.loads(dynamic[dynamic.index("{"):])\n    assert all(data[k]==v for k,v in expected_packages.items()),data\n    assert data["api_count"]==7 and data["npu_available"] is True\n    assert data["coordinator_keyword"]=="max_in_flight_tokens" and data["vllm_version_override"] is None\n    assert data["vllm_ascend_path"].startswith("/vllm-workspace/vllm-ascend/"),data\n    assert (root/f"{role}-source-heads.txt").read_text().split()==expected_heads\n    runtime=(root/f"{role}-runtime-check.log").read_text()\n    assert "Mooncake session/range APIs: OK" in runtime and "compatibility lane: main-verified" in runtime and "coordinator keyword: max_in_flight_tokens" in runtime\n    assert "not found" not in (root/f"{role}-mooncake-ldd.txt").read_text()\n    assert "| OK" in (root/f"{role}-npu-smi.txt").read_text()\n    model=json.loads((root/f"{role}-model-identity.json").read_text())\n    assert model=={"config_sha256":"229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75","tokenizer_sha256":"41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669","num_layers":27,"max_position_embeddings":163840}\n    identities[role]={"packages":data,"model":model,"source_heads":expected_heads}\nargs=(root/"master-deployment-args.txt").read_text()+(root/"master-process-args.txt").read_text()\nassert "--default_kv_lease_ttl=30s" in args\nstartup=(root/"master-startup.log").read_text()\nassert "default_kv_lease_ttl=30s" in startup or "default_kv_lease_ttl" in args\nmetrics=(root/"master-initial.metrics").read_text()\nfor name in ("master_key_count","master_allocated_bytes","master_active_clients"):\n    match=re.search(rf"^{name} ([0-9.eE+-]+)$",metrics,re.M)\n    assert match and float(match.group(1))==0,(name,match.group(1) if match else None)\npod_contract=json.loads((root/"pod-identity-assertions.json").read_text())\nassert pod_contract["validated"] and pod_contract["vllm_lane"]=="main-verified" and pod_contract["vllm_version_override"] is None\nprint(json.dumps({"validated":True,"roles":identities,"lease_ttl_ms":30000,"master_empty":{"keys":0,"allocated_bytes":0,"active_clients":0},"pod_contract":pod_contract},sort_keys=True,indent=2))'
+[2026-07-31T10:40:10Z] END prestart-identity-assertions exit=0 artifact=prestart-identity-assertions.json
+[2026-07-31T10:40:35Z] START start-prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
+[2026-07-31T10:40:38Z] END start-prefill exit=0 artifact=start-prefill.log
+[2026-07-31T10:40:43Z] START start-decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- /opt/vllm-layerwise/start-decode.sh
+[2026-07-31T10:40:46Z] END start-decode exit=0 artifact=start-decode.log
+[2026-07-31T10:41:01Z] START wait-prefill-ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-7f4fc6ddc7-n884l --timeout=1200s
+[2026-07-31T10:42:29Z] END wait-prefill-ready exit=0 artifact=wait-prefill-ready.log
+[2026-07-31T10:42:49Z] START wait-decode-ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-f6f4b9988-gxlwd --timeout=1200s
+[2026-07-31T10:42:49Z] END wait-decode-ready exit=0 artifact=wait-decode-ready.log
+[2026-07-31T10:43:26Z] START ready-pods
+COMMAND kubectl get pods -n liangjiahao -l app\ in\ \(prefill\,decode\) -o json
+[2026-07-31T10:43:27Z] END ready-pods exit=0 artifact=ready-pods.json
+[2026-07-31T10:43:31Z] START prefill-engine-log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- cat /tmp/vllm-prefill.log
+[2026-07-31T10:43:31Z] END prefill-engine-log exit=0 artifact=prefill-engine.log
+[2026-07-31T10:43:43Z] START prefill-process-state
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- bash -lc pid=\$\(cat\ /tmp/vllm-prefill.pid\)\;\ ps\ -o\ pid\,ppid\,stat\,args\ -p\ \"\$pid\"\;\ pgrep\ -a\ -P\ \"\$pid\"\ \|\|\ true
+[2026-07-31T10:43:43Z] END prefill-process-state exit=0 artifact=prefill-process-state.txt
+[2026-07-31T10:43:48Z] START prefill-models-http
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://127.0.0.1:8100/v1/models\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:43:48Z] END prefill-models-http exit=0 artifact=prefill-models.json
+[2026-07-31T10:43:55Z] START decode-engine-log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- cat /tmp/vllm-decode.log
+[2026-07-31T10:43:55Z] END decode-engine-log exit=0 artifact=decode-engine.log
+[2026-07-31T10:43:59Z] START decode-process-state
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- bash -lc pid=\$\(cat\ /tmp/vllm-decode.pid\)\;\ ps\ -o\ pid\,ppid\,stat\,args\ -p\ \"\$pid\"\;\ pgrep\ -a\ -P\ \"\$pid\"\ \|\|\ true
+[2026-07-31T10:43:59Z] END decode-process-state exit=0 artifact=decode-process-state.txt
+[2026-07-31T10:44:04Z] START decode-models-http
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://127.0.0.1:8200/v1/models\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:44:04Z] END decode-models-http exit=0 artifact=decode-models.json
+[2026-07-31T10:44:11Z] START proxy-health
+COMMAND kubectl exec -n liangjiahao proxy-server-deployment-54bb6c9585-7fzs5 -c proxy-server -- python3 -c from\ urllib.request\ import\ urlopen\;\ response=urlopen\(\"http://127.0.0.1:8000/health\"\,timeout=10\)\;\ print\(response.status\)\;\ print\(response.read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:44:11Z] END proxy-health exit=0 artifact=proxy-health.txt
+[2026-07-31T10:44:15Z] START proxy-endpoints
+COMMAND kubectl exec -n liangjiahao proxy-server-deployment-54bb6c9585-7fzs5 -c proxy-server -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://127.0.0.1:8000/listEndPoints\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:44:15Z] END proxy-endpoints exit=0 artifact=proxy-endpoints.json
+[2026-07-31T10:44:40Z] START master-running-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:44:40Z] END master-running-metrics exit=0 artifact=master-running.metrics
+[2026-07-31T10:45:04Z] START startup-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json,re\nfrom pathlib import Path\nroot=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0")\npods=json.loads((root/"ready-pods.json").read_text())["items"]\nassert len(pods)==2\nready={}\nfor pod in pods:\n    app=pod["metadata"]["labels"]["app"]\n    status=pod["status"]["containerStatuses"][0]\n    condition=next(c for c in pod["status"]["conditions"] if c["type"]=="Ready")\n    assert app in {"prefill","decode"} and condition["status"]=="True" and status["ready"] and status["restartCount"]==0\n    ready[app]={"pod":pod["metadata"]["name"],"image_id":status["imageID"]}\nfor role in ("prefill","decode"):\n    log=(root/f"{role}-engine.log").read_text()\n    assert "Application startup complete" in log and "Starting vLLM server" in log and "Creating v1 connector with name: AscendStoreConnector" in log\n    assert "TypeError" not in log and "Traceback (most recent call last)" not in log\n    assert "max_num_batched_tokens\' is an invalid keyword argument" not in log\n    process=(root/f"{role}-process-state.txt").read_text()\n    assert "python3 -m vllm.entrypoints.openai.api_server" in process\n    models=json.loads((root/f"{role}-models.json").read_text())\n    assert models["object"]=="list" and len(models["data"])==1 and models["data"][0]["id"]=="vllm-ascend/DeepSeek-V2-Lite-W8A8"\nproxy=json.loads((root/"proxy-endpoints.json").read_text())\nassert proxy["status"]=="ok" and len(proxy["prefill_nodes"])==1 and len(proxy["decode_nodes"])==1\nassert (root/"proxy-health.txt").read_text().splitlines()[0]=="200"\nmetrics=(root/"master-running.metrics").read_text()\nvalues={}\nfor name in ("master_key_count","master_allocated_bytes","master_active_clients"):\n    match=re.search(rf"^{name} ([0-9.eE+-]+)$",metrics,re.M); assert match; values[name]=float(match.group(1))\nassert values["master_key_count"]==0 and values["master_allocated_bytes"]==0 and values["master_active_clients"]>=2,values\nprint(json.dumps({"validated":True,"ready_pods":ready,"http_models":True,"proxy_prefill_nodes":1,"proxy_decode_nodes":1,"coordinator_type_error":False,"master_metrics":values},sort_keys=True,indent=2))'
+[2026-07-31T10:45:04Z] END startup-assertions exit=0 artifact=startup-assertions.json
+[2026-07-31T10:45:20Z] START stop-prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-07-31T10:45:22Z] END stop-prefill exit=0 artifact=stop-prefill.log
+[2026-07-31T10:45:36Z] START stop-decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-07-31T10:45:37Z] END stop-decode exit=0 artifact=stop-decode.log
+[2026-07-31T10:45:59Z] START assert-prefill-stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-prefill.pid\;\ \!\ pgrep\ -f\ \'vllm.entrypoints.openai.api_server.\*--port\ 8100\'\;\ printf\ \'prefill_stopped=true\\n\'
+[2026-07-31T10:45:59Z] END assert-prefill-stopped exit=0 artifact=assert-prefill-stopped.txt
+[2026-07-31T10:46:04Z] START assert-decode-stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-decode.pid\;\ \!\ pgrep\ -f\ \'vllm.entrypoints.openai.api_server.\*--port\ 8200\'\;\ printf\ \'decode_stopped=true\\n\'
+[2026-07-31T10:46:05Z] END assert-decode-stopped exit=0 artifact=assert-decode-stopped.txt
+[2026-07-31T10:46:09Z] START restart-master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-07-31T10:46:09Z] END restart-master exit=0 artifact=restart-master.log
+[2026-07-31T10:46:16Z] START wait-master-reset
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=600s
+[2026-07-31T10:46:17Z] END wait-master-reset exit=0 artifact=wait-master-reset.log
+[2026-07-31T10:46:45Z] START reset-master-pod
+COMMAND kubectl get pod -n liangjiahao mooncake-master-deployment-6d8b6b6d77-7mqsv -o yaml
+[2026-07-31T10:46:45Z] END reset-master-pod exit=0 artifact=reset-master-pod.yaml
+[2026-07-31T10:46:49Z] START reset-master-log
+COMMAND kubectl logs -n liangjiahao mooncake-master-deployment-6d8b6b6d77-7mqsv -c mooncake-master
+[2026-07-31T10:46:50Z] END reset-master-log exit=0 artifact=reset-master.log
+[2026-07-31T10:46:54Z] START final-empty-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-07-31T10:46:55Z] END final-empty-metrics exit=0 artifact=final-empty.metrics
+[2026-07-31T10:47:00Z] START final-pods
+COMMAND kubectl get pods -n liangjiahao -o json
+[2026-07-31T10:47:00Z] END final-pods exit=0 artifact=final-pods.json
+[2026-07-31T10:47:07Z] START final-deployments
+COMMAND kubectl get deployments -n liangjiahao mooncake-master-deployment prefill-engine-deployment decode-engine-deployment proxy-server-deployment -o yaml
+[2026-07-31T10:47:07Z] END final-deployments exit=0 artifact=final-deployments.yaml
+[2026-07-31T10:47:33Z] START source-state
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json,subprocess\nrun=lambda *args: subprocess.check_output(args,text=True).strip()\nrepo="repos/vllm-ascend"; head=run("git","-C",repo,"rev-parse","HEAD"); base=run("git","-C",repo,"merge-base","collaborator/kv_offload_0723","HEAD"); count=int(run("git","-C",repo,"rev-list","--count","collaborator/kv_offload_0723..HEAD")); merges=run("git","-C",repo,"rev-list","--merges","collaborator/kv_offload_0723..HEAD").splitlines(); dirty=run("git","-C",repo,"status","--porcelain=v1"); assert head=="14beaf161cca6f1e044e20529ca96c6554dbbe50" and base=="a46a1dabbc260e8695002969f29528eb555eb583" and count==11 and not merges and not dirty; print(json.dumps({"head":head,"merge_base":base,"commit_count":count,"merge_commits":merges,"dirty":False},sort_keys=True,indent=2))'
+[2026-07-31T10:47:33Z] END source-state exit=0 artifact=source-state.json
+[2026-07-31T10:47:33Z] START source-diff-check
+COMMAND git -C repos/vllm-ascend diff --check a46a1dabbc260e8695002969f29528eb555eb583..14beaf161cca6f1e044e20529ca96c6554dbbe50
+[2026-07-31T10:47:33Z] END source-diff-check exit=0 artifact=source-diff-check.log
+[2026-07-31T10:47:33Z] START control-diff-check
+COMMAND git diff --check
+[2026-07-31T10:47:33Z] END control-diff-check exit=0 artifact=control-diff-check.log
+[2026-07-31T10:48:02Z] START artifact-assertions
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c $'import json,re\nfrom pathlib import Path\nroot=Path("features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0")\nsteps=[json.loads(line) for line in (root/"steps.jsonl").read_text().splitlines()]\nassert len(steps)==71,len(steps)\nfailures=[s for s in steps if s["exit_code"]!=0]\nassert len(failures)==1 and failures[0]["name"]=="prefill-pod-yaml" and failures[0]["exit_code"]==1,failures\npre=json.loads((root/"prestart-identity-assertions.json").read_text()); start=json.loads((root/"startup-assertions.json").read_text())\nassert pre["validated"] and start["validated"] and start["coordinator_type_error"] is False\nassert start["proxy_prefill_nodes"]==1 and start["proxy_decode_nodes"]==1\nassert start["master_metrics"]["master_active_clients"]>=2\nfor role in ("prefill","decode"):\n    assert f"{role}_stopped=true" in (root/f"assert-{role}-stopped.txt").read_text()\n    log=(root/f"{role}-engine.log").read_text()\n    assert "Application startup complete" in log and "TypeError" not in log and "Traceback (most recent call last)" not in log\nmetrics=(root/"final-empty.metrics").read_text()\nfinal={}\nfor name in ("master_key_count","master_allocated_bytes","master_active_clients"):\n    match=re.search(rf"^{name} ([0-9.eE+-]+)$",metrics,re.M); assert match; final[name]=float(match.group(1)); assert final[name]==0,(name,final[name])\nhistory=json.loads((root/"source-state.json").read_text())\nassert history["head"]=="14beaf161cca6f1e044e20529ca96c6554dbbe50" and history["commit_count"]==11 and not history["merge_commits"] and not history["dirty"]\npods=json.loads((root/"final-pods.json").read_text())["items"]\nby_app={p["metadata"].get("labels",{}).get("app"):p for p in pods}\nfor app in ("prefill","decode","mooncake-master","proxy"):\n    assert by_app[app]["status"]["phase"]=="Running" and by_app[app]["status"]["containerStatuses"][0]["restartCount"]==0\nprint(json.dumps({"validated":True,"recorded_steps":len(steps),"superseded_nonzero_steps":failures,"prestart_identity":True,"prefill_ready":True,"decode_ready":True,"proxy_routing":True,"old_coordinator_type_error_reproduced":False,"engines_stopped":True,"master_reset":True,"final_metrics":final,"source_head":history["head"],"source_commits":history["commit_count"],"pods_retained":True},sort_keys=True,indent=2))'
+[2026-07-31T10:48:03Z] END artifact-assertions exit=0 artifact=artifact-assertions.json
+[2026-07-31T10:48:18Z] START g0-summary
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ json\,sys\;\ print\(json.dumps\(json.loads\(sys.argv\[1\]\)\,sort_keys=True\,indent=2\)\) \{\"schema_version\":1\,\"status\":\"passed\"\,\"validated\":true\,\"run_id\":\"20260731T064607Z-g0\"\,\"tooling_commit\":\"cb313156c0d8f40fcf92a0273aea98caf5910cf6\"\,\"source_commit\":\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,\"image\":\{\"name\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1\"\,\"config_id\":\"sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57\"\}\,\"topology\":\{\"node\":\"n1\"\,\"prefill\":\{\"dp\":1\,\"tp\":1\,\"npu\":1\}\,\"decode\":\{\"dp\":1\,\"tp\":1\,\"npu\":1\}\,\"proxy_prefill_nodes\":1\,\"proxy_decode_nodes\":1\}\,\"gates\":\{\"capacity_preflight\":true\,\"pod_identity\":true\,\"main_verified_lane\":true\,\"vllm_version_override\":null\,\"coordinator_keyword\":\"max_in_flight_tokens\"\,\"session_apis\":7\,\"npu_health\":true\,\"native_libraries\":true\,\"model_identity\":true\,\"lease_ttl_ms\":30000\,\"master_initial_empty\":true\,\"prefill_http_ready\":true\,\"decode_http_ready\":true\,\"proxy_routing\":true\,\"old_coordinator_type_error_reproduced\":false\,\"engines_stopped\":true\,\"master_reset\":true\,\"final_key_count\":0\,\"final_allocated_bytes\":0\,\"final_active_clients\":0\,\"source_clean\":true\,\"source_history_commits\":11\}\,\"retained\":\{\"ut_pod\":true\,\"prefill_pod\":true\,\"decode_pod\":true\,\"master_pod\":true\,\"proxy_pod\":true\,\"engine_processes_running\":false\}\,\"superseded_steps\":\[\{\"step\":\"prefill-pod-yaml\"\,\"exit_code\":1\,\"classification\":\"kubectl\ resource\ type\ was\ specified\ twice\"\,\"replacement\":\"prefill-pod-yaml-r2\ with\ bare\ Pod\ name\"\,\"replacement_passed\":true\}\]\,\"errors\":\[\]\}
+[2026-07-31T10:48:19Z] END g0-summary exit=0 artifact=summary.json
+[2026-07-31T10:48:31Z] START summary-assert
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .gates.main_verified_lane\ ==\ true\ and\ .gates.coordinator_keyword\ ==\ \"max_in_flight_tokens\"\ and\ .gates.prefill_http_ready\ ==\ true\ and\ .gates.decode_http_ready\ ==\ true\ and\ .gates.old_coordinator_type_error_reproduced\ ==\ false\ and\ .gates.engines_stopped\ ==\ true\ and\ .gates.final_key_count\ ==\ 0\ and\ .gates.final_allocated_bytes\ ==\ 0\ and\ .gates.final_active_clients\ ==\ 0\ and\ \(.errors\ \|\ length\)\ ==\ 0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0/summary.json
+[2026-07-31T10:48:31Z] END summary-assert exit=0 artifact=summary-assert.log
+[2026-07-31T10:48:31Z] START g0-checksums
+COMMAND bash -lc cd\ \'features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260731T064607Z/g0\'\ \&\&\ find\ .\ -maxdepth\ 1\ -type\ f\ \!\ -name\ SHA256SUMS\ \!\ -name\ steps.jsonl\ \!\ -name\ command-transcript.log\ \!\ -name\ checksum-generation.log\ -print0\ \|\ sort\ -z\ \|\ xargs\ -0\ sha256sum\ \>\ SHA256SUMS\ \&\&\ sha256sum\ -c\ SHA256SUMS
+[2026-07-31T10:48:31Z] END g0-checksums exit=0 artifact=checksum-generation.log

@@ -2,7 +2,7 @@
 
 Status: tooling gate passed in `tooling-r4`; image r1 ended as a transient
 infrastructure failure, the unchanged-identity image r2 retry passed, and the
-corrected-image CPU-only UT family passed.
+corrected-image CPU-only UT and G0 families passed.
 
 ## Frozen Identity
 
@@ -80,3 +80,14 @@ tooling checkpoint is `e97b41a046c03f1926f096740765ae13a56329e9`.
   Python compilation passed, and the frozen 11-commit source history remained
   clean. Its `SHA256SUMS` digest is
   `9fe25f229eddd594ee0fbe15ebc80539a96b71c2665be54160fce2c4d2e27426`.
+
+## G0 Base Runtime Gate
+
+- [`g0/`](g0/summary.json): passed. Exact-image Prefill and Decode Pods passed
+  main-lane, coordinator-signature, seven-API, source HEAD, NPU, native-library,
+  model, and hash-seed checks. Both engines reached HTTP readiness and the
+  proxy discovered exactly one endpoint for each role; the previous
+  coordinator keyword `TypeError` did not recur. Both vLLM child processes were
+  stopped afterward and the restarted Master reported zero keys, zero
+  allocated bytes, and zero active clients. Its `SHA256SUMS` digest is
+  `6416863ddba50d3e716cf6f765869c79488c70707adb78b0b6c1a0a28662524c`.
