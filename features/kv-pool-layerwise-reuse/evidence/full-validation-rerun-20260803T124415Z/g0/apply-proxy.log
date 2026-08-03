@@ -1,0 +1,5 @@
+serviceaccount/vllm-proxy-sa unchanged
+role.rbac.authorization.k8s.io/vllm-proxy-pod-reader unchanged
+rolebinding.rbac.authorization.k8s.io/vllm-proxy-pod-reader unchanged
+deployment.apps/proxy-server-deployment unchanged
+service/vllm-proxy-service unchanged

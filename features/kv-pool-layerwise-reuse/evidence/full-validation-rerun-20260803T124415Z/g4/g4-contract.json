@@ -1,0 +1,28 @@
+{
+  "decode_hit_tokens": 512,
+  "metrics": {
+    "master_active_clients": 2.0,
+    "master_allocated_bytes": 15925248.0,
+    "master_batch_put_end_requests_total": 1.0,
+    "master_batch_put_start_requests_total": 1.0,
+    "master_key_count": 4.0
+  },
+  "num_layers": 27,
+  "prefill_commits": 1,
+  "response_id": "cmpl-4a53c64a-8aba-4ac2-8f35-f2fa2cc8fe76",
+  "role_data": {
+    "decode": {
+      "range_events": 27
+    },
+    "prefill": {
+      "range_events": 27
+    }
+  },
+  "superseded_validation_steps": [
+    "pre-request-assert",
+    "capture G4 response",
+    "check 27-layer ranged audit"
+  ],
+  "validated": true,
+  "whole_key_calls": 0
+}

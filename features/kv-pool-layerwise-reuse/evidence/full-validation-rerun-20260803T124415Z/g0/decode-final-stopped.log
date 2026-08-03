@@ -1,0 +1,24 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 13:12 ?        00:00:00 sleep infinity
+root         189       1 12 13:18 ?        00:00:29 [python3] <defunct>
+root         321       1 12 13:19 ?        00:00:18 [python3] <defunct>
+root         400       1  0 13:19 ?        00:00:00 [python3] <defunct>
+root         401       1  2 13:19 ?        00:00:03 [python3] <defunct>
+root         402       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         403       1  2 13:19 ?        00:00:03 [python3] <defunct>
+root         404       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         405       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         406       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         407       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         408       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         409       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         410       1  2 13:19 ?        00:00:03 [python3] <defunct>
+root         411       1  2 13:19 ?        00:00:03 [python3] <defunct>
+root         412       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         413       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         414       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         415       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         416       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root         417       1  2 13:19 ?        00:00:02 [python3] <defunct>
+root        1273       0  0 13:21 ?        00:00:00 sh -c test ! -e /tmp/vllm-decode.pid; ps -efww
+root        1279    1273  0 13:21 ?        00:00:00 ps -efww

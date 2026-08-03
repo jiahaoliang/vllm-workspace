@@ -1,0 +1,30 @@
+{
+  "credential_fields_excluded": true,
+  "results": {
+    "g0": {
+      "allocatable": 8,
+      "available": 7,
+      "counted_pods": [
+        {
+          "namespace": "mooncake-main",
+          "pod": "qwen3-8b-agg-01-aggregated-1",
+          "request": 1
+        }
+      ],
+      "used_excluding_replaced_engines": 1
+    },
+    "stress": {
+      "allocatable": 8,
+      "available": 7,
+      "counted_pods": [
+        {
+          "namespace": "mooncake-main",
+          "pod": "qwen3-8b-agg-01-aggregated-1",
+          "request": 1
+        }
+      ],
+      "used_excluding_replaced_engines": 1
+    }
+  },
+  "validated": true
+}

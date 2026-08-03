@@ -1,0 +1,21 @@
+context=bke-cluster-admin@bke-cluster
+namespace=liangjiahao
+pod=vllm-ascend-ut
+image_source_head=14beaf161cca6f1e044e20529ca96c6554dbbe50
+source_head=d28c52958a30cebdb7822d56e3dbb0dbe41499bc
+source_branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+source_dirty=false
+........................................................................ [ 15%]
+........................................................................ [ 30%]
+........................................................................ [ 45%]
+........................................................................ [ 60%]
+........................................................................ [ 75%]
+........................................................................ [ 90%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+../../usr/local/python3.12.13/lib/python3.12/site-packages/torch/jit/_script.py:362: 14 warnings
+  /usr/local/python3.12.13/lib/python3.12/site-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+478 passed, 14 warnings in 4.13s

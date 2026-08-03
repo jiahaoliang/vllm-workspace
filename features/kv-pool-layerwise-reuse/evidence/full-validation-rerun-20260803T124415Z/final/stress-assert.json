@@ -1,0 +1,20 @@
+{
+  "recorded_steps": 163,
+  "s1": {
+    "actual_key_count": 508,
+    "cases": 4,
+    "validated": true
+  },
+  "s2": {
+    "actual_key_count": 288,
+    "cases": 16,
+    "validated": true
+  },
+  "s3": {
+    "actual_key_count": 348,
+    "cases": 4,
+    "validated": true
+  },
+  "topology": "DP2/TP2 Prefill + DP1/TP2 Decode",
+  "validated": true
+}

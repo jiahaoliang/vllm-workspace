@@ -1,0 +1,106 @@
+{
+  "block_size": 128,
+  "cached_blocks": 255,
+  "cached_boundary_tokens": 32640,
+  "definition": {
+    "case_count": 4,
+    "expected_keys": 348,
+    "name": "s3",
+    "seed_offset": 200,
+    "shared_blocks": 224,
+    "unique_blocks": 31
+  },
+  "expected_key_count": 348,
+  "expected_marker_texts": [
+    " S3_CASE_00",
+    " S3_CASE_01",
+    " S3_CASE_02",
+    " S3_CASE_03"
+  ],
+  "expected_marker_token_ids": [
+    [
+      324,
+      18,
+      62,
+      35886,
+      62,
+      15,
+      15
+    ],
+    [
+      324,
+      18,
+      62,
+      35886,
+      62,
+      15,
+      16
+    ],
+    [
+      324,
+      18,
+      62,
+      35886,
+      62,
+      15,
+      17
+    ],
+    [
+      324,
+      18,
+      62,
+      35886,
+      62,
+      15,
+      18
+    ]
+  ],
+  "generated_tokens": 24,
+  "markers": [
+    "S3_CASE_00",
+    "S3_CASE_01",
+    "S3_CASE_02",
+    "S3_CASE_03"
+  ],
+  "prompt_tokens": [
+    32658,
+    32658,
+    32658,
+    32658
+  ],
+  "request_files": [
+    "requests/case-00.json",
+    "requests/case-01.json",
+    "requests/case-02.json",
+    "requests/case-03.json"
+  ],
+  "request_ids": {
+    "baseline": [
+      "stress-s3-baseline-0",
+      "stress-s3-baseline-1",
+      "stress-s3-baseline-2",
+      "stress-s3-baseline-3"
+    ],
+    "pinned": [
+      "stress-s3-pinned-0",
+      "stress-s3-pinned-1",
+      "stress-s3-pinned-2",
+      "stress-s3-pinned-3"
+    ],
+    "proxy": [
+      "stress-s3-proxy-0",
+      "stress-s3-proxy-1",
+      "stress-s3-proxy-2",
+      "stress-s3-proxy-3"
+    ]
+  },
+  "scenario": "s3",
+  "schema_version": 2,
+  "seeds": [
+    2026072600,
+    2026072601,
+    2026072602,
+    2026072603
+  ],
+  "tail_tokens": 18
+}

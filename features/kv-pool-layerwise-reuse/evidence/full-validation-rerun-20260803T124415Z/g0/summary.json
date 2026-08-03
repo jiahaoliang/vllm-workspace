@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "gate": "G0",
+  "status": "passed",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+  "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "image_vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "overlay_vllm_ascend": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
+  "prefill_pod": "prefill-engine-deployment-69cfdd6cb4-pmb8k",
+  "decode_pod": "decode-engine-deployment-56559b48fc-48kcr",
+  "engines_stopped": true,
+  "master_empty": true
+}

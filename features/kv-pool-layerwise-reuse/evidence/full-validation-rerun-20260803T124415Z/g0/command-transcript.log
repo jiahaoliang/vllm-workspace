@@ -1,0 +1,159 @@
+[2026-08-03T13:08:52Z] START capture n1
+COMMAND kubectl get node -n liangjiahao n1 -o json
+[2026-08-03T13:08:52Z] END capture n1 exit=0 artifact=node.json
+[2026-08-03T13:08:52Z] START capture cluster Pods
+COMMAND kubectl -n liangjiahao get --raw /api/v1/pods
+[2026-08-03T13:08:52Z] END capture cluster Pods exit=0 artifact=pods.json
+[2026-08-03T13:09:05Z] START assert NPU capacity
+COMMAND python3 -c $'import json,sys; node=json.load(open(sys.argv[1])); pods=json.load(open(sys.argv[2]))["items"]; alloc=int(node["status"]["allocatable"]["huawei.com/Ascend910"]); used=0; counted=[]\nfor pod in pods:\n spec=pod.get("spec",{}); status=pod.get("status",{}); meta=pod.get("metadata",{}); name=meta.get("name",""); ns=meta.get("namespace","")\n if spec.get("nodeName") != "n1" or status.get("phase") not in {"Running","Pending"}: continue\n if ns == "liangjiahao" and (name.startswith("prefill-engine-deployment-") or name.startswith("decode-engine-deployment-")): continue\n request=sum(int(c.get("resources",{}).get("requests",{}).get("huawei.com/Ascend910",0)) for c in spec.get("containers",[]))\n if request: counted.append({"namespace":ns,"pod":name,"request":request}); used += request\nresult={"allocatable":alloc,"used_excluding_replaced_engines":used,"available":alloc-used,"base_required":2,"stress_required":6,"counted_pods":counted}; print(json.dumps(result,indent=2)); assert result["available"] >= result["stress_required"], result' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/node.json features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/pods.json
+[2026-08-03T13:09:05Z] END assert NPU capacity exit=0 artifact=npu-capacity.json
+[2026-08-03T13:09:47Z] START capture old engine Pods
+COMMAND kubectl get pod -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd prefill-engine-deployment-7f4fc6ddc7-n884l -o json
+[2026-08-03T13:09:47Z] END capture old engine Pods exit=0 artifact=engine-pods-before.json
+[2026-08-03T13:09:47Z] START stop old Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-7f4fc6ddc7-n884l -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-03T13:09:47Z] END stop old Prefill exit=0 artifact=stop-old-prefill.log
+[2026-08-03T13:09:47Z] START stop old Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-f6f4b9988-gxlwd -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-03T13:09:48Z] END stop old Decode exit=0 artifact=stop-old-decode.log
+[2026-08-03T13:10:12Z] START apply namespace
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/00-namespace.yaml
+[2026-08-03T13:10:12Z] END apply namespace exit=0 artifact=apply-namespace.log
+[2026-08-03T13:10:12Z] START apply base runtime ConfigMap
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml
+[2026-08-03T13:10:12Z] END apply base runtime ConfigMap exit=0 artifact=apply-runtime-config.log
+[2026-08-03T13:10:12Z] START apply Mooncake Master
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/30-mooncake-master.yaml
+[2026-08-03T13:10:13Z] END apply Mooncake Master exit=0 artifact=apply-master.log
+[2026-08-03T13:10:13Z] START apply base Prefill
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml
+[2026-08-03T13:10:13Z] END apply base Prefill exit=0 artifact=apply-prefill.log
+[2026-08-03T13:10:13Z] START apply base Decode
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/50-decode-engine.yaml
+[2026-08-03T13:10:13Z] END apply base Decode exit=0 artifact=apply-decode.log
+[2026-08-03T13:10:13Z] START apply proxy
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/20-proxy-server.yaml
+[2026-08-03T13:10:14Z] END apply proxy exit=0 artifact=apply-proxy.log
+[2026-08-03T13:10:44Z] START wait old Prefill deletion
+COMMAND kubectl wait -n liangjiahao --for=delete pod/prefill-engine-deployment-7f4fc6ddc7-n884l --timeout=300s
+[2026-08-03T13:12:14Z] END wait old Prefill deletion exit=0 artifact=wait-old-prefill-delete.log
+[2026-08-03T13:12:14Z] START wait old Decode deletion
+COMMAND kubectl wait -n liangjiahao --for=delete pod/decode-engine-deployment-f6f4b9988-gxlwd --timeout=300s
+[2026-08-03T13:12:15Z] END wait old Decode deletion exit=0 artifact=wait-old-decode-delete.log
+[2026-08-03T13:13:11Z] START sync d28c52958 Python overlay
+COMMAND features/kv-pool-layerwise-reuse/deployment/sync-vllm-ascend-python.sh
+[2026-08-03T13:13:13Z] END sync d28c52958 Python overlay exit=0 artifact=source-sync.log
+[2026-08-03T13:13:41Z] START capture new engine Pods
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k decode-engine-deployment-56559b48fc-48kcr -o json
+[2026-08-03T13:13:41Z] END capture new engine Pods exit=0 artifact=engine-pods-after.json
+[2026-08-03T13:13:41Z] START assert new engine Pod identity
+COMMAND jq -e --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1 --arg image_id sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57 --arg old_prefill 8b5888f9-1232-43e1-9d8d-49cd34051311 --arg old_decode c6a19427-8fed-4de4-8f18-54e2c096f2a4 \(.items\|length\)==2\ and\ all\(.items\[\]\;\ .metadata.namespace==\"liangjiahao\"\ and\ .spec.nodeName==\"n1\"\ and\ .metadata.uid\ \!=\ \$old_prefill\ and\ .metadata.uid\ \!=\ \$old_decode\ and\ .spec.containers\[0\].image==\$image\ and\ .status.containerStatuses\[0\].imageID==\$image_id\ and\ any\(.spec.containers\[0\].env\[\]\;\ .name==\"PYTHONDONTWRITEBYTECODE\"\ and\ .value==\"1\"\)\ and\ .spec.containers\[0\].resources.requests\[\"huawei.com/Ascend910\"\]==\"1\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/engine-pods-after.json
+[2026-08-03T13:13:41Z] END assert new engine Pod identity exit=0 artifact=engine-pod-contract.log
+[2026-08-03T13:13:58Z] START four-way overlay checksums
+COMMAND bash -c set\ -euo\ pipefail\;\ root=\$1\;\ prefill=\$2\;\ decode=\$3\;\ shift\ 3\;\ for\ path\ in\ \"\$@\"\;\ do\ read\ -r\ host_sum\ _\ \<\ \<\(sha256sum\ \"\$\{root\}/\$\{path\}\"\)\;\ line=\$\(kubectl\ exec\ -n\ liangjiahao\ \"\$prefill\"\ -c\ prefill-engine\ --\ sha256sum\ \"/vllm-workspace/vllm-ascend/\$\{path\}\"\)\;\ read\ -r\ prefill_sum\ _\ \<\<\<\"\$line\"\;\ line=\$\(kubectl\ exec\ -n\ liangjiahao\ \"\$decode\"\ -c\ decode-engine\ --\ sha256sum\ \"/vllm-workspace/vllm-ascend/\$\{path\}\"\)\;\ read\ -r\ decode_sum\ _\ \<\<\<\"\$line\"\;\ line=\$\(kubectl\ exec\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ sha256sum\ \"/workspace/vllm-ascend/\$\{path\}\"\)\;\ read\ -r\ ut_sum\ _\ \<\<\<\"\$line\"\;\ printf\ \"%s\\t%s\\t%s\\t%s\\t%s\\n\"\ \"\$path\"\ \"\$host_sum\"\ \"\$prefill_sum\"\ \"\$decode_sum\"\ \"\$ut_sum\"\;\ test\ \"\$host_sum\"\ =\ \"\$prefill_sum\"\;\ test\ \"\$host_sum\"\ =\ \"\$decode_sum\"\;\ test\ \"\$host_sum\"\ =\ \"\$ut_sum\"\;\ done bash /root/ljh/vllm-workspace/repos/vllm-ascend prefill-engine-deployment-69cfdd6cb4-pmb8k decode-engine-deployment-56559b48fc-48kcr vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+[2026-08-03T13:13:59Z] END four-way overlay checksums exit=0 artifact=source-checksums.tsv
+[2026-08-03T13:14:22Z] START Prefill runtime identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /opt/vllm-layerwise/check-runtime.py
+[2026-08-03T13:14:44Z] END Prefill runtime identity exit=0 artifact=prefill-runtime-check.log
+[2026-08-03T13:14:44Z] START Decode runtime identity
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /opt/vllm-layerwise/check-runtime.py
+[2026-08-03T13:15:05Z] END Decode runtime identity exit=0 artifact=decode-runtime-check.log
+[2026-08-03T13:15:33Z] START assert Prefill stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- sh -c test\ \!\ -e\ /tmp/vllm-prefill.pid\;\ ps\ -efww
+[2026-08-03T13:15:33Z] END assert Prefill stopped exit=0 artifact=prefill-stopped-ps.log
+[2026-08-03T13:15:33Z] START assert Decode stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- sh -c test\ \!\ -e\ /tmp/vllm-decode.pid\;\ ps\ -efww
+[2026-08-03T13:15:33Z] END assert Decode stopped exit=0 artifact=decode-stopped-ps.log
+[2026-08-03T13:15:47Z] START restart Mooncake Master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-03T13:15:47Z] END restart Mooncake Master exit=0 artifact=restart-master.log
+[2026-08-03T13:15:47Z] START wait Mooncake Master rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-03T13:15:50Z] END wait Mooncake Master rollout exit=0 artifact=master-rollout.log
+[2026-08-03T13:16:16Z] START capture Master deployment
+COMMAND kubectl get deployment -n liangjiahao mooncake-master-deployment -o json
+[2026-08-03T13:16:16Z] END capture Master deployment exit=0 artifact=master-deployment.json
+[2026-08-03T13:16:16Z] START capture Master startup log
+COMMAND kubectl logs -n liangjiahao mooncake-master-deployment-79d6c5bc85-hdxrt -c mooncake-master
+[2026-08-03T13:16:16Z] END capture Master startup log exit=0 artifact=master-startup.log
+[2026-08-03T13:16:16Z] START capture empty Master metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c $'import time; from urllib.request import urlopen; url="http://mooncake-master-service:9003/metrics"; deadline=time.monotonic()+60; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode(),end=""); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(0.5)\nraise SystemExit(f"metrics timeout: {last}")'
+[2026-08-03T13:16:16Z] END capture empty Master metrics exit=0 artifact=master-empty.metrics
+[2026-08-03T13:16:31Z] START assert Master manifest TTL
+COMMAND jq -e \[.spec.template.spec.containers\[\]\ \|\ select\(.name\ ==\ \"mooncake-master\"\)\ \|\ .args\[\]\]\ \|\ join\(\"\ \"\)\ \|\ contains\(\"--default_kv_lease_ttl=30s\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/master-deployment.json
+[2026-08-03T13:16:31Z] END assert Master manifest TTL exit=0 artifact=master-ttl-manifest.log
+[2026-08-03T13:16:31Z] START assert Master runtime TTL
+COMMAND rg -F default_kv_lease_ttl=30000 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/master-startup.log
+[2026-08-03T13:16:31Z] END assert Master runtime TTL exit=0 artifact=master-ttl-runtime.log
+[2026-08-03T13:16:31Z] START assert Master empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/master-empty.metrics
+[2026-08-03T13:16:31Z] END assert Master empty exit=0 artifact=master-empty-assert.log
+[2026-08-03T13:16:50Z] START inspect reused local image
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+[2026-08-03T13:16:51Z] END inspect reused local image exit=0 artifact=image-inspect.json
+[2026-08-03T13:17:24Z] START Prefill image source identities
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- bash -c set\ -e\;\ v=\$\(git\ -C\ /vllm-workspace/vllm\ rev-parse\ HEAD\)\;\ a=\$\(git\ -C\ /vllm-workspace/vllm-ascend\ rev-parse\ HEAD\)\;\ m=\$\(git\ -C\ /vllm-workspace/Mooncake\ rev-parse\ HEAD\)\;\ test\ \"\$v\"\ =\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\;\ test\ \"\$a\"\ =\ 14beaf161cca6f1e044e20529ca96c6554dbbe50\;\ test\ \"\$m\"\ =\ 786c77ff7692bed58dd99971afef87d6b690cbe3\;\ printf\ \"vllm=%s\\nvllm_ascend_image=%s\\nmooncake=%s\\n\"\ \"\$v\"\ \"\$a\"\ \"\$m\"
+[2026-08-03T13:17:24Z] END Prefill image source identities exit=0 artifact=prefill-image-sources.log
+[2026-08-03T13:17:24Z] START Decode image source identities
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- bash -c set\ -e\;\ v=\$\(git\ -C\ /vllm-workspace/vllm\ rev-parse\ HEAD\)\;\ a=\$\(git\ -C\ /vllm-workspace/vllm-ascend\ rev-parse\ HEAD\)\;\ m=\$\(git\ -C\ /vllm-workspace/Mooncake\ rev-parse\ HEAD\)\;\ test\ \"\$v\"\ =\ 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\;\ test\ \"\$a\"\ =\ 14beaf161cca6f1e044e20529ca96c6554dbbe50\;\ test\ \"\$m\"\ =\ 786c77ff7692bed58dd99971afef87d6b690cbe3\;\ printf\ \"vllm=%s\\nvllm_ascend_image=%s\\nmooncake=%s\\n\"\ \"\$v\"\ \"\$a\"\ \"\$m\"
+[2026-08-03T13:17:24Z] END Decode image source identities exit=0 artifact=decode-image-sources.log
+[2026-08-03T13:17:42Z] START model identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- bash -c set\ -e\;\ model=/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8\;\ test\ -f\ \"\$model/config.json\"\;\ sha256sum\ \"\$model/config.json\"\ \"\$model/tokenizer_config.json\"\;\ env\ PYTHONDONTWRITEBYTECODE=1\ python3\ -c\ \'import\ json\,sys\;\ c=json.load\(open\(sys.argv\[1\]\)\)\;\ assert\ c\[\"num_hidden_layers\"\]==27\ and\ c\[\"max_position_embeddings\"\]\>=65536\,\ c\;\ print\(json.dumps\(\{\"num_hidden_layers\":c\[\"num_hidden_layers\"\]\,\"max_position_embeddings\":c\[\"max_position_embeddings\"\]\}\)\)\'\ \"\$model/config.json\"
+[2026-08-03T13:17:43Z] END model identity exit=0 artifact=model-identity.log
+[2026-08-03T13:17:43Z] START Prefill NPU identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- npu-smi info
+[2026-08-03T13:17:43Z] END Prefill NPU identity exit=0 artifact=prefill-npu-smi.log
+[2026-08-03T13:17:43Z] START Decode NPU identity
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- npu-smi info
+[2026-08-03T13:17:44Z] END Decode NPU identity exit=0 artifact=decode-npu-smi.log
+[2026-08-03T13:18:05Z] START start Prefill engine
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
+[2026-08-03T13:18:09Z] END start Prefill engine exit=0 artifact=start-prefill.log
+[2026-08-03T13:18:09Z] START start Decode engine
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- /opt/vllm-layerwise/start-decode.sh
+[2026-08-03T13:18:12Z] END start Decode engine exit=0 artifact=start-decode.log
+[2026-08-03T13:18:34Z] START wait Prefill API
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c $'import sys,time,urllib.request; url=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8100/v1/models
+[2026-08-03T13:20:05Z] END wait Prefill API exit=0 artifact=wait-prefill-api.log
+[2026-08-03T13:20:33Z] START wait Decode API
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- python3 -c import\ urllib.request\;\ url=\"http://127.0.0.1:8200/v1/models\"\;\ response=urllib.request.urlopen\(url\,timeout=10\)\;\ assert\ response.status==200\;\ print\(response.read\(\).decode\(\)\)
+[2026-08-03T13:20:33Z] END wait Decode API exit=0 artifact=wait-decode-api.log
+[2026-08-03T13:20:33Z] START assert Prefill Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-69cfdd6cb4-pmb8k --timeout=60s
+[2026-08-03T13:20:33Z] END assert Prefill Ready exit=0 artifact=prefill-ready.log
+[2026-08-03T13:20:33Z] START assert Decode Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-56559b48fc-48kcr --timeout=60s
+[2026-08-03T13:20:33Z] END assert Decode Ready exit=0 artifact=decode-ready.log
+[2026-08-03T13:20:48Z] START proxy health
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ response=urlopen\(\"http://vllm-proxy-service:8000/health\"\,timeout=10\)\;\ assert\ response.status==200\;\ print\(response.read\(\).decode\(\)\)
+[2026-08-03T13:20:48Z] END proxy health exit=0 artifact=proxy-health.log
+[2026-08-03T13:20:48Z] START proxy endpoint discovery
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c import\ json\;\ from\ urllib.request\ import\ urlopen\;\ body=json.load\(urlopen\(\"http://vllm-proxy-service:8000/listEndPoints\"\,timeout=10\)\)\;\ assert\ len\(body.get\(\"prefill_nodes\"\,\[\]\)\)==1\ and\ len\(body.get\(\"decode_nodes\"\,\[\]\)\)==1\,\ body\;\ print\(json.dumps\(body\,indent=2\)\)
+[2026-08-03T13:20:49Z] END proxy endpoint discovery exit=0 artifact=proxy-endpoints.json
+[2026-08-03T13:21:09Z] START stop verified Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-03T13:21:12Z] END stop verified Prefill exit=0 artifact=stop-prefill-final.log
+[2026-08-03T13:21:12Z] START stop verified Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-03T13:21:14Z] END stop verified Decode exit=0 artifact=stop-decode-final.log
+[2026-08-03T13:21:14Z] START reset Master after G0
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-03T13:21:14Z] END reset Master after G0 exit=0 artifact=reset-master-final.log
+[2026-08-03T13:21:14Z] START wait final G0 Master rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-03T13:21:19Z] END wait final G0 Master rollout exit=0 artifact=reset-master-final-wait.log
+[2026-08-03T13:21:58Z] START assert final Prefill stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- sh -c test\ \!\ -e\ /tmp/vllm-prefill.pid\;\ ps\ -efww
+[2026-08-03T13:21:58Z] END assert final Prefill stopped exit=0 artifact=prefill-final-stopped.log
+[2026-08-03T13:21:58Z] START assert final Decode stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- sh -c test\ \!\ -e\ /tmp/vllm-decode.pid\;\ ps\ -efww
+[2026-08-03T13:21:58Z] END assert final Decode stopped exit=0 artifact=decode-final-stopped.log
+[2026-08-03T13:21:58Z] START capture final empty Master metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ response=urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\)\;\ assert\ response.status==200\;\ print\(response.read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:21:58Z] END capture final empty Master metrics exit=0 artifact=master-empty-final.metrics
+[2026-08-03T13:22:14Z] START assert final Master empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g0/master-empty-final.metrics
+[2026-08-03T13:22:14Z] END assert final Master empty exit=0 artifact=master-empty-final-assert.log
+[2026-08-03T13:22:14Z] START write G0 summary
+COMMAND python3 -c import\ json\;\ print\(json.dumps\(\{\"schema_version\":1\,\"gate\":\"G0\"\,\"status\":\"passed\"\,\"image\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1\"\,\"image_id\":\"sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57\"\,\"image_vllm_ascend\":\"14beaf161cca6f1e044e20529ca96c6554dbbe50\"\,\"overlay_vllm_ascend\":\"d28c52958a30cebdb7822d56e3dbb0dbe41499bc\"\,\"prefill_pod\":\"prefill-engine-deployment-69cfdd6cb4-pmb8k\"\,\"decode_pod\":\"decode-engine-deployment-56559b48fc-48kcr\"\,\"engines_stopped\":True\,\"master_empty\":True\}\,indent=2\)\)
+[2026-08-03T13:22:14Z] END write G0 summary exit=0 artifact=summary.json

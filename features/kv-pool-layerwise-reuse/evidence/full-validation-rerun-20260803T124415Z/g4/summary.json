@@ -1,0 +1,23 @@
+{
+  "decode_hit_tokens": 512,
+  "decode_range_events": 27,
+  "engines_stopped": true,
+  "errors": [],
+  "gate": "G4",
+  "image_vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
+  "master_empty": true,
+  "num_layers": 27,
+  "overlay_vllm_ascend": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
+  "prefill_commits": 1,
+  "prefill_range_events": 27,
+  "response_id": "cmpl-4a53c64a-8aba-4ac2-8f35-f2fa2cc8fe76",
+  "schema_version": 1,
+  "status": "passed",
+  "superseded_validation_steps": [
+    "pre-request-assert",
+    "capture G4 response",
+    "check 27-layer ranged audit"
+  ],
+  "validated": true,
+  "whole_key_calls": 0
+}

@@ -1,0 +1,25 @@
+{
+  "decode_rank": 0,
+  "endpoints": {
+    "decode_nodes": [
+      {
+        "active_tokens": 0,
+        "endpoint": "http://10.250.40.217:8200",
+        "host": "10.250.40.217",
+        "port": 8200
+      }
+    ],
+    "prefill_nodes": [
+      {
+        "active_tokens": -2.842170943040401e-14,
+        "endpoint": "http://10.250.40.140:8100",
+        "host": "10.250.40.140",
+        "port": 8100
+      }
+    ],
+    "status": "ok"
+  },
+  "prefill_rank": 1,
+  "request_id": "stress-s1-pinned-1",
+  "transfer_params_attached": false
+}

@@ -78,6 +78,30 @@ collect() {
   }
 }
 
+collect_capacity_pods() {
+  kubectl -n "${namespace}" get --raw /api/v1/pods | jq '
+    {
+      kind,
+      apiVersion,
+      metadata: {resourceVersion: .metadata.resourceVersion},
+      items: [
+        .items[] | {
+          metadata: {
+            name: .metadata.name,
+            namespace: .metadata.namespace,
+            deletionTimestamp: .metadata.deletionTimestamp
+          },
+          spec: {
+            nodeName: .spec.nodeName,
+            containers: [.spec.containers[] | {name, resources}]
+          },
+          status: {phase: .status.phase}
+        }
+      ]
+    }
+  '
+}
+
 stop_engines() {
   local rc=0
   [[ -z ${prefill_pod} ]] || kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill || rc=1
@@ -331,7 +355,7 @@ for revision in 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 d28c52958a30cebdb7822d5
   jq -e --arg revision "${revision}" '.. | strings | select(. == $revision)' "${workspace_root}/workspace.lock.json" >/dev/null || { fail_run "workspace lock is missing ${revision}"; exit 1; }
 done
 collect "node JSON" "${output_dir}/node.json" kubectl get node -n "${namespace}" "${node_name}" -o json || { fail_run "node query failed"; exit 1; }
-collect "all cluster Pods" "${output_dir}/pods-before.json" kubectl -n "${namespace}" get --raw /api/v1/pods || { fail_run "Pod capacity query failed"; exit 1; }
+collect "capacity-only cluster Pod fields" "${output_dir}/pods-before.json" collect_capacity_pods || { fail_run "Pod capacity query failed"; exit 1; }
 python3 -c 'import json,sys
 node=json.load(open(sys.argv[1])); pods=json.load(open(sys.argv[2]))["items"]
 alloc=int(node["status"]["allocatable"]["huawei.com/Ascend910"]); used=0; counted=[]

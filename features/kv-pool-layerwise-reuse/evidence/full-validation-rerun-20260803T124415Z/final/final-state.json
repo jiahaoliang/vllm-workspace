@@ -1,0 +1,17 @@
+{
+  "allocated_npus_retained": 6,
+  "decode_pod": "decode-engine-deployment-85f47466d6-m7ndf",
+  "engines_stopped": true,
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+  "image_id": "sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57",
+  "master_empty": true,
+  "metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "prefill_pod": "prefill-engine-deployment-686979fcc-qpr6c",
+  "stress_pods_retained": true,
+  "ut_pod": "vllm-ascend-ut",
+  "validated": true
+}

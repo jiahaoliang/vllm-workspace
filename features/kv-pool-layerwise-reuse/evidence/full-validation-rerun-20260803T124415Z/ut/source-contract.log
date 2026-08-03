@@ -1,0 +1,17 @@
+head=d28c52958a30cebdb7822d56e3dbb0dbe41499bc
+merge_base=a46a1dabbc260e8695002969f29528eb555eb583
+commit_count=12
+merge_count=0
+package_files=vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+3676b98f11afad3d5f59b6da48008b5ecedcc9a8 feat(kv_pool): define Mooncake layerwise backend contract
+7f8bdf29029ff998de38cf1767b56fe78f107613 feat(kv_pool): add Mooncake layerwise metadata
+baa547632fcc6ebec37f1e6922469652b7cec90b feat(kv_pool): build Mooncake layer range batches
+d6f6a26226d989c2db8ef2b64659e84700dcf2bd refactor(kv_pool): make layer transfer completion exception-safe
+4f87dfb6b7ba9b220f54ec9810ccaee34c62c5fc feat(kv_pool): add Mooncake ranged layer save
+88f8501725f8606bb1478bc6ab89206965d0b322 feat(kv_pool): add Mooncake ranged layer load
+bcc2b916f131fdaa2c28b3d04574366bdcd278c2 feat(kv_pool): orchestrate Mooncake layerwise sessions
+35d64610cd84e980cddacd9ca6d9eeb953a7d649 docs(kv_pool): document Mooncake layerwise backend
+a2d654419f5c5cc4cc2bd50b1ec46c49eb18c079 feat(kv_pool): support Mooncake chunked prefill sessions
+4da8b2deb254ded804975dded799c9eb19a4bf5a feat(kv_pool): add ranged transfer audit logging
+14beaf161cca6f1e044e20529ca96c6554dbbe50 fix(kv_pool): adapt renamed Mooncake session APIs
+d28c52958a30cebdb7822d56e3dbb0dbe41499bc fix(kv_pool): isolate concurrent Mooncake range loads

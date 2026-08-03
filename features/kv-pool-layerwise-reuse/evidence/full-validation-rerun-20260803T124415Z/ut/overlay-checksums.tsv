@@ -1,0 +1,4 @@
+awk: cmd. line:1: {print \vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py}
+awk: cmd. line:1:        ^ backslash not last character on line
+awk: cmd. line:1: {print \vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py}
+awk: cmd. line:1:        ^ syntax error

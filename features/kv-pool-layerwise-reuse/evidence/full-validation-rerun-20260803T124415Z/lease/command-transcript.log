@@ -1,0 +1,42 @@
+[2026-08-03T13:26:21Z] START capture live lease contract
+COMMAND kubectl get deployment -n liangjiahao mooncake-master-deployment -o json
+[2026-08-03T13:26:21Z] END capture live lease contract exit=0 artifact=master-deployment.json
+[2026-08-03T13:26:21Z] START capture lease initial metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:26:21Z] END capture lease initial metrics exit=0 artifact=master-empty-before.metrics
+[2026-08-03T13:26:21Z] START assert live 30s lease
+COMMAND jq -e \[.spec.template.spec.containers\[\]\ \|\ select\(.name\ ==\ \"mooncake-master\"\)\ \|\ .args\[\]\]\ \|\ join\(\"\ \"\)\ \|\ contains\(\"--default_kv_lease_ttl=30s\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/master-deployment.json
+[2026-08-03T13:26:21Z] END assert live 30s lease exit=0 artifact=lease-contract.log
+[2026-08-03T13:26:40Z] START assert lease initial empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/master-empty-before.metrics
+[2026-08-03T13:26:40Z] END assert lease initial empty exit=0 artifact=master-empty-before-assert.log
+[2026-08-03T13:26:40Z] START run lease expiry contract
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /tmp/full-validation-direct-20260803T124415Z/lease-expiry-test.py --output /tmp/full-validation-direct-20260803T124415Z/lease-summary.json --lease-ttl-ms 30000 --wait-margin-ms 1500 --page-size 4096
+[2026-08-03T13:28:01Z] END run lease expiry contract exit=0 artifact=lease-expiry.log
+[2026-08-03T13:28:20Z] START capture lease summary
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- cat /tmp/full-validation-direct-20260803T124415Z/lease-summary.json
+[2026-08-03T13:28:20Z] END capture lease summary exit=0 artifact=summary.json
+[2026-08-03T13:28:20Z] START capture lease final metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:28:20Z] END capture lease final metrics exit=0 artifact=master-final.metrics
+[2026-08-03T13:28:41Z] START assert lease contract
+COMMAND jq -e .passed\ ==\ true\ and\ .config.lease_ttl_ms\ ==\ 30000\ and\ .config.wait_margin_ms\ ==\ 1500\ and\ \(.waits\|length\)==2\ and\ all\(.waits\[\]\;\ .elapsed_ms\ \>=\ 30000\)\ and\ .semantic_result.expired_session_error_code\ ==\ -707\ and\ .semantic_result.slow_put_completed_after_read_ttl_gap\ ==\ true\ and\ .semantic_result.old_get_session_survives_ttl\ ==\ false\ and\ .semantic_result.fresh_batch_get_session_start_after_expiry_finds_object\ ==\ true\ and\ all\(.cases\[\]\;\ .passed\ ==\ true\)\ and\ \(any\(.cases\[\]\;\ .name\ ==\ \"read_layer_1_old_session_lease_expired\"\ and\ .actual\ ==\ \[-707\]\)\)\ and\ \(any\(.cases\[\]\;\ .name\ ==\ \"two_layer_data_matches_after_fresh_lease\"\ and\ .actual\ ==\ true\)\)\ and\ all\(.cleanup\[\]\;\ .passed\ ==\ true\)\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/summary.json
+[2026-08-03T13:28:41Z] END assert lease contract exit=0 artifact=summary-assert.log
+[2026-08-03T13:28:41Z] START assert lease cleanup empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/master-final.metrics
+[2026-08-03T13:28:41Z] END assert lease cleanup empty exit=0 artifact=master-final-assert.log
+[2026-08-03T13:28:57Z] START independent reset after lease
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-03T13:28:57Z] END independent reset after lease exit=0 artifact=reset-master.log
+[2026-08-03T13:28:57Z] START wait independent reset after lease
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-03T13:29:02Z] END wait independent reset after lease exit=0 artifact=reset-master-wait.log
+[2026-08-03T13:29:02Z] START capture post-reset metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:29:03Z] END capture post-reset metrics exit=1 artifact=reset-empty.metrics
+[2026-08-03T13:29:17Z] START assert post-reset empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/reset-empty.metrics
+[2026-08-03T13:29:17Z] END assert post-reset empty exit=1 artifact=reset-empty-assert.log
+[2026-08-03T14:15:13Z] START account for post-reset endpoint race
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nassert values=={"master_key_count":0.0,"master_allocated_bytes":0.0,"master_active_clients":0.0},values; failed=open(sys.argv[2],encoding="utf-8").read(); assert "ConnectionRefusedError" in failed; print({"superseded_connection_refused":True,"same_reset_later_empty":True,"metrics":values})' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g4/preflight.metrics features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/lease/reset-empty.metrics
+[2026-08-03T14:15:13Z] END account for post-reset endpoint race exit=0 artifact=reset-recovery-assert.log

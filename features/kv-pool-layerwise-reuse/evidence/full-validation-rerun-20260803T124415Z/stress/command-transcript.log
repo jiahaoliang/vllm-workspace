@@ -1,0 +1,489 @@
+[2026-08-03T13:46:11Z] START namespace safety gate
+COMMAND kubectl get namespace -n liangjiahao liangjiahao -o name 
+[2026-08-03T13:46:11Z] END namespace safety gate exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/namespace.txt
+[2026-08-03T13:46:11Z] START control and source identity
+COMMAND identity_check 
+[2026-08-03T13:46:11Z] END control and source identity exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/identity.txt
+[2026-08-03T13:46:11Z] START collect: control repo status
+COMMAND git status --short --branch 
+[2026-08-03T13:46:11Z] END collect: control repo status exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/git-status.txt
+[2026-08-03T13:46:11Z] START collect: remote feature HEAD
+COMMAND git ls-remote origin refs/heads/kv-pool-layerwise-reuse 
+[2026-08-03T13:46:12Z] END collect: remote feature HEAD exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/remote-head.txt
+[2026-08-03T13:46:12Z] START capture workspace lock
+COMMAND cp /root/ljh/vllm-workspace/workspace.lock.json features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/workspace.lock.json 
+[2026-08-03T13:46:12Z] END capture workspace lock exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/workspace-lock-copy.log
+[2026-08-03T13:46:12Z] START collect: node JSON
+COMMAND kubectl get node -n liangjiahao n1 -o json 
+[2026-08-03T13:46:12Z] END collect: node JSON exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/node.json
+[2026-08-03T13:46:12Z] START collect: all cluster Pods
+COMMAND kubectl -n liangjiahao get --raw /api/v1/pods 
+[2026-08-03T13:46:12Z] END collect: all cluster Pods exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/pods-before.json
+[2026-08-03T13:46:12Z] START local image identity
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1 
+[2026-08-03T13:46:12Z] END local image identity exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/image-inspect.json
+[2026-08-03T13:46:13Z] START collect: current engine image on n1
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k decode-engine-deployment-56559b48fc-48kcr -o json 
+[2026-08-03T13:46:13Z] END collect: current engine image on n1 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/current-engine-image.json
+[2026-08-03T13:46:13Z] START model identity
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c import\ json\,sys\;\ p=sys.argv\[1\]\;\ c=json.load\(open\(p+\"/config.json\"\)\)\;\ assert\ c\[\"max_position_embeddings\"\]\>=65536\;\ print\(json.dumps\(\{\"path\":p\,\"max_position_embeddings\":c\[\"max_position_embeddings\"\]\}\)\) /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 
+[2026-08-03T13:46:13Z] END model identity exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/model-identity.json
+[2026-08-03T13:46:13Z] START prefill pre-replacement runtime check
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-08-03T13:46:35Z] END prefill pre-replacement runtime check exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-runtime-check-before.log
+[2026-08-03T13:46:35Z] START decode pre-replacement runtime check
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-08-03T13:46:55Z] END decode pre-replacement runtime check exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-runtime-check-before.log
+[2026-08-03T13:46:55Z] START apply Mooncake Master
+COMMAND kubectl apply -n liangjiahao -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/30-mooncake-master.yaml 
+[2026-08-03T13:46:56Z] END apply Mooncake Master exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/apply-master.log
+[2026-08-03T13:46:56Z] START apply stress ConfigMap
+COMMAND kubectl apply -n liangjiahao -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/10-runtime-config.yaml 
+[2026-08-03T13:46:56Z] END apply stress ConfigMap exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/apply-config.log
+[2026-08-03T13:46:56Z] START apply stress Prefill
+COMMAND kubectl apply -n liangjiahao -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/40-prefill-engine.yaml 
+[2026-08-03T13:46:56Z] END apply stress Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/apply-prefill.log
+[2026-08-03T13:46:56Z] START apply stress Decode
+COMMAND kubectl apply -n liangjiahao -f /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress/50-decode-engine.yaml 
+[2026-08-03T13:46:56Z] END apply stress Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/apply-decode.log
+[2026-08-03T13:49:00Z] START sync vLLM-Ascend Python
+COMMAND /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/sync-vllm-ascend-python.sh 
+[2026-08-03T13:49:02Z] END sync vLLM-Ascend Python exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/source-sync.log
+[2026-08-03T13:49:02Z] START prefill runtime check
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-08-03T13:49:27Z] END prefill runtime check exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-runtime-check.log
+[2026-08-03T13:49:27Z] START decode runtime check
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py 
+[2026-08-03T13:49:48Z] END decode runtime check exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-runtime-check.log
+[2026-08-03T13:49:49Z] START restart Mooncake Master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment 
+[2026-08-03T13:49:49Z] END restart Mooncake Master exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-reset-134949.log
+[2026-08-03T13:49:49Z] START wait Mooncake Master rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s 
+[2026-08-03T13:49:52Z] END wait Mooncake Master rollout exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-rollout-134949.log
+[2026-08-03T13:49:52Z] START collect: Mooncake Master deployment
+COMMAND kubectl get deployment -n liangjiahao mooncake-master-deployment -o json 
+[2026-08-03T13:49:52Z] END collect: Mooncake Master deployment exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-deployment.json
+[2026-08-03T13:49:52Z] START collect: Mooncake Master startup log
+COMMAND kubectl logs -n liangjiahao mooncake-master-deployment-94df75cf4-d9ksb -c mooncake-master 
+[2026-08-03T13:49:52Z] END collect: Mooncake Master startup log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-startup.log
+[2026-08-03T13:49:52Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T13:49:52Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-empty-initial.metrics
+[2026-08-03T13:49:52Z] START start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh 
+[2026-08-03T13:49:56Z] END start Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-prefill-134952.log
+[2026-08-03T13:49:56Z] START start Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- /opt/vllm-layerwise/start-decode.sh 
+[2026-08-03T13:49:59Z] END start Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-decode-134956.log
+[2026-08-03T13:49:59Z] START wait HTTP: Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8100/v1/models 
+[2026-08-03T13:53:29Z] END wait HTTP: Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-Prefill-134959.log
+[2026-08-03T13:53:29Z] START wait HTTP: Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8200/v1/models 
+[2026-08-03T13:53:30Z] END wait HTTP: Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-Decode-135329.log
+[2026-08-03T13:53:30Z] START wait Kubernetes Ready: Prefill
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-686979fcc-qpr6c --timeout=1800s 
+[2026-08-03T13:53:31Z] END wait Kubernetes Ready: Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-Prefill-135330.log
+[2026-08-03T13:53:31Z] START wait Kubernetes Ready: Decode
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-85f47466d6-m7ndf --timeout=1800s 
+[2026-08-03T13:53:32Z] END wait Kubernetes Ready: Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-Decode-135331.log
+[2026-08-03T13:53:32Z] START wait HTTP: proxy
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://vllm-proxy-service:8000/health 
+[2026-08-03T13:53:32Z] END wait HTTP: proxy exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-proxy-135332.log
+[2026-08-03T13:53:32Z] START collect: proxy endpoints before topology
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import json\nfrom urllib.request import urlopen\nbody=json.load(urlopen("http://vllm-proxy-service:8000/listEndPoints",timeout=10))\nassert len(body.get("prefill_nodes",[]))==1 and len(body.get("decode_nodes",[]))==1, body\nprint(json.dumps(body,indent=2))' 
+[2026-08-03T13:53:32Z] END collect: proxy endpoints before topology exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/proxy-endpoints-initial.json
+[2026-08-03T13:53:32Z] START collect: prefill engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-08-03T13:53:32Z] END collect: prefill engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/vllm-prefill.log
+[2026-08-03T13:53:33Z] START collect: decode engine log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-08-03T13:53:33Z] END collect: decode engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/vllm-decode.log
+[2026-08-03T13:53:33Z] START collect: Prefill Pod YAML
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -o yaml 
+[2026-08-03T13:53:33Z] END collect: Prefill Pod YAML exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-pod.yaml
+[2026-08-03T13:53:33Z] START collect: Decode Pod YAML
+COMMAND kubectl get pod -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -o yaml 
+[2026-08-03T13:53:33Z] END collect: Decode Pod YAML exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-pod.yaml
+[2026-08-03T13:53:33Z] START collect: Prefill process tree
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- ps -efww 
+[2026-08-03T13:53:33Z] END collect: Prefill process tree exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-ps.txt
+[2026-08-03T13:53:33Z] START collect: Decode process tree
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- ps -efww 
+[2026-08-03T13:53:33Z] END collect: Decode process tree exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-ps.txt
+[2026-08-03T13:53:33Z] START collect: Prefill NPU info
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- npu-smi info 
+[2026-08-03T13:53:34Z] END collect: Prefill NPU info exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-npu-info.txt
+[2026-08-03T13:53:34Z] START collect: Decode NPU info
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- npu-smi info 
+[2026-08-03T13:53:35Z] END collect: Decode NPU info exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-npu-info.txt
+[2026-08-03T13:53:35Z] START log checker: topology
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py topology --prefill-log features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/vllm-prefill.log --decode-log features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/vllm-decode.log --prefill-pod-yaml features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-pod.yaml --decode-pod-yaml features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-pod.yaml --prefill-ps features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-ps.txt --decode-ps features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-ps.txt --prefill-npu-info features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/prefill-npu-info.txt --decode-npu-info features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/decode-npu-info.txt --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/check.json 
+[2026-08-03T13:53:35Z] END log checker: topology exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/topology/check.log
+[2026-08-03T13:53:35Z] START create remote tool directories
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- mkdir -p /tmp/layerwise-stress-tools /tmp/layerwise-stress-run-stress 
+[2026-08-03T13:53:35Z] END create remote tool directories exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/install-driver.log
+[2026-08-03T13:53:35Z] START copy remote stress driver
+COMMAND kubectl cp -n liangjiahao -c prefill-engine /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/stress-test.py prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-tools/stress-test.py 
+[2026-08-03T13:53:35Z] END copy remote stress driver exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/copy-driver.log
+[2026-08-03T13:53:35Z] START create S1 remote directory
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- mkdir -p /tmp/layerwise-stress-run-stress/s1-pinned-16k 
+[2026-08-03T13:53:36Z] END create S1 remote directory exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/mkdir.log
+[2026-08-03T13:53:36Z] START remote driver: prepare
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py prepare --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k 
+[2026-08-03T13:53:52Z] END remote driver: prepare exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/prepare.log
+[2026-08-03T13:53:52Z] START remote driver: baseline
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py baseline --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k 
+[2026-08-03T13:54:32Z] END remote driver: baseline exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/baseline.log
+[2026-08-03T13:54:32Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T13:54:32Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/after-baseline.metrics
+[2026-08-03T13:54:33Z] START remote driver: pinned-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py pinned-load --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k --case-index 0 --prefill-rank 0 --decode-rank 0 
+[2026-08-03T13:55:26Z] END remote driver: pinned-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/pinned-0.log
+[2026-08-03T13:55:26Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 707\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T13:55:26Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-prefill.log
+[2026-08-03T13:55:26Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 504\,\$p /tmp/vllm-decode.log 
+[2026-08-03T13:55:26Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-decode.log
+[2026-08-03T13:55:26Z] START copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-0 
+[2026-08-03T13:55:26Z] END copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-0/kubectl-cp.log
+[2026-08-03T13:55:26Z] START log checker: pinned
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py pinned --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-decode.log --expected-prefill-dp-rank 0 --expected-prompt-tokens 16274 --expected-hit-tokens 16256 --min-context-iterations 16 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-check.json 
+[2026-08-03T13:55:27Z] END log checker: pinned exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-check.log
+[2026-08-03T13:55:27Z] START copy S1 checker 0 remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-0-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/case-0-check.json 
+[2026-08-03T13:55:27Z] END copy S1 checker 0 remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/copy-check-0.log
+[2026-08-03T13:55:27Z] START wait for Master key count 127
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 127 
+[2026-08-03T13:55:27Z] END wait for Master key count 127 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/after-case-0.metrics
+[2026-08-03T13:55:28Z] START remote driver: pinned-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py pinned-load --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k --case-index 1 --prefill-rank 1 --decode-rank 0 
+[2026-08-03T13:56:00Z] END remote driver: pinned-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/pinned-1.log
+[2026-08-03T13:56:00Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 1638\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T13:56:00Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-prefill.log
+[2026-08-03T13:56:00Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 598\,\$p /tmp/vllm-decode.log 
+[2026-08-03T13:56:01Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-decode.log
+[2026-08-03T13:56:01Z] START copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-1 
+[2026-08-03T13:56:01Z] END copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-1/kubectl-cp.log
+[2026-08-03T13:56:01Z] START log checker: pinned
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py pinned --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-decode.log --expected-prefill-dp-rank 1 --expected-prompt-tokens 16274 --expected-hit-tokens 16256 --min-context-iterations 16 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-check.json 
+[2026-08-03T13:56:01Z] END log checker: pinned exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-check.log
+[2026-08-03T13:56:01Z] START copy S1 checker 1 remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-1-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/case-1-check.json 
+[2026-08-03T13:56:01Z] END copy S1 checker 1 remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/copy-check-1.log
+[2026-08-03T13:56:01Z] START wait for Master key count 254
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 254 
+[2026-08-03T13:56:02Z] END wait for Master key count 254 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/after-case-1.metrics
+[2026-08-03T13:56:02Z] START remote driver: pinned-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py pinned-load --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k --case-index 2 --prefill-rank 0 --decode-rank 0 
+[2026-08-03T13:56:35Z] END remote driver: pinned-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/pinned-2.log
+[2026-08-03T13:56:35Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 2566\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T13:56:35Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-prefill.log
+[2026-08-03T13:56:35Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 690\,\$p /tmp/vllm-decode.log 
+[2026-08-03T13:56:35Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-decode.log
+[2026-08-03T13:56:35Z] START copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-2 
+[2026-08-03T13:56:36Z] END copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-2/kubectl-cp.log
+[2026-08-03T13:56:36Z] START log checker: pinned
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py pinned --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-decode.log --expected-prefill-dp-rank 0 --expected-prompt-tokens 16274 --expected-hit-tokens 16256 --min-context-iterations 16 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-check.json 
+[2026-08-03T13:56:36Z] END log checker: pinned exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-check.log
+[2026-08-03T13:56:36Z] START copy S1 checker 2 remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-2-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/case-2-check.json 
+[2026-08-03T13:56:36Z] END copy S1 checker 2 remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/copy-check-2.log
+[2026-08-03T13:56:36Z] START wait for Master key count 381
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 381 
+[2026-08-03T13:56:37Z] END wait for Master key count 381 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/after-case-2.metrics
+[2026-08-03T13:56:37Z] START remote driver: pinned-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py pinned-load --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k --case-index 3 --prefill-rank 1 --decode-rank 0 
+[2026-08-03T13:57:09Z] END remote driver: pinned-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/pinned-3.log
+[2026-08-03T13:57:09Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 3493\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T13:57:09Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-prefill.log
+[2026-08-03T13:57:09Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 780\,\$p /tmp/vllm-decode.log 
+[2026-08-03T13:57:09Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-decode.log
+[2026-08-03T13:57:09Z] START copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-3 
+[2026-08-03T13:57:09Z] END copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/snapshot-3/kubectl-cp.log
+[2026-08-03T13:57:09Z] START log checker: pinned
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py pinned --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-decode.log --expected-prefill-dp-rank 1 --expected-prompt-tokens 16274 --expected-hit-tokens 16256 --min-context-iterations 16 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-check.json 
+[2026-08-03T13:57:10Z] END log checker: pinned exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-check.log
+[2026-08-03T13:57:10Z] START copy S1 checker 3 remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/case-3-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/case-3-check.json 
+[2026-08-03T13:57:10Z] END copy S1 checker 3 remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/copy-check-3.log
+[2026-08-03T13:57:10Z] START wait for Master key count 508
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 508 
+[2026-08-03T13:57:10Z] END wait for Master key count 508 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/after-case-3.metrics
+[2026-08-03T13:57:10Z] START wait for Master key count 508
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 508 
+[2026-08-03T13:57:11Z] END wait for Master key count 508 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/final.metrics
+[2026-08-03T13:57:11Z] START copy S1 final metrics remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/final.metrics prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/final.metrics 
+[2026-08-03T13:57:11Z] END copy S1 final metrics remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/copy-metrics.log
+[2026-08-03T13:57:11Z] START remote driver: finalize
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py finalize --scenario s1 --output /tmp/layerwise-stress-run-stress/s1-pinned-16k --master-metrics /tmp/layerwise-stress-run-stress/s1-pinned-16k/final.metrics --log-check-summary /tmp/layerwise-stress-run-stress/s1-pinned-16k/case-0-check.json --log-check-summary /tmp/layerwise-stress-run-stress/s1-pinned-16k/case-1-check.json --log-check-summary /tmp/layerwise-stress-run-stress/s1-pinned-16k/case-2-check.json --log-check-summary /tmp/layerwise-stress-run-stress/s1-pinned-16k/case-3-check.json 
+[2026-08-03T13:57:11Z] END remote driver: finalize exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/finalize.log
+[2026-08-03T13:57:11Z] START copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s1-pinned-16k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/artifacts 
+[2026-08-03T13:57:11Z] END copy scenario /tmp/layerwise-stress-run-stress/s1-pinned-16k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/artifacts/kubectl-cp.log
+[2026-08-03T13:57:11Z] START collect: prefill engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-08-03T13:57:12Z] END collect: prefill engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/vllm-prefill-full.log
+[2026-08-03T13:57:12Z] START collect: decode engine log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-08-03T13:57:12Z] END collect: decode engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s1-pinned-16k/vllm-decode-full.log
+[2026-08-03T13:57:16Z] START collect: before-s2 prefill stopped process state
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sh -c test\ \!\ -e\ /tmp/vllm-prefill.pid\ \&\&\ ps\ -efww 
+[2026-08-03T13:57:17Z] END collect: before-s2 prefill stopped process state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s2-prefill-stopped-ps.txt
+[2026-08-03T13:57:17Z] START collect: before-s2 decode stopped process state
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sh -c test\ \!\ -e\ /tmp/vllm-decode.pid\ \&\&\ ps\ -efww 
+[2026-08-03T13:57:17Z] END collect: before-s2 decode stopped process state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s2-decode-stopped-ps.txt
+[2026-08-03T13:57:17Z] START restart Mooncake Master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment 
+[2026-08-03T13:57:17Z] END restart Mooncake Master exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-reset-135717.log
+[2026-08-03T13:57:17Z] START wait Mooncake Master rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s 
+[2026-08-03T13:57:20Z] END wait Mooncake Master rollout exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-rollout-135717.log
+[2026-08-03T13:57:20Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T13:57:20Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s2-empty.metrics
+[2026-08-03T13:57:20Z] START start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh 
+[2026-08-03T13:57:23Z] END start Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-prefill-135720.log
+[2026-08-03T13:57:23Z] START start Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- /opt/vllm-layerwise/start-decode.sh 
+[2026-08-03T13:57:26Z] END start Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-decode-135723.log
+[2026-08-03T13:57:26Z] START wait HTTP: before-s2-Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8100/v1/models 
+[2026-08-03T14:00:48Z] END wait HTTP: before-s2-Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s2-Prefill-135726.log
+[2026-08-03T14:00:48Z] START wait HTTP: before-s2-Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8200/v1/models 
+[2026-08-03T14:00:48Z] END wait HTTP: before-s2-Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s2-Decode-140048.log
+[2026-08-03T14:00:48Z] START wait Kubernetes Ready: before-s2-Prefill
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-686979fcc-qpr6c --timeout=1800s 
+[2026-08-03T14:00:48Z] END wait Kubernetes Ready: before-s2-Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-before-s2-Prefill-140048.log
+[2026-08-03T14:00:48Z] START wait Kubernetes Ready: before-s2-Decode
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-85f47466d6-m7ndf --timeout=1800s 
+[2026-08-03T14:00:49Z] END wait Kubernetes Ready: before-s2-Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-before-s2-Decode-140048.log
+[2026-08-03T14:00:49Z] START wait HTTP: before-s2-proxy
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://vllm-proxy-service:8000/health 
+[2026-08-03T14:00:49Z] END wait HTTP: before-s2-proxy exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s2-proxy-140049.log
+[2026-08-03T14:00:49Z] START collect: before-s2 prefill fresh log head
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sh -c test\ \$\(wc\ -l\ \<\ /tmp/vllm-prefill.log\)\ -gt\ 0\ \&\&\ sed\ -n\ \'1\,20p\'\ /tmp/vllm-prefill.log 
+[2026-08-03T14:00:49Z] END collect: before-s2 prefill fresh log head exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s2-prefill-fresh-log.txt
+[2026-08-03T14:00:49Z] START collect: before-s2 decode fresh log head
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sh -c test\ \$\(wc\ -l\ \<\ /tmp/vllm-decode.log\)\ -gt\ 0\ \&\&\ sed\ -n\ \'1\,20p\'\ /tmp/vllm-decode.log 
+[2026-08-03T14:00:49Z] END collect: before-s2 decode fresh log head exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s2-decode-fresh-log.txt
+[2026-08-03T14:00:49Z] START create S2 remote directory
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- mkdir -p /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k 
+[2026-08-03T14:00:50Z] END create S2 remote directory exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/mkdir.log
+[2026-08-03T14:00:50Z] START remote driver: prepare
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py prepare --scenario s2 --output /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k 
+[2026-08-03T14:01:06Z] END remote driver: prepare exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/prepare.log
+[2026-08-03T14:01:06Z] START remote driver: baseline
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py baseline --scenario s2 --output /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k 
+[2026-08-03T14:01:36Z] END remote driver: baseline exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/baseline.log
+[2026-08-03T14:01:36Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T14:01:36Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/after-baseline.metrics
+[2026-08-03T14:01:37Z] START remote driver: proxy-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py proxy-load --scenario s2 --output /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k 
+[2026-08-03T14:02:24Z] END remote driver: proxy-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/proxy-load.log
+[2026-08-03T14:02:24Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 705\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T14:02:24Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/prefill-window.log
+[2026-08-03T14:02:24Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 587\,\$p /tmp/vllm-decode.log 
+[2026-08-03T14:02:25Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/decode-window.log
+[2026-08-03T14:02:25Z] START log checker: aggregate
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py aggregate --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/prefill-window.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/decode-window.log --required-prefill-dp-ranks 0\,1 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/aggregate-check.json 
+[2026-08-03T14:02:26Z] END log checker: aggregate exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/aggregate-check.log
+[2026-08-03T14:02:26Z] START wait for Master key count 288
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 288 
+[2026-08-03T14:02:26Z] END wait for Master key count 288 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/final.metrics
+[2026-08-03T14:02:26Z] START copy S2 aggregate-check.json remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/aggregate-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s2-concurrent-16x8k/aggregate-check.json 
+[2026-08-03T14:02:27Z] END copy S2 aggregate-check.json remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/copy-aggregate-check.json.log
+[2026-08-03T14:02:27Z] START copy S2 final.metrics remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/final.metrics prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s2-concurrent-16x8k/final.metrics 
+[2026-08-03T14:02:27Z] END copy S2 final.metrics remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/copy-final.metrics.log
+[2026-08-03T14:02:27Z] START remote driver: finalize
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py finalize --scenario s2 --output /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k --master-metrics /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k/final.metrics --log-check-summary /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k/aggregate-check.json 
+[2026-08-03T14:02:27Z] END remote driver: finalize exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/finalize.log
+[2026-08-03T14:02:27Z] START copy scenario /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s2-concurrent-16x8k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/artifacts 
+[2026-08-03T14:02:28Z] END copy scenario /tmp/layerwise-stress-run-stress/s2-concurrent-16x8k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/artifacts/kubectl-cp.log
+[2026-08-03T14:02:28Z] START collect: prefill engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-08-03T14:02:28Z] END collect: prefill engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/vllm-prefill-full.log
+[2026-08-03T14:02:28Z] START collect: decode engine log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-08-03T14:02:28Z] END collect: decode engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s2-concurrent-16x8k/vllm-decode-full.log
+[2026-08-03T14:02:33Z] START collect: before-s3 prefill stopped process state
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sh -c test\ \!\ -e\ /tmp/vllm-prefill.pid\ \&\&\ ps\ -efww 
+[2026-08-03T14:02:33Z] END collect: before-s3 prefill stopped process state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s3-prefill-stopped-ps.txt
+[2026-08-03T14:02:33Z] START collect: before-s3 decode stopped process state
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sh -c test\ \!\ -e\ /tmp/vllm-decode.pid\ \&\&\ ps\ -efww 
+[2026-08-03T14:02:33Z] END collect: before-s3 decode stopped process state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s3-decode-stopped-ps.txt
+[2026-08-03T14:02:33Z] START restart Mooncake Master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment 
+[2026-08-03T14:02:33Z] END restart Mooncake Master exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-reset-140233.log
+[2026-08-03T14:02:33Z] START wait Mooncake Master rollout
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s 
+[2026-08-03T14:02:36Z] END wait Mooncake Master rollout exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-rollout-140233.log
+[2026-08-03T14:02:36Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T14:02:36Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s3-empty.metrics
+[2026-08-03T14:02:36Z] START start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh 
+[2026-08-03T14:02:40Z] END start Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-prefill-140236.log
+[2026-08-03T14:02:40Z] START start Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- /opt/vllm-layerwise/start-decode.sh 
+[2026-08-03T14:02:43Z] END start Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/start-decode-140240.log
+[2026-08-03T14:02:43Z] START wait HTTP: before-s3-Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8100/v1/models 
+[2026-08-03T14:06:07Z] END wait HTTP: before-s3-Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s3-Prefill-140243.log
+[2026-08-03T14:06:07Z] START wait HTTP: before-s3-Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8200/v1/models 
+[2026-08-03T14:06:08Z] END wait HTTP: before-s3-Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s3-Decode-140607.log
+[2026-08-03T14:06:08Z] START wait Kubernetes Ready: before-s3-Prefill
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-686979fcc-qpr6c --timeout=1800s 
+[2026-08-03T14:06:08Z] END wait Kubernetes Ready: before-s3-Prefill exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-before-s3-Prefill-140608.log
+[2026-08-03T14:06:08Z] START wait Kubernetes Ready: before-s3-Decode
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-85f47466d6-m7ndf --timeout=1800s 
+[2026-08-03T14:06:08Z] END wait Kubernetes Ready: before-s3-Decode exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-ready-before-s3-Decode-140608.log
+[2026-08-03T14:06:08Z] START wait HTTP: before-s3-proxy
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time,urllib.request\nurl=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://vllm-proxy-service:8000/health 
+[2026-08-03T14:06:08Z] END wait HTTP: before-s3-proxy exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/wait-http-before-s3-proxy-140608.log
+[2026-08-03T14:06:08Z] START collect: before-s3 prefill fresh log head
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sh -c test\ \$\(wc\ -l\ \<\ /tmp/vllm-prefill.log\)\ -gt\ 0\ \&\&\ sed\ -n\ \'1\,20p\'\ /tmp/vllm-prefill.log 
+[2026-08-03T14:06:08Z] END collect: before-s3 prefill fresh log head exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s3-prefill-fresh-log.txt
+[2026-08-03T14:06:08Z] START collect: before-s3 decode fresh log head
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sh -c test\ \$\(wc\ -l\ \<\ /tmp/vllm-decode.log\)\ -gt\ 0\ \&\&\ sed\ -n\ \'1\,20p\'\ /tmp/vllm-decode.log 
+[2026-08-03T14:06:09Z] END collect: before-s3 decode fresh log head exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/before-s3-decode-fresh-log.txt
+[2026-08-03T14:06:09Z] START create S3 remote directory
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- mkdir -p /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k 
+[2026-08-03T14:06:09Z] END create S3 remote directory exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/mkdir.log
+[2026-08-03T14:06:09Z] START remote driver: prepare
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py prepare --scenario s3 --output /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k 
+[2026-08-03T14:06:25Z] END remote driver: prepare exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/prepare.log
+[2026-08-03T14:06:25Z] START remote driver: baseline
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py baseline --scenario s3 --output /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k 
+[2026-08-03T14:06:52Z] END remote driver: baseline exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/baseline.log
+[2026-08-03T14:06:52Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T14:06:53Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/after-baseline.metrics
+[2026-08-03T14:06:53Z] START remote driver: pinned-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py pinned-load --scenario s3 --output /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k --case-index 0 --prefill-rank 0 --decode-rank 0 
+[2026-08-03T14:08:28Z] END remote driver: pinned-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-0.log
+[2026-08-03T14:08:28Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 703\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T14:08:28Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-prefill.log
+[2026-08-03T14:08:28Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 565\,\$p /tmp/vllm-decode.log 
+[2026-08-03T14:08:28Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-decode.log
+[2026-08-03T14:08:28Z] START copy scenario /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/snapshot-pinned 
+[2026-08-03T14:08:29Z] END copy scenario /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/snapshot-pinned/kubectl-cp.log
+[2026-08-03T14:08:29Z] START log checker: pinned
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py pinned --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-decode.log --expected-prefill-dp-rank 0 --expected-prompt-tokens 32658 --expected-hit-tokens 32640 --min-context-iterations 32 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-check.json 
+[2026-08-03T14:08:30Z] END log checker: pinned exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-check.log
+[2026-08-03T14:08:30Z] START wait for Master key count 255
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 255 
+[2026-08-03T14:08:30Z] END wait for Master key count 255 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/after-pinned.metrics
+[2026-08-03T14:08:30Z] START remote driver: proxy-load
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py proxy-load --scenario s3 --output /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k 
+[2026-08-03T14:09:23Z] END remote driver: proxy-load exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/proxy-load.log
+[2026-08-03T14:09:23Z] START collect: prefill log window
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- sed -n 2586\,\$p /tmp/vllm-prefill.log 
+[2026-08-03T14:09:23Z] END collect: prefill log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-prefill.log
+[2026-08-03T14:09:23Z] START collect: decode log window
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- sed -n 668\,\$p /tmp/vllm-decode.log 
+[2026-08-03T14:09:23Z] END collect: decode log window exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-decode.log
+[2026-08-03T14:09:23Z] START log checker: aggregate
+COMMAND python3 /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/check-stress-log.py aggregate --prefill-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-prefill.log --decode-log-window features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-decode.log --required-prefill-dp-ranks 0\,1 --max-context-tokens 1024 --num-layers 27 --output features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-check.json 
+[2026-08-03T14:09:25Z] END log checker: aggregate exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-check.log
+[2026-08-03T14:09:25Z] START wait for Master key count 348
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,time\nfrom urllib.request import urlopen\nexpected=int(sys.argv[1]); deadline=time.monotonic()+60; last=""\nwhile time.monotonic()<deadline:\n last=urlopen("http://mooncake-master-service:9003/metrics",timeout=10).read().decode()\n values={line.split()[0]:float(line.split()[1]) for line in last.splitlines() if len(line.split())==2}\n actual=values.get("master_key_count")\n if actual==expected: print(last,end=""); raise SystemExit(0)\n if actual is not None and actual>expected: raise SystemExit(f"key count exceeded expected value: {actual}>{expected}")\n time.sleep(0.5)\nraise SystemExit(f"key count did not reach {expected}; last metrics:\\n{last}")' 348 
+[2026-08-03T14:09:26Z] END wait for Master key count 348 exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/final.metrics
+[2026-08-03T14:09:26Z] START copy S3 pinned-check.json remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/pinned-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/pinned-check.json 
+[2026-08-03T14:09:26Z] END copy S3 pinned-check.json remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/copy-pinned-check.json.log
+[2026-08-03T14:09:26Z] START copy S3 aggregate-check.json remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/aggregate-check.json prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/aggregate-check.json 
+[2026-08-03T14:09:26Z] END copy S3 aggregate-check.json remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/copy-aggregate-check.json.log
+[2026-08-03T14:09:26Z] START copy S3 final.metrics remote
+COMMAND kubectl cp -n liangjiahao -c prefill-engine features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/final.metrics prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/final.metrics 
+[2026-08-03T14:09:26Z] END copy S3 final.metrics remote exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/copy-final.metrics.log
+[2026-08-03T14:09:26Z] START remote driver: finalize
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 /tmp/layerwise-stress-tools/stress-test.py finalize --scenario s3 --output /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k --master-metrics /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/final.metrics --log-check-summary /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/pinned-check.json --log-check-summary /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/aggregate-check.json 
+[2026-08-03T14:09:27Z] END remote driver: finalize exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/finalize.log
+[2026-08-03T14:09:27Z] START copy scenario /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k
+COMMAND kubectl cp -n liangjiahao -c prefill-engine prefill-engine-deployment-686979fcc-qpr6c:/tmp/layerwise-stress-run-stress/s3-concurrent-4x32k/. features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/artifacts 
+[2026-08-03T14:09:27Z] END copy scenario /tmp/layerwise-stress-run-stress/s3-concurrent-4x32k exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/artifacts/kubectl-cp.log
+[2026-08-03T14:09:27Z] START collect: prefill engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-08-03T14:09:27Z] END collect: prefill engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/vllm-prefill-full.log
+[2026-08-03T14:09:27Z] START collect: decode engine log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-08-03T14:09:28Z] END collect: decode engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/s3-concurrent-4x32k/vllm-decode-full.log
+[2026-08-03T14:09:28Z] START collect: Mooncake metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import time\nfrom urllib.request import urlopen\nurl="http://mooncake-master-service:9003/metrics"\ndeadline=time.monotonic()+60\nlast=None\nwhile time.monotonic()<deadline:\n try:\n  with urlopen(url,timeout=5) as response:\n   if response.status==200:\n    print(response.read().decode(),end="")\n    raise SystemExit(0)\n   last=RuntimeError(f"HTTP {response.status}")\n except Exception as exc:\n  last=exc\n time.sleep(0.5)\nraise SystemExit(f"timeout waiting for Mooncake metrics: {last}")' 
+[2026-08-03T14:09:28Z] END collect: Mooncake metrics exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/master-final.metrics
+[2026-08-03T14:09:28Z] START collect: final proxy endpoints
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://vllm-proxy-service:8000/listEndPoints\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\) 
+[2026-08-03T14:09:28Z] END collect: final proxy endpoints exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/proxy-endpoints-final.json
+[2026-08-03T14:09:28Z] START collect: final Prefill NPU info
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- npu-smi info 
+[2026-08-03T14:09:29Z] END collect: final Prefill NPU info exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-npu-final.txt
+[2026-08-03T14:09:29Z] START collect: final Decode NPU info
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- npu-smi info 
+[2026-08-03T14:09:30Z] END collect: final Decode NPU info exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-npu-final.txt
+[2026-08-03T14:09:30Z] START collect: final Prefill process tree
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- ps -efww 
+[2026-08-03T14:09:30Z] END collect: final Prefill process tree exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-ps-final.txt
+[2026-08-03T14:09:30Z] START collect: final Decode process tree
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- ps -efww 
+[2026-08-03T14:09:31Z] END collect: final Decode process tree exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-ps-final.txt
+[2026-08-03T14:09:35Z] START collect: final stopped engine Pod state
+COMMAND kubectl get pods -n liangjiahao -l app\ in\ \(prefill\,decode\) -o yaml 
+[2026-08-03T14:09:35Z] END collect: final stopped engine Pod state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final-stopped-pods.yaml
+[2026-08-03T14:09:35Z] START confirm prefill PID absent
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- test \! -e /tmp/vllm-prefill.pid 
+[2026-08-03T14:09:35Z] END confirm prefill PID absent exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-pid-absent.log
+[2026-08-03T14:09:35Z] START confirm prefill HTTP stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- python3 -c $'import sys,urllib.request\ntry: urllib.request.urlopen(sys.argv[1],timeout=2)\nexcept Exception as exc: print(type(exc).__name__,exc); raise SystemExit(0)\nraise SystemExit("HTTP endpoint still accepts requests")' http://127.0.0.1:8100/v1/models 
+[2026-08-03T14:09:36Z] END confirm prefill HTTP stopped exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/prefill-http-stopped.log
+[2026-08-03T14:09:36Z] START confirm decode PID absent
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- test \! -e /tmp/vllm-decode.pid 
+[2026-08-03T14:09:36Z] END confirm decode PID absent exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-pid-absent.log
+[2026-08-03T14:09:36Z] START confirm decode HTTP stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- python3 -c $'import sys,urllib.request\ntry: urllib.request.urlopen(sys.argv[1],timeout=2)\nexcept Exception as exc: print(type(exc).__name__,exc); raise SystemExit(0)\nraise SystemExit("HTTP endpoint still accepts requests")' http://127.0.0.1:8200/v1/models 
+[2026-08-03T14:09:36Z] END confirm decode HTTP stopped exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/decode-http-stopped.log
+[2026-08-03T14:09:36Z] START collect: retained six-NPU allocation
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c decode-engine-deployment-85f47466d6-m7ndf -o json 
+[2026-08-03T14:09:36Z] END collect: retained six-NPU allocation exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/retained-allocation.json
+[2026-08-03T14:09:36Z] START collect: prefill engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c -c prefill-engine -- cat /tmp/vllm-prefill.log 
+[2026-08-03T14:09:37Z] END collect: prefill engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final/vllm-prefill.log
+[2026-08-03T14:09:37Z] START collect: decode engine log
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-85f47466d6-m7ndf -c decode-engine -- cat /tmp/vllm-decode.log 
+[2026-08-03T14:09:37Z] END collect: decode engine log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final/vllm-decode.log
+[2026-08-03T14:09:37Z] START collect: final engine Pod state
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-686979fcc-qpr6c decode-engine-deployment-85f47466d6-m7ndf -o yaml 
+[2026-08-03T14:09:37Z] END collect: final engine Pod state exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final/engine-pods.yaml
+[2026-08-03T14:09:37Z] START collect: final proxy log
+COMMAND kubectl logs -n liangjiahao proxy-server-deployment-54bb6c9585-7fzs5 -c proxy-server 
+[2026-08-03T14:09:37Z] END collect: final proxy log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final/proxy.log
+[2026-08-03T14:09:38Z] START collect: final Master log
+COMMAND kubectl logs -n liangjiahao mooncake-master-deployment-5d6464c74c-bm9wf -c mooncake-master 
+[2026-08-03T14:09:38Z] END collect: final Master log exit=0 artifact=features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/stress/final/mooncake-master.log

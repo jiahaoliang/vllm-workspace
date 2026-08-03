@@ -1,0 +1,12 @@
+captured_at=2026-08-03T21:42:15+08:00
+namespace=liangjiahao
+prefill_pod=prefill-engine-deployment-69cfdd6cb4-pmb8k
+decode_pod=decode-engine-deployment-56559b48fc-48kcr
+proxy_pod=proxy-server-deployment-54bb6c9585-7fzs5
+master_pod=mooncake-master-deployment-5cff688c55-jbpmx
+remote_artifact_dir=/tmp/layerwise-smoke
+image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+vllm=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
+vllm_ascend_image_base=14beaf161cca6f1e044e20529ca96c6554dbbe50
+vllm_ascend=d28c52958a30cebdb7822d56e3dbb0dbe41499bc
+mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3

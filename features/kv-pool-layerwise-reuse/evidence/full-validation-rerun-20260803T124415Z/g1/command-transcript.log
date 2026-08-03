@@ -1,0 +1,36 @@
+[2026-08-03T13:23:28Z] START sync direct API drivers
+COMMAND bash -o pipefail -c kubectl\ exec\ -n\ liangjiahao\ prefill-engine-deployment-69cfdd6cb4-pmb8k\ -c\ prefill-engine\ --\ mkdir\ -p\ /tmp/full-validation-direct-20260803T124415Z\;\ tar\ -C\ features/kv-pool-layerwise-reuse/deployment\ -cf\ -\ range-api-smoke.py\ lease-expiry-test.py\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ prefill-engine-deployment-69cfdd6cb4-pmb8k\ -c\ prefill-engine\ --\ tar\ -C\ /tmp/full-validation-direct-20260803T124415Z\ -xf\ -
+[2026-08-03T13:23:29Z] END sync direct API drivers exit=0 artifact=sync-drivers.log
+[2026-08-03T13:23:29Z] START capture initial empty metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:23:29Z] END capture initial empty metrics exit=0 artifact=master-empty-before.metrics
+[2026-08-03T13:23:48Z] START assert initial Master empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g1/master-empty-before.metrics
+[2026-08-03T13:23:48Z] END assert initial Master empty exit=0 artifact=master-empty-before-assert.log
+[2026-08-03T13:23:48Z] START run direct ranged API smoke
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /tmp/full-validation-direct-20260803T124415Z/range-api-smoke.py --output /tmp/full-validation-direct-20260803T124415Z/g1-summary.json --num-keys 3 --num-layers 4 --page-size 4096 --run-negative
+[2026-08-03T13:24:07Z] END run direct ranged API smoke exit=0 artifact=range-api-smoke.log
+[2026-08-03T13:24:21Z] START capture G1 summary
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- cat /tmp/full-validation-direct-20260803T124415Z/g1-summary.json
+[2026-08-03T13:24:21Z] END capture G1 summary exit=0 artifact=summary.json
+[2026-08-03T13:24:21Z] START capture final Master metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:24:22Z] END capture final Master metrics exit=0 artifact=master-final.metrics
+[2026-08-03T13:25:02Z] START assert G1 contract
+COMMAND jq -e .passed\ ==\ true\ and\ .config.num_keys\ ==\ 3\ and\ .config.num_layers\ ==\ 4\ and\ .config.page_size\ ==\ 4096\ and\ \(.cases\|length\)\ ==\ 43\ and\ all\(.cases\[\]\;\ .passed\ ==\ true\)\ and\ \(\[.cases\[\]\ \|\ select\(.name\ \|\ startswith\(\"negative\"\)\)\]\ \|\ length\)\ ==\ 24\ and\ \(.api_calls\|length\)\ ==\ 40\ and\ \(\[.api_calls\[\]\ \|\ .object_offsets\[\]\?\[\]\?\ \|\ select\(.\ \>\ 0\)\]\ \|\ length\)\ \>\ 0\ and\ .source_checksum\ ==\ .destination_checksum_after\ and\ all\(.cleanup\[\]\;\ .passed\ ==\ true\)\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g1/summary.json
+[2026-08-03T13:25:02Z] END assert G1 contract exit=0 artifact=summary-assert.log
+[2026-08-03T13:25:02Z] START assert G1 cleanup empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g1/master-final.metrics
+[2026-08-03T13:25:02Z] END assert G1 cleanup empty exit=0 artifact=master-final-assert.log
+[2026-08-03T13:25:20Z] START independent reset after G1
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-03T13:25:20Z] END independent reset after G1 exit=0 artifact=reset-master.log
+[2026-08-03T13:25:20Z] START wait independent reset after G1
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-03T13:25:26Z] END wait independent reset after G1 exit=0 artifact=reset-master-wait.log
+[2026-08-03T13:25:26Z] START capture reset empty metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:25:26Z] END capture reset empty metrics exit=0 artifact=reset-empty.metrics
+[2026-08-03T13:25:56Z] START assert reset empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/g1/reset-empty.metrics
+[2026-08-03T13:25:56Z] END assert reset empty exit=0 artifact=reset-empty-assert.log

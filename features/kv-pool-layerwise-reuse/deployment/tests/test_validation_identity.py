@@ -261,6 +261,16 @@ class ValidationIdentityTest(unittest.TestCase):
             self.assertIn(commit, runner)
         self.assertIn(IDENTITY["image_commits"]["vllm_ascend"], runner)
 
+    def test_stress_capacity_snapshot_excludes_unrelated_pod_secrets(self):
+        runner = read("deployment/run-stress-test.sh")
+        self.assertIn("collect_capacity_pods()", runner)
+        self.assertIn("containers: [.spec.containers[] | {name, resources}]", runner)
+        self.assertIn('"${output_dir}/pods-before.json" collect_capacity_pods', runner)
+        projection = runner.split("collect_capacity_pods()", 1)[1].split("}\n", 1)[0]
+        self.assertNotIn(".args", projection)
+        self.assertNotIn(".command", projection)
+        self.assertNotIn(".env", projection)
+
 
 if __name__ == "__main__":
     unittest.main()

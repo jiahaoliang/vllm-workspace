@@ -1,0 +1,48 @@
+[2026-08-03T13:39:31Z] START start smoke Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 /opt/vllm-layerwise/start-prefill.sh
+[2026-08-03T13:39:34Z] END start smoke Prefill exit=0 artifact=start-prefill.log
+[2026-08-03T13:39:34Z] START start smoke Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 /opt/vllm-layerwise/start-decode.sh
+[2026-08-03T13:39:38Z] END start smoke Decode exit=0 artifact=start-decode.log
+[2026-08-03T13:39:59Z] START wait smoke Prefill API
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c $'import sys,time,urllib.request; url=sys.argv[1]; deadline=time.monotonic()+1800; last=None\nwhile time.monotonic()<deadline:\n try:\n  with urllib.request.urlopen(url,timeout=5) as response:\n   if response.status==200: print(response.read().decode()); raise SystemExit(0)\n except Exception as exc: last=exc\n time.sleep(3)\nraise SystemExit(f"timeout waiting for {url}: {last}")' http://127.0.0.1:8100/v1/models
+[2026-08-03T13:41:32Z] END wait smoke Prefill API exit=0 artifact=prefill-models.json
+[2026-08-03T13:41:56Z] START wait smoke Decode API
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ r=urlopen\(\"http://127.0.0.1:8200/v1/models\"\,timeout=10\)\;\ assert\ r.status==200\;\ print\(r.read\(\).decode\(\)\)
+[2026-08-03T13:41:56Z] END wait smoke Decode API exit=0 artifact=decode-models.json
+[2026-08-03T13:41:56Z] START assert smoke proxy endpoints
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c import\ json\;\ from\ urllib.request\ import\ urlopen\;\ b=json.load\(urlopen\(\"http://vllm-proxy-service:8000/listEndPoints\"\,timeout=10\)\)\;\ assert\ len\(b.get\(\"prefill_nodes\"\,\[\]\)\)==1\ and\ len\(b.get\(\"decode_nodes\"\,\[\]\)\)==1\,b\;\ print\(json.dumps\(b\,indent=2\)\)
+[2026-08-03T13:41:56Z] END assert smoke proxy endpoints exit=0 artifact=proxy-endpoints.json
+[2026-08-03T13:41:56Z] START capture smoke preflight metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:41:57Z] END capture smoke preflight metrics exit=0 artifact=preflight.metrics
+[2026-08-03T13:42:15Z] START assert smoke preflight
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values=={"master_key_count":0.0,"master_allocated_bytes":0.0,"master_active_clients":2.0},values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/smoke-prep/preflight.metrics
+[2026-08-03T13:42:15Z] END assert smoke preflight exit=0 artifact=preflight-assert.log
+[2026-08-03T13:42:15Z] START run formal concurrent smoke
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/smoke
+[2026-08-03T13:43:48Z] END run formal concurrent smoke exit=0 artifact=run-smoke.log
+[2026-08-03T13:44:37Z] START assert formal smoke summary
+COMMAND jq -e .status==\"passed\"\ and\ .validated==true\ and\ .diagnosis==\"passed\"\ and\ .concurrency==4\ and\ .expected_hit_blocks==25\ and\ .expected_hit_tokens==3200\ and\ .actual_master_key_count==.expected_master_key_count\ and\ \(.prompt_layout.markers==\[\"CASE_ZERO\"\,\"CASE_ONE\"\,\"CASE_TWO\"\,\"CASE_THREE\"\]\)\ and\ all\(.phases\[\]\;\ .status==\"passed\"\ and\ .validated==true\ and\ \(.cases\|length\)==4\ and\ all\(.cases\[\]\;\ .validated==true\ and\ .request_isolation==true\ and\ \(.foreign_markers\|length\)==0\ and\ .hard_gate_checks.validated==true\)\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/smoke/concurrent-summary.json
+[2026-08-03T13:44:37Z] END assert formal smoke summary exit=1 artifact=smoke-summary-assert.log
+[2026-08-03T13:45:02Z] START stop smoke Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-03T13:45:04Z] END stop smoke Prefill exit=0 artifact=stop-prefill.log
+[2026-08-03T13:45:04Z] START stop smoke Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-56559b48fc-48kcr -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-03T13:45:06Z] END stop smoke Decode exit=0 artifact=stop-decode.log
+[2026-08-03T13:45:06Z] START reset Master after smoke
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-03T13:45:06Z] END reset Master after smoke exit=0 artifact=reset-master.log
+[2026-08-03T13:45:06Z] START wait Master reset after smoke
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-03T13:45:09Z] END wait Master reset after smoke exit=0 artifact=reset-master-wait.log
+[2026-08-03T13:45:30Z] START capture post-smoke empty metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-69cfdd6cb4-pmb8k -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-03T13:45:31Z] END capture post-smoke empty metrics exit=0 artifact=final-empty.metrics
+[2026-08-03T13:45:31Z] START assert post-smoke empty
+COMMAND python3 -c $'import sys; values={}\nfor line in open(sys.argv[1],encoding="utf-8"):\n parts=line.split()\n if len(parts)==2 and parts[0] in {"master_key_count","master_allocated_bytes","master_active_clients"}: values[parts[0]]=float(parts[1])\nprint(values); assert values.get("master_key_count")==0 and values.get("master_allocated_bytes")==0 and values.get("master_active_clients")==0, values' features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/smoke-prep/final-empty.metrics
+[2026-08-03T13:45:31Z] END assert post-smoke empty exit=0 artifact=final-empty-assert.log
+[2026-08-03T14:15:13Z] START assert corrected formal smoke summary
+COMMAND jq -e .status==\"passed\"\ and\ .validated==true\ and\ .diagnosis==\"passed\"\ and\ .concurrency==4\ and\ .expected_hit_blocks==25\ and\ .expected_hit_tokens==3200\ and\ .actual_master_key_count==.expected_master_key_count\ and\ \(.prompt_layout.markers==\[\"CASE_ZERO\"\,\"CASE_ONE\"\,\"CASE_TWO\"\,\"CASE_THREE\"\]\)\ and\ \(.phases.empty_pool_baseline.cases\|length\)==4\ and\ \(.phases.warmup.cases\|length\)==5\ and\ \(.phases.direct_kv_load.cases\|length\)==4\ and\ \(.phases.proxy_kv_load.cases\|length\)==4\ and\ all\(.phases\[\]\;\ .status==\"passed\"\ and\ .validated==true\ and\ all\(.cases\[\]\;\ .validated==true\ and\ .request_isolation==true\ and\ \(.foreign_markers\|length\)==0\ and\ .hard_gate_checks.validated==true\)\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260803T124415Z/smoke/concurrent-summary.json
+[2026-08-03T14:15:13Z] END assert corrected formal smoke summary exit=0 artifact=smoke-summary-assert-rerun.log

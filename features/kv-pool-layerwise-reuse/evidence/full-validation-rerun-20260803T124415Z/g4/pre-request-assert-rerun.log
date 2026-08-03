@@ -1,0 +1,10 @@
+{
+  "validated": true,
+  "metrics": {
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0,
+    "master_active_clients": 2.0
+  },
+  "prefill_nodes": 1,
+  "decode_nodes": 1
+}

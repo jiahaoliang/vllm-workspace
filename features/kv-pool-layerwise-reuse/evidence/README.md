@@ -9,6 +9,24 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
+## Python Overlay Full Validation 20260803T124415Z
+
+- Plan:
+  [Python overlay rerun](../implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md)
+- Evidence:
+  [full-validation-rerun-20260803T124415Z](full-validation-rerun-20260803T124415Z/README.md)
+- Result: PASSED. The unchanged ARM64 image at vLLM-Ascend `14beaf161` was
+  validated with the explicit two-file Python overlay at `d28c52958`.
+  CPU/mock, G0, G1, lease, G4, four-request concurrent smoke, and stress S1-S3
+  all passed. Final vLLM child processes are stopped; the Master is empty and
+  the six-NPU stress Pods are retained.
+- Stress `SHA256SUMS` digest:
+  `da8b8880f80bfef620c0553c6688e26b1eafbee17c312e5a8a6d3be6e8d0bbcf`.
+- Final-state `SHA256SUMS` digest:
+  `4359c24159d25f5e311b6bcaead3a594e7cd81aae98b4119f00cf6d7e753e2fb`.
+- Complete run `SHA256SUMS` digest (616 files):
+  `e66b4909df7a3bcf6e870c434f37590aad3927f800dfdfadc1f5c710fc7f4aa5`.
+
 ## Full Validation Rerun 20260731T064607Z
 
 - Plan:
