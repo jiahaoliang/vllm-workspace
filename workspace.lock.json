@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-08-03T20:48:10+08:00",
+  "updated_at": "2026-08-03T22:41:06+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -22,7 +22,7 @@
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
       "commit": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
-      "purpose": "Completed 11/11 Mooncake linear integration plus post-validation fix d28c52958 isolating concurrent Mooncake ranged loads by request; frozen source for the Python-overlay full validation rerun"
+      "purpose": "Completed 11/11 Mooncake linear integration plus post-validation fix d28c52958; the exact two-file Python overlay passed CPU/mock, G0, G1, lease, G4, concurrent smoke, and stress S1-S3 without rebuilding the native image"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

@@ -574,3 +574,44 @@
   `Dockerfile.a2`; and the new bytecode assertion initially failed only Ruff
   formatting. The fixture layout and test formatting were corrected, then all
   affected gates were rerun to green. No production source changed during T0.
+- The dedicated CPU-only UT Pod then passed the complete AscendStore collection
+  (`478 passed`) and deployment collection (`69 passed`) with bytecode and
+  pytest cache disabled. G0 proved the original imageID plus exact host,
+  Prefill, Decode, and UT checksums for the two overlaid Python files. G1 passed
+  3 keys across 4 layers with 40 API calls, 43 cases, and 24 negative cases.
+- Lease validation passed two 31.5-second waits, exact stale-session result
+  `-707`, fresh-session exact recovery, and empty cleanup. G4 passed all 27
+  Prefill range saves, one ordered final commit, all 27 Decode range loads, and
+  zero whole-key calls.
+- The formal four-request smoke passed cold baseline 4/4, five warmups, direct
+  concurrent loads 4/4, proxy concurrent loads 4/4, and all 12 response/hit
+  correlations. This clears the exact hard gate that failed on 2026-07-31;
+  marker ownership, token/usage, finish-reason, and foreign-marker oracles were
+  unchanged.
+- Stress ran on Prefill DP2/TP2 plus Decode DP1/TP2. S1 passed 4/4 at 508 keys,
+  S2 passed 16/16 at 288 keys, and S3 passed its pinned probe plus 4/4 proxy
+  cases at 348 keys. All `163/163` recorded runtime steps exited 0, all
+  scenarios had zero whole-key events, and both Prefill DP ranks were active.
+- Validation execution corrections were preserved in the tracker: an
+  over-escaped UT checksum command; one lease post-rollout endpoint race; the
+  G4 pre-request active-client oracle corrected before any request; the smoke
+  offline warmup count corrected from four to five; and credential-safe
+  capacity projection with a regression test. The final deployment collection
+  passed `70` tests and capacity arithmetic remained unchanged.
+- Evidence commit `03d13567659a30c2df42521f1a0d384c30d220c1` contains 616
+  files. Root `SHA256SUMS` digest is
+  `e66b4909df7a3bcf6e870c434f37590aad3927f800dfdfadc1f5c710fc7f4aa5`;
+  complete `sha256sum -c` replay passed. Six dated family/umbrella reports pass
+  the fail-closed report checker after placing each `Script SHA256` and digest
+  on the same line.
+- Final live audit confirmed the original retained Pod and node UIDs, imageID,
+  overlay checksums, CPU-only UT contract, stopped Prefill/Decode child
+  processes, and Master keys/bytes/clients `0/0/0`. The cluster was not
+  reorganized. The six-NPU stress Pods, Master, proxy, and UT Pod remain
+  retained; `deployment_yaml/` and `dockerfile.vllm23` remain untouched.
+- A publication audit accidentally broadened Ruff to the entire historical
+  deployment directory and exposed one existing unused checker read plus seven
+  existing format differences. Those files were not changed because rewriting
+  the frozen stress checker after runtime would invalidate its evidence. The
+  formal scope was rerun instead: all three source-fix Python files and the
+  credential-safe tooling test passed Ruff and format checks.

@@ -15,6 +15,14 @@ current test entry points.
   [Python overlay rerun](../implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md)
 - Evidence:
   [full-validation-rerun-20260803T124415Z](full-validation-rerun-20260803T124415Z/README.md)
+- Umbrella report:
+  [full-validation-rerun-2026-08-03.md](../full-validation-rerun-2026-08-03.md)
+- Family reports:
+  [G0/G1](../ranged-api-validation-2026-08-03.md),
+  [lease](../lease-expiry-validation-2026-08-03.md),
+  [G4](../ranged-api-g4-validation-2026-08-03.md),
+  [1P1D smoke](../deployment/validation-2026-08-03.md), and
+  [stress](../multi-dp-tp-stress-validation-2026-08-03.md).
 - Result: PASSED. The unchanged ARM64 image at vLLM-Ascend `14beaf161` was
   validated with the explicit two-file Python overlay at `d28c52958`.
   CPU/mock, G0, G1, lease, G4, four-request concurrent smoke, and stress S1-S3

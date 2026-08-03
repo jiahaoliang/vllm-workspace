@@ -64,25 +64,33 @@
   [implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md](implementation-plans/2026-07-30-full-validation-rerun-20260730T130225Z.md)
 - Historical termination report:
   [full-validation-rerun-2026-07-30.md](full-validation-rerun-2026-07-30.md)
-- Current terminated run tracker:
+- Historical terminated run tracker:
   [implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md](implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md)
-- Current failure report:
+- Historical failure report:
   [full-validation-rerun-2026-07-31.md](full-validation-rerun-2026-07-31.md)
+- Current passed Python-overlay tracker:
+  [implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md](implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md)
+- Current passed umbrella report:
+  [full-validation-rerun-2026-08-03.md](full-validation-rerun-2026-08-03.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 
 Stable guide 不携带历史 run 的默认 SHA、image tag、model dimensions 或 key counts。
 每次执行必须新建 dated tracker，并优先采用用户显式指定的版本；未指定字段从当次 clean
-checkout、lock、model 和 live runtime 派生后冻结。Run `20260731T064607Z` 修正了
-旧 G0 compatibility-lane 问题，并通过 UT、G0、G1、lease 与 G4；随后在 smoke 确认
-concurrent warm layerwise KV-load production defect 并终止。修复源码后必须新建 run
-identity，不得从 stress 续跑。
+checkout、lock、model 和 live runtime 派生后冻结。Run `20260731T064607Z` 在 smoke
+确认 concurrent warm layerwise KV-load production defect 并终止。源码修复
+`d28c52958` 后，run `20260803T124415Z` 未从 stress 续跑，而是使用明确的两文件
+Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；全部通过。
+该结果不代表在 `d28c52958` 上重新构建了镜像。
 
 ### 1P1D Smoke
 
 - Runbook: [deployment/README.md](deployment/README.md)
 - Runner: [deployment/run-smoke-test.sh](deployment/run-smoke-test.sh)
-- Report: [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md)
+- Current overlay report:
+  [deployment/validation-2026-08-03.md](deployment/validation-2026-08-03.md)
+- Historical report:
+  [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
 
 ### Ranged API 与 G4 Runtime Audit
@@ -92,6 +100,10 @@ identity，不得从 stress 续跑。
   [ranged-api-validation-2026-07-23.md](ranged-api-validation-2026-07-23.md)
 - G4 report/runbook:
   [ranged-api-g4-validation-2026-07-23.md](ranged-api-g4-validation-2026-07-23.md)
+- Current overlay G0/G1 report:
+  [ranged-api-validation-2026-08-03.md](ranged-api-validation-2026-08-03.md)
+- Current overlay G4 report:
+  [ranged-api-g4-validation-2026-08-03.md](ranged-api-g4-validation-2026-08-03.md)
 - Direct driver: [deployment/range-api-smoke.py](deployment/range-api-smoke.py)
 - G4 checker:
   [deployment/check-range-debug-log.py](deployment/check-range-debug-log.py)
@@ -109,6 +121,8 @@ identity，不得从 stress 续跑。
 - Workload driver: [deployment/stress-test.py](deployment/stress-test.py)
 - Report:
   [multi-dp-tp-stress-validation-2026-07-25.md](multi-dp-tp-stress-validation-2026-07-25.md)
+- Current overlay report:
+  [multi-dp-tp-stress-validation-2026-08-03.md](multi-dp-tp-stress-validation-2026-08-03.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
 
 ### Lease Expiry
@@ -116,6 +130,8 @@ identity，不得从 stress 续跑。
 - Plan: [lease-expiry-validation-plan.md](lease-expiry-validation-plan.md)
 - Report and complete runbook:
   [lease-expiry-validation-2026-07-27.md](lease-expiry-validation-2026-07-27.md)
+- Current overlay report:
+  [lease-expiry-validation-2026-08-03.md](lease-expiry-validation-2026-08-03.md)
 - Driver: [deployment/lease-expiry-test.py](deployment/lease-expiry-test.py)
 - Evidence index: [evidence/README.md](evidence/README.md)
 
