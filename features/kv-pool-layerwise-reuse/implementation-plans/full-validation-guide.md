@@ -23,6 +23,26 @@
 - Do not delete a namespace. Finalization stops vLLM child processes and records retained resources; it does not restore the pre-run workload unless the user explicitly requests restoration.
 - Historical reports and evidence are immutable. Every attempt uses a new UTC run ID and a new evidence directory.
 
+### Explicit Python Overlay Exception
+
+A full image rebuild remains the default. A Python overlay is valid only when the
+user explicitly requires reuse of an existing image after a production Python
+fix. Such a run must freeze both identities instead of presenting the overlay as
+the image source:
+
+- record the image's original vLLM-Ascend commit and the final source commit;
+- prove the commit range changes only `vllm_ascend/**/*.py` and tests, with no
+  native, build, dependency, or packaging changes;
+- tar-sync the exact clean final checkout, disable bytecode writes, and compare
+  every changed package file checksum across host, Prefill, Decode, and UT;
+- retain the original image tag/imageID and rerun every source-dependent gate,
+  including the complete CPU/mock, G0, G1, lease, G4, smoke, and S1-S3 flow;
+- stop if any unapproved file enters the overlay or any checksum differs.
+
+The dated tracker and final report must call this an overlay validation and list
+the residual risk; it is not evidence for a newly built image at the final source
+commit.
+
 ---
 
 ## Stable Files And Responsibilities

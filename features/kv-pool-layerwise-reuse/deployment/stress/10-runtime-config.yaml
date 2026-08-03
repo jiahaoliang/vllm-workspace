@@ -49,7 +49,7 @@ data:
       rm -f "${pid_file}"
     fi
     : >"${log_file}"
-    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
       python3 -m vllm.entrypoints.openai.api_server \
       --host 0.0.0.0 --port 8100 \
       --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
@@ -93,7 +93,7 @@ data:
       rm -f "${pid_file}"
     fi
     : >"${log_file}"
-    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 \
       python3 -m vllm.entrypoints.openai.api_server \
       --host 0.0.0.0 --port 8200 \
       --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
@@ -184,6 +184,7 @@ data:
     expected = Path("/vllm-workspace/vllm-ascend").resolve()
     assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
     assert os.environ.get("PYTHONHASHSEED") == "0", "PYTHONHASHSEED must be fixed"
+    assert os.environ.get("PYTHONDONTWRITEBYTECODE") == "1", "bytecode writes must be disabled"
     assert os.environ.get("VLLM_VERSION") is None, "main-verified lane must not force VLLM_VERSION"
     assert not vllm_version_is("0.25.1"), f"wrong compatibility lane: {vllm.__version__}"
     coordinator_parameters = inspect.signature(get_kv_cache_coordinator).parameters

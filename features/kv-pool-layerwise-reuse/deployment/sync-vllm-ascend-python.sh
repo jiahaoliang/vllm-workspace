@@ -2,6 +2,7 @@
 set -euo pipefail
 
 readonly BASE_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
+readonly SOURCE_COMMIT="d28c52958a30cebdb7822d56e3dbb0dbe41499bc"
 readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
 readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,6 +17,11 @@ fi
 kubectl get namespace -n "${NAMESPACE}" "${NAMESPACE}" >/dev/null
 
 git -C "${SOURCE_REPO}" cat-file -e "${BASE_COMMIT}^{commit}"
+if [[ $(git -C "${SOURCE_REPO}" rev-parse HEAD) != "${SOURCE_COMMIT}" || \
+      -n $(git -C "${SOURCE_REPO}" status --porcelain=v1) ]]; then
+  echo "source must be clean at ${SOURCE_COMMIT}" >&2
+  exit 1
+fi
 
 mapfile -t unsupported < <(
   {
@@ -38,8 +44,20 @@ mapfile -t changed < <(
   } | sort -u
 )
 mapfile -t deleted < <(
-  git -C "${SOURCE_REPO}" diff --name-only --diff-filter=D "${BASE_COMMIT}" -- vllm_ascend
+  git -C "${SOURCE_REPO}" diff --name-only --diff-filter=D \
+    "${BASE_COMMIT}" -- vllm_ascend | LC_ALL=C sort
 )
+
+expected_changed=(
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+)
+if [[ "${changed[*]}" != "${expected_changed[*]}" || ${#deleted[@]} -ne 0 ]]; then
+  echo "Python overlay does not match the frozen ${BASE_COMMIT}..${SOURCE_COMMIT} contract" >&2
+  printf 'changed: %s\n' "${changed[*]}" >&2
+  printf 'deleted: %s\n' "${deleted[*]}" >&2
+  exit 1
+fi
 
 if (( ${#changed[@]} == 0 && ${#deleted[@]} == 0 )); then
   echo "no vllm_ascend package changes relative to ${BASE_COMMIT}"
@@ -84,8 +102,10 @@ for role in prefill decode; do
   done
 
   kubectl exec -n "${NAMESPACE}" "${pod}" -c "${role}-engine" -- \
-    python3 -m compileall -q "${CONTAINER_SOURCE}/vllm_ascend"
-  echo "synced ${role} pod ${pod}; vLLM remains stopped"
+    env PYTHONDONTWRITEBYTECODE=1 python3 -c \
+      'import pathlib,sys; root=pathlib.Path(sys.argv[1]); [compile((root/path).read_text(), str(root/path), "exec") for path in sys.argv[2:]]' \
+      "${CONTAINER_SOURCE}" "${changed[@]}"
+  echo "synced ${role} pod ${pod} to ${SOURCE_COMMIT}; vLLM remains stopped"
 done
 
 echo "start the two vLLM processes manually after reviewing the synced files"

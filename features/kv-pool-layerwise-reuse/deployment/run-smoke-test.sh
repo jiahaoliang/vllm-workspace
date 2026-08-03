@@ -5,7 +5,8 @@ readonly namespace=liangjiahao
 readonly remote_artifact_dir=/tmp/layerwise-smoke
 readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
 readonly expected_vllm=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
-readonly expected_vllm_ascend=14beaf161cca6f1e044e20529ca96c6554dbbe50
+readonly image_vllm_ascend=14beaf161cca6f1e044e20529ca96c6554dbbe50
+readonly expected_vllm_ascend=d28c52958a30cebdb7822d56e3dbb0dbe41499bc
 readonly expected_mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
@@ -19,7 +20,7 @@ if [[ $# -gt 1 ]]; then
   exit 2
 fi
 
-for command_name in git jq kubectl python3; do
+for command_name in git jq kubectl python3 sha256sum; do
   if ! command -v "${command_name}" >/dev/null 2>&1; then
     echo "required command is not available: ${command_name}" >&2
     exit 2
@@ -102,6 +103,7 @@ master_pod=${master_pod}
 remote_artifact_dir=${remote_artifact_dir}
 image=${expected_image}
 vllm=${expected_vllm}
+vllm_ascend_image_base=${image_vllm_ascend}
 vllm_ascend=${expected_vllm_ascend}
 mooncake=${expected_mooncake}
 EOF
@@ -133,6 +135,30 @@ for role in prefill decode; do
     python3 /opt/vllm-layerwise/check-runtime.py \
     >"${output_dir}/${role}-runtime-identity.log" 2>&1; then
     echo "${role} runtime identity gate failed" >&2
+    exit 2
+  fi
+done
+
+mapfile -t overlay_files < <(
+  git -C "${workspace_root}/repos/vllm-ascend" diff --name-only \
+    "${image_vllm_ascend}" -- vllm_ascend | LC_ALL=C sort
+)
+expected_overlay_files=(
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+)
+if [[ "${overlay_files[*]}" != "${expected_overlay_files[*]}" ]]; then
+  echo "unexpected Python overlay file set: ${overlay_files[*]}" >&2
+  exit 2
+fi
+for path in "${overlay_files[@]}"; do
+  host_sum=$(sha256sum "${workspace_root}/repos/vllm-ascend/${path}" | awk '{print $1}')
+  prefill_sum=$(kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- \
+    sha256sum "/vllm-workspace/vllm-ascend/${path}" | awk '{print $1}')
+  decode_sum=$(kubectl exec -n "${namespace}" "${decode_pod}" -c decode-engine -- \
+    sha256sum "/vllm-workspace/vllm-ascend/${path}" | awk '{print $1}')
+  if [[ ${host_sum} != "${prefill_sum}" || ${host_sum} != "${decode_sum}" ]]; then
+    echo "Python overlay checksum mismatch: ${path}" >&2
     exit 2
   fi
 done

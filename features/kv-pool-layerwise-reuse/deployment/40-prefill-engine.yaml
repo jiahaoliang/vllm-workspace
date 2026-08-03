@@ -54,6 +54,8 @@ spec:
               value: "1"
             - name: PYTHONHASHSEED
               value: "0"
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
           resources:
             requests:
               huawei.com/Ascend910: "1"

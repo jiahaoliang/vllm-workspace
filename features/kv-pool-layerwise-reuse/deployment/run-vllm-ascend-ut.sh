@@ -6,7 +6,8 @@ readonly pod_name=vllm-ascend-ut
 readonly container_name=ut
 readonly node_name=n1
 readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
-readonly expected_source_head=14beaf161cca6f1e044e20529ca96c6554dbbe50
+readonly image_source_head=14beaf161cca6f1e044e20529ca96c6554dbbe50
+readonly expected_source_head=d28c52958a30cebdb7822d56e3dbb0dbe41499bc
 readonly remote_parent=/workspace
 readonly remote_checkout=${remote_parent}/vllm-ascend
 readonly remote_lock=${remote_parent}/.vllm-ascend-ut.lock
@@ -40,6 +41,21 @@ done
 if [[ ! -d ${source_repo}/vllm_ascend || ! -d ${source_repo}/tests/ut ]]; then
   echo "vLLM-Ascend checkout is incomplete: ${source_repo}" >&2
   exit 2
+fi
+
+mapfile -t overlay_files < <(
+  git -C "${source_repo}" diff --name-only "${image_source_head}" -- \
+    vllm_ascend | LC_ALL=C sort
+)
+expected_overlay_files=(
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+)
+if [[ "${overlay_files[*]}" != "${expected_overlay_files[*]}" ]]; then
+  printf 'unexpected Python overlay relative to image source %s:\n' \
+    "${image_source_head}" >&2
+  printf '  %s\n' "${overlay_files[@]}" >&2
+  exit 1
 fi
 
 current_context=$(kubectl -n "${namespace}" config current-context)
@@ -134,9 +150,11 @@ synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 kubectl exec -n "${namespace}" "${pod_name}" -c "${container_name}" -- \
   bash -c 'printf "%s\n" \
-    "head=$2" "branch=$3" "dirty=$4" "synced_at=$5" >"$1"' \
+    "head=$2" "branch=$3" "dirty=$4" "synced_at=$5" \
+    "image_source_head=$6" >"$1"' \
   bash "${remote_stage}/.workspace-source" "${source_head}" \
-  "${source_branch}" "${source_dirty}" "${synced_at}"
+  "${source_branch}" "${source_dirty}" "${synced_at}" \
+  "${image_source_head}"
 
 kubectl exec -n "${namespace}" "${pod_name}" -c "${container_name}" -- \
   bash -c '
@@ -159,9 +177,9 @@ kubectl exec -n "${namespace}" "${pod_name}" -c "${container_name}" -- \
     fi
   ' bash "${remote_stage}" "${remote_checkout}" "${remote_previous}"
 
-printf 'context=%s\nnamespace=%s\npod=%s\nsource_head=%s\nsource_branch=%s\nsource_dirty=%s\n' \
-  "${current_context}" "${namespace}" "${pod_name}" "${source_head}" \
-  "${source_branch}" "${source_dirty}"
+printf 'context=%s\nnamespace=%s\npod=%s\nimage_source_head=%s\nsource_head=%s\nsource_branch=%s\nsource_dirty=%s\n' \
+  "${current_context}" "${namespace}" "${pod_name}" "${image_source_head}" \
+  "${source_head}" "${source_branch}" "${source_dirty}"
 
 kubectl exec -n "${namespace}" "${pod_name}" -c "${container_name}" -- \
   bash -c '

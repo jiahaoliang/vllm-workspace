@@ -68,7 +68,23 @@ class ValidationIdentityTest(unittest.TestCase):
         }
         for component, commit in IDENTITY["commits"].items():
             self.assertEqual(lock["repos"][lock_names[component]]["commit"], commit)
+        for component, commit in IDENTITY["image_commits"].items():
             self.assertIn(f'ARG {arg_names[component]}="{commit}"', dockerfile)
+
+    def test_python_overlay_keeps_image_and_final_source_identity_explicit(self):
+        overlay = IDENTITY["python_overlay"]
+        self.assertTrue(overlay["required"])
+        self.assertEqual(
+            overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
+        )
+        self.assertEqual(overlay["commit"], IDENTITY["commits"]["vllm_ascend"])
+        self.assertEqual(
+            overlay["files"],
+            [
+                "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
+                "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
+            ],
+        )
 
     def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
         manifests = [
@@ -82,6 +98,38 @@ class ValidationIdentityTest(unittest.TestCase):
         for manifest in manifests:
             self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
 
+    def test_all_python_workloads_disable_bytecode_writes(self):
+        manifests = (
+            "deployment/40-prefill-engine.yaml",
+            "deployment/50-decode-engine.yaml",
+            "deployment/60-vllm-ascend-ut-pod.yaml",
+            "deployment/stress/40-prefill-engine.yaml",
+            "deployment/stress/50-decode-engine.yaml",
+        )
+        for manifest in manifests:
+            text = read(manifest)
+            self.assertIn("PYTHONDONTWRITEBYTECODE", text, manifest)
+            self.assertRegex(
+                text,
+                r"PYTHONDONTWRITEBYTECODE(?:\n\s+value:|, value:) \"?1\"?",
+                manifest,
+            )
+
+        for config in (
+            "deployment/10-runtime-config.yaml",
+            "deployment/stress/10-runtime-config.yaml",
+        ):
+            text = read(config)
+            self.assertEqual(
+                text.count(
+                    "nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 "
+                    "PYTHONDONTWRITEBYTECODE=1"
+                ),
+                2,
+                config,
+            )
+            self.assertIn('os.environ.get("PYTHONDONTWRITEBYTECODE")', text, config)
+
     def test_runners_and_runtime_checkers_match_identity_and_new_session_api(self):
         runner_paths = [
             "deployment/run-smoke-test.sh",
@@ -93,6 +141,7 @@ class ValidationIdentityTest(unittest.TestCase):
             text = read(path)
             self.assertIn(IDENTITY["image"], text, path)
             self.assertIn(IDENTITY["commits"]["vllm_ascend"], text, path)
+            self.assertIn(IDENTITY["python_overlay"]["base_commit"], text, path)
         checked_paths = [
             "deployment/10-runtime-config.yaml",
             "deployment/stress/10-runtime-config.yaml",
@@ -124,6 +173,7 @@ class ValidationIdentityTest(unittest.TestCase):
             self.assertIn(f"compatibility lane: {IDENTITY['vllm_lane']}", text, path)
 
     def test_run_identity_records_model_runtime_and_cluster_contract(self):
+        self.assertGreaterEqual(IDENTITY["schema_version"], 2)
         self.assertRegex(IDENTITY["run_id"], r"^\d{8}T\d{6}Z$")
         self.assertEqual(IDENTITY["attempt"], 1)
         self.assertEqual(IDENTITY["tooling_base"]["branch"], "kv-pool-layerwise-reuse")
@@ -209,6 +259,7 @@ class ValidationIdentityTest(unittest.TestCase):
         runner = read("deployment/run-stress-test.sh")
         for commit in IDENTITY["commits"].values():
             self.assertIn(commit, runner)
+        self.assertIn(IDENTITY["image_commits"]["vllm_ascend"], runner)
 
 
 if __name__ == "__main__":

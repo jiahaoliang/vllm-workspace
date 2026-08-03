@@ -533,3 +533,44 @@
   and `git rev-list --left-right --count` returned `0 0`. This metadata-only
   follow-up records that completed publication check; its own remote equality
   is verified independently after push.
+
+## 2026-08-03
+
+- Reproduced the 2026-07-31 warm pair 2/3 defect on the unchanged image and
+  Pod UIDs at `20/120` failed rounds. Every failure affected case 2 with the
+  same marker-free continuation while Decode reported 25/25 block hits and
+  3200 hit tokens.
+- Temporary tagged probes proved scheduler block allocation, worker `ReqMeta`,
+  ranged key/local-buffer rows, and attention block-table rows were aligned for
+  failed requests. Experiments that split duplicate keys (`26/120` failed) or
+  synchronized the NPU after each ranged get (`19/120` failed) were falsified
+  and reverted.
+- The accepted fix keeps Mooncake key-major batching inside each request and
+  dispatches concurrent requests separately. Focused UT went red then green;
+  row-local failure filtering is also covered. The complete AscendStore suite
+  passed `478` tests, and two independent warm pair 2/3 runs passed `120/120`
+  each. All temporary `[DEBUG-KVPAIR-20260803]` source and bytecode probes were
+  removed.
+- Committed and normally pushed source fix
+  `d28c52958a30cebdb7822d56e3dbb0dbe41499bc` (`fix(kv_pool): isolate
+  concurrent Mooncake range loads`). Origin matched and left/right was `0 0`.
+  The original 11 Mooncake integration commits remain linear and unmodified;
+  this is a twelfth post-validation bugfix commit.
+- Per explicit user direction, the next full validation reuses image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1`
+  without rebuilding. The run freezes image source `14beaf161` separately from
+  final Python source `d28c52958`, permits only the two changed package files,
+  and requires host/Prefill/Decode/UT checksums plus every source-dependent
+  gate to rerun.
+- The overlay validation tooling now fail-closes on the exact two-file package
+  set, verifies host/Prefill/Decode checksums, disables Python bytecode writes
+  in base and stress engines, and records image-source and final-source
+  identities separately. Before the tooling freeze, the complete deployment
+  collection passed `69` tests in the dedicated CPU-only UT Pod; Ruff
+  lint/format, shell syntax, rendered ConfigMap Python/shell checks, all 10
+  manifest client dry-runs, and source/control diff checks passed.
+- Superseded tooling attempts were not treated as runtime failures: host Python
+  lacked pytest; the first Pod fixture omitted `workspace.lock.json` and
+  `Dockerfile.a2`; and the new bytecode assertion initially failed only Ruff
+  formatting. The fixture layout and test formatting were corrected, then all
+  affected gates were rerun to green. No production source changed during T0.

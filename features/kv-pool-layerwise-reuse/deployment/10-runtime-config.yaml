@@ -52,7 +52,7 @@ data:
     fi
 
     : >"${log_file}"
-    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 \
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
       python3 -m vllm.entrypoints.openai.api_server \
       --host 0.0.0.0 \
       --port 8100 \
@@ -108,7 +108,7 @@ data:
     fi
 
     : >"${log_file}"
-    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 \
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
       python3 -m vllm.entrypoints.openai.api_server \
       --host 0.0.0.0 \
       --port 8200 \
@@ -221,6 +221,9 @@ data:
     assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
     assert os.environ.get("PYTHONHASHSEED") == "0", (
         "PYTHONHASHSEED must have the same fixed value in every engine Pod"
+    )
+    assert os.environ.get("PYTHONDONTWRITEBYTECODE") == "1", (
+        "engine processes must not write stale Python bytecode"
     )
     assert os.environ.get("VLLM_VERSION") is None, (
         "main-verified lane must not force a release VLLM_VERSION override"

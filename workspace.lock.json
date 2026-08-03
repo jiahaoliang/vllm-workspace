@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-07-31T19:56:19+08:00",
+  "updated_at": "2026-08-03T20:48:10+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,8 +21,8 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
-      "purpose": "Completed 11/11 Mooncake linear integration onto collaborator/kv_offload_0723 a46a1dabb; frozen source passed UT, G0, G1, lease, and G4 before validation terminated on a concurrent warm layerwise KV-load defect"
+      "commit": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
+      "purpose": "Completed 11/11 Mooncake linear integration plus post-validation fix d28c52958 isolating concurrent Mooncake ranged loads by request; frozen source for the Python-overlay full validation rerun"
     },
     "Mooncake": {
       "path": "repos/Mooncake",
