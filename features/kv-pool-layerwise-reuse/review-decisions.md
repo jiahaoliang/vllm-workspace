@@ -1,9 +1,7 @@
 # Mooncake Layerwise KV Pool Feature Branch 检视决策
 
-本文只记录 2026-07-20 整体 feature branch 检视中用户作出的当前决策。完整 findings、
-证据和验证结果见：
-
-`features/kv-pool-layerwise-reuse/feature-branch-review-2026-07-20.md`
+本文保留每轮 feature branch 检视必须遵守的通用规则。新的 findings、实施记录和旧 SHA
+在开始新 review 时移除；只有用户明确采纳的结论才记录为本轮决策。
 
 ## 新 Review 准备流程
 
@@ -35,91 +33,27 @@
 
 ## 验证边界
 
-- CPU UT 使用专用隔离 venv，并区分真实依赖与 test stub。
+- CPU/mock UT 遵守 workspace `AGENTS.md`：使用 `liangjiahao` namespace 的 CPU-only
+  专用 UT Pod，通过 tar + `kubectl exec` 同步源码，并区分真实依赖与 test stub。
 - CPU mock UT、Ruff、`py_compile` 和 `git diff --check` 不能表述为真实 Mooncake wheel、
   memcache E2E 或 NPU E2E 已验证。
-- 当前没有 NPU 测试环境；本轮明确不把 NPU E2E、NPU benchmark 或真实 NPU 硬件
-  验证纳入本地实施/验收范围，但报告必须持续标注该 residual risk。
+- NPU E2E、NPU benchmark 或真实 NPU 硬件验证只有在实际执行并保存证据后才能声明
+  完成；未执行时必须持续标注 residual risk。
 
-## 本轮检视范围
+## 当前 Review 范围
 
-- vLLM Ascend branch：`feature/mooncake-layerwise-kv-pool`
-- feature HEAD：`1c75b507fe268b91a6f4183da0ae6221ffd05568`
-- review fixed point：`upstream/main`
-- review 时 `upstream/main`：`bb474a6a94a999d54a5a6c54663bce70502d7aad`
-- feature merge-base：`9dcbeaa2ad36bf96789a7f039d11d7cadaf1c384`
-- Mooncake collaborator branch：`feature/layerwise-kv-session`
-- Mooncake collaborator HEAD：`74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`
+- vLLM Ascend 原分支：`feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`
+- 临时 review 分支：`review/mooncake-kv-offload-d28c529`
+- review fixed point：`collaborator/kv_offload_0723`
+- fixed point SHA：`a46a1dabbc260e8695002969f29528eb555eb583`
+- review HEAD：`d28c52958a30cebdb7822d56e3dbb0dbe41499bc`
+- diff：`git diff collaborator/kv_offload_0723...HEAD`
+- 范围：11 个 Mooncake 线性集成 commit，以及其后的并发 ranged-load 隔离修复 commit。
 
-重点：
+本轮继续重点检查：
 
-1. 是否对原有 memcache 路径造成 breaking change；
-2. 是否符合权威设计文档；
-3. chunked-prefill session owner、last-owner cleanup 和失败收尾是否正确；
-4. 真实 wheel、CPU UT 与 NPU E2E 的证据等级是否被准确区分。
-
-## 本轮已采纳决策
-
-### MC2：Layer load timeout 保留 drain barrier，并提供有界终止策略
-
-- 用户决定：采纳。
-- 问题：`wait_for_layer_load()` 第一次等待 10 秒超时后，会执行无 timeout 的第二次
-  `event.wait()`。第二次等待用于让 RecvingThread 退出正在进行的 ranged read，避免
-  backend 仍使用 Client session 时调用 `batch_get_end`；如果 backend 永久不返回，
-  forward 也会永久阻塞。
-- 设计约束：不能为了消除无限等待而提前 `batch_get_end`。Mooncake session cleanup
-  必须晚于 in-flight ranged read，并继续由 Worker 按最后 active owner 统一执行。
-- 采纳方案：
-  - 保留 drain barrier；
-  - 增加有界终止、backend cancel 或进程级失败策略；
-  - 将 Mooncake session cleanup 竞态处理与 memcache fault-path 分开；
-  - 不得无意改变 memcache 的正常路径行为。
-- 测试要求：覆盖正常 completion、backend exception、首次 timeout 后最终 completion、
-  backend 永久不 completion 的有界退出，以及 memcache/Mooncake 两条路径；in-flight
-  ranged read 完成前不得调用 `batch_get_end`。
-
-### D3：Put-start 异常 revoke 不得阻塞 Worker forward 主线程
-
-- 用户决定：采纳。
-- 问题：`batch_put_start` 抛异常或返回 malformed result 时，Worker 主线程同步执行
-  `_best_effort_revoke_layerwise_keys(new_keys)`；该 Master RPC 可能阻塞 chunk setup。
-- 设计依据：权威设计 §1.4 要求 ranges、`batch_put_end`、`batch_put_revoke` 在传输线程
-  执行，使 offload control/data work 不阻塞 forward 热路径。
-- 采纳方案：Worker 只完成本地 metadata filtering 与 pending-state transition，将需要
-  revoke 的 keys 交给 SendingThread/control queue；异步 cleanup 保留
-  `_put_started_keys`、pending owners 和 Master-timeout fallback 的既有不变量。
-- 测试要求：覆盖 put-start exception、shape error、partial failure、queue handler
-  exception 和 revoke failure；Worker preparation 不得同步调用 revoke，失败 keys 不得
-  进入 ranged save，异步 cleanup 最终准确更新 tracker。
-
-## 本轮明确不纳入
-
-- `MC1`：不采纳。memcache block-key layerwise 的 TP-only breaking boundary 是
-  intentional correctness boundary。
-- `MC3/D4`：不采纳并忽略。失败 GVA 进入 transfer 是继承的 memcache 既有问题，
-  不是本 feature 引入，也不直接影响 Mooncake。
-- `D1/D2`：先前的采纳决定被用户最新实施边界覆盖。本轮不得修改 `repos/Mooncake`；
-  不在 vLLM-Ascend 内伪造 Mooncake Client contract。`MooncakeBackend` 继续适配当前
-  collaborator wheel：`batch_put_start(keys, sizes)`，ranged put 使用四参数调用。
-  `batch_put_end` 幂等与 ranged put 可选 `ReplicateConfig` 仍是设计和 collaborator
-  实现之间的已知差异，但不属于本轮代码改动。
-- `D5b/ST1`：不采纳为当前本地实施/验收项。当前没有 NPU 环境，不要求完成 NPU E2E、
-  NPU benchmark 或真实 NPU 硬件验证；仍须明确标注“未经 NPU 验证”。
-
-## 当前实施状态
-
-- MC2/D3 已折叠到 vLLM-Ascend commit
-  `9f2aefa59c239171d5e31c800b8979e67ff62c18`
-  (`feat(kv_pool): orchestrate Mooncake layerwise sessions`)。
-- 两个相互抵消的 Mooncake contract fixup 已折叠到
-  `0e5c41c00c0f893dd8fe7bd87533a93aab47ac9f`；该 commit 的最终 patch 与折叠前
-  原 Backend contract commit 等价，源码不依赖 D2 的新 signature。
-- vLLM-Ascend feature HEAD：`663209fd6208a59a48742f75116345bf5f5281ec`，
-  已使用精确 `--force-with-lease` 推送到
-  `origin/feature/mooncake-layerwise-kv-pool`；feature history 中不再有 `fixup!` commit。
-- Mooncake 已恢复到未修改的 collaborator HEAD
-  `74b0acf15bd6e41f0177b1e79c4a2eed39a58fa5`，没有 Mooncake commit 或 push。
-- 隔离 AscendStore CPU suite：`402 passed`；Ruff、`py_compile`、
-  `git diff --check` 和全部 9 个重写 commit checks 通过。折叠前后最终 tree hash 均为
-  `96cb96b70854e4f69f5598feab74c3e7e1fd6605`。
-- 未运行真实 Mooncake wheel、memcache E2E 或 NPU E2E；本轮不声称经过 NPU 验证。
+1. collaborator 的 group-aware/shared-buffer GVA 路径与 Mooncake key-major ranged 路径
+   是否通过明确条件并存；
+2. session owner、chunked-prefill、失败收尾和并发 request 隔离是否符合权威设计；
+3. 是否保持 memcache、whole-key、Yuanrong 和既有 positional constructor contract；
+4. 测试与 full-validation 证据是否覆盖新增行为，且没有越过验证边界。
