@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-08-04T21:05:58+08:00",
+  "updated_at": "2026-08-04T22:50:21+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,8 +21,8 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873",
-      "purpose": "Current merge target with reviewed single-group backports and their review correction; section 5.8 multi-group remains deferred and excluded from this checkout"
+      "commit": "6bf3fb04c2fe1b52c7a369aa13c5e1e9fd43f4c7",
+      "purpose": "Current merge target after squashing 16 owned commits into 8 functional commits; tree ca363697034538b86626517066940315283ac8ad exactly matches fully validated d5f0ea7f8; section 5.8 multi-group remains deferred and excluded"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

@@ -703,3 +703,45 @@
   both left/right counts were `0 0`. Protected source ref
   `feature/mooncake-layerwise-kv-pool` remained
   `b5b65d9bbe325d009ad887fb87b8883b7ecee156`.
+- Audited the complete source range from pinned parent `a46a1dabb` through
+  `d5f0ea7f8`: all 16 linear commits were authored and committed by
+  `jiahaoliang <gzliangjiahao@gmail.com>`. The fetched moving collaborator ref
+  had been force-updated to `e4f2dd3e6`; it was explicitly excluded because
+  the requested result must preserve the `d5f0ea7f8` tree.
+- Rewrote only
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` into eight
+  functionally grouped DCO-signed commits: foundations `7b5e57d5b`, ranged
+  transfers `309798210`, session orchestration `c429750b9`, audit introduction
+  `a4e4c8787`, Mooncake API compatibility `0b4445773`, request failure
+  isolation `e6391552c`, audit centralization `e1979b151`, and performance
+  contract alignment `6bf3fb04c`.
+- Every rewritten commit tree exactly matches its selected original group
+  endpoint. Final old/new trees are both
+  `ca363697034538b86626517066940315283ac8ad`; `git diff` is empty, merge-base
+  is the pinned `a46a1dabb`, commit count is eight, merge count is zero, DCO is
+  complete, and §5.8 prohibited symbols remain absent. A local recovery ref
+  preserves old tip `d5f0ea7f8`.
+- Re-synchronized the identical tree by tar into the CPU-only, no-hostPath
+  `liangjiahao/vllm-ascend-ut` Pod and ran with bytecode and pytest cache
+  disabled. AscendStore, env, and performance-contract tests passed
+  `492 passed, 1 skipped`; the skip is the expected unconfigured real
+  Mooncake/NPU benchmark. All 22 Python diff files passed Ruff lint/format,
+  11 production files passed `py_compile`, and `git diff --check` passed.
+- The source remote still pointed to exact old checkpoint `d5f0ea7f8` before
+  publication. An explicit old-SHA `--force-with-lease` updated only the target
+  ref to `6bf3fb04c2fe1b52c7a369aa13c5e1e9fd43f4c7`; live `git ls-remote` matched,
+  left/right is `0 0`, and protected local/origin
+  `feature/mooncake-layerwise-kv-pool` remains `b5b65d9bb`.
+- Added the recoverable execution plan and detailed Chinese committer report.
+  Historical run `20260804T103209Z`, `validation-identity.json`, and checksummed
+  evidence remain immutable at source identity `d5f0ea7f8`; exact tree identity
+  supports the current code but is not represented as a newly executed full
+  NPU validation or throughput benchmark.
+- `pwsh` and `powershell` were unavailable. Linux equivalents of
+  `lock-repos.ps1`, `status-all.ps1`, and `validate-workspace.ps1` passed:
+  lock schema/remote contracts are valid; all three nested repos are clean and
+  match branch/HEAD pins; required paths, workspace instruction text, the one
+  tracked direct feature, and all snapshot headers passed. The first ad hoc
+  feature check incorrectly treated nested README files as feature roots; it
+  was corrected to the PowerShell script's direct-child enumeration and rerun
+  without any repository file change.
