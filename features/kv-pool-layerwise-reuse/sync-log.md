@@ -697,3 +697,9 @@
   logs and then for curated summaries/source-publication metadata. The control
   branch therefore publishes reports/tooling/state only; it does not upload
   this run's evidence payload.
+- Published the report/state checkpoint as
+  `2ecc56730cf29c0765460e66db3ad5fb09789b5b`. Live `git ls-remote` matched
+  that control SHA and source `d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873`;
+  both left/right counts were `0 0`. Protected source ref
+  `feature/mooncake-layerwise-kv-pool` remained
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156`.

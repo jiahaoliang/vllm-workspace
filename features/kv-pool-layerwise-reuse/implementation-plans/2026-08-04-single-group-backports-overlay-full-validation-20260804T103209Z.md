@@ -2,7 +2,7 @@
 
 ## Frozen Run Identity
 
-- Status: runtime validation passed; evidence publication in progress
+- Status: complete; source and control reports/state published, raw evidence local-only
 - Umbrella run ID: `20260804T103209Z`
 - Evidence root: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260804T103209Z`
 - Control branch: `kv-pool-layerwise-reuse`
@@ -95,6 +95,6 @@ package tree.
 - [x] Produce and validate five family reports plus umbrella report.
 - [x] Verify origin remained `d28c52958`, then fast-forward push source.
 - [x] Update lock/repo-state/sync-log/status/README.
-- [ ] Commit and push control reports/state. Raw and curated evidence remain
+- [x] Commit and push control reports/state. Raw and curated evidence remain
   local-only because the workspace safety gate rejected external evidence upload.
-- [ ] Verify both remotes with `git ls-remote` and left/right `0 0`.
+- [x] Verify both remotes with `git ls-remote` and left/right `0 0`.
