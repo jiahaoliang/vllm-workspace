@@ -68,10 +68,14 @@
   [implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md](implementation-plans/2026-07-31-main-verified-full-validation-rerun-20260731T064607Z.md)
 - Historical failure report:
   [full-validation-rerun-2026-07-31.md](full-validation-rerun-2026-07-31.md)
-- Current passed Python-overlay tracker:
+- Previous passed Python-overlay tracker:
   [implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md](implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md)
-- Current passed umbrella report:
+- Previous passed umbrella report:
   [full-validation-rerun-2026-08-03.md](full-validation-rerun-2026-08-03.md)
+- Current single-group backport tracker:
+  [implementation-plans/2026-08-04-single-group-backports-overlay-full-validation-20260804T103209Z.md](implementation-plans/2026-08-04-single-group-backports-overlay-full-validation-20260804T103209Z.md)
+- Current passed umbrella report:
+  [full-validation-rerun-2026-08-04.md](full-validation-rerun-2026-08-04.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 
@@ -82,6 +86,9 @@ checkout、lock、model 和 live runtime 派生后冻结。Run `20260731T064607Z
 `d28c52958` 后，run `20260803T124415Z` 未从 stress 续跑，而是使用明确的两文件
 Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；全部通过。
 该结果不代表在 `d28c52958` 上重新构建了镜像。
+Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overlay，
+继续复用同一镜像；§5.8 multi-group 明确延期。本次 raw evidence 因 workspace
+安全边界只保留本地，control repo 发布自包含报告、tooling 和状态记录。
 
 ### 1P1D Smoke
 
@@ -89,6 +96,8 @@ Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；
 - Runner: [deployment/run-smoke-test.sh](deployment/run-smoke-test.sh)
 - Current overlay report:
   [deployment/validation-2026-08-03.md](deployment/validation-2026-08-03.md)
+- Current single-group backport report:
+  [deployment/validation-2026-08-04.md](deployment/validation-2026-08-04.md)
 - Historical report:
   [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
@@ -104,6 +113,9 @@ Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；
   [ranged-api-validation-2026-08-03.md](ranged-api-validation-2026-08-03.md)
 - Current overlay G4 report:
   [ranged-api-g4-validation-2026-08-03.md](ranged-api-g4-validation-2026-08-03.md)
+- Current single-group reports:
+  [ranged-api-validation-2026-08-04.md](ranged-api-validation-2026-08-04.md) and
+  [ranged-api-g4-validation-2026-08-04.md](ranged-api-g4-validation-2026-08-04.md)
 - Direct driver: [deployment/range-api-smoke.py](deployment/range-api-smoke.py)
 - G4 checker:
   [deployment/check-range-debug-log.py](deployment/check-range-debug-log.py)
@@ -123,6 +135,8 @@ Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；
   [multi-dp-tp-stress-validation-2026-07-25.md](multi-dp-tp-stress-validation-2026-07-25.md)
 - Current overlay report:
   [multi-dp-tp-stress-validation-2026-08-03.md](multi-dp-tp-stress-validation-2026-08-03.md)
+- Current single-group backport report:
+  [multi-dp-tp-stress-validation-2026-08-04.md](multi-dp-tp-stress-validation-2026-08-04.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
 
 ### Lease Expiry
@@ -132,6 +146,8 @@ Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；
   [lease-expiry-validation-2026-07-27.md](lease-expiry-validation-2026-07-27.md)
 - Current overlay report:
   [lease-expiry-validation-2026-08-03.md](lease-expiry-validation-2026-08-03.md)
+- Current single-group backport report:
+  [lease-expiry-validation-2026-08-04.md](lease-expiry-validation-2026-08-04.md)
 - Driver: [deployment/lease-expiry-test.py](deployment/lease-expiry-test.py)
 - Evidence index: [evidence/README.md](evidence/README.md)
 

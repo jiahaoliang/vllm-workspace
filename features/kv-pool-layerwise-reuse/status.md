@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Status
 
-Current Phase: 11/11 Mooncake linear integration frozen; main-lane full validation terminated at smoke on a concurrent warm layerwise KV-load defect
+Current Phase: single-group review backports validated and source-published; §5.8 Mooncake multi-group deferred
 
 ## Baseline
 
@@ -9,23 +9,37 @@ Current Phase: 11/11 Mooncake linear integration frozen; main-lane full validati
   vLLM-Ascend branch (release line `v0.25.1`)
 - `repos/vllm-ascend`:
   `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`
-  (`14beaf161cca6f1e044e20529ca96c6554dbbe50`), with exactly 11 linear
-  Mooncake commits on `collaborator/kv_offload_0723`
-  `a46a1dabbc260e8695002969f29528eb555eb583`
+  (`d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873`), with the original 11 linear
+  Mooncake commits, post-validation fix `d28c52958`, and four reviewed
+  single-group backport/correction commits. §5.8 multi-group is excluded
 - `repos/Mooncake`: collaborator branch `feature/layerwise-kv-session` at PR #2881 head
   `786c77ff7692bed58dd99971afef87d6b690cbe3` (WIP)
 
 ## Next Steps
 
-- Diagnose and fix the concurrent Mooncake layerwise ranged-load request/key/
-  local-block mapping in a separately authorized source change. The terminated
-  validation did not modify `repos/*`.
-- After a source fix, create a new validation identity and run ID, rebuild the
-  complete image, and restart the full sequence from tooling/image/UT. Do not
-  resume run `20260731T064607Z` at Stress S1.
-- Preserve both terminated runs and their checksummed evidence.
+- Keep §5.8 Mooncake multi-group on the WIP branch until a future explicit
+  implementation decision and real multi-group NPU E2E.
+- Run the opt-in ranged performance nightly gate when benchmark configuration
+  and thresholds are available; the current full validation is correctness,
+  lifecycle, and stress evidence, not a throughput claim.
+- Preserve local raw run `20260804T103209Z`; external publication contains
+  reports/tooling only because the workspace safety gate blocked evidence upload.
 
 ## Latest Validation
+
+- Run `20260804T103209Z` passed the five-file single-group overlay flow at
+  source `d5f0ea7f8`: CPU/mock `490 passed`, deployment tooling `82 passed`,
+  G1 `43/43` plus `24/24` negatives, stale lease `-707`, G4 27 save/load
+  layers with zero whole-key events, smoke baseline/direct/proxy `4/4` with
+  five warmups and `12/12` correlations, and stress S1 `4/4`/508, S2
+  `16/16`/288, S3 pinned plus `4/4`/348. Final Master was `0/0/0`.
+- Physical NPU 1 failed three Decode startups before KVPool traffic with
+  `libcpu_kernels.so` and ACL `507018`. It was identified as `/dev/davinci1`,
+  quarantined for the passing final run, then released. A runner clean-start
+  assumption was fixed test-first without changing frozen production source.
+- Source origin was normally fast-forwarded to `d5f0ea7f8`; live left/right is
+  `0 0`, and protected local/origin `feature/mooncake-layerwise-kv-pool`
+  remains `b5b65d9bb`. Six dated reports passed the fail-closed checker.
 
 - Full validation run `20260731T064607Z` used the corrected `main-verified`
   lane and exact ARM64 image at vLLM-Ascend `14beaf161`. AscendStore passed

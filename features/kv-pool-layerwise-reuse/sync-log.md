@@ -678,3 +678,22 @@
   `fdd0713e6` and the `ST1`/`ST5` parts of `69819f6ea`; `f97aed26f` is an independent direct
   cherry-pick candidate. `git apply --check` confirmed only `f97aed26f` applies directly to
   `d28c52958`; no candidate was applied in this decision step.
+- Applied the approved single-group content as signed commits `8d9897143`,
+  `189dcdd2c`, and `6451f9010`. A two-axis review then found ranged-success,
+  centralized-env, hot-path, magic-number, and limitation-documentation issues;
+  signed correction `d5f0ea7f8` fixed them before source freeze. No §5.8 symbols
+  entered the range.
+- The CPU-only `liangjiahao/vllm-ascend-ut` Pod passed `490` source tests. Ruff,
+  format, compile, DCO, no-merge, protected-ref, and diff gates passed. The
+  target source branch was normally pushed from `d28c52958` to `d5f0ea7f8`;
+  live left/right is `0 0`, while protected branch local/origin remains
+  `b5b65d9bbe325d009ad887fb87b8883b7ecee156`.
+- Full validation run `20260804T103209Z` passed G0/G1, lease, G4, smoke, and
+  stress S1-S3. Physical NPU 1 was isolated before the passing stress run; the
+  only post-freeze code change was validation tooling to support a clean start
+  without retained engine Pods. The complete deployment suite passed `82`.
+- Raw evidence and checksums remain local. Two external evidence-push attempts
+  were rejected by the workspace safety gate, first for raw cluster/runtime
+  logs and then for curated summaries/source-publication metadata. The control
+  branch therefore publishes reports/tooling/state only; it does not upload
+  this run's evidence payload.

@@ -91,9 +91,10 @@ package tree.
 
 ## Publication
 
-- [ ] Generate and replay family/root checksums.
-- [ ] Produce and validate six family reports plus umbrella report.
-- [ ] Verify origin remains `d28c52958`, then fast-forward push source.
-- [ ] Update lock/repo-state/sync-log/status/README.
-- [ ] Commit and push control evidence/reports/state.
+- [x] Generate and replay family/root checksums locally.
+- [x] Produce and validate five family reports plus umbrella report.
+- [x] Verify origin remained `d28c52958`, then fast-forward push source.
+- [x] Update lock/repo-state/sync-log/status/README.
+- [ ] Commit and push control reports/state. Raw and curated evidence remain
+  local-only because the workspace safety gate rejected external evidence upload.
 - [ ] Verify both remotes with `git ls-remote` and left/right `0 0`.
