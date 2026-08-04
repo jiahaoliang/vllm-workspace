@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-08-04T13:00:16+08:00",
+  "updated_at": "2026-08-04T14:46:06+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -22,7 +22,7 @@
       },
       "branch": "wip/mooncake-review-findings-d28c529",
       "commit": "f97aed26f25a3427f20bdb7587b720dd6ef25bbf",
-      "purpose": "Independent five-commit WIP implementing SP1, SP2, and ST1-ST5 on the reviewed d28c52958 tree; CPU/mock and static gates passed, while the real Mooncake/NPU ranged benchmark remains unrun and origin publication is credential-blocked"
+      "purpose": "Published independent five-commit WIP implementing SP1, SP2, and ST1-ST5 on the reviewed d28c52958 tree; CPU/mock and static gates passed, origin matches at left/right 0 0, and the real Mooncake/NPU ranged benchmark remains unrun"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

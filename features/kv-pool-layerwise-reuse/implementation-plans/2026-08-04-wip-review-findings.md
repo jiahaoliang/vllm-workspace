@@ -484,3 +484,8 @@ protected-ref checks also passed.
 The subsequent normal control push to `origin/kv-pool-layerwise-reuse` also returned HTTP 403 for
 the same authenticated account. The control remote remained
 `bc75cb6adf7aa3dd9bc0a2089e8ff6efa94c3a0f`; neither target repository was modified remotely.
+After the workspace-only token was replaced, the source WIP branch was normally pushed without
+force. Live `git ls-remote` and the local HEAD both returned
+`f97aed26f25a3427f20bdb7587b720dd6ef25bbf`; left/right count was `0 0`. The earlier 403 entries
+remain as historical execution evidence and no longer describe the current source publication
+state.

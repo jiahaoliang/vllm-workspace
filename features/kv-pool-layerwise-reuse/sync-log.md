@@ -657,3 +657,8 @@
   for authenticated account `swallowCXY`. `origin/kv-pool-layerwise-reuse` remained at that
   checkpoint. Source and control publication both require a GitHub token with write permission to
   the `jiahaoliang` forks; repeated retries with the current token were stopped.
+- After replacing the workspace-only credential with a token that has access to the `jiahaoliang`
+  forks, normally pushed `wip/mooncake-review-findings-d28c529` to vLLM-Ascend origin. Live
+  `git ls-remote` returned `f97aed26f25a3427f20bdb7587b720dd6ef25bbf`, and
+  `git rev-list --left-right --count origin/wip/mooncake-review-findings-d28c529...HEAD` returned
+  `0 0`. Both protected source refs remained unchanged.
