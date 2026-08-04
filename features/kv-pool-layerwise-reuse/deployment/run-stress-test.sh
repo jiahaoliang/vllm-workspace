@@ -148,17 +148,24 @@ wait_engine_ready() {
 }
 
 wait_for_http() {
-  local pod=$1 container=$2 url=$3 description=$4
+  local pod=$1 container=$2 url=$3 description=$4 pid_file=${5:-}
   record_step "wait HTTP: ${description}" "${output_dir}/wait-http-${description// /-}-$(date -u +%H%M%S).log" kubectl exec -n "${namespace}" "${pod}" -c "${container}" -- \
-    python3 -c 'import sys,time,urllib.request
-url=sys.argv[1]; deadline=time.monotonic()+1800; last=None
+    python3 -c 'import os,sys,time,urllib.request
+url=sys.argv[1]; pid_file=sys.argv[2]; deadline=time.monotonic()+1800; last=None
 while time.monotonic()<deadline:
+ if pid_file:
+  try:
+   pid=int(open(pid_file).read().strip())
+   os.kill(pid,0)
+   state=open(f"/proc/{pid}/stat").read().split()[2]
+   if state=="Z": raise RuntimeError(f"engine process {pid} is a zombie")
+  except Exception as exc: raise SystemExit(f"engine exited before {url} became ready: {exc}")
  try:
   with urllib.request.urlopen(url,timeout=5) as response:
    if response.status==200: print(response.read().decode()); raise SystemExit(0)
  except Exception as exc: last=exc
  time.sleep(3)
-raise SystemExit(f"timeout waiting for {url}: {last}")' "${url}"
+raise SystemExit(f"timeout waiting for {url}: {last}")' "${url}" "${pid_file}"
 }
 
 capture_metrics() {
@@ -276,6 +283,11 @@ finalize_run() {
   exit "${overall_rc}"
 }
 
+handle_signal() {
+  overall_rc=1
+  exit "$1"
+}
+
 reset_between_scenarios() {
   local label=$1
   stop_engines >"${output_dir}/${label}-stop.log" 2>&1 || return 1
@@ -292,11 +304,11 @@ reset_between_scenarios() {
   capture_metrics "${output_dir}/${label}-empty.metrics" || return 1
   assert_metrics "${output_dir}/${label}-empty.metrics" 0 true || return 1
   start_engines || return 1
-  wait_for_http "${prefill_pod}" prefill-engine http://127.0.0.1:8100/v1/models "${label}-Prefill" || return 1
-  wait_for_http "${decode_pod}" decode-engine http://127.0.0.1:8200/v1/models "${label}-Decode" || return 1
+  wait_for_http "${prefill_pod}" prefill-engine http://127.0.0.1:8100/v1/models "${label}-Prefill" /tmp/vllm-prefill.pid || return 1
+  wait_for_http "${decode_pod}" decode-engine http://127.0.0.1:8200/v1/models "${label}-Decode" /tmp/vllm-decode.pid || return 1
   wait_engine_ready "${label}-Prefill" "${prefill_pod}" || return 1
   wait_engine_ready "${label}-Decode" "${decode_pod}" || return 1
-  wait_for_http "${prefill_pod}" prefill-engine http://vllm-proxy-service:8000/health "${label}-proxy" || return 1
+  wait_for_http "${prefill_pod}" prefill-engine http://vllm-proxy-service:8000/health "${label}-proxy" /tmp/vllm-prefill.pid || return 1
   for role in prefill decode; do
     local pod_variable pod container
     pod_variable=${role}_pod
@@ -323,6 +335,8 @@ fi
 touch "${output_dir}/command-transcript.log" "${output_dir}/steps.jsonl"
 trap_active=1
 trap finalize_run EXIT
+trap 'handle_signal 130' INT
+trap 'handle_signal 143' TERM
 
 if [[ "${namespace}" != liangjiahao ]]; then
   fail_run "refusing to run outside the liangjiahao namespace"
@@ -429,11 +443,11 @@ rg -F 'default_kv_lease_ttl=30000' "${output_dir}/master-startup.log" >/dev/null
 capture_metrics "${output_dir}/master-empty-initial.metrics" || { fail_run "initial metrics capture failed"; exit 1; }
 assert_metrics "${output_dir}/master-empty-initial.metrics" 0 true || { fail_run "Master was not empty"; exit 1; }
 start_engines || { fail_run "engine startup failed"; exit 1; }
-wait_for_http "${prefill_pod}" prefill-engine http://127.0.0.1:8100/v1/models Prefill || { fail_run "Prefill readiness failed"; exit 1; }
-wait_for_http "${decode_pod}" decode-engine http://127.0.0.1:8200/v1/models Decode || { fail_run "Decode readiness failed"; exit 1; }
+wait_for_http "${prefill_pod}" prefill-engine http://127.0.0.1:8100/v1/models Prefill /tmp/vllm-prefill.pid || { fail_run "Prefill readiness failed"; exit 1; }
+wait_for_http "${decode_pod}" decode-engine http://127.0.0.1:8200/v1/models Decode /tmp/vllm-decode.pid || { fail_run "Decode readiness failed"; exit 1; }
 wait_engine_ready Prefill "${prefill_pod}" || { fail_run "Prefill Pod did not become Ready"; exit 1; }
 wait_engine_ready Decode "${decode_pod}" || { fail_run "Decode Pod did not become Ready"; exit 1; }
-wait_for_http "${prefill_pod}" prefill-engine http://vllm-proxy-service:8000/health proxy || { fail_run "proxy health failed"; exit 1; }
+wait_for_http "${prefill_pod}" prefill-engine http://vllm-proxy-service:8000/health proxy /tmp/vllm-prefill.pid || { fail_run "proxy health failed"; exit 1; }
 collect "proxy endpoints before topology" "${output_dir}/proxy-endpoints-initial.json" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- \
   python3 -c 'import json
 from urllib.request import urlopen

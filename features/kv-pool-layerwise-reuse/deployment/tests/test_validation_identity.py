@@ -117,6 +117,13 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertIn('sha256sum "${CONTAINER_SOURCE}/${path}"', sync)
         self.assertIn("checksum mismatch for ${role} ${path}", sync)
 
+    def test_stress_readiness_fails_fast_when_engine_process_exits(self):
+        runner = read("deployment/run-stress-test.sh")
+        self.assertIn("engine exited before {url} became ready", runner)
+        self.assertIn('state=open(f"/proc/{pid}/stat").read().split()[2]', runner)
+        self.assertIn("trap 'handle_signal 130' INT", runner)
+        self.assertIn("trap 'handle_signal 143' TERM", runner)
+
     def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
         manifests = [
             "deployment/30-mooncake-master.yaml",
