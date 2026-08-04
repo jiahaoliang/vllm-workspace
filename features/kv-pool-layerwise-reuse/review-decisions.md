@@ -186,7 +186,7 @@ Spec 与 Standards 两轴分别记录，不跨轴重排优先级。
 - 实施结果：新增依赖方向单一的 `range_debug.py`，集中 range、commit、whole-key 三类
   best-effort emitter；disabled、payload coercion 和 logger failure 均有 focused coverage。
 
-## 本轮已采纳决策
+## 本轮 WIP 实施记录
 
 - `SP1`、`SP2`、`ST1`、`ST2`、`ST3`、`ST4`、`ST5` 均已在独立 WIP 分支实施。
 - 最终 source verification：AscendStore、patch 与 env CPU/mock tests `534 passed`；22 个
@@ -194,3 +194,26 @@ Spec 与 Standards 两轴分别记录，不跨轴重排优先级。
   `git diff --check` 通过；5 个 WIP commits 均有 DCO sign-off 且无 merge commit。
 - 验证边界：真实 Mooncake/NPU ranged performance benchmark 未运行，不能声明性能 gate
   已通过；原受保护 feature 分支未被修改。
+
+## 2026-08-04 合回范围决策
+
+- 当前合回目标是
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` at
+  `d28c52958a30cebdb7822d56e3dbb0dbe41499bc`。
+- 暂不实现权威设计 §5.8；`SP1` owning commit `0dad9ad94` 不进入当前合回范围，完整
+  multi-group 实现继续只保存在 `wip/mooncake-review-findings-d28c529`。
+- `04cb824f6` 与目标分支现有 `d28c52958` tree 完全相同，不能通过普通 cherry-pick
+  替换已有 unsigned commit；当前不改写受保护分支历史。DCO 问题只能在明确授权的
+  history rewrite 或后续 squash 边界处理。
+- `SP2` 与 `ST4`（`fdd0713e6`）在语义上不依赖 multi-group，可以按单 group 基线定向
+  backport：保留 immutable `LayerRangeRow`、legacy positional constructor 和
+  request-local exception/result-shape failure 隔离；不得带入 `group_id`、group-local
+  active rows 或 encoded group/block failure。该 commit 依赖 `0dad9ad94` 的上下文，不能
+  整笔直接 cherry-pick。
+- `ST1` 与 `ST5`（`69819f6ea`）在语义上不依赖 multi-group，可以定向 backport Client API
+  文档修正、共享 `range_debug.py` 和对应测试；该 commit 的 `kv_transfer.py` hunk 基于
+  WIP row/group 上下文，不能整笔直接 cherry-pick。
+- `ST3`（`f97aed26f`）不依赖 multi-group，当前 patch 对 `d28c52958` 通过
+  `git apply --check`，可作为独立 cherry-pick 候选。它只新增 nightly performance gate
+  和文档；真实 Mooncake/NPU benchmark 仍未运行。
+- 本决策只确定候选范围；本次未向目标 source 分支应用任何 commit 或源码修改。

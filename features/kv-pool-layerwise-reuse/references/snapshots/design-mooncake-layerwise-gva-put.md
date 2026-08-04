@@ -1,6 +1,6 @@
 Source: https://hackmd.io/@QQ5HFJZeT1-uFJm16Qaq_Q/HJGESQG4ze
 Captured At: 2026-07-28T17:05:16+08:00
-Notes: Latest authoritative Mooncake layerwise KVPool put design, including section 5.7 chunked-prefill session lifecycle and lease renewal semantics, plus section 5.8 multi-group KV cache handling.
+Notes: Latest authoritative Mooncake layerwise KVPool put design, including section 5.7 chunked-prefill session lifecycle and lease renewal semantics, plus section 5.8 multi-group KV cache handling. Workspace decision on 2026-08-04: retain section 5.8 as future design, but defer its implementation from the current merge target.
 
 # Mooncake Layerwise KVPool Put 设计文档
 
@@ -570,6 +570,13 @@ Worker chunk Ci:
 ```
 
 ### 5.8 Multi-group KV Cache
+
+> **当前实施决策（2026-08-04）**：暂不实现本节，不将 §5.8 multi-group Mooncake
+> layerwise 代码合回
+> `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`。本节保留为后续设计依据，
+> 已有实验实现继续保存在 `wip/mooncake-review-findings-d28c529`，不得据此声明当前合回
+> 分支支持或已验证 Mooncake multi-group。未来重新启用本节时，需要重新评审实现基线并
+> 完成真实 multi-group Mooncake/NPU E2E。
 
 #### 背景
 

@@ -667,3 +667,14 @@
   from remote checkpoint `bc75cb6adf7aa3dd9bc0a2089e8ff6efa94c3a0f`. Post-push
   `git ls-remote` returned `b22dff4080dcc7e89a191ad41882adb6c8eee2a5`, and
   `git rev-list --left-right --count origin/kv-pool-layerwise-reuse...HEAD` returned `0 0`.
+- Decided to defer authoritative design §5.8 from the current merge target. The design snapshot now
+  retains multi-group as future work and explicitly forbids claiming it as supported or validated
+  on `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`.
+- Switched the active vLLM-Ascend checkout from the clean, published WIP `f97aed26f` back to
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` at local/origin
+  `d28c52958a30cebdb7822d56e3dbb0dbe41499bc`; no source commit or worktree change was made.
+- Classified WIP merge candidates without §5.8: exclude `0dad9ad94`; do not cherry-pick the empty
+  signed replacement `04cb824f6`; selectively backport the single-group `SP2`/`ST4` parts of
+  `fdd0713e6` and the `ST1`/`ST5` parts of `69819f6ea`; `f97aed26f` is an independent direct
+  cherry-pick candidate. `git apply --check` confirmed only `f97aed26f` applies directly to
+  `d28c52958`; no candidate was applied in this decision step.
