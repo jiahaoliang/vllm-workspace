@@ -489,3 +489,7 @@ force. Live `git ls-remote` and the local HEAD both returned
 `f97aed26f25a3427f20bdb7587b720dd6ef25bbf`; left/right count was `0 0`. The earlier 403 entries
 remain as historical execution evidence and no longer describe the current source publication
 state.
+The refreshed control state was committed as `b22dff4080dcc7e89a191ad41882adb6c8eee2a5` and normally
+fast-forward pushed from checkpoint `bc75cb6adf7aa3dd9bc0a2089e8ff6efa94c3a0f`. Live
+`git ls-remote` returned `b22dff4080dcc7e89a191ad41882adb6c8eee2a5`; left/right count was
+`0 0`. A metadata-only follow-up records that completed publication check.

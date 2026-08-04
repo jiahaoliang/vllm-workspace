@@ -662,3 +662,8 @@
   `git ls-remote` returned `f97aed26f25a3427f20bdb7587b720dd6ef25bbf`, and
   `git rev-list --left-right --count origin/wip/mooncake-review-findings-d28c529...HEAD` returned
   `0 0`. Both protected source refs remained unchanged.
+- Committed the refreshed source publication state as
+  `b22dff4080dcc7e89a191ad41882adb6c8eee2a5` and normally fast-forward pushed the control branch
+  from remote checkpoint `bc75cb6adf7aa3dd9bc0a2089e8ff6efa94c3a0f`. Post-push
+  `git ls-remote` returned `b22dff4080dcc7e89a191ad41882adb6c8eee2a5`, and
+  `git rev-list --left-right --count origin/kv-pool-layerwise-reuse...HEAD` returned `0 0`.
