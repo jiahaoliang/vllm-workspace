@@ -1,6 +1,6 @@
 ﻿{
   "version": 1,
-  "updated_at": "2026-08-03T22:41:06+08:00",
+  "updated_at": "2026-08-04T13:00:16+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -20,9 +20,9 @@
         "upstream": "https://github.com/vllm-project/vllm-ascend.git",
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
-      "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
-      "purpose": "Completed 11/11 Mooncake linear integration plus post-validation fix d28c52958; the exact two-file Python overlay passed CPU/mock, G0, G1, lease, G4, concurrent smoke, and stress S1-S3 without rebuilding the native image"
+      "branch": "wip/mooncake-review-findings-d28c529",
+      "commit": "f97aed26f25a3427f20bdb7587b720dd6ef25bbf",
+      "purpose": "Independent five-commit WIP implementing SP1, SP2, and ST1-ST5 on the reviewed d28c52958 tree; CPU/mock and static gates passed, while the real Mooncake/NPU ranged benchmark remains unrun and origin publication is credential-blocked"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

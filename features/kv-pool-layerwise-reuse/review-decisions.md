@@ -43,11 +43,14 @@
 ## 当前 Review 范围
 
 - vLLM Ascend 原分支：`feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`
-- 临时 review 分支：`review/mooncake-kv-offload-d28c529`
+- 临时 review 分支：`review/mooncake-kv-offload-d28c529`（review 输入，已结束）
+- WIP 实施分支：`wip/mooncake-review-findings-d28c529`
 - review fixed point：`collaborator/kv_offload_0723`
 - fixed point SHA：`a46a1dabbc260e8695002969f29528eb555eb583`
 - review HEAD：`d28c52958a30cebdb7822d56e3dbb0dbe41499bc`
-- diff：`git diff collaborator/kv_offload_0723...HEAD`
+- WIP HEAD：`f97aed26f25a3427f20bdb7587b720dd6ef25bbf`
+- review diff：`git diff collaborator/kv_offload_0723...d28c52958`
+- WIP diff：`git diff 14beaf161...f97aed26f`
 - 范围：11 个 Mooncake 线性集成 commit，以及其后的并发 ranged-load 隔离修复 commit。
 
 本轮继续重点检查：
@@ -58,16 +61,17 @@
 3. 是否保持 memcache、whole-key、Yuanrong 和既有 positional constructor contract；
 4. 测试与 full-validation 证据是否覆盖新增行为，且没有越过验证边界。
 
-## 本轮待用户 Review 建议
+## 本轮 Review 建议与实施状态
 
-以下条目均为 `待决策`，不代表已经采纳。Spec 与 Standards 两轴分别记录，不跨轴
-重排优先级。用户明确回复“采纳”“纳入”“不采纳”或“延后”后，再更新对应状态。
+以下条目保留最初 review 证据，并记录独立 WIP 分支上的实施结果。`已实施` 只表示对应
+改动已在 WIP 分支完成和通过所列验证，不表示已合入或已经完成未实际运行的 NPU gate。
+Spec 与 Standards 两轴分别记录，不跨轴重排优先级。
 
 ### Spec
 
 #### SP1：Mooncake multi-group contract 与当前实现不一致
 
-- 状态：待决策。
+- 状态：已实施于 WIP；owning commit `0dad9ad94c23fb43abac420bf0c7feca5e35ba3d`。
 - 严重级别：High。
 - 判断性质：Spec 缺失/实现错误；兼容性风险。
 - 设计依据：权威设计 §2.3、§5.8 要求 multi-group key 包含 `group_id`，每个 group
@@ -90,17 +94,16 @@
 - 历史边界：未完成的 Mooncake multi-group 实现曾被明确隔离到
   `wip/mooncake-multi-group-layerwise-optimization`，不应在未确认设计和范围时直接带入
   当前 review 分支。
-- 待决定方案：
-  1. 纳入：按权威设计完整实现 group-local key、metadata、session tracker、object size、
-     offset、completion 和 failure state；或
-  2. 不纳入当前分支：初始化时对 Mooncake block-key layerwise multi-group 明确 fail-fast，
-     修正文档的支持声明，并把 §5.8 标为后续 WIP，而不是让不完整路径继续可达。
-- 若纳入的测试要求：覆盖 Scheduler/Worker key 一致性、不同 group block size、同一物理层
-  多 group、组内 offset、逐组 commit/revoke、失败隔离和 `batch_get_end` owner cleanup。
+- 实施结果：采用完整 group-local 路径，覆盖 key、metadata、session tracker、object size、
+  组内 offset、逐组 completion/revoke 和 encoded invalid block IDs；保留 collaborator 的
+  group-aware/shared-buffer GVA 路径以及单 group、Memcache、whole-key、Yuanrong 和 MTP 行为。
+- 验证：覆盖 Scheduler/Worker key 一致性、不同 group block size、同一物理层多 group、
+  组内 offset、逐组 commit/revoke、失败隔离和 session cleanup；最终 CPU/mock gate 包含在
+  `534 passed` 中。真实 multi-group Mooncake/NPU E2E 尚未运行。
 
 #### SP2：并发 ranged-load 的异常边界仍扩大到其他 request
 
-- 状态：待决策。
+- 状态：已实施于 WIP；owning commit `fdd0713e607ab919e08272e81f2925f191de678d`。
 - 严重级别：Medium。
 - 判断性质：代码正确性；测试充分性。
 - 设计依据：`implementation-plan.md:91-96` 和 `implementation-plan.md:792-797`
@@ -110,17 +113,16 @@
   `transfer_tasks` 的 blocks 标为 invalid、清空全部 active rows 并 abort。
 - 影响：单个 request 的 Mooncake/协议故障会使同批其他 request 无谓重算；当前新增测试
   只覆盖负返回码的 row-local failure，没有覆盖 subgroup exception 或 shape error。
-- 建议：将 request-local API exception/shape failure 映射到该 request 的 active indices，
-  继续处理其他 request；只有 shared metadata/invariant 失配等无法归属的错误才 abort
-  整个 transfer task。
-- 测试要求：覆盖第一个/中间/最后一个 request 抛异常，以及 short、long、non-integer
-  result；验证其他 request 仍执行、只有受影响 block invalid，session cleanup 仍 exactly-once。
+- 实施结果：request-local API exception 和 result-shape failure 只移除该 request 的 active
+  rows，其他 request 继续；无法归属的 shared metadata/invariant 错误仍 abort 整个 task。
+- 验证：覆盖第一个/中间/最后一个 request 抛异常，以及 short、long、non-integer result；
+  focused gate `150 passed`，并包含在最终 `534 passed` 中。
 
 ### Standards
 
 #### ST1：用户文档发布了错误的 Mooncake Client API 名称
 
-- 状态：待决策。
+- 状态：已实施于 WIP；owning commit `69819f6ea9a67944c14f749a66bffeba02d0db3f`。
 - 严重级别：P1。
 - 判断性质：Documented-standard hard violation。
 - 规范依据：vLLM Ascend `AGENTS.md:367-371` 要求 public API 与用户可见行为被准确记录。
@@ -128,24 +130,27 @@
   wheel 提供 `batch_put_start`、`batch_put_end` 等 API；实际 capability contract 是
   `backend/mooncake_backend.py:29-37` 的 `batch_*_session_*` API。
 - 影响：用户可能按错误 contract 选择 wheel，随后在 startup capability validation 失败。
-- 建议：文档明确区分 vLLM Ascend 内部 `Backend` method 与 Mooncake Client method，列出
-  当前七个 `batch_*_session_*`/ranged API，并同步 chunked-prefill 段落中的调用名称。
+- 实施结果：文档已明确区分内部 `Backend` method 与 Mooncake Client method，列出五个
+  `batch_*_session_*` 和两个 ranged Client API，并同步 chunked-prefill 调用名称。
 
 #### ST2：最新 source fix commit 缺少 DCO sign-off
 
-- 状态：待决策。
+- 状态：已实施于独立 WIP history；owning commit
+  `04cb824f6e8161e89547f220b92a0bc42ba0531a`。
 - 严重级别：P2。
 - 判断性质：Documented-standard hard violation。
 - 规范依据：vLLM Ascend `AGENTS.md:271-279` 要求每个 commit 必须包含 `Signed-off-by`。
 - 代码证据：`d28c52958 fix(kv_pool): isolate concurrent Mooncake range loads` 只有 subject，
   没有 `Signed-off-by`；其余 11 个 review commit 均包含 sign-off。
 - 影响：DCO/提交规范检查会拒绝该 commit。
-- 建议：仅在用户明确授权 history rewrite 后，为 `d28c52958` 补签并使用精确
-  `--force-with-lease` 更新目标 source branch；不得改写受保护的原始 feature branch。
+- 实施结果：从 `14beaf161` 建立 WIP 分支并将 `d28c52958` 的 patch 重放为 signed commit
+  `04cb824f6`；原 `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` local/origin
+  继续保持 `d28c52958`，未改写、未 force-push。
 
 #### ST3：NPU ranged-transfer 热路径缺少持续性能回归 gate
 
-- 状态：待决策。
+- 状态：性能 gate 已实施于 WIP；owning commit
+  `f97aed26f25a3427f20bdb7587b720dd6ef25bbf`；真实 NPU benchmark 未运行。
 - 严重级别：P2。
 - 判断性质：Documented-standard hard violation；测试充分性。
 - 规范依据：vLLM Ascend `AGENTS.md:78-90` 要求 NPU-specific code path 提供 nightly
@@ -153,31 +158,39 @@
 - 代码证据：`kv_transfer.py:2047-2100` 新增 ranged-load batching/dispatch 热路径及 mock UT，
   但当前 diff 没有新增 `tests/e2e/nightly` benchmark 或可持续的性能阈值检查。
 - 影响：现有 full validation 证明一次功能和压力运行通过，但不能防止后续吞吐或延迟回归。
-- 建议：纳入 nightly ranged save/load benchmark，至少记录 batch size、并发 request 数、
-  layer 数、吞吐和延迟阈值；若本分支暂不纳入，明确记录为合入前 residual gate。
+- 实施结果：新增真实 Mooncake/NPU ranged save/load nightly benchmark，固定记录 batch size、
+  并发 request 数、layer 数、吞吐和 p50/p95，并通过环境变量设置最小 GB/s 和最大 p95
+  阈值。CPU-only Pod 完成单测试 collection 和未配置环境的预期 skip；真实 benchmark
+  仍是 nightly runner residual gate。
 
 #### ST4：Ranged row 使用多组位置对齐 list
 
-- 状态：待决策。
+- 状态：已实施于 WIP；owning commit `fdd0713e607ab919e08272e81f2925f191de678d`。
 - 严重级别：P2。
 - 判断性质：Standards judgement call；Data Clumps smell。
 - 代码证据：`config_data.py:1093-1103` 以 `keys`、`block_ids`、`all_buffers`、
   `all_sizes`、`all_offsets`、`row_req_ids` 等平行 list 表示一行；`kv_transfer.py:2069-2092`
   依赖长度检查和重复 index 维持关联。此前并发串扰正与 ownership 未进入 row model 有关。
 - 影响：以后新增 row 属性或过滤逻辑时仍容易出现静默错位。
-- 建议：考虑引入不可变 `LayerRangeRow` 值对象，使 key、destination、sizes、offsets 和
-  owner 结构性绑定。该项不是当前 correctness fix 的必要条件，可由用户决定延后。
+- 实施结果：引入 immutable `LayerRangeRow`，结构性绑定 key、block、buffers、sizes、
+  offsets 和 owner；`LayerRangeReqMeta` 保留并验证 legacy positional constructor contract。
 
 #### ST5：Ranged audit emitter 存在重复逻辑
 
-- 状态：待决策。
+- 状态：已实施于 WIP；owning commit `69819f6ea9a67944c14f749a66bffeba02d0db3f`。
 - 严重级别：P3。
 - 判断性质：Standards judgement call；Duplicated Code smell。
 - 代码证据：`kv_transfer.py:55-117` 与 `backend/mooncake_backend.py:41-62` 重复实现
   feature gate、JSON logging 和 instrumentation exception isolation。
 - 影响：未来修改 payload 或失败策略时，两处审计事件可能产生不一致行为。
-- 建议：仅在能保持模块依赖方向清晰时提取共享 emitter；否则保留现状并补充一致性测试。
+- 实施结果：新增依赖方向单一的 `range_debug.py`，集中 range、commit、whole-key 三类
+  best-effort emitter；disabled、payload coercion 和 logger failure 均有 focused coverage。
 
 ## 本轮已采纳决策
 
-- 无。等待用户逐项确认上述 `SP1`、`SP2`、`ST1`、`ST2`、`ST3`、`ST4`、`ST5`。
+- `SP1`、`SP2`、`ST1`、`ST2`、`ST3`、`ST4`、`ST5` 均已在独立 WIP 分支实施。
+- 最终 source verification：AscendStore、patch 与 env CPU/mock tests `534 passed`；22 个
+  Python diff 文件 Ruff/format 通过；12 个 source 文件 `py_compile` 通过；
+  `git diff --check` 通过；5 个 WIP commits 均有 DCO sign-off 且无 merge commit。
+- 验证边界：真实 Mooncake/NPU ranged performance benchmark 未运行，不能声明性能 gate
+  已通过；原受保护 feature 分支未被修改。

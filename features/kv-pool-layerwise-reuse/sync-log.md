@@ -621,3 +621,39 @@
   `03d13567659a30c2df42521f1a0d384c30d220c1`. Post-push `git ls-remote`
   returned `127e781277c21bb3a28de2a2a1d53aa0619c9d97` and
   `git rev-list --left-right --count` returned `0 0`.
+
+## 2026-08-04
+
+- Created independent source branch `wip/mooncake-review-findings-d28c529` from
+  `14beaf161cca6f1e044e20529ca96c6554dbbe50` without modifying either protected feature branch.
+  Replayed the unsigned post-validation fix as signed commit `04cb824f6e8161e89547f220b92a0bc42ba0531a`.
+- Implemented all seven review findings: multi-group Mooncake keys/sessions/transfers/failure
+  handling in `0dad9ad94c23fb43abac420bf0c7feca5e35ba3d`; request-local ranged failure isolation and
+  immutable `LayerRangeRow` in `fdd0713e607ab919e08272e81f2925f191de678d`; shared audit emitters
+  and corrected Client API documentation in `69819f6ea9a67944c14f749a66bffeba02d0db3f`; and the
+  configurable real Mooncake/NPU nightly performance gate in
+  `f97aed26f25a3427f20bdb7587b720dd6ef25bbf`.
+- Final CPU/mock verification in the tar-synced CPU-only `liangjiahao/vllm-ascend-ut` Pod passed
+  `534` tests with bytecode and pytest cache disabled. All 22 Python diff files passed Ruff and
+  format checks, 12 source files passed `py_compile`, `git diff --check` passed, and the five WIP
+  commits are signed with no merge commit. The benchmark collected one test and skipped as
+  designed without external configuration; a real Mooncake/NPU performance run remains required.
+- Protected local/origin refs remained unchanged:
+  `feature/mooncake-layerwise-kv-pool` at `b5b65d9bbe325d009ad887fb87b8883b7ecee156` and
+  `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` at
+  `d28c52958a30cebdb7822d56e3dbb0dbe41499bc`.
+- Configured the control repo and all three nested repos to use the same workspace-only helper,
+  `store --file=/root/.config/git/credentials-vllm-workspace`, with `credential.useHttpPath=false`
+  and store mode `0600`. The stored token matches the existing global GitHub token, but a normal
+  source WIP push returned HTTP 403 because it authenticates `swallowCXY`, which has no write
+  permission to `jiahaoliang/vllm-ascend`; no source remote ref was created or modified.
+- `pwsh` and `powershell` are unavailable. Linux equivalents of `lock-repos.ps1`,
+  `status-all.ps1`, and `validate-workspace.ps1` passed: all three nested repos are clean and match
+  the refreshed lock, workspace required paths and snapshot headers are valid, and the lock schema
+  contains every required repository field. Control `git diff --check`, JSON parsing, source DCO,
+  history, and protected-ref checks also passed.
+- The control branch was a verified fast-forward from remote checkpoint
+  `bc75cb6adf7aa3dd9bc0a2089e8ff6efa94c3a0f`, but its normal push was also rejected with HTTP 403
+  for authenticated account `swallowCXY`. `origin/kv-pool-layerwise-reuse` remained at that
+  checkpoint. Source and control publication both require a GitHub token with write permission to
+  the `jiahaoliang` forks; repeated retries with the current token were stopped.
