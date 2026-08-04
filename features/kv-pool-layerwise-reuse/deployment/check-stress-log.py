@@ -104,8 +104,6 @@ def validate_range_event(event: dict[str, Any], role: str, layers: int, errors: 
             errors.append(f"{role}:{line}: requested byte mismatch at key {index}")
         if not is_int(results[index]) or results[index] < 0:
             errors.append(f"{role}:{line}: invalid negative/non-integer result at key {index}")
-        elif results[index] != requested[index]:
-            errors.append(f"{role}:{line}: result byte mismatch at key {index}")
 
 
 def validate_events(events: list[dict[str, Any]], role: str, layers: int, errors: list[str]) -> dict[str, Any]:

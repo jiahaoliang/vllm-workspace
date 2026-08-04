@@ -586,8 +586,9 @@ checker 使用 JSON parser 解析事件，并断言：
 - prefill `save` 和 decode `load` 的 layer set 都严格等于 `0..num_layers-1`，每层至少一个
   `range` event；
 - 每个 event 的 `len(requested_bytes) == len(results) == key_count`；
-- 对每个 key，`requested_bytes[i] == sum(sizes[i])`、`results[i] >= 0` 且
-  `results[i] == requested_bytes[i]`；
+- 对每个 key，`requested_bytes[i] == sum(sizes[i])` 且 `results[i] >= 0`；
+  ranged data API 的合法成功返回可以是 `0` 或正字节数，最终字节一致性由独立 oracle
+  验证；
 - prefill final-layer successful `commit` event 位于该进程最后一个 ranged save event 之后；
 - prefill/decode 的 `whole_key` event 总数为 0；
 - 缺字段、非法 JSON、未知 direction、越界 layer 或空 event 集合都 fail closed。

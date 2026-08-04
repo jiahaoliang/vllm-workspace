@@ -281,7 +281,8 @@ nerdctl -n "${CONTAINERD_NAMESPACE}" build \
 - Produces: direct proof independent of vLLM orchestration
 
 - [ ] Start a unique multi-key, multi-layer test session using the selected driver dimensions.
-- [ ] Require non-zero object offsets, fragment sums equal requested bytes, per-key results equal transferred bytes, and final source/destination bytes match.
+- [ ] Require non-zero object offsets, fragment sums equal requested bytes,
+  aligned nonnegative per-key results, and final source/destination bytes match.
 - [ ] Run negative cases for no session, overflow, arity mismatch, duplicate start, operations after end, revoke, and cleanup.
 - [ ] Stop immediately on an unexpected API shape or result; do not reinterpret a new code without first updating the contract and tests.
 - [ ] Force cleanup and prove the pool returns to zero.

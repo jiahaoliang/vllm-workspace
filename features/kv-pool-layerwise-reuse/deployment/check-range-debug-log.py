@@ -136,10 +136,6 @@ def validate_range(
             errors.append(
                 f"{role}:{line}: negative or invalid result for key index {index}"
             )
-        elif results[index] != requested[index]:
-            errors.append(
-                f"{role}:{line}: results[{index}] does not equal requested_bytes[{index}]"
-            )
 
 
 def validate_events(

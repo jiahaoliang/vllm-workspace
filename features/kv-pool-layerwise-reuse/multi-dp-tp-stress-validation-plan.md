@@ -226,7 +226,7 @@ Fixture：
 6. 所有 context iteration 都不超过 1024 tokens，并出现持续多轮的 concurrent context activity；
    per-request 多轮 chunking 由 S1 的 isolated line windows 证明，不从缺少 request ID 的并发
    iteration 行推断逐请求归属；
-7. ranged event 聚合覆盖全部 `0..26` 层，所有 result bytes 等于 requested bytes，所有 commit
+7. ranged event 聚合覆盖全部 `0..26` 层，所有 result 为对齐的非负成功值，所有 commit
    成功且 whole-key event 为 0；
 8. 最终 master key count 精确为 288。
 

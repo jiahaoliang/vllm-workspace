@@ -484,7 +484,7 @@ Common ranged-event validation must reuse the field and return-code rules from
 - vector lengths equal `key_count`;
 - fragment sizes/offsets are non-negative integers;
 - requested bytes equal the fragment sum;
-- every result equals requested bytes;
+- every result is an aligned nonnegative ranged success value;
 - every Prefill chunk commit is on layer 26, all results are zero, and immediately follows that chunk's last
   save; the sum of successful commit `key_count` values in a pinned window equals its cached block count;
 - Decode has no commit;

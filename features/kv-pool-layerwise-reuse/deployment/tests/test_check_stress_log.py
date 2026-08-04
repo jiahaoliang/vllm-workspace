@@ -103,6 +103,21 @@ def test_valid_pinned_allows_one_commit_per_chunk(tmp_path):
     assert summary["checks"]["prefill_ranges"]["committed_key_count"] == 2
 
 
+@pytest.mark.parametrize("result", [0, 7, 8])
+def test_valid_pinned_accepts_any_nonnegative_ranged_result(tmp_path, result):
+    prefill_ranges = ranged_lines("prefill")
+    prefill_ranges[0] = (
+        f"x {checker.PREFIX} "
+        f"{json.dumps(range_event('prefill', 0, result=result, direction='load'))}"
+    )
+    args = pinned_args(
+        tmp_path,
+        [iteration(0, 8), iteration(0, 8), "hit_blocks=0/2", *prefill_ranges],
+        ["kvpool hit tokens: 256", *ranged_lines("decode")],
+    )
+    assert checker.pinned(args) == 0
+
+
 def test_pinned_rejects_committed_key_count_mismatch(tmp_path):
     args = pinned_args(
         tmp_path,
@@ -118,7 +133,6 @@ def test_pinned_rejects_committed_key_count_mismatch(tmp_path):
     [
         (lambda lines: lines.pop(1), "layer set mismatch"),
         (lambda lines: lines.__setitem__(0, f"x {checker.PREFIX} not-json"), "malformed range event"),
-        (lambda lines: lines.__setitem__(0, f"x {checker.PREFIX} {json.dumps(range_event('prefill', 0, result=7))}"), "result byte mismatch"),
         (lambda lines: lines.__setitem__(0, f"x {checker.PREFIX} {json.dumps(range_event('prefill', 0, result=-1))}"), "negative"),
         (lambda lines: lines.insert(0, f"x {checker.PREFIX} " + json.dumps({"event": "commit", "layer_id": 2, "key_count": 1, "results": [0]})), "does not immediately follow"),
         (lambda lines: lines.append(f"x {checker.PREFIX} " + json.dumps({"event": "whole_key", "direction": "put", "key_count": 1})), "whole-key"),
