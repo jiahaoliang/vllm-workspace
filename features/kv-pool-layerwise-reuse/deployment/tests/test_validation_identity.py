@@ -11,6 +11,13 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
+FINAL_SOURCE_COMMIT = "6451f9010294913da5eedc4a73c0993d5b4a8907"
+EXPECTED_OVERLAY_FILES = [
+    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py",
+    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
+    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
+    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py",
+]
 
 
 def read(relative: str) -> str:
@@ -74,17 +81,40 @@ class ValidationIdentityTest(unittest.TestCase):
     def test_python_overlay_keeps_image_and_final_source_identity_explicit(self):
         overlay = IDENTITY["python_overlay"]
         self.assertTrue(overlay["required"])
+        self.assertEqual(IDENTITY["commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
         self.assertEqual(
             overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
         )
         self.assertEqual(overlay["commit"], IDENTITY["commits"]["vllm_ascend"])
-        self.assertEqual(
-            overlay["files"],
-            [
-                "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
-                "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
-            ],
-        )
+        self.assertEqual(overlay["files"], EXPECTED_OVERLAY_FILES)
+
+    def test_overlay_consumers_allow_exact_frozen_files(self):
+        consumers = {
+            "deployment/sync-vllm-ascend-python.sh": "expected_changed",
+            "deployment/run-vllm-ascend-ut.sh": "expected_overlay_files",
+            "deployment/run-smoke-test.sh": "expected_overlay_files",
+        }
+        for path, array_name in consumers.items():
+            text = read(path)
+            match = re.search(
+                rf"^{array_name}=\(\n(?P<body>.*?)^\)$",
+                text,
+                flags=re.MULTILINE | re.DOTALL,
+            )
+            self.assertIsNotNone(match, path)
+            actual = [
+                line.strip()
+                for line in match.group("body").splitlines()
+                if line.strip()
+            ]
+            self.assertEqual(actual, EXPECTED_OVERLAY_FILES, path)
+
+    def test_overlay_sync_compares_every_host_and_pod_checksum(self):
+        sync = read("deployment/sync-vllm-ascend-python.sh")
+        self.assertIn('mkdir -p "${destination_dirs[@]}"', sync)
+        self.assertIn('sha256sum "${SOURCE_REPO}/${path}"', sync)
+        self.assertIn('sha256sum "${CONTAINER_SOURCE}/${path}"', sync)
+        self.assertIn("checksum mismatch for ${role} ${path}", sync)
 
     def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
         manifests = [

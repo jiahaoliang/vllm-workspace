@@ -88,7 +88,7 @@ Mooncake Client, JSON/JSONL evidence, Markdown reports.
 - Produces: immutable `LayerRangeRow`; `LayerRangeReqMeta.rows`; read-only legacy properties;
   request-local handling for exceptions and malformed batch results.
 
-- [ ] **Step 1: Add the row-model red tests from `fdd0713e6`, without group fields**
+- [x] **Step 1: Add the row-model red tests from `fdd0713e6`, without group fields**
 
 Add the exact WIP methods
 `test_layer_range_metadata_uses_immutable_rows_as_legacy_view_source`,
@@ -100,7 +100,7 @@ The first constructs legacy positional metadata, asserts `rows` is a tuple of fr
 `all_offsets`, and `row_req_ids` are derived copies. The latter tests require `ValueError` for
 parallel-list length mismatch and per-row buffer/size/offset mismatch.
 
-- [ ] **Step 2: Add request-local failure red tests**
+- [x] **Step 2: Add request-local failure red tests**
 
 Port the exact WIP methods `test_request_exception_does_not_stop_later_range_subgroups`,
 `test_request_failure_is_local_for_every_subgroup_and_result_shape`,
@@ -113,7 +113,7 @@ Parameterize first/middle/last request positions and `exception`, `too_short`, `
 be invalid, the layer completion event to be set, and shared metadata corruption to retain the
 existing task-level abort.
 
-- [ ] **Step 3: Run focused tests and prove the new contract is red**
+- [x] **Step 3: Run focused tests and prove the new contract is red**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
@@ -124,7 +124,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
 Expected: failures because `LayerRangeRow` and request-local exception/result-shape handling are
 not present on `d28c52958`.
 
-- [ ] **Step 4: Implement `LayerRangeRow` and the compatibility constructor**
+- [x] **Step 4: Implement `LayerRangeRow` and the compatibility constructor**
 
 ```python
 @dataclass(frozen=True)
@@ -142,7 +142,7 @@ keyword-only `rows`. Normalize legacy inputs once, reject mixed row/legacy input
 only for a single request, validate segment lengths, and expose the six old parallel fields through
 copy-producing properties. Do not add `group_id`.
 
-- [ ] **Step 5: Build rows directly and isolate subgroup failures**
+- [x] **Step 5: Build rows directly and isolate subgroup failures**
 
 `LayerBatchBuilder.build` creates `LayerRangeRow` values directly from
 `SharedBlockData.row_req_ids`, block IDs, keys, buffers, sizes, and offsets. In
@@ -151,7 +151,7 @@ each subgroup's API exception or `BatchResultShapeError`, invalidate only those 
 them from `_active_load_indices`, and continue. Negative integer results remain row-local. Keep
 `_active_load_indices` as one single-group set.
 
-- [ ] **Step 6: Run focused and compatibility tests**
+- [x] **Step 6: Run focused and compatibility tests**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
@@ -160,7 +160,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
   tests/ut/distributed/ascend_store/test_pool_worker.py
 ```
 
-- [ ] **Step 7: Run Ruff/format/compile/diff gates and commit**
+- [x] **Step 7: Run Ruff/format/compile/diff gates and commit**
 
 ```bash
 /workspace/tools/ruff check \
@@ -198,7 +198,7 @@ git commit -s -m "fix(kv_pool): isolate single-group ranged row failures"
 - Produces: `emit_range_event`, `emit_commit_event`, and `emit_whole_key_event`; correct public
   Client API documentation.
 
-- [ ] **Step 1: Add shared-emitter red tests**
+- [x] **Step 1: Add shared-emitter red tests**
 
 Port `test_range_debug.py` from `69819f6ea` with the exact tests
 `test_emitters_share_the_existing_json_event_contract`,
@@ -208,7 +208,7 @@ Port `test_range_debug.py` from `69819f6ea` with the exact tests
 
 Update backend/transfer tests to patch `range_debug.logger` rather than duplicated local helpers.
 
-- [ ] **Step 2: Run focused tests and prove the module is red**
+- [x] **Step 2: Run focused tests and prove the module is red**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
@@ -219,7 +219,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
 
 Expected: collection fails because `range_debug.py` does not exist.
 
-- [ ] **Step 3: Add the shared module and replace duplicate emitters**
+- [x] **Step 3: Add the shared module and replace duplicate emitters**
 
 Create the exact best-effort helper from `69819f6ea`:
 
@@ -240,14 +240,14 @@ def _emit(payload_factory: Callable[[], dict[str, object]]) -> None:
 Move the current range/commit payload contract out of `kv_transfer.py` and the whole-key contract
 out of `mooncake_backend.py`. Keep every field name and debug prefix unchanged.
 
-- [ ] **Step 4: Correct Client API documentation**
+- [x] **Step 4: Correct Client API documentation**
 
 Document internal `Backend.batch_get_start`/`batch_commit`/`batch_get_end` separately from Client
 `batch_get_session_start`/`batch_put_session_end`/`batch_get_session_end`. List the five
 `batch_*_session_*` control calls plus the two unchanged ranged calls. Do not add multi-group
 support claims.
 
-- [ ] **Step 5: Run focused tests and static gates**
+- [x] **Step 5: Run focused tests and static gates**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
@@ -276,7 +276,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile \
 git diff --check
 ```
 
-- [ ] **Step 6: Commit the independent audit/docs backport**
+- [x] **Step 6: Commit the independent audit/docs backport**
 
 ```bash
 git commit -s -m "refactor(kv_pool): centralize ranged audit events"
@@ -294,7 +294,7 @@ git commit -s -m "refactor(kv_pool): centralize ranged audit events"
 - Consumes: real registered NPU buffers and configured Mooncake Client.
 - Produces: opt-in save/load throughput and p50/p95 regression gate with cleanup.
 
-- [ ] **Step 1: Cherry-pick the already independent commit**
+- [x] **Step 1: Cherry-pick the already independent commit**
 
 ```bash
 git cherry-pick f97aed26f25a3427f20bdb7587b720dd6ef25bbf
@@ -302,7 +302,7 @@ git cherry-pick f97aed26f25a3427f20bdb7587b720dd6ef25bbf
 
 Expected: clean application. Preserve its existing DCO sign-off.
 
-- [ ] **Step 2: Verify collection and fail-closed configured behavior**
+- [x] **Step 2: Verify collection and fail-closed configured behavior**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest \
@@ -315,7 +315,7 @@ Expected without config: exactly one skipped test. Source inspection and tests m
 configured run fails for missing NPU, missing thresholds, transfer/session failure, data mismatch,
 threshold regression, or cleanup failure.
 
-- [ ] **Step 3: Prove no §5.8 code entered the source range**
+- [x] **Step 3: Prove no §5.8 code entered the source range**
 
 ```bash
 git diff --check d28c52958..HEAD
@@ -338,12 +338,12 @@ Expected: the prohibited-symbol search returns no matches.
 - Produces: immutable `FINAL_SOURCE_HEAD`, exact four-file package overlay, and pre-validation test
   evidence.
 
-- [ ] **Step 1: Tar-sync the clean checkout to `liangjiahao/vllm-ascend-ut`**
+- [x] **Step 1: Tar-sync the clean checkout to `liangjiahao/vllm-ascend-ut`**
 
 Record branch, HEAD, remote, and clean state before sync. Create a new `/workspace` temporary
 directory with `mktemp -d`; do not reuse serving Pods or `hostPath`.
 
-- [ ] **Step 2: Run the complete CPU/mock gate**
+- [x] **Step 2: Run the complete CPU/mock gate**
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
@@ -355,7 +355,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
 If `test_patch_group_block_failures.py` is absent on the target branch, omit that nonexistent
 target and record the exact collected scope rather than importing §5.8 patch code.
 
-- [ ] **Step 3: Run complete diff-scoped static gates**
+- [x] **Step 3: Run complete diff-scoped static gates**
 
 ```bash
 mapfile -t python_files < <(git diff --name-only d28c52958..HEAD | rg '\.py$')
@@ -366,7 +366,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile "${source_files[@]}"
 git diff --check d28c52958..HEAD
 ```
 
-- [ ] **Step 4: Verify history, DCO, overlay allowlist, and protected references**
+- [x] **Step 4: Verify history, DCO, overlay allowlist, and protected references**
 
 ```bash
 FINAL_SOURCE_HEAD=$(git rev-parse HEAD)
@@ -379,7 +379,7 @@ Require exactly four package files in the overlay allowlist, no native/build/dep
 three new signed commits, no merge commit, and unchanged
 `feature/mooncake-layerwise-kv-pool` at `b5b65d9bb`.
 
-- [ ] **Step 5: Freeze production source**
+- [x] **Step 5: Freeze production source**
 
 After this checkbox is marked complete, do not modify `repos/vllm-ascend`. A source failure during
 formal validation terminates the run with a report instead of triggering an inline source fix.
@@ -401,7 +401,7 @@ formal validation terminates the run with a report instead of triggering an inli
 - Consumes: frozen `FINAL_SOURCE_HEAD`, image source `14beaf161`, and the existing retained image.
 - Produces: one fail-closed tooling commit and a new run identity.
 
-- [ ] **Step 1: Add red identity tests for the final source and four-file allowlist**
+- [x] **Step 1: Add red identity tests for the final source and four-file allowlist**
 
 Update `test_validation_identity.py` to require the derived `FINAL_SOURCE_HEAD` everywhere current
 executable tooling expects `d28c52958`, and require exactly:
@@ -417,14 +417,14 @@ executable tooling expects `d28c52958`, and require exactly:
 
 Run the identity test before tooling edits and require failure on old SHA/two-file assumptions.
 
-- [ ] **Step 2: Update every executable identity consumer**
+- [x] **Step 2: Update every executable identity consumer**
 
 Update the identity JSON, sync helper, UT runner, smoke runner, and stress runner. Keep image commit
 `14beaf161`, vLLM `54503ecec`, Mooncake `786c77ff`, image tag, imageID, model, namespace, and all
 oracles unchanged. `sync-vllm-ascend-python.sh` must create the destination for new
 `range_debug.py` and compare all four checksums after tar synchronization.
 
-- [ ] **Step 3: Create a new UTC run tracker and evidence root**
+- [x] **Step 3: Create a new UTC run tracker and evidence root**
 
 ```bash
 UMBRELLA_RUN_ID=$(date -u +%Y%m%dT%H%M%SZ)
@@ -438,7 +438,7 @@ test ! -e "$TRACKER"
 Record the exact source/image split, four paths, test results, cluster snapshot, attempt ledger,
 failure policy, and every gate as pending.
 
-- [ ] **Step 4: Run tooling validation**
+- [x] **Step 4: Run tooling validation**
 
 Run the complete `deployment/tests` collection in the dedicated UT Pod, `bash -n` for changed
 shell scripts, Ruff/format/compile for changed Python, rendered ConfigMap checks, all manifest

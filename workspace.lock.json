@@ -21,8 +21,8 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "d28c52958a30cebdb7822d56e3dbb0dbe41499bc",
-      "purpose": "Current merge target whose exact Python source delta passed single-group full validation; section 5.8 multi-group is deferred and remains only on published WIP f97aed26f, with no WIP candidate applied to this checkout"
+      "commit": "6451f9010294913da5eedc4a73c0993d5b4a8907",
+      "purpose": "Current merge target with three reviewed single-group backports; section 5.8 multi-group remains deferred and excluded from this checkout"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

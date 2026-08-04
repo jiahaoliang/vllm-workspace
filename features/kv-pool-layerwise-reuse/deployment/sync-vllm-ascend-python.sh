@@ -2,7 +2,7 @@
 set -euo pipefail
 
 readonly BASE_COMMIT="14beaf161cca6f1e044e20529ca96c6554dbbe50"
-readonly SOURCE_COMMIT="d28c52958a30cebdb7822d56e3dbb0dbe41499bc"
+readonly SOURCE_COMMIT="6451f9010294913da5eedc4a73c0993d5b4a8907"
 readonly EXPECTED_IMAGE="docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
 readonly NAMESPACE="liangjiahao"
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -49,8 +49,10 @@ mapfile -t deleted < <(
 )
 
 expected_changed=(
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py
   vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
   vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
 )
 if [[ "${changed[*]}" != "${expected_changed[*]}" || ${#deleted[@]} -ne 0 ]]; then
   echo "Python overlay does not match the frozen ${BASE_COMMIT}..${SOURCE_COMMIT} contract" >&2
@@ -91,6 +93,12 @@ for role in prefill decode; do
     /opt/vllm-layerwise/stop-engine.sh "${role}"
 
   if (( ${#changed[@]} > 0 )); then
+    mapfile -t destination_dirs < <(
+      printf '%s\n' "${changed[@]}" | sed 's#/[^/]*$##' | \
+        sed "s#^#${CONTAINER_SOURCE}/#" | sort -u
+    )
+    kubectl exec -n "${NAMESPACE}" "${pod}" -c "${role}-engine" -- \
+      mkdir -p "${destination_dirs[@]}"
     tar -C "${SOURCE_REPO}" -cf - "${changed[@]}" | \
       kubectl exec -i -n "${NAMESPACE}" "${pod}" -c "${role}-engine" -- \
         tar -C "${CONTAINER_SOURCE}" -xf -
@@ -105,6 +113,17 @@ for role in prefill decode; do
     env PYTHONDONTWRITEBYTECODE=1 python3 -c \
       'import pathlib,sys; root=pathlib.Path(sys.argv[1]); [compile((root/path).read_text(), str(root/path), "exec") for path in sys.argv[2:]]' \
       "${CONTAINER_SOURCE}" "${changed[@]}"
+  for path in "${changed[@]}"; do
+    host_checksum=$(sha256sum "${SOURCE_REPO}/${path}" | awk '{print $1}')
+    pod_checksum=$(
+      kubectl exec -n "${NAMESPACE}" "${pod}" -c "${role}-engine" -- \
+        sha256sum "${CONTAINER_SOURCE}/${path}" | awk '{print $1}'
+    )
+    if [[ ${pod_checksum} != "${host_checksum}" ]]; then
+      echo "checksum mismatch for ${role} ${path}: host=${host_checksum} pod=${pod_checksum}" >&2
+      exit 1
+    fi
+  done
   echo "synced ${role} pod ${pod} to ${SOURCE_COMMIT}; vLLM remains stopped"
 done
 

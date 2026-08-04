@@ -335,7 +335,7 @@ record_step "namespace safety gate" "${output_dir}/namespace.txt" \
 identity_check() {
   test "$(git branch --show-current)" = kv-pool-layerwise-reuse
   test "$(git -C repos/vllm rev-parse HEAD)" = 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
-  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = d28c52958a30cebdb7822d56e3dbb0dbe41499bc
+  test "$(git -C repos/vllm-ascend rev-parse HEAD)" = 6451f9010294913da5eedc4a73c0993d5b4a8907
   test "$(git -C repos/Mooncake rev-parse HEAD)" = 786c77ff7692bed58dd99971afef87d6b690cbe3
   test -z "$(git -C repos/vllm status --porcelain)"
   test -z "$(git -C repos/vllm-ascend status --porcelain)"
@@ -351,7 +351,7 @@ record_step "control and source identity" "${output_dir}/identity.txt" identity_
 collect "control repo status" "${output_dir}/git-status.txt" git status --short --branch || { fail_run "Git status capture failed"; exit 1; }
 collect "remote feature HEAD" "${output_dir}/remote-head.txt" git ls-remote origin refs/heads/kv-pool-layerwise-reuse || { fail_run "remote HEAD capture failed"; exit 1; }
 record_step "capture workspace lock" "${output_dir}/workspace-lock-copy.log" cp "${workspace_root}/workspace.lock.json" "${output_dir}/workspace.lock.json" || { fail_run "lock capture failed"; exit 1; }
-for revision in 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 d28c52958a30cebdb7822d56e3dbb0dbe41499bc 786c77ff7692bed58dd99971afef87d6b690cbe3; do
+for revision in 54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 6451f9010294913da5eedc4a73c0993d5b4a8907 786c77ff7692bed58dd99971afef87d6b690cbe3; do
   jq -e --arg revision "${revision}" '.. | strings | select(. == $revision)' "${workspace_root}/workspace.lock.json" >/dev/null || { fail_run "workspace lock is missing ${revision}"; exit 1; }
 done
 collect "node JSON" "${output_dir}/node.json" kubectl get node -n "${namespace}" "${node_name}" -o json || { fail_run "node query failed"; exit 1; }
@@ -567,7 +567,7 @@ capture_role_log decode "${s3_host}/vllm-decode-full.log" || true
 jq -n --slurpfile topology "${output_dir}/topology/check.json" --slurpfile s1 "${s1_host}/artifacts/scenario-summary.json" \
   --slurpfile s2 "${s2_host}/artifacts/scenario-summary.json" --slurpfile s3 "${s3_host}/artifacts/scenario-summary.json" \
   --arg control_commit "$(git rev-parse HEAD)" --arg image "${image}" --arg prefill_pod "${prefill_pod}" --arg decode_pod "${decode_pod}" \
-  '{schema_version:2,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",image_vllm_ascend:"14beaf161cca6f1e044e20529ca96c6554dbbe50",vllm_ascend:"d28c52958a30cebdb7822d56e3dbb0dbe41499bc",mooncake:"786c77ff7692bed58dd99971afef87d6b690cbe3",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
+  '{schema_version:2,status:(if ($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated) then "passed" else "failed" end),validated:($topology[0].validated and $s1[0].validated and $s2[0].validated and $s3[0].validated),identity:{control_commit:$control_commit,image:$image,vllm:"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",image_vllm_ascend:"14beaf161cca6f1e044e20529ca96c6554dbbe50",vllm_ascend:"6451f9010294913da5eedc4a73c0993d5b4a8907",mooncake:"786c77ff7692bed58dd99971afef87d6b690cbe3",prefill_pod:$prefill_pod,decode_pod:$decode_pod},topology:$topology[0],scenarios:{s1_pinned_16k:$s1[0],s2_concurrent_16x8k:$s2[0],s3_concurrent_4x32k:$s3[0]},errors:[]}' \
   >"${output_dir}/overall-summary.json" || { fail_run "overall summary creation failed"; exit 1; }
 jq -e '.status == "passed" and .validated == true and .topology.validated == true and .scenarios.s1_pinned_16k.validated == true and .scenarios.s2_concurrent_16x8k.validated == true and .scenarios.s3_concurrent_4x32k.validated == true and (.errors|length)==0' \
   "${output_dir}/overall-summary.json" >/dev/null || { fail_run "overall assertion failed"; exit 1; }
