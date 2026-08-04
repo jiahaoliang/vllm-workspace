@@ -216,4 +216,18 @@ Spec 与 Standards 两轴分别记录，不跨轴重排优先级。
 - `ST3`（`f97aed26f`）不依赖 multi-group，当前 patch 对 `d28c52958` 通过
   `git apply --check`，可作为独立 cherry-pick 候选。它只新增 nightly performance gate
   和文档；真实 Mooncake/NPU benchmark 仍未运行。
-- 本决策只确定候选范围；本次未向目标 source 分支应用任何 commit 或源码修改。
+- 已按上述边界回合为目标分支上的独立 signed commits：
+  - `8d9897143`：`fdd0713e6` 的 single-group row/failure isolation；
+  - `189dcdd2c`：`69819f6ea` 的共享 ranged audit emitter 与 Client API 文档修正；
+  - `6451f9010`：`f97aed26f` 的 opt-in nightly performance gate。
+- 合回后的第二轮 Standards/Spec 复核发现 `6451f9010` 不能原样发布：测试错误要求
+  ranged data API 必须返回精确字节数，而权威 contract 允许任意非负成功码；nightly
+  环境变量没有集中注册；用户文档仍错误暗示 Mooncake multi-group 可用；immutable row
+  的兼容 property 还在 save 热路径重复物化。
+- 上述问题修复于 `d5f0ea7f8`：接受长度对齐的非负 ranged 结果并保留最终数据一致性
+  oracle；集中注册 nightly env；save 热路径直接消费 `LayerRangeRow`；明确 memcache
+  既有 multi-group 路径与当前不支持的 Mooncake multi-group 边界。该修复没有引入
+  `group_id`、group-local key/session/offset/completion 或 encoded failure。
+- 修复后 gate：nightly contract `2 passed, 1 skipped`，env `3 passed`，AscendStore + env
+  `490 passed`，Ruff/format/compile/`git diff --check` 通过。真实 Mooncake/NPU performance
+  benchmark 仍是 nightly residual gate，不得声明已通过。

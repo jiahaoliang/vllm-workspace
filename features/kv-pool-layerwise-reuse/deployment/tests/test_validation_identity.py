@@ -11,12 +11,13 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "6451f9010294913da5eedc4a73c0993d5b4a8907"
+FINAL_SOURCE_COMMIT = "d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873"
 EXPECTED_OVERLAY_FILES = [
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py",
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py",
+    "vllm_ascend/envs.py",
 ]
 
 

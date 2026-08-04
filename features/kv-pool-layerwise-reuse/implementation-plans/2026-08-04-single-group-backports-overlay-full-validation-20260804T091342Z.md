@@ -2,7 +2,7 @@
 
 ## Frozen Run Identity
 
-- Status: source frozen; validation tooling preparation in progress
+- Status: terminated after review gate; superseded by run `20260804T103209Z`
 - Umbrella run ID: `20260804T091342Z`
 - Evidence root: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260804T091342Z`
 - Control branch: `kv-pool-layerwise-reuse`
@@ -41,6 +41,12 @@ was built from `6451f9010`. The complete package overlay is exactly:
   gate.
 - After the source gate below, `repos/vllm-ascend` is frozen. A production
   failure terminates the formal run; only validation tooling may be repaired.
+- A post-freeze two-axis review found that the new nightly test rejected the
+  contractually valid ranged success code `0`, bypassed centralized env
+  registration, and left the user guide inconsistent with the explicit §5.8
+  deferral. This run therefore stopped before stress. Its runtime evidence is
+  retained as historical evidence for `6451f9010`, not reused for the corrected
+  source `d5f0ea7f8`.
 
 ## Source Gate
 
@@ -105,6 +111,7 @@ Captured before formal runtime execution on 2026-08-04 UTC:
 | source-red-1 | immutable rows | expected failure | TDD red | missing `LayerRangeRow` |
 | source-red-2 | shared emitter | expected failure | TDD red | missing `range_debug.py` |
 | tooling-red-1 | identity | expected failure | tooling drift | old SHA and two-file allowlist |
+| review-gate-1 | source/spec review | failed | test/spec defect | stopped run; corrected in `d5f0ea7f8`; full rerun required |
 
 New runtime attempts must use unique family run IDs beneath the evidence root.
 Tooling defects require a regression test and affected-family rerun. Production
