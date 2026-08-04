@@ -31,8 +31,9 @@ Mooncake Client, JSON/JSONL evidence, Markdown reports.
 - Preserve the existing single-group `LayerTransferTask` positional constructor contract,
   collaborator `GroupBatchPlan`/GVA paths, Memcache, Mooncake whole-key, Yuanrong, and MTP behavior.
 - Keep `repos/Mooncake` read-only.
-- Create three source commits: single-group row/failure backport, audit/docs backport, and the
-  performance gate cherry-pick. Every new source commit has
+- Create three source backport commits: single-group row/failure backport, audit/docs backport, and
+  the performance gate cherry-pick. Add one signed review-correction commit before source freeze
+  when the two-axis gate finds an integration defect. Every new source commit has
   `Signed-off-by: jiahaoliang <gzliangjiahao@gmail.com>`.
 - CPU/mock tests use the CPU-only `liangjiahao/vllm-ascend-ut` Pod, explicit `-n liangjiahao`, tar
   synchronization, `PYTHONDONTWRITEBYTECODE=1`, and `-p no:cacheprovider`.
@@ -40,9 +41,10 @@ Mooncake Client, JSON/JSONL evidence, Markdown reports.
   `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1`;
   do not rebuild it.
 - The overlay base remains `14beaf161cca6f1e044e20529ca96c6554dbbe50`. The final allowlist is
-  derived fail-closed after the three source commits and must contain exactly these package files:
+  derived fail-closed after the four source commits and must contain exactly these package files:
   `config_data.py`, `kv_transfer.py`, `backend/mooncake_backend.py`, and new `range_debug.py` under
-  `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/`.
+  `vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/`, plus `vllm_ascend/envs.py` for the
+  centrally registered opt-in nightly variables.
 - After the final source commit and source verification, production source is frozen. A production
   failure terminates validation with evidence; only validation scripts, manifests, checkers, and
   reports may be repaired, with focused regression tests and affected-gate reruns.
@@ -65,7 +67,8 @@ Mooncake Client, JSON/JSONL evidence, Markdown reports.
 | `tests/ut/distributed/ascend_store/test_range_debug.py` | Shared emitter gate, payload, coercion, serialization, logger isolation |
 | `tests/ut/distributed/ascend_store/test_backend.py` | Whole-key emitter integration and Backend result-shape contract |
 | `tests/e2e/nightly/single_node/kv_pool/test_mooncake_layerwise_range_performance.py` | Opt-in real NPU/Mooncake throughput and p95 gate |
-| `features/kv-pool-layerwise-reuse/deployment/validation-identity.json` | Frozen image and final four-file overlay identity |
+| `vllm_ascend/envs.py` | Central registration for the three opt-in nightly benchmark variables |
+| `features/kv-pool-layerwise-reuse/deployment/validation-identity.json` | Frozen image and final five-file overlay identity |
 | `features/kv-pool-layerwise-reuse/deployment/sync-vllm-ascend-python.sh` | Exact package overlay synchronization and checksum source |
 | `features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh` | CPU-only Pod source/allowlist gate |
 | `features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh` | Smoke source/allowlist/checksum gate |
@@ -334,8 +337,8 @@ Expected: the prohibited-symbol search returns no matches.
 - Preserve: source branch after final commit.
 
 **Interfaces:**
-- Consumes: three signed backport commits.
-- Produces: immutable `FINAL_SOURCE_HEAD`, exact four-file package overlay, and pre-validation test
+- Consumes: three signed backport commits and one signed review-correction commit.
+- Produces: immutable `FINAL_SOURCE_HEAD`, exact five-file package overlay, and pre-validation test
   evidence.
 
 - [x] **Step 1: Tar-sync the clean checkout to `liangjiahao/vllm-ascend-ut`**
@@ -375,8 +378,8 @@ git log --format='%H %s%n%b' d28c52958..HEAD
 git diff --name-only --diff-filter=ACMRT 14beaf161..HEAD -- vllm_ascend
 ```
 
-Require exactly four package files in the overlay allowlist, no native/build/dependency files,
-three new signed commits, no merge commit, and unchanged
+Require exactly five package files in the overlay allowlist, no native/build/dependency files,
+four new signed commits, no merge commit, and unchanged
 `feature/mooncake-layerwise-kv-pool` at `b5b65d9bb`.
 
 - [x] **Step 5: Freeze production source**
@@ -386,7 +389,7 @@ formal validation terminates the run with a report instead of triggering an inli
 
 ---
 
-### Task 5: Freeze Four-File Overlay Validation Tooling
+### Task 5: Freeze Five-File Overlay Validation Tooling
 
 **Files:**
 - Create: dated tracker under `features/kv-pool-layerwise-reuse/implementation-plans/`
@@ -401,7 +404,7 @@ formal validation terminates the run with a report instead of triggering an inli
 - Consumes: frozen `FINAL_SOURCE_HEAD`, image source `14beaf161`, and the existing retained image.
 - Produces: one fail-closed tooling commit and a new run identity.
 
-- [x] **Step 1: Add red identity tests for the final source and four-file allowlist**
+- [x] **Step 1: Add red identity tests for the final source and five-file allowlist**
 
 Update `test_validation_identity.py` to require the derived `FINAL_SOURCE_HEAD` everywhere current
 executable tooling expects `d28c52958`, and require exactly:
@@ -412,6 +415,7 @@ executable tooling expects `d28c52958`, and require exactly:
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
     "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py",
+    "vllm_ascend/envs.py",
 ]
 ```
 
@@ -422,7 +426,7 @@ Run the identity test before tooling edits and require failure on old SHA/two-fi
 Update the identity JSON, sync helper, UT runner, smoke runner, and stress runner. Keep image commit
 `14beaf161`, vLLM `54503ecec`, Mooncake `786c77ff`, image tag, imageID, model, namespace, and all
 oracles unchanged. `sync-vllm-ascend-python.sh` must create the destination for new
-`range_debug.py` and compare all four checksums after tar synchronization.
+`range_debug.py` and compare all five checksums after tar synchronization.
 
 - [x] **Step 3: Create a new UTC run tracker and evidence root**
 
@@ -528,7 +532,7 @@ scan, report checker, tracked local links, and offline checker replay.
 - [ ] **Step 3: Publish source normally**
 
 Before push, fetch origin and require the remote target still equals the pre-run checkpoint.
-Normally push the three source commits without force; verify `git ls-remote` equals
+Normally push the four source commits without force; verify `git ls-remote` equals
 `FINAL_SOURCE_HEAD` and left/right is `0 0`.
 
 - [ ] **Step 4: Publish evidence then reports**
@@ -539,7 +543,7 @@ commit/push reports and verify the control remote with `git ls-remote` and left/
 
 - [ ] **Step 5: Completion audit**
 
-Require all three approved changes present, prohibited §5.8 symbols absent from the source diff,
+Require all three approved WIP changes plus the review correction present, prohibited §5.8 symbols absent from the source diff,
 source and control remotes synchronized, all validation families passed, all evidence tracked and
 replayable, source/control worktrees clean except preserved user-owned untracked files, and no
 claim that the reused image was built from `FINAL_SOURCE_HEAD`.

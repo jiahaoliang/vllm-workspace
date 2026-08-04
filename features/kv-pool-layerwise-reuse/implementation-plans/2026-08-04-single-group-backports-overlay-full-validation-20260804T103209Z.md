@@ -2,7 +2,7 @@
 
 ## Frozen Run Identity
 
-- Status: tooling preparation
+- Status: runtime validation passed; evidence publication in progress
 - Umbrella run ID: `20260804T103209Z`
 - Evidence root: `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260804T103209Z`
 - Control branch: `kv-pool-layerwise-reuse`
@@ -59,29 +59,35 @@ package tree.
 
 ## Tooling Gate
 
-- [ ] Update identity, workspace lock, and all runner source pins.
-- [ ] Run focused and complete deployment tooling tests.
-- [ ] Run shell syntax, Python compile, Ruff/format, and manifest dry-runs.
-- [ ] Freeze and record the tooling commit.
+- [x] Update identity, workspace lock, and all runner source pins.
+- [x] Run focused and complete deployment tooling tests: `81 passed`.
+- [x] Run shell syntax, Python compile, Ruff/format, and manifest dry-runs.
+- [x] Freeze tooling in local control commits through `20800ac`.
 
 ## Formal Validation Gates
 
-- [ ] CPU/mock UT through the frozen control runner.
-- [ ] G0 identity/startup and empty Master.
-- [ ] G1 direct ranged contract and negative cases.
-- [ ] Lease expiry and exact fresh-session recovery.
-- [ ] G4 27-layer save/load/commit audit with zero whole-key events.
-- [ ] 1P1D smoke baseline, warmup, direct/proxy and `12/12` correlation.
-- [ ] Stress S1 `4/4`, 508 keys.
-- [ ] Stress S2 `16/16`, 288 keys.
-- [ ] Stress S3 pinned proof plus `4/4`, 348 keys.
-- [ ] Stop engines, reset Master, and prove final `0/0/0`.
+- [x] CPU/mock UT through the frozen control runner: `490 passed`.
+- [x] G0 identity/startup and empty Master; five overlay checksums exact.
+- [x] G1 direct ranged contract `43/43` and negative cases `24/24`.
+- [x] Lease expiry `-707` and exact fresh-session recovery.
+- [x] G4 27-layer save/load/commit audit with zero whole-key events.
+- [x] 1P1D smoke baseline/warmup/direct/proxy and `12/12` correlation.
+- [x] Stress S1 `4/4`, 508 keys.
+- [x] Stress S2 `16/16`, 288 keys.
+- [x] Stress S3 pinned proof plus `4/4`, 348 keys.
+- [x] Stop engines, reset Master, and prove final `0/0/0`.
 
 ## Attempts And Failures
 
 | Attempt | Family | Status | Classification | Invalidation/Fix |
 | --- | --- | --- | --- | --- |
 | prior run `20260804T091342Z` | post-freeze review | stopped | test/spec defect | corrected source; no evidence reused for this run |
+| G4 attempt 1 | debug configuration | stopped | tooling | preserved under `g4/attempt1-no-debug`; enabled required audit mode |
+| G4 attempt 2 | Python overlay | stopped | tooling | preserved under `g4/attempt2-python39-zip-strict`; removed unsupported strict zip use |
+| G4 attempt 3 | readiness | stopped | tooling | preserved under `g4/attempt3-master-metrics-readiness`; corrected Master readiness check |
+| stress attempts 1-3 | Decode startup | stopped | external hardware | physical NPU 1 repeatedly failed loading `libcpu_kernels.so` with ACL `507018`; quarantined `/dev/davinci1` in `layerwise-npu-quarantine-c` |
+| stress attempt 4 | pre-apply runner gate | stopped | tooling | runner required retained engine Pods after scale-to-zero; added clean-start support and regression coverage; complete deployment suite passed `82` tests |
+| stress final | S1-S3 | passed | runtime | `162/162` recorded steps passed; S1 `4/4`/508, S2 `16/16`/288, S3 pinned plus `4/4`/348 |
 
 ## Publication
 

@@ -124,6 +124,18 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertIn("trap 'handle_signal 130' INT", runner)
         self.assertIn("trap 'handle_signal 143' TERM", runner)
 
+    def test_stress_runner_allows_clean_start_without_retained_engine_pods(self):
+        runner = read("deployment/run-stress-test.sh")
+        self.assertIn("resolve_optional_running_pod()", runner)
+        self.assertIn(
+            "Prefill and Decode Pods must either both exist or both be absent", runner
+        )
+        self.assertIn("clean start without retained engine Pods", runner)
+        self.assertLess(
+            runner.index("prefill_pod=$(wait_running app=prefill 4)"),
+            runner.index('"${output_dir}/current-engine-image.json"'),
+        )
+
     def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
         manifests = [
             "deployment/30-mooncake-master.yaml",

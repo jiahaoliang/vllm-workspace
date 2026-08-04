@@ -51,6 +51,23 @@ resolve_running_pod() {
   printf '%s\n' "${lines[0]}"
 }
 
+resolve_optional_running_pod() {
+  local role=$1 selector=$2
+  local -a lines
+  mapfile -t lines < <(
+    kubectl get pods -n "${namespace}" -l "${selector}" -o json | jq -r '
+      .items[] |
+      select(.metadata.deletionTimestamp == null and .status.phase == "Running") |
+      .metadata.name
+    '
+  ) || return 1
+  if (( ${#lines[@]} > 1 )); then
+    echo "expected at most one non-terminating Running ${role} Pod, got: ${lines[*]}" >&2
+    return 1
+  fi
+  (( ${#lines[@]} == 0 )) || printf '%s\n' "${lines[0]}"
+}
+
 record_step() {
   local name=$1 artifact=$2
   shift 2
@@ -385,10 +402,34 @@ result={"allocatable":alloc,"used_excluding_replaced_engines":used,"available":a
 print(json.dumps(result,indent=2)); assert result["available"]>=6, result' "${output_dir}/node.json" "${output_dir}/pods-before.json" >"${output_dir}/npu-capacity.json" || { fail_run "fewer than 6 NPUs are available"; exit 1; }
 record_step "local image identity" "${output_dir}/image-inspect.json" nerdctl -n k8s.io image inspect "${image}" || { fail_run "local image unavailable"; exit 1; }
 
-prefill_pod=$(resolve_running_pod prefill app=prefill) || { fail_run "current Prefill Pod unavailable"; exit 1; }
-decode_pod=$(resolve_running_pod decode app=decode) || { fail_run "current Decode Pod unavailable"; exit 1; }
+prefill_pod=$(resolve_optional_running_pod prefill app=prefill) || { fail_run "current Prefill Pod query failed"; exit 1; }
+decode_pod=$(resolve_optional_running_pod decode app=decode) || { fail_run "current Decode Pod query failed"; exit 1; }
 proxy_pod=$(resolve_running_pod proxy app=proxy) || { fail_run "proxy Pod unavailable"; exit 1; }
 master_pod=$(resolve_running_pod master app=mooncake-master) || { fail_run "Master Pod unavailable"; exit 1; }
+if [[ -n ${prefill_pod} && -n ${decode_pod} ]]; then
+  collect "pre-replacement engine Pods" "${output_dir}/pre-replacement-engine-pods.json" kubectl get pod -n "${namespace}" \
+    "${prefill_pod}" "${decode_pod}" -o json || { fail_run "pre-replacement engine Pod capture failed"; exit 1; }
+  for role in prefill decode; do
+    pod_variable=${role}_pod
+    pod=${!pod_variable}
+    record_step "${role} pre-replacement runtime check" "${output_dir}/${role}-runtime-check-before.log" kubectl exec -n "${namespace}" "${pod}" -c "${role}-engine" -- python3 /opt/vllm-layerwise/check-runtime.py || { fail_run "${role} pre-replacement runtime check failed"; exit 1; }
+  done
+  stop_engines >"${output_dir}/stop-before-apply.log" 2>&1 || { fail_run "could not stop old engines"; exit 1; }
+elif [[ -n ${prefill_pod} || -n ${decode_pod} ]]; then
+  fail_run "Prefill and Decode Pods must either both exist or both be absent"
+  exit 1
+else
+  record_step "clean start without retained engine Pods" "${output_dir}/pre-replacement-engine-pods.json" \
+    kubectl get pods -n "${namespace}" -l 'app in (prefill,decode)' -o json \
+    || { fail_run "clean-start engine Pod capture failed"; exit 1; }
+  printf '%s\n' "no retained engine processes to stop" >"${output_dir}/stop-before-apply.log"
+fi
+record_step "apply Mooncake Master" "${output_dir}/apply-master.log" kubectl apply -n "${namespace}" -f "${script_dir}/30-mooncake-master.yaml" || { fail_run "Mooncake Master apply failed"; exit 1; }
+record_step "apply stress ConfigMap" "${output_dir}/apply-config.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/10-runtime-config.yaml" || { fail_run "stress ConfigMap apply failed"; exit 1; }
+record_step "apply stress Prefill" "${output_dir}/apply-prefill.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/40-prefill-engine.yaml" || { fail_run "stress Prefill apply failed"; exit 1; }
+record_step "apply stress Decode" "${output_dir}/apply-decode.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/50-decode-engine.yaml" || { fail_run "stress Decode apply failed"; exit 1; }
+prefill_pod=$(wait_running app=prefill 4) || { fail_run "stress Prefill Pod did not run"; exit 1; }
+decode_pod=$(wait_running app=decode 2) || { fail_run "stress Decode Pod did not run"; exit 1; }
 collect "current engine image on n1" "${output_dir}/current-engine-image.json" kubectl get pod -n "${namespace}" \
   "${prefill_pod}" "${decode_pod}" -o json || { fail_run "current engine image capture failed"; exit 1; }
 jq -e --arg image "${image}" '
@@ -400,19 +441,6 @@ jq -e --arg image "${image}" '
 ' "${output_dir}/current-engine-image.json" >/dev/null || { fail_run "image is not confirmed on n1"; exit 1; }
 record_step "model identity" "${output_dir}/model-identity.json" kubectl exec -n "${namespace}" "${prefill_pod}" -c prefill-engine -- \
   python3 -c 'import json,sys; p=sys.argv[1]; c=json.load(open(p+"/config.json")); assert c["max_position_embeddings"]>=65536; print(json.dumps({"path":p,"max_position_embeddings":c["max_position_embeddings"]}))' "${model_path}" || { fail_run "model identity gate failed"; exit 1; }
-for role in prefill decode; do
-  pod_variable=${role}_pod
-  pod=${!pod_variable}
-  record_step "${role} pre-replacement runtime check" "${output_dir}/${role}-runtime-check-before.log" kubectl exec -n "${namespace}" "${pod}" -c "${role}-engine" -- python3 /opt/vllm-layerwise/check-runtime.py || { fail_run "${role} pre-replacement runtime check failed"; exit 1; }
-done
-
-stop_engines >"${output_dir}/stop-before-apply.log" 2>&1 || { fail_run "could not stop old engines"; exit 1; }
-record_step "apply Mooncake Master" "${output_dir}/apply-master.log" kubectl apply -n "${namespace}" -f "${script_dir}/30-mooncake-master.yaml" || { fail_run "Mooncake Master apply failed"; exit 1; }
-record_step "apply stress ConfigMap" "${output_dir}/apply-config.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/10-runtime-config.yaml" || { fail_run "stress ConfigMap apply failed"; exit 1; }
-record_step "apply stress Prefill" "${output_dir}/apply-prefill.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/40-prefill-engine.yaml" || { fail_run "stress Prefill apply failed"; exit 1; }
-record_step "apply stress Decode" "${output_dir}/apply-decode.log" kubectl apply -n "${namespace}" -f "${script_dir}/stress/50-decode-engine.yaml" || { fail_run "stress Decode apply failed"; exit 1; }
-prefill_pod=$(wait_running app=prefill 4) || { fail_run "stress Prefill Pod did not run"; exit 1; }
-decode_pod=$(wait_running app=decode 2) || { fail_run "stress Decode Pod did not run"; exit 1; }
 record_step "sync vLLM-Ascend Python" "${output_dir}/source-sync.log" "${script_dir}/sync-vllm-ascend-python.sh" || { fail_run "source sync failed"; exit 1; }
 for role in prefill decode; do
   pod_variable=${role}_pod
