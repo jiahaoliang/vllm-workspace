@@ -1,0 +1,48 @@
+[2026-08-07T12:39:01Z] START capture-master-deployment
+COMMAND kubectl get deployment -n liangjiahao mooncake-master-deployment -o json
+[2026-08-07T12:39:01Z] END capture-master-deployment exit=0 artifact=master-deployment.json
+[2026-08-07T12:39:10Z] START assert-master-contract
+COMMAND jq -er --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z .metadata.namespace\ ==\ \"liangjiahao\"\ and\ .metadata.name\ ==\ \"mooncake-master-deployment\"\ and\ .spec.replicas\ ==\ 1\ and\ .spec.template.spec.containers\[0\].image\ ==\ \$image\ and\ \(\[.spec.template.spec.containers\[0\].args\[\]\]\ \|\ join\(\"\ \"\)\ \|\ contains\(\"--default_kv_lease_ttl=30s\"\)\)\ and\ \(\[.spec.template.spec.containers\[0\].env\[\]\?\ \|\ select\(.name==\"ASCEND_ENABLE_USE_FABRIC_MEM\"\)\]\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/master-deployment.json
+[2026-08-07T12:39:10Z] END assert-master-contract exit=0 artifact=master-contract.txt
+[2026-08-07T12:39:22Z] START capture-initial-master-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:39:22Z] END capture-initial-master-metrics exit=0 artifact=master-empty-before.metrics
+[2026-08-07T12:39:31Z] START assert-initial-master-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/master-empty-before.metrics
+[2026-08-07T12:39:31Z] END assert-initial-master-empty exit=0 artifact=master-empty-before-assert.log
+[2026-08-07T12:39:47Z] START run-lease-expiry
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /tmp/full-validation-direct-20260807T100722Z/lease-expiry-test.py --output /tmp/full-validation-direct-20260807T100722Z/lease-summary.json --lease-ttl-ms 30000 --wait-margin-ms 1500 --page-size 4096
+[2026-08-07T12:41:09Z] END run-lease-expiry exit=0 artifact=lease-expiry.log
+[2026-08-07T12:41:21Z] START capture-lease-summary
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- cat /tmp/full-validation-direct-20260807T100722Z/lease-summary.json
+[2026-08-07T12:41:22Z] END capture-lease-summary exit=0 artifact=summary.json
+[2026-08-07T12:41:42Z] START assert-lease-contract
+COMMAND jq -e .passed==true\ and\ .config.lease_ttl_ms==30000\ and\ .config.wait_margin_ms==1500\ and\ .config.wait_ms==31500\ and\ .semantic_result==\{\"expired_session_error_code\":-707\,\"fresh_batch_get_session_start_after_expiry_finds_object\":true\,\"old_get_session_survives_ttl\":false\,\"slow_put_completed_after_read_ttl_gap\":true\}\ and\ \(\[.cases\[\]\|select\(.name==\"between_put_layers_wait_exceeded_lease_ttl\"\)\]\[0\].actual\ \>=\ 31500\)\ and\ \(\[.cases\[\]\|select\(.name==\"between_get_layers_wait_exceeded_lease_ttl\"\)\]\[0\].actual\ \>=\ 31500\)\ and\ \(\[.cases\[\]\|select\(.name==\"read_layer_1_old_session_lease_expired\"\)\]\[0\].actual==\[-707\]\)\ and\ \(\[.cases\[\]\|select\(.name==\"fresh_batch_get_session_start_after_expiry_finds_object\"\)\]\[0\].actual==\[0\]\)\ and\ \(\[.cases\[\]\|select\(.name==\"two_layer_data_matches_after_fresh_lease\"\)\]\[0\].actual==true\)\ and\ all\(.cases\[\]\;.passed==true\)\ and\ all\(.cleanup\[\]\;.passed==true\)\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/summary.json
+[2026-08-07T12:41:42Z] END assert-lease-contract exit=0 artifact=summary-assert.log
+[2026-08-07T12:41:56Z] START capture-post-driver-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:41:56Z] END capture-post-driver-metrics exit=0 artifact=master-before-reset.metrics
+[2026-08-07T12:42:05Z] START assert-post-driver-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/master-before-reset.metrics
+[2026-08-07T12:42:05Z] END assert-post-driver-empty exit=0 artifact=master-before-reset-assert.log
+[2026-08-07T12:42:19Z] START restart-master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-07T12:42:19Z] END restart-master exit=0 artifact=post-lease-restart.log
+[2026-08-07T12:42:29Z] START wait-master
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-07T12:42:29Z] END wait-master exit=0 artifact=post-lease-rollout.log
+[2026-08-07T12:42:41Z] START capture-post-reset-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:42:41Z] END capture-post-reset-metrics exit=0 artifact=master-empty-final.metrics
+[2026-08-07T12:42:49Z] START assert-post-reset-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/master-empty-final.metrics
+[2026-08-07T12:42:49Z] END assert-post-reset-empty exit=0 artifact=master-empty-final-assert.log
+[2026-08-07T12:44:09Z] START validate-family-summary
+COMMAND jq -e .status==\"passed\"\ and\ .validated==true\ and\ .gates.live_lease_ttl_ms==30000\ and\ .gates.wait_margin_ms==1500\ and\ .gates.put_wait_elapsed_ms\>=31500\ and\ .gates.get_wait_elapsed_ms\>=31500\ and\ .gates.stale_get_result==\[-707\]\ and\ .gates.fresh_get_start_result==\[0\]\ and\ .gates.fresh_get_byte_equality==true\ and\ .gates.terminal_step_failures==0\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/family-summary.json
+[2026-08-07T12:44:09Z] END validate-family-summary exit=0 artifact=family-summary-validation.txt
+[2026-08-07T12:44:19Z] START generate-checksums
+COMMAND python3 -c import\ hashlib\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease\"\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\]
+[2026-08-07T12:44:19Z] END generate-checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T12:44:29Z] START replay-checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/lease/SHA256SUMS
+[2026-08-07T12:44:29Z] END replay-checksums exit=0 artifact=checksum-replay.log

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260807T100722Z-lease",
+  "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
+  "identity": {
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "image_config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "device": "Ascend910B4"
+  },
+  "gates": {
+    "live_lease_ttl_ms": 30000,
+    "wait_margin_ms": 1500,
+    "put_wait_elapsed_ms": 31500.12843310833,
+    "get_wait_elapsed_ms": 31500.09026285261,
+    "slow_put_crossed_ttl_and_committed": true,
+    "stale_get_result": [-707],
+    "fresh_get_start_result": [0],
+    "fresh_get_byte_equality": true,
+    "all_cases_passed": true,
+    "cleanup_passed": true,
+    "master_empty_before": true,
+    "master_empty_before_reset": true,
+    "master_empty_after_reset": true,
+    "terminal_step_failures": 0
+  },
+  "errors": []
+}

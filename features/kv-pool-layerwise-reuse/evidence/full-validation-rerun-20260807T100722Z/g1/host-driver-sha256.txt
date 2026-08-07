@@ -1,0 +1,2 @@
+042e69a69d72309ca098413b7689f7adfb3a8e15684a6902652fb2c8cec6d494  features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py
+8de8030fd0566c71aad5fd2f8f02c5d5f4eda2e9a8eeb701e6ab5296c3468875  features/kv-pool-layerwise-reuse/deployment/lease-expiry-test.py

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "g0_verified",
+  "status": "lease_verified",
   "run_id": "20260807T100722Z",
   "captured_at": "2026-08-07T10:07:22Z",
   "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
@@ -31,7 +31,7 @@
     "namespace": "liangjiahao",
     "node": "n1",
     "fabric_mem_enabled": false,
-    "status": "g0_verified"
+    "status": "lease_verified"
   },
   "completed_gates": {
     "ascend_store_tests": 495,
@@ -45,6 +45,15 @@
     "native_image_ut": true,
     "g0_base_1p1d": true,
     "g0_final_master_empty": true,
-    "direct_revoke_same_key_tooling": true
+    "direct_revoke_same_key_tooling": true,
+    "g1_direct_ranged": true,
+    "g1_case_count": 45,
+    "g1_negative_case_count": 26,
+    "g1_same_key_restart": true,
+    "g1_final_master_empty": true,
+    "lease_expiry": true,
+    "lease_expired_code": -707,
+    "lease_fresh_recovery": true,
+    "lease_final_master_empty": true
   }
 }

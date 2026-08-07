@@ -111,7 +111,7 @@
 - Consumes: frozen clean source/control identity and verified native image.
 - Produces: checked reports for direct session/range, G0, G1, lease, G4, 1P1D smoke, concurrent smoke, stress S1-S3, final empty pool, checksums, and offline replay.
 
-- [ ] Run installed-module/API and direct multi-key, multi-layer, multi-fragment byte-equality tests, including negative session and same-key PutStart after revoke.
+- [x] Run installed-module/API and direct multi-key, multi-layer, multi-fragment byte-equality tests, including negative session and same-key PutStart after revoke.
 - [ ] Run tooling, native-image CPU/mock, G0, direct G1, lease, G4, 1P1D smoke, concurrent smoke, and stress S1-S3 serially.
 - [ ] Prove per-layer scatter coverage, per-key byte results, commit ordering, marker isolation, hit correlation, whole-key zero, and final empty Master metrics.
 - [ ] Run checksum replay and all offline report checkers; stop and preserve evidence immediately on any production-source defect.

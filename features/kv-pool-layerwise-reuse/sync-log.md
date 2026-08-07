@@ -811,3 +811,17 @@
   earlier broad formatter result remains a non-contract extra check. An
   existing Ruff cache was recorded and removed before a `--no-cache` rerun.
   This direct-driver-only change does not invalidate G0; G1 had not started.
+- Direct G1 on the stopped Prefill NPU Pod passed all `45` cases, including
+  `26` negative cases and result-zero same-key restart/cleanup after revoke.
+  Eight positive ranged calls covered three keys, four layers, and two
+  fragments per key; all per-key byte results were `4096` and final source and
+  destination SHA256 matched. Master metrics were `0/0/0` both before reset
+  and after reset. The first preflight assertion incorrectly required
+  container readiness after the intentional G0 engine stop; the replacement
+  required Running Pods, `ready=false`, exact image/config ID, one physical NPU
+  request each, zero restarts, and no vLLM PID.
+- Lease validation used the live `30000ms` TTL and `1500ms` margin. The put and
+  get waits were `31500.128ms` and `31500.090ms`; slow put committed, stale
+  ranged read returned exact `-707`, and fresh get recovered exact two-layer
+  bytes. All `13` recorded execution steps were green, cleanup returned Master
+  to `0/0/0`, and the post-family reset was also empty.

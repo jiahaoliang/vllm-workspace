@@ -2,10 +2,10 @@
 
 ## Status And Scope
 
-G0_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
+LEASE_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
 same-key restart oracle, the exact native ARM64 image, native-image CPU/mock,
-and base 1P1D runtime identity gates passed. Direct ranged, lease, G4, smoke,
-stress, and throughput remain unclaimed.
+base 1P1D runtime identity, direct ranged G1, and lease expiry/recovery gates
+passed. G4, smoke, stress, and throughput remain unclaimed.
 
 ## Frozen Identity
 
@@ -44,11 +44,12 @@ stress, and throughput remain unclaimed.
 | G0 | 7 free physical cards after replacement; exact new 1+1 Pods; dynamic APIs/model/ldd; 1P1D Ready; proxy 1/1; engines stopped; final Master `0/0/0` |
 | G0 evidence | `g0/summary.json` passed; checksums replayed |
 | G1 oracle correction | TDD red/green; `negative_revoke_same_key_restart` and cleanup require `[0]`; `tooling-revoke-restart/summary.json` and checksums passed. G0 unaffected; G1 had not started |
+| Direct G1 | `45/45` cases and `26/26` negative cases; 3 keys, 4 layers, 2 fragments; same-key restart/cleanup `[0]`; per-key result bytes and final SHA256 equality; Master `0/0/0` before cleanup reset and after reset |
+| Lease | live TTL `30000ms`; waits `31500.128ms` and `31500.090ms`; stale ranged read `[-707]`; fresh get exact two-layer recovery; Master `0/0/0` before and after reset |
 
 ## Pending Gates
 
-- Run installed-module and direct session/range byte-equality tests.
-- Run G1, lease, G4, smoke, concurrent smoke, and stress S1-S3 serially.
+- Run G4, smoke, concurrent smoke, and stress S1-S3 serially.
 - Assert final empty Master metrics, generate checksums, replay offline reports,
   stop vLLM processes, and publish final reports/state.
 

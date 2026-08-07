@@ -1,9 +1,9 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: G0_VERIFIED. Source/tooling, the exact native ARM64 image, native-image
-CPU/mock gates, and base 1P1D runtime identity are verified. This directory
-does not yet claim direct ranged, lease, G4, smoke, stress, or throughput
-success.
+Status: LEASE_VERIFIED. Source/tooling, the exact native ARM64 image,
+native-image CPU/mock, base 1P1D runtime identity, direct ranged G1, and lease
+expiry/recovery are verified. This directory does not yet claim G4, smoke,
+stress, or throughput success.
 
 ## Frozen Inputs
 
@@ -42,6 +42,14 @@ success.
   TDD red/green, the complete `84`-test deployment suite, Ruff lint,
   `py_compile`, cache-free tar sync, host/Pod SHA256 equality, and checksum
   replay passed. This direct-driver-only correction does not invalidate G0.
+- `g1/family-summary.json`: `45/45` cases passed, including `26/26` negative
+  cases and result-zero same-key restart/cleanup after revoke. Eight positive
+  ranged calls covered three keys, four layers, and two fragments per key;
+  per-key bytes and final SHA256 equality passed. Master stayed `0/0/0` before
+  and after reset.
+- `lease/family-summary.json`: both waits exceeded the live 30 second TTL by
+  the frozen 1.5 second margin, stale ranged read returned exact `-707`, fresh
+  get recovered both layers, and Master stayed `0/0/0` before and after reset.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

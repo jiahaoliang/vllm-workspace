@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260807T100722Z-g1",
+  "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
+  "identity": {
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "image_config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "device": "Ascend910B4"
+  },
+  "gates": {
+    "engine_pods_running_and_stopped": true,
+    "engine_restart_counts_zero": true,
+    "physical_npu_requests_each": 1,
+    "host_pod_driver_sha256_match": true,
+    "num_keys": 3,
+    "num_layers": 4,
+    "fragments_per_key_layer": 2,
+    "case_count": 45,
+    "negative_case_count": 26,
+    "positive_ranged_call_count": 8,
+    "positive_result_bytes_per_key": 4096,
+    "same_key_restart_result": [0],
+    "same_key_cleanup_result": [0],
+    "source_destination_sha256_equal": true,
+    "all_cases_passed": true,
+    "cleanup_passed": true,
+    "master_empty_before": true,
+    "master_empty_before_reset": true,
+    "master_empty_after_reset": true
+  },
+  "superseded_steps": [
+    {
+      "step": "assert-engine-pod-identity",
+      "exit_code": 1,
+      "classification": "preflight incorrectly required container readiness after the intentional G0 engine stop",
+      "replacement": "assert-stopped-engine-pod-identity plus explicit Prefill and Decode PID absence",
+      "replacement_passed": true
+    }
+  ],
+  "errors": []
+}

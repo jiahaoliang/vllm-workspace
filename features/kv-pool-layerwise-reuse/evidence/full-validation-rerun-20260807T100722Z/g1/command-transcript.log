@@ -1,0 +1,72 @@
+[2026-08-07T12:33:18Z] START capture-pods
+COMMAND kubectl get pods -n liangjiahao -o json
+[2026-08-07T12:33:18Z] END capture-pods exit=0 artifact=pods-before.json
+[2026-08-07T12:33:37Z] START assert-engine-pod-identity
+COMMAND jq -er --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z --arg config sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b \[.items\[\]\ \|\ select\(.metadata.deletionTimestamp\ ==\ null\ and\ \(.metadata.labels.app\ ==\ \"prefill\"\ or\ .metadata.labels.app\ ==\ \"decode\"\)\)\]\ as\ \$p\ \|\ \(\$p\ \|\ length\)\ ==\ 2\ and\ all\(\$p\[\]\;\ .status.phase\ ==\ \"Running\"\ and\ .spec.nodeName\ ==\ \"n1\"\ and\ \(.spec.containers\ \|\ length\)\ ==\ 1\ and\ .spec.containers\[0\].image\ ==\ \$image\ and\ .status.containerStatuses\[0\].imageID\ ==\ \$config\ and\ .status.containerStatuses\[0\].ready\ ==\ true\ and\ .status.containerStatuses\[0\].restartCount\ ==\ 0\ and\ .spec.containers\[0\].resources.requests\[\"huawei.com/Ascend910\"\]\ ==\ \"1\"\ and\ .spec.containers\[0\].resources.limits\[\"huawei.com/Ascend910\"\]\ ==\ \"1\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/pods-before.json
+[2026-08-07T12:33:37Z] END assert-engine-pod-identity exit=1 artifact=pod-identity.txt
+[2026-08-07T12:34:03Z] START assert-stopped-engine-pod-identity
+COMMAND jq -er --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z --arg config sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b \[.items\[\]\ \|\ select\(.metadata.deletionTimestamp\ ==\ null\ and\ \(.metadata.labels.app\ ==\ \"prefill\"\ or\ .metadata.labels.app\ ==\ \"decode\"\)\)\]\ as\ \$p\ \|\ \(\$p\ \|\ length\)\ ==\ 2\ and\ all\(\$p\[\]\;\ .status.phase\ ==\ \"Running\"\ and\ .spec.nodeName\ ==\ \"n1\"\ and\ \(.spec.containers\ \|\ length\)\ ==\ 1\ and\ .spec.containers\[0\].image\ ==\ \$image\ and\ .status.containerStatuses\[0\].imageID\ ==\ \$config\ and\ .status.containerStatuses\[0\].ready\ ==\ false\ and\ .status.containerStatuses\[0\].restartCount\ ==\ 0\ and\ .spec.containers\[0\].resources.requests\[\"huawei.com/Ascend910\"\]\ ==\ \"1\"\ and\ .spec.containers\[0\].resources.limits\[\"huawei.com/Ascend910\"\]\ ==\ \"1\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/pods-before.json
+[2026-08-07T12:34:03Z] END assert-stopped-engine-pod-identity exit=0 artifact=pod-identity-r2.txt
+[2026-08-07T12:34:31Z] START assert-prefill-stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-prefill.pid\;\ \!\ pgrep\ -f\ \"\[v\]llm.entrypoints.openai.api_server\"
+[2026-08-07T12:34:31Z] END assert-prefill-stopped exit=0 artifact=prefill-stopped.log
+[2026-08-07T12:34:43Z] START assert-decode-stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-598b59d746-fmbpp -c decode-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-decode.pid\;\ \!\ pgrep\ -f\ \"\[v\]llm.entrypoints.openai.api_server\"
+[2026-08-07T12:34:43Z] END assert-decode-stopped exit=0 artifact=decode-stopped.log
+[2026-08-07T12:34:55Z] START capture-initial-master-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:34:55Z] END capture-initial-master-metrics exit=0 artifact=master-empty-before.metrics
+[2026-08-07T12:35:04Z] START assert-initial-master-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/master-empty-before.metrics
+[2026-08-07T12:35:04Z] END assert-initial-master-empty exit=0 artifact=master-empty-before-assert.log
+[2026-08-07T12:35:18Z] START create-remote-driver-directory
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- mkdir -p /tmp/full-validation-direct-20260807T100722Z
+[2026-08-07T12:35:18Z] END create-remote-driver-directory exit=0 artifact=remote-mkdir.log
+[2026-08-07T12:35:30Z] START sync-direct-drivers
+COMMAND bash -lc tar\ -C\ features/kv-pool-layerwise-reuse/deployment\ -cf\ -\ range-api-smoke.py\ lease-expiry-test.py\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ prefill-engine-deployment-868546d9f5-g56hb\ -c\ prefill-engine\ --\ tar\ -C\ /tmp/full-validation-direct-20260807T100722Z\ -xf\ -
+[2026-08-07T12:35:32Z] END sync-direct-drivers exit=0 artifact=sync-drivers.log
+[2026-08-07T12:35:38Z] START hash-host-direct-drivers
+COMMAND sha256sum features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/lease-expiry-test.py
+[2026-08-07T12:35:38Z] END hash-host-direct-drivers exit=0 artifact=host-driver-sha256.txt
+[2026-08-07T12:35:52Z] START hash-pod-direct-drivers
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- sha256sum /tmp/full-validation-direct-20260807T100722Z/range-api-smoke.py /tmp/full-validation-direct-20260807T100722Z/lease-expiry-test.py
+[2026-08-07T12:35:52Z] END hash-pod-direct-drivers exit=0 artifact=pod-driver-sha256.txt
+[2026-08-07T12:36:00Z] START compare-driver-checksums
+COMMAND python3 -c from\ pathlib\ import\ Path\;\ r=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1\"\)\;\ h=\[x.split\(\)\[0\]\ for\ x\ in\ \(r/\"host-driver-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ p=\[x.split\(\)\[0\]\ for\ x\ in\ \(r/\"pod-driver-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ assert\ h==p\,\(h\,p\)\;\ print\(\"host_pod_driver_sha256_match=true\"\)
+[2026-08-07T12:36:00Z] END compare-driver-checksums exit=0 artifact=driver-checksum-compare.txt
+[2026-08-07T12:36:16Z] START run-direct-ranged-api
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 python3 /tmp/full-validation-direct-20260807T100722Z/range-api-smoke.py --output /tmp/full-validation-direct-20260807T100722Z/g1-summary.json --num-keys 3 --num-layers 4 --page-size 4096 --run-negative
+[2026-08-07T12:36:34Z] END run-direct-ranged-api exit=0 artifact=range-api-smoke.log
+[2026-08-07T12:36:45Z] START capture-direct-summary
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- cat /tmp/full-validation-direct-20260807T100722Z/g1-summary.json
+[2026-08-07T12:36:45Z] END capture-direct-summary exit=0 artifact=summary.json
+[2026-08-07T12:37:14Z] START assert-direct-contract
+COMMAND jq -e .passed\ ==\ true\ and\ .config\ ==\ \{\"num_keys\":3\,\"num_layers\":4\,\"object_size\":16384\,\"page_size\":4096\,\"run_negative\":true\,\"total_size\":49152\}\ and\ \(.cases\|length\)\ ==\ 45\ and\ \(\[.cases\[\]\|select\(.name\|startswith\(\"negative\"\)\)\]\|length\)\ ==\ 26\ and\ all\(.cases\[\]\;.passed\ ==\ true\)\ and\ \(\[.cases\[\]\|select\(.name==\"negative_revoke_same_key_restart\"\)\]\|length\)==1\ and\ \(\[.cases\[\]\|select\(.name==\"negative_revoke_same_key_restart\"\)\]\[0\].actual\ ==\ \[0\]\)\ and\ \(\[.cases\[\]\|select\(.name==\"negative_revoke_same_key_cleanup\"\)\]\|length\)==1\ and\ \(\[.cases\[\]\|select\(.name==\"negative_revoke_same_key_cleanup\"\)\]\[0\].actual\ ==\ \[0\]\)\ and\ .source_checksum\ ==\ .destination_checksum_after\ and\ \(\[.api_calls\[\]\|select\(.phase==\"positive\"\ and\ \(.operation\|contains\(\"multi_buffer_ranges\"\)\)\)\]\|length\)==8\ and\ all\(.api_calls\[\]\|select\(.phase==\"positive\"\ and\ \(.operation\|contains\(\"multi_buffer_ranges\"\)\)\)\;\ \(.keys\|length\)==3\ and\ \(.sizes\|length\)==3\ and\ all\(.sizes\[\]\;length==2\)\ and\ .result==\[4096\,4096\,4096\]\)\ and\ any\(.api_calls\[\]\|select\(.phase==\"positive\"\ and\ \(.operation\|contains\(\"multi_buffer_ranges\"\)\)\)\;\ any\(.object_offsets\[\]\[\]\;.\>0\)\)\ and\ \(\[\"batch_put_session_start\"\,\"batch_put_from_multi_buffer_ranges\"\,\"batch_put_session_end\"\,\"batch_put_session_revoke\"\,\"batch_get_session_start\"\,\"batch_get_into_multi_buffer_ranges\"\,\"batch_get_session_end\"\]\ -\ \[.api_calls\[\].operation\]\ \|\ length\)==0\ and\ all\(.cleanup\[\]\;.passed==true\)\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/summary.json
+[2026-08-07T12:37:14Z] END assert-direct-contract exit=0 artifact=summary-assert.log
+[2026-08-07T12:37:29Z] START capture-post-driver-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:37:29Z] END capture-post-driver-metrics exit=0 artifact=master-before-reset.metrics
+[2026-08-07T12:37:47Z] START assert-post-driver-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/master-before-reset.metrics
+[2026-08-07T12:37:47Z] END assert-post-driver-empty exit=0 artifact=master-before-reset-assert.log
+[2026-08-07T12:38:02Z] START restart-master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-07T12:38:02Z] END restart-master exit=0 artifact=post-g1-restart.log
+[2026-08-07T12:38:13Z] START wait-master
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-07T12:38:13Z] END wait-master exit=0 artifact=post-g1-rollout.log
+[2026-08-07T12:38:26Z] START capture-post-reset-metrics
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\"http://mooncake-master-service:9003/metrics\"\,timeout=10\).read\(\).decode\(\)\,end=\"\"\)
+[2026-08-07T12:38:27Z] END capture-post-reset-metrics exit=0 artifact=master-empty-final.metrics
+[2026-08-07T12:38:40Z] START assert-post-reset-empty
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/master-empty-final.metrics
+[2026-08-07T12:38:40Z] END assert-post-reset-empty exit=0 artifact=master-empty-final-assert.log
+[2026-08-07T12:43:45Z] START validate-family-summary
+COMMAND jq -e .status==\"passed\"\ and\ .validated==true\ and\ .gates.case_count==45\ and\ .gates.negative_case_count==26\ and\ .gates.same_key_restart_result==\[0\]\ and\ .gates.same_key_cleanup_result==\[0\]\ and\ .gates.master_empty_after_reset==true\ and\ \(.superseded_steps\|length\)==1\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/family-summary.json
+[2026-08-07T12:43:45Z] END validate-family-summary exit=0 artifact=family-summary-validation.txt
+[2026-08-07T12:43:54Z] START generate-checksums
+COMMAND python3 -c import\ hashlib\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1\"\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\]
+[2026-08-07T12:43:54Z] END generate-checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T12:44:01Z] START replay-checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/g1/SHA256SUMS
+[2026-08-07T12:44:01Z] END replay-checksums exit=0 artifact=checksum-replay.log
