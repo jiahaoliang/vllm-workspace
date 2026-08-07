@@ -84,7 +84,7 @@
 - [x] Update lock, Dockerfile pins, manifests, runners, checker tests, and validation identity to the final source SHAs and one provenance-bearing image tag.
 - [x] Set `python_overlay.required` to false and remove old overlay execution from the formal path.
 - [x] Create a UTC run ID, tracker, evidence identity, and source/tooling checksums.
-- [ ] Commit and push the frozen control/tooling state before image/full validation.
+- [x] Commit and push the frozen control/tooling state before image/full validation.
 
 ### Task 5: Native ARM64 Image
 
@@ -96,10 +96,10 @@
 **Interfaces:**
 - Produces: a `linux/arm64` image whose labels and in-image Git HEADs match all three frozen SHAs.
 
-- [ ] Verify `/root/buildkitd.yaml` SHA256 is `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52`, then apply and wait for `default/buildkitd`.
-- [ ] Record Pod imageID, security context, node architecture, and native ARM64 BuildKit worker.
-- [ ] Build through `BUILDKIT_HOST=kube-pod://buildkitd?namespace=default` and containerd namespace `k8s.io` with all three exact commit build args.
-- [ ] Verify platform, manifest digest, config ID, labels, in-image Git HEADs, native modules, dependency checks, and seven Mooncake APIs.
+- [x] Verify `/root/buildkitd.yaml` SHA256 is `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52`, then apply and wait for `default/buildkitd`.
+- [x] Record Pod imageID, security context, node architecture, and native ARM64 BuildKit worker.
+- [x] Build through `BUILDKIT_HOST=kube-pod://buildkitd?namespace=default` and containerd namespace `k8s.io` with all three exact commit build args.
+- [x] Verify platform, manifest digest, config ID, labels, in-image Git HEADs, native modules, dependency checks, and seven Mooncake APIs.
 
 ### Task 6: Full Validation And Final Publication
 

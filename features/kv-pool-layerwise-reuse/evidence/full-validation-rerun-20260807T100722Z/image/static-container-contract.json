@@ -1,0 +1,1 @@
+time="2026-08-07T19:36:45+08:00" level=fatal msg="failed to verify networking settings: failed to create default network: needs CNI plugin \"bridge\" to be installed in CNI_PATH (\"/opt/cni/bin\"), see https://github.com/containernetworking/plugins/releases: exec: \"/opt/cni/bin/bridge\": stat /opt/cni/bin/bridge: no such file or directory"

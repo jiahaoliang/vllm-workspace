@@ -1,0 +1,1 @@
+f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52  /root/buildkitd.yaml

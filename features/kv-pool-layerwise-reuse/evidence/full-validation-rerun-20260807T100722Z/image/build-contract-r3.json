@@ -1,0 +1,12 @@
+{
+  "validated": true,
+  "normalized_line_endings": true,
+  "required_markers": [
+    "Successfully built vllm_ascend",
+    "pip check reported only frozen known compatibility issues",
+    "vllm-ascend=0.1.dev1+g45b2e785b",
+    "mooncake-store=/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store.cpython-312-aarch64-linux-gnu.so",
+    "Loaded image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
+  ],
+  "unexpected_runtime_lines": []
+}

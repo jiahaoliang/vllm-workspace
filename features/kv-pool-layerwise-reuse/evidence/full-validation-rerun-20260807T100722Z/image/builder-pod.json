@@ -1,0 +1,247 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cni.projectcalico.org/containerID": "c7b646168c02f469c27543cc639069e00f3b4028368cf10246776d4180948d37",
+            "cni.projectcalico.org/podIP": "10.250.202.48/32",
+            "cni.projectcalico.org/podIPs": "10.250.202.48/32",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"name\":\"buildkitd\",\"namespace\":\"default\"},\"spec\":{\"containers\":[{\"image\":\"moby/buildkit:master\",\"livenessProbe\":{\"exec\":{\"command\":[\"buildctl\",\"debug\",\"workers\"]},\"initialDelaySeconds\":5,\"periodSeconds\":30},\"name\":\"buildkitd\",\"readinessProbe\":{\"exec\":{\"command\":[\"buildctl\",\"debug\",\"workers\"]},\"initialDelaySeconds\":5,\"periodSeconds\":30},\"resources\":{\"requests\":{\"cpu\":\"5\",\"memory\":\"512Mi\"}},\"securityContext\":{\"privileged\":true}}]}}\n"
+        },
+        "creationTimestamp": "2026-08-07T10:19:05Z",
+        "generation": 1,
+        "name": "buildkitd",
+        "namespace": "default",
+        "resourceVersion": "32626570",
+        "uid": "f47979ce-f70d-4d6f-a1b9-b0154d68424d"
+    },
+    "spec": {
+        "containers": [
+            {
+                "image": "moby/buildkit:master",
+                "imagePullPolicy": "IfNotPresent",
+                "livenessProbe": {
+                    "exec": {
+                        "command": [
+                            "buildctl",
+                            "debug",
+                            "workers"
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 30,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "name": "buildkitd",
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "buildctl",
+                            "debug",
+                            "workers"
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 30,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "resources": {
+                    "requests": {
+                        "cpu": "5",
+                        "memory": "512Mi"
+                    }
+                },
+                "securityContext": {
+                    "privileged": true
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-cxhf4",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "nodeName": "m1",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 30,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            }
+        ],
+        "volumes": [
+            {
+                "name": "kube-api-access-cxhf4",
+                "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ],
+                                "name": "kube-root-ca.crt"
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        },
+                                        "path": "namespace"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T10:19:06Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T10:19:05Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T10:19:38Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T10:19:38Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T10:19:05Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "5",
+                    "memory": "512Mi"
+                },
+                "containerID": "containerd://7fa67894966e76d20306903776ca5d72ccedcf0bca6199e0bdb5a7fbaca54041",
+                "image": "docker.io/moby/buildkit:master",
+                "imageID": "docker.io/moby/buildkit@sha256:12ca7ceca05fad7e41c9a5541a40998a6292f25b8c43e7cfc24e938823d4f47e",
+                "lastState": {},
+                "name": "buildkitd",
+                "ready": true,
+                "resources": {
+                    "requests": {
+                        "cpu": "5",
+                        "memory": "512Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-08-07T10:19:06Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 0,
+                        "supplementalGroups": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            6,
+                            10,
+                            11,
+                            20,
+                            26,
+                            27
+                        ],
+                        "uid": 0
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-cxhf4",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.200.25",
+        "hostIPs": [
+            {
+                "ip": "192.168.200.25"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.250.202.48",
+        "podIPs": [
+            {
+                "ip": "10.250.202.48"
+            }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-08-07T10:19:05Z"
+    }
+}

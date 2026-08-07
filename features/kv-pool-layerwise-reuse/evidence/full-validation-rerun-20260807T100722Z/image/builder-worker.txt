@@ -1,0 +1,2 @@
+ID				PLATFORMS
+wyj641zmytcmd2gpmkr94pbok	linux/arm64

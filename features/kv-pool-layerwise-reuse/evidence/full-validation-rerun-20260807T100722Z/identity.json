@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "source_and_tooling_frozen",
+  "status": "native_image_verified",
   "run_id": "20260807T100722Z",
   "captured_at": "2026-08-07T10:07:22Z",
   "tooling_commit": "4b5e49900a9ea3cd50344cb053747dc9e5a5b07b",
@@ -12,12 +12,20 @@
   "image": {
     "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
     "platform": "linux/arm64",
-    "status": "pending",
+    "manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "size_bytes": 19103703040,
+    "status": "verified",
     "python_overlay_required": false
   },
   "buildkit": {
     "namespace": "default",
-    "manifest_sha256": "f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52"
+    "manifest_sha256": "f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52",
+    "pod": "buildkitd",
+    "node": "m1",
+    "node_uid": "715f7775-52c0-4461-aba3-15031159ef09",
+    "platform": "linux/arm64",
+    "image_id": "docker.io/moby/buildkit@sha256:12ca7ceca05fad7e41c9a5541a40998a6292f25b8c43e7cfc24e938823d4f47e"
   },
   "runtime": {
     "namespace": "liangjiahao",
@@ -29,6 +37,8 @@
     "ascend_store_tests": 495,
     "deployment_tests": 83,
     "source_static": true,
-    "tooling_static": true
+    "tooling_static": true,
+    "native_image": true,
+    "image_static_session_apis": 7
   }
 }

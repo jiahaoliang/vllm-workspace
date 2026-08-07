@@ -1,0 +1,13 @@
+{
+  "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+  "labels": {
+    "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "org.opencontainers.image.vllm-ascend.commit": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "org.opencontainers.image.vllm.compatibility-lane": "main-verified"
+  },
+  "manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+  "normalized_json": true,
+  "platform": "linux/arm64",
+  "validated": true
+}

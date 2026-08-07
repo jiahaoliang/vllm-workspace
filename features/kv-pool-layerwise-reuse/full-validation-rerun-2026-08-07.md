@@ -2,9 +2,9 @@
 
 ## Status And Scope
 
-SOURCE_AND_TOOLING_FROZEN. vLLM-Ascend ownership tests and deployment tooling
-gates passed. The native ARM64 image and A2 full validation have not run at this
-checkpoint, so this document does not yet claim image, NPU, smoke, stress, or
+NATIVE_IMAGE_VERIFIED. vLLM-Ascend ownership tests, deployment tooling, and the
+exact native ARM64 image passed. A2 runtime families have not run at this
+checkpoint, so this document does not yet claim NPU, smoke, stress, or
 throughput success.
 
 ## Frozen Identity
@@ -18,6 +18,9 @@ throughput success.
 | Mooncake | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
 | Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z` |
 | Platform | `linux/arm64` |
+| Manifest digest | `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351` |
+| Config ID | `sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b` |
+| BuildKit node | `m1`; Ready native ARM64 worker |
 | Runtime namespace | `liangjiahao` |
 | BuildKit namespace | `default` |
 | Python overlay | disabled; image source equals final source |
@@ -34,10 +37,11 @@ throughput success.
 | Deployment tooling | `83 passed`; Ruff, shell, JSON, diff checks passed |
 | Mooncake checkout | clean read-only detached `df3f74ed...` |
 | BuildKit manifest | SHA256 `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52` |
+| Native image | build exit `0`; OCI labels, three Git HEADs, native modules, exact pip allowlist, and seven static Mooncake APIs passed |
+| Image evidence | `image/summary.json` passed; checksums replayed |
 
 ## Pending Gates
 
-- Restore and inspect `default/buildkitd`, then build and verify the native image.
 - Run installed-module and direct session/range byte-equality tests.
 - Run native-image CPU/mock, G0, G1, lease, G4, smoke, concurrent smoke, and
   stress S1-S3 serially.
@@ -48,5 +52,5 @@ throughput success.
 
 The run evidence root is
 `features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/`.
-Its current identity is a pre-runtime freeze; subsequent evidence must preserve
-this run ID and exact source/tooling identity.
+Subsequent evidence must preserve this run ID, exact source/tooling identity,
+and immutable image digest/config ID.

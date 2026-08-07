@@ -767,3 +767,17 @@
 - Created validation run `20260807T100722Z`. At this checkpoint only source and
   tooling are frozen; native image construction and A2 full validation remain
   pending and are not yet claimed.
+- Built the frozen native image with exit `0`. Containerd records manifest
+  `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351`
+  and config
+  `sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b`
+  for `linux/arm64`; OCI labels and in-image Git HEADs match all three frozen
+  commits. The dependency allowlist, Mooncake native module and seven static
+  APIs, and vLLM-Ascend native modules passed.
+- The live `default/buildkitd` Pod was Ready, privileged, restart-free, and
+  scheduled on ARM64 node `m1` with the recorded BuildKit image digest. Corrected
+  the earlier `builder_node: n1` metadata before any UT or A2 runtime family;
+  runtime workloads remain pinned to `n1`. The image evidence preserves two
+  superseded validation-command failures: an over-broad log match and missing
+  host CNI bridge for default `nerdctl run`; exact regex and `--net=none`
+  replacements passed.

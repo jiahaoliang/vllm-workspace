@@ -53,7 +53,7 @@
   "kubernetes": {
     "context": "bke-cluster-admin@bke-cluster",
     "node": "n1",
-    "builder_node": "n1",
+    "builder_node": "m1",
     "builder_platform": "linux/arm64"
   },
   "session_apis": [

@@ -1,0 +1,67 @@
+{
+  "builder": {
+    "image_id": "docker.io/moby/buildkit@sha256:12ca7ceca05fad7e41c9a5541a40998a6292f25b8c43e7cfc24e938823d4f47e",
+    "namespace": "default",
+    "node": "m1",
+    "node_uid": "715f7775-52c0-4461-aba3-15031159ef09",
+    "platform": "linux/arm64",
+    "pod": "buildkitd"
+  },
+  "errors": [],
+  "gates": {
+    "build_exit_zero": true,
+    "build_pip_allowlist": true,
+    "builder_privileged": true,
+    "builder_ready": true,
+    "builder_restarts": 0,
+    "mooncake_native_path": true,
+    "native_arm64_builder": true,
+    "oci_labels": true,
+    "source_heads": true,
+    "static_session_api_symbols": 7,
+    "vllm_ascend_native_extensions": 8
+  },
+  "image": {
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "platform": "linux/arm64",
+    "size_bytes": 19103703040
+  },
+  "limitations": [
+    "dynamic torch_npu and Mooncake imports are deferred to an NPU Pod",
+    "Mooncake is source-built by CMake and has no wheel distribution metadata"
+  ],
+  "packages": {
+    "torch": "2.10.0+cpu",
+    "torch-npu": "2.10.0.post2",
+    "triton-ascend": "3.2.1",
+    "vllm": "0.1.dev1+g54503ecec.empty",
+    "vllm-ascend": "0.1.dev1+g45b2e785b"
+  },
+  "run_id": "20260807T100722Z-image",
+  "schema_version": 1,
+  "source_commits": {
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781"
+  },
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "classification": "over-broad negative match included Dockerfile source text",
+      "exit_code": 1,
+      "replacement": "assert build transcript contract r2",
+      "replacement_passed": true,
+      "step": "assert build transcript contract"
+    },
+    {
+      "classification": "host CNI bridge plugin absent for default container network",
+      "exit_code": 1,
+      "replacement": "verify in-image static contract r2 with --net=none",
+      "replacement_passed": true,
+      "step": "verify in-image static contract"
+    }
+  ],
+  "validated": true
+}

@@ -1,0 +1,2 @@
+REPOSITORY     TAG                                                                      DIGEST                                                                     IMAGE ID        CREATED               PLATFORM       SIZE      BLOB SIZE
+vllm-ascend    kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z    sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351    411c381c0802    About a minute ago    linux/arm64    19.1GB    6.76GB

@@ -1,7 +1,8 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: SOURCE_AND_TOOLING_FROZEN. This directory does not yet contain a native
-image or A2 runtime success claim.
+Status: NATIVE_IMAGE_VERIFIED. Source/tooling and the exact native ARM64 image
+are verified. This directory does not yet claim A2 runtime, smoke, stress, or
+throughput success.
 
 ## Frozen Inputs
 
@@ -14,6 +15,18 @@ image or A2 runtime success claim.
 - Runtime namespace `liangjiahao`; BuildKit namespace `default`
 - Python overlay disabled; FabricMem disabled and out of scope
 
-The structured pre-runtime identity is in `identity.json`; frozen source and
-tooling file hashes are in `source-tooling-sha256.txt`. Runtime evidence and
-its checksums will be added only after the corresponding gates execute.
+## Completed Runtime Artifacts
+
+- `image/summary.json`: manifest
+  `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351`,
+  config
+  `sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b`,
+  native `linux/arm64`, exact source labels/HEADs, native modules, dependency
+  allowlist, and seven static Mooncake session/range APIs.
+- The actual BuildKit Pod ran on ARM64 node `m1`. The earlier frozen
+  `builder_node: n1` value was a metadata error and was corrected before any
+  UT or A2 runtime family. Runtime workloads remain pinned to `n1`.
+
+The structured run identity is in `identity.json`; frozen source and tooling
+file hashes are in `source-tooling-sha256.txt`. Each completed family records
+its own transcript, structured summary, and checksums.
