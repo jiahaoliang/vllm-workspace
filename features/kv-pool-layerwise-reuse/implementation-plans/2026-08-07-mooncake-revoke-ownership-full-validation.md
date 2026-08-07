@@ -83,7 +83,7 @@
 - [x] Detach `repos/Mooncake` at `df3f74ed8ebdb0c935554beea6299a9f11c723e2`; do not create or modify a Mooncake branch.
 - [x] Update lock, Dockerfile pins, manifests, runners, checker tests, and validation identity to the final source SHAs and one provenance-bearing image tag.
 - [x] Set `python_overlay.required` to false and remove old overlay execution from the formal path.
-- [ ] Create a UTC run ID, tracker, evidence identity, and source/tooling checksums.
+- [x] Create a UTC run ID, tracker, evidence identity, and source/tooling checksums.
 - [ ] Commit and push the frozen control/tooling state before image/full validation.
 
 ### Task 5: Native ARM64 Image

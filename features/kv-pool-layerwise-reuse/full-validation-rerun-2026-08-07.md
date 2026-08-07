@@ -1,0 +1,52 @@
+# Mooncake Revoke Ownership Full Validation 2026-08-07
+
+## Status And Scope
+
+SOURCE_AND_TOOLING_FROZEN. vLLM-Ascend ownership tests and deployment tooling
+gates passed. The native ARM64 image and A2 full validation have not run at this
+checkpoint, so this document does not yet claim image, NPU, smoke, stress, or
+throughput success.
+
+## Frozen Identity
+
+| Item | Value |
+| --- | --- |
+| Run ID | `20260807T100722Z` |
+| Tooling base | `4b5e49900a9ea3cd50344cb053747dc9e5a5b07b` |
+| vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
+| vLLM-Ascend | `45b2e785b10ca4604cd6314819ed15f3ff674781` |
+| Mooncake | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z` |
+| Platform | `linux/arm64` |
+| Runtime namespace | `liangjiahao` |
+| BuildKit namespace | `default` |
+| Python overlay | disabled; image source equals final source |
+| FabricMem | disabled and outside this run |
+
+## Completed Gates
+
+| Gate | Result |
+| --- | --- |
+| Source TDD red | `10 failed, 33 passed` for the expected missing behavior |
+| Source focused green | `43 passed` before the stale-retry audit addition |
+| Source full gate | `495 passed`; Ruff, `py_compile`, `git diff --check` passed |
+| Source publication | local/origin `45b2e785b...`; left/right `0 0` |
+| Deployment tooling | `83 passed`; Ruff, shell, JSON, diff checks passed |
+| Mooncake checkout | clean read-only detached `df3f74ed...` |
+| BuildKit manifest | SHA256 `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52` |
+
+## Pending Gates
+
+- Restore and inspect `default/buildkitd`, then build and verify the native image.
+- Run installed-module and direct session/range byte-equality tests.
+- Run native-image CPU/mock, G0, G1, lease, G4, smoke, concurrent smoke, and
+  stress S1-S3 serially.
+- Assert final empty Master metrics, generate checksums, replay offline reports,
+  stop vLLM processes, and publish final reports/state.
+
+## Evidence
+
+The run evidence root is
+`features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/`.
+Its current identity is a pre-runtime freeze; subsequent evidence must preserve
+this run ID and exact source/tooling identity.

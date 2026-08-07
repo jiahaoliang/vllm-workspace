@@ -745,3 +745,25 @@
   feature check incorrectly treated nested README files as feature roots; it
   was corrected to the PowerShell script's direct-child enumeration and rerun
   without any repository file change.
+
+## 2026-08-07
+
+- Froze the rewritten Mooncake collaborator implementation at read-only detached
+  `df3f74ed8ebdb0c935554beea6299a9f11c723e2`. The seven session/range API names
+  remain unchanged; failed revoke now intentionally retains the local session.
+- Added vLLM-Ascend ownership state for failed cleanup in DCO commit
+  `45b2e785b10ca4604cd6314819ed15f3ff674781`. `_put_started_keys` contains only
+  writable sessions, `_put_revoke_pending_keys` fails closed, cleanup retries
+  only failed keys up to three attempts, and commit/revoke release tracker state
+  only for result-zero keys.
+- TDD red reproduced ten missing ownership/retry behaviors. The final tar-synced
+  CPU-only `liangjiahao/vllm-ascend-ut` gate passed `495` AscendStore tests;
+  `/workspace/tools/ruff`, `py_compile`, and `git diff --check` passed. The source
+  commit was normally pushed and local/origin left-right is `0 0`.
+- Tooling freeze `4b5e49900a9ea3cd50344cb053747dc9e5a5b07b` pins native image tag
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z`,
+  removes the formal Python overlay path, and marks FabricMem disabled/out of
+  scope. Deployment tests passed `83`; shell, JSON, Ruff, and diff checks passed.
+- Created validation run `20260807T100722Z`. At this checkpoint only source and
+  tooling are frozen; native image construction and A2 full validation remain
+  pending and are not yet claimed.

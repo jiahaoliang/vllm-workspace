@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "source_and_tooling_frozen",
+  "run_id": "20260807T100722Z",
+  "captured_at": "2026-08-07T10:07:22Z",
+  "tooling_commit": "4b5e49900a9ea3cd50344cb053747dc9e5a5b07b",
+  "source": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "image": {
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "platform": "linux/arm64",
+    "status": "pending",
+    "python_overlay_required": false
+  },
+  "buildkit": {
+    "namespace": "default",
+    "manifest_sha256": "f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52"
+  },
+  "runtime": {
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "fabric_mem_enabled": false,
+    "status": "pending"
+  },
+  "completed_gates": {
+    "ascend_store_tests": 495,
+    "deployment_tests": 83,
+    "source_static": true,
+    "tooling_static": true
+  }
+}
