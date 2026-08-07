@@ -1,8 +1,8 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: NATIVE_IMAGE_VERIFIED. Source/tooling and the exact native ARM64 image
-are verified. This directory does not yet claim A2 runtime, smoke, stress, or
-throughput success.
+Status: NATIVE_IMAGE_AND_UT_VERIFIED. Source/tooling, the exact native ARM64
+image, and native-image CPU/mock gates are verified. This directory does not
+yet claim A2 runtime, smoke, stress, or throughput success.
 
 ## Frozen Inputs
 
@@ -26,6 +26,11 @@ throughput success.
 - The actual BuildKit Pod ran on ARM64 node `m1`. The earlier frozen
   `builder_node: n1` value was a metadata error and was corrected before any
   UT or A2 runtime family. Runtime workloads remain pinned to `n1`.
+- `ut/summary.json`: recreated CPU-only `liangjiahao/vllm-ascend-ut` at config
+  `sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b`;
+  tar-synced clean source passed `495` AscendStore tests, cache-free control
+  sync passed `83` deployment tests, and Ruff lint, `py_compile`, source diff,
+  package/native-path, and cache-pollution gates passed.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

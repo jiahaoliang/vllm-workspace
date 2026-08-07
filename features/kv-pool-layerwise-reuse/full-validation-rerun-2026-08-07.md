@@ -2,10 +2,10 @@
 
 ## Status And Scope
 
-NATIVE_IMAGE_VERIFIED. vLLM-Ascend ownership tests, deployment tooling, and the
-exact native ARM64 image passed. A2 runtime families have not run at this
-checkpoint, so this document does not yet claim NPU, smoke, stress, or
-throughput success.
+NATIVE_IMAGE_AND_UT_VERIFIED. vLLM-Ascend ownership tests, deployment tooling,
+the exact native ARM64 image, and native-image CPU/mock gates passed. A2 runtime
+families have not run at this checkpoint, so this document does not yet claim
+NPU, smoke, stress, or throughput success.
 
 ## Frozen Identity
 
@@ -39,12 +39,13 @@ throughput success.
 | BuildKit manifest | SHA256 `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52` |
 | Native image | build exit `0`; OCI labels, three Git HEADs, native modules, exact pip allowlist, and seven static Mooncake APIs passed |
 | Image evidence | `image/summary.json` passed; checksums replayed |
+| Native-image UT | new CPU-only Pod/config ID; `495` AscendStore and `83` deployment tests; Ruff lint, `py_compile`, diff, cache-free sync passed |
+| UT evidence | `ut/summary.json` passed; checksums replayed; long-running Pod retained |
 
 ## Pending Gates
 
 - Run installed-module and direct session/range byte-equality tests.
-- Run native-image CPU/mock, G0, G1, lease, G4, smoke, concurrent smoke, and
-  stress S1-S3 serially.
+- Run G0, G1, lease, G4, smoke, concurrent smoke, and stress S1-S3 serially.
 - Assert final empty Master metrics, generate checksums, replay offline reports,
   stop vLLM processes, and publish final reports/state.
 

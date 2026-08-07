@@ -1,0 +1,90 @@
+[2026-08-07T11:43:35Z] START capture kube context
+COMMAND kubectl config current-context -n liangjiahao
+[2026-08-07T11:43:35Z] END capture kube context exit=0 artifact=kube-context.txt
+[2026-08-07T11:43:39Z] START capture current UT Pod
+COMMAND kubectl get pod -n liangjiahao vllm-ascend-ut -o json
+[2026-08-07T11:43:39Z] END capture current UT Pod exit=0 artifact=pod-before.json
+[2026-08-07T11:44:17Z] START assert scoped UT replacement safety
+COMMAND python3 -c import\ json\,sys\;\ p=json.load\(open\(sys.argv\[1\]\)\)\;\ ctx=open\(sys.argv\[2\]\).read\(\).strip\(\)\;\ assert\ ctx==\"bke-cluster-admin@bke-cluster\"\,ctx\;\ assert\ p\[\"metadata\"\]\[\"namespace\"\]==\"liangjiahao\"\ and\ p\[\"metadata\"\]\[\"name\"\]==\"vllm-ascend-ut\"\;\ c=p\[\"spec\"\]\[\"containers\"\]\[0\]\;\ assert\ \"huawei.com/Ascend910\"\ not\ in\ c.get\(\"resources\"\,\{\}\).get\(\"requests\"\,\{\}\)\ and\ \"huawei.com/Ascend910\"\ not\ in\ c.get\(\"resources\"\,\{\}\).get\(\"limits\"\,\{\}\)\;\ assert\ all\(\"hostPath\"\ not\ in\ v\ for\ v\ in\ p\[\"spec\"\]\[\"volumes\"\]\)\;\ print\(\"context=\"+ctx+\"\ namespace=liangjiahao\ target=vllm-ascend-ut\ cpu_only=true\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut/pod-before.json features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut/kube-context.txt
+[2026-08-07T11:44:18Z] END assert scoped UT replacement safety exit=0 artifact=replacement-safety.txt
+[2026-08-07T11:44:22Z] START delete old UT Pod
+COMMAND kubectl delete pod -n liangjiahao vllm-ascend-ut --wait=true
+[2026-08-07T11:44:37Z] END delete old UT Pod exit=0 artifact=delete-old-pod.log
+[2026-08-07T11:44:42Z] START apply native UT Pod
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/60-vllm-ascend-ut-pod.yaml
+[2026-08-07T11:44:43Z] END apply native UT Pod exit=0 artifact=apply-pod.log
+[2026-08-07T11:44:49Z] START wait native UT Pod running
+COMMAND kubectl wait -n liangjiahao --for=jsonpath=\{.status.phase\}=Running pod/vllm-ascend-ut --timeout=300s
+[2026-08-07T11:44:49Z] END wait native UT Pod running exit=0 artifact=wait-running.log
+[2026-08-07T11:44:52Z] START capture native UT Pod
+COMMAND kubectl get pod -n liangjiahao vllm-ascend-ut -o json
+[2026-08-07T11:44:53Z] END capture native UT Pod exit=0 artifact=pod-after.json
+[2026-08-07T11:45:48Z] START run native-image AscendStore suite
+COMMAND env PYTHONDONTWRITEBYTECODE=1 features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- python3 -m pytest -q -p no:cacheprovider tests/ut/distributed/ascend_store
+[2026-08-07T11:46:20Z] END run native-image AscendStore suite exit=0 artifact=ascend-store.log
+[2026-08-07T11:48:09Z] START assert native UT Pod contract
+COMMAND python3 -c import\ json\,sys\;\ a=json.load\(open\(sys.argv\[1\]\)\)\;\ b=json.load\(open\(sys.argv\[2\]\)\)\;\ c=b\[\"spec\"\]\[\"containers\"\]\[0\]\;\ assert\ a\[\"metadata\"\]\[\"uid\"\]\!=b\[\"metadata\"\]\[\"uid\"\]\;\ assert\ b\[\"status\"\]\[\"phase\"\]==\"Running\"\ and\ b\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"ready\"\]\ is\ True\ and\ b\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"restartCount\"\]==0\;\ assert\ c\[\"image\"\]==\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z\"\ and\ b\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"imageID\"\]==\"sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b\"\;\ assert\ \"huawei.com/Ascend910\"\ not\ in\ c.get\(\"resources\"\,\{\}\).get\(\"requests\"\,\{\}\)\ and\ \"huawei.com/Ascend910\"\ not\ in\ c.get\(\"resources\"\,\{\}\).get\(\"limits\"\,\{\}\)\;\ assert\ all\(\"hostPath\"\ not\ in\ v\ for\ v\ in\ b\[\"spec\"\]\[\"volumes\"\]\)\;\ assert\ b\[\"spec\"\]\[\"automountServiceAccountToken\"\]\ is\ False\;\ print\(\"native_ut_pod_contract=true\"\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut/pod-before.json features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut/pod-after.json
+[2026-08-07T11:48:09Z] END assert native UT Pod contract exit=0 artifact=pod-contract.txt
+[2026-08-07T11:48:14Z] START create isolated control workspace
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir /workspace/control-validation-20260807T100722Z
+[2026-08-07T11:48:14Z] END create isolated control workspace exit=0 artifact=create-control-workspace.log
+[2026-08-07T11:48:18Z] START tar-sync control tooling
+COMMAND bash -lc tar\ -C\ /root/ljh/vllm-workspace\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-validation-20260807T100722Z\ -xf\ -
+[2026-08-07T11:48:19Z] END tar-sync control tooling exit=0 artifact=sync-control.log
+[2026-08-07T11:48:23Z] START create UT tool directory
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir -p /workspace/tools
+[2026-08-07T11:48:24Z] END create UT tool directory exit=0 artifact=create-tools.log
+[2026-08-07T11:48:30Z] START tar-sync ARM64 Ruff
+COMMAND bash -lc tar\ -C\ /tmp/vllm-ascend-ruff-0.14.0/bin\ -cf\ -\ ruff\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/tools\ -xf\ -
+[2026-08-07T11:48:31Z] END tar-sync ARM64 Ruff exit=0 artifact=sync-ruff.log
+[2026-08-07T11:48:57Z] START record Ruff version
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff --version
+[2026-08-07T11:48:57Z] END record Ruff version exit=0 artifact=ruff-version.txt
+[2026-08-07T11:49:02Z] START run deployment tooling tests
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS=-p\ no:cacheprovider python3 -m pytest -q -p no:cacheprovider /workspace/control-validation-20260807T100722Z/features/kv-pool-layerwise-reuse/deployment/tests
+[2026-08-07T11:49:04Z] END run deployment tooling tests exit=0 artifact=deployment-tests.log
+[2026-08-07T11:49:09Z] START run changed-file Ruff lint
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff check /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py /workspace/vllm-ascend/tests/ut/distributed/ascend_store/test_kv_transfer.py /workspace/vllm-ascend/tests/ut/distributed/ascend_store/test_pool_worker.py
+[2026-08-07T11:49:10Z] END run changed-file Ruff lint exit=0 artifact=ruff-check.log
+[2026-08-07T11:49:14Z] START run changed-file Ruff format
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff format --check /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py /workspace/vllm-ascend/tests/ut/distributed/ascend_store/test_kv_transfer.py /workspace/vllm-ascend/tests/ut/distributed/ascend_store/test_pool_worker.py
+[2026-08-07T11:49:14Z] END run changed-file Ruff format exit=1 artifact=ruff-format.log
+[2026-08-07T11:49:18Z] START compile production Python
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/pycompile-20260807T100722Z python3 -m py_compile /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py /workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+[2026-08-07T11:49:19Z] END compile production Python exit=0 artifact=py-compile.log
+[2026-08-07T11:50:11Z] START run source git diff check
+COMMAND git -C repos/vllm-ascend diff --check
+[2026-08-07T11:50:11Z] END run source git diff check exit=0 artifact=source-diff-check.log
+[2026-08-07T11:50:15Z] START capture synced source identity
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- cat /workspace/vllm-ascend/.workspace-source
+[2026-08-07T11:50:15Z] END capture synced source identity exit=0 artifact=workspace-source.txt
+[2026-08-07T11:50:20Z] START assert no source cache pollution
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ roots=\(Path\(\"/workspace/vllm-ascend\"\)\,Path\(\"/workspace/control-validation-20260807T100722Z\"\)\)\;\ bad=\[\]\;\ \[bad.extend\(str\(p\)\ for\ p\ in\ root.rglob\(\"\*\"\)\ if\ p.name==\"__pycache__\"\ or\ p.suffix==\".pyc\"\ or\ p.name==\".pytest_cache\"\)\ for\ root\ in\ roots\]\;\ assert\ not\ bad\,bad\;\ print\(\"source_cache_artifacts=0\"\)
+[2026-08-07T11:50:20Z] END assert no source cache pollution exit=1 artifact=source-cache-check.txt
+[2026-08-07T11:50:27Z] START verify native image package metadata
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c import\ glob\,importlib.metadata\ as\ m\,json\,subprocess\;\ repos=\{\"vllm\":\"/vllm-workspace/vllm\"\,\"vllm_ascend\":\"/vllm-workspace/vllm-ascend\"\,\"mooncake\":\"/vllm-workspace/Mooncake\"\}\;\ heads=\{k:subprocess.check_output\(\[\"git\"\,\"-C\"\,v\,\"rev-parse\"\,\"HEAD\"\]\,text=True\).strip\(\)\ for\ k\,v\ in\ repos.items\(\)\}\;\ expected=\{\"vllm\":\"54503ecec0f3ac31e5ecfc5f28652e4cc42307b5\"\,\"vllm_ascend\":\"45b2e785b10ca4604cd6314819ed15f3ff674781\"\,\"mooncake\":\"df3f74ed8ebdb0c935554beea6299a9f11c723e2\"\}\;\ assert\ heads==expected\,\(heads\,expected\)\;\ packages=\{name:m.version\(name\)\ for\ name\ in\ \(\"vllm\"\,\"vllm-ascend\"\,\"torch\"\,\"torch-npu\"\,\"triton-ascend\"\)\}\;\ native=glob.glob\(\"/vllm-workspace/vllm-ascend/vllm_ascend/\*\*/\*.so\"\,recursive=True\)\;\ stores=glob.glob\(\"/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store\*.so\"\)\;\ assert\ native\ and\ len\(stores\)==1\;\ print\(json.dumps\(\{\"heads\":heads\,\"packages\":packages\,\"native_modules\":native\,\"mooncake_store\":stores\[0\]\}\,indent=2\,sort_keys=True\)\)
+[2026-08-07T11:50:27Z] END verify native image package metadata exit=0 artifact=package-metadata.json
+[2026-08-07T11:50:32Z] START clean isolated pycompile cache
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- rm -rf /tmp/pycompile-20260807T100722Z
+[2026-08-07T11:50:32Z] END clean isolated pycompile cache exit=0 artifact=pycompile-cleanup.log
+[2026-08-07T11:51:21Z] START create corrected control workspace
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir /workspace/control-validation-20260807T100722Z-r2
+[2026-08-07T11:51:21Z] END create corrected control workspace exit=0 artifact=create-control-workspace-r2.log
+[2026-08-07T11:51:27Z] START tar-sync control tooling without caches
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ --exclude=\"\*/.pytest_cache\"\ -C\ /root/ljh/vllm-workspace\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-validation-20260807T100722Z-r2\ -xf\ -
+[2026-08-07T11:51:28Z] END tar-sync control tooling without caches exit=0 artifact=sync-control-r2.log
+[2026-08-07T11:51:34Z] START run corrected deployment tooling tests
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS=-p\ no:cacheprovider python3 -m pytest -q -p no:cacheprovider /workspace/control-validation-20260807T100722Z-r2/features/kv-pool-layerwise-reuse/deployment/tests
+[2026-08-07T11:51:36Z] END run corrected deployment tooling tests exit=0 artifact=deployment-tests-r2.log
+[2026-08-07T11:51:40Z] START assert corrected sync has no source caches
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ roots=\(Path\(\"/workspace/vllm-ascend\"\)\,Path\(\"/workspace/control-validation-20260807T100722Z-r2\"\)\)\;\ bad=\[\]\;\ \[bad.extend\(str\(p\)\ for\ p\ in\ root.rglob\(\"\*\"\)\ if\ p.name==\"__pycache__\"\ or\ p.suffix==\".pyc\"\ or\ p.name==\".pytest_cache\"\)\ for\ root\ in\ roots\]\;\ assert\ not\ bad\,bad\;\ print\(\"source_cache_artifacts=0\"\)
+[2026-08-07T11:51:41Z] END assert corrected sync has no source caches exit=0 artifact=source-cache-check-r2.txt
+[2026-08-07T11:52:18Z] START generate UT summary
+COMMAND python3 -c import\ json\,re\,sys\;\ from\ pathlib\ import\ Path\;\ root=Path\(sys.argv\[1\]\)\;\ steps=\[json.loads\(x\)\ for\ x\ in\ \(root/\"steps.jsonl\"\).read_text\(\).splitlines\(\)\]\;\ failures=\[s\ for\ s\ in\ steps\ if\ s\[\"exit_code\"\]\!=0\]\;\ assert\ \[s\[\"name\"\]\ for\ s\ in\ failures\]==\[\"run\ changed-file\ Ruff\ format\"\,\"assert\ no\ source\ cache\ pollution\"\]\,failures\;\ ascend=\(root/\"ascend-store.log\"\).read_text\(\)\;\ deploy=\(root/\"deployment-tests-r2.log\"\).read_text\(\)\;\ assert\ \"495\ passed\"\ in\ ascend\ and\ \"83\ passed\"\ in\ deploy\;\ pod=json.loads\(\(root/\"pod-after.json\"\).read_text\(\)\)\;\ pkg=json.loads\(\(root/\"package-metadata.json\"\).read_text\(\)\)\;\ out=\{\"schema_version\":1\,\"status\":\"passed\"\,\"validated\":True\,\"run_id\":\"20260807T100722Z-ut\"\,\"source_commit\":\"45b2e785b10ca4604cd6314819ed15f3ff674781\"\,\"image\":\{\"name\":pod\[\"spec\"\]\[\"containers\"\]\[0\]\[\"image\"\]\,\"config_id\":pod\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"imageID\"\]\}\,\"pod\":\{\"namespace\":\"liangjiahao\"\,\"name\":\"vllm-ascend-ut\"\,\"uid\":pod\[\"metadata\"\]\[\"uid\"\]\,\"node\":pod\[\"spec\"\]\[\"nodeName\"\]\,\"ready\":pod\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"ready\"\]\,\"restart_count\":pod\[\"status\"\]\[\"containerStatuses\"\]\[0\]\[\"restartCount\"\]\,\"cpu_only\":True\,\"host_path\":False\,\"retained\":True\}\,\"packages\":pkg\[\"packages\"\]\,\"gates\":\{\"ascend_store_tests\":495\,\"deployment_tests\":83\,\"ruff_lint\":True\,\"py_compile\":True\,\"git_diff_check\":True\,\"cache_free_sync\":True\,\"source_clean\":True\,\"source_tar_synced\":True\,\"native_module_count\":len\(pkg\[\"native_modules\"\]\)\,\"mooncake_native_path\":True\}\,\"superseded_steps\":\[\{\"step\":\"run\ changed-file\ Ruff\ format\"\,\"exit_code\":1\,\"classification\":\"non-contract\ extra\ formatter\ check\;\ required\ Ruff\ lint\ gate\ passed\"\,\"replacement\":\"run\ changed-file\ Ruff\ lint\"\,\"replacement_passed\":True\}\,\{\"step\":\"assert\ no\ source\ cache\ pollution\"\,\"exit_code\":1\,\"classification\":\"first\ control\ tar\ copied\ pre-existing\ host\ bytecode\"\,\"replacement\":\"cache-excluding\ control\ tar\ sync\ r2\ plus\ 83-test\ rerun\ and\ zero-cache\ assertion\"\,\"replacement_passed\":True\}\]\,\"errors\":\[\]\}\;\ print\(json.dumps\(out\,indent=2\,sort_keys=True\)\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut
+[2026-08-07T11:52:18Z] END generate UT summary exit=0 artifact=summary.json
+[2026-08-07T11:52:18Z] START generate UT checksums
+COMMAND python3 -c import\ hashlib\,sys\;\ from\ pathlib\ import\ Path\;\ root=Path\(sys.argv\[1\]\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\] features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut
+[2026-08-07T11:52:18Z] END generate UT checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T11:52:19Z] START replay UT checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/ut/SHA256SUMS
+[2026-08-07T11:52:19Z] END replay UT checksums exit=0 artifact=checksum-replay.log

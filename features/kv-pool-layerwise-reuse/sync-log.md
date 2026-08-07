@@ -781,3 +781,14 @@
   superseded validation-command failures: an over-broad log match and missing
   host CNI bridge for default `nerdctl run`; exact regex and `--net=none`
   replacements passed.
+- Recreated only `liangjiahao/vllm-ascend-ut` from the native image. The new Pod
+  UID uses config ID
+  `sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b`,
+  is Ready/restart-free, and has no NPU resource, driver/model/hostPath mount,
+  or service-account token. Tar-synced clean source passed `495` AscendStore
+  tests; a corrected cache-excluding control sync passed `83` deployment tests.
+  Ruff lint, isolated `py_compile`, source `git diff --check`, exact package/Git
+  metadata, and zero source cache pollution passed. The evidence retains a
+  non-contract Ruff formatter result and the first cache-copying tar attempt as
+  superseded execution checks; neither changed source or weakened a required
+  gate.

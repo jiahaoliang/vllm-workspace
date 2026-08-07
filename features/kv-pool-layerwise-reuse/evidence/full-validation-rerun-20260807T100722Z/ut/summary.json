@@ -1,0 +1,58 @@
+{
+  "errors": [],
+  "gates": {
+    "ascend_store_tests": 495,
+    "cache_free_sync": true,
+    "deployment_tests": 83,
+    "git_diff_check": true,
+    "mooncake_native_path": true,
+    "native_module_count": 8,
+    "py_compile": true,
+    "ruff_lint": true,
+    "source_clean": true,
+    "source_tar_synced": true
+  },
+  "image": {
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
+  },
+  "packages": {
+    "torch": "2.10.0+cpu",
+    "torch-npu": "2.10.0.post2",
+    "triton-ascend": "3.2.1",
+    "vllm": "0.1.dev1+g54503ecec.empty",
+    "vllm-ascend": "0.1.dev1+g45b2e785b"
+  },
+  "pod": {
+    "cpu_only": true,
+    "host_path": false,
+    "name": "vllm-ascend-ut",
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "ready": true,
+    "restart_count": 0,
+    "retained": true,
+    "uid": "96ebc23a-e62e-46f5-8428-9438bd8a93a7"
+  },
+  "run_id": "20260807T100722Z-ut",
+  "schema_version": 1,
+  "source_commit": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "classification": "non-contract extra formatter check; required Ruff lint gate passed",
+      "exit_code": 1,
+      "replacement": "run changed-file Ruff lint",
+      "replacement_passed": true,
+      "step": "run changed-file Ruff format"
+    },
+    {
+      "classification": "first control tar copied pre-existing host bytecode",
+      "exit_code": 1,
+      "replacement": "cache-excluding control tar sync r2 plus 83-test rerun and zero-cache assertion",
+      "replacement_passed": true,
+      "step": "assert no source cache pollution"
+    }
+  ],
+  "validated": true
+}

@@ -1,0 +1,5 @@
+head=45b2e785b10ca4604cd6314819ed15f3ff674781
+branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+dirty=false
+synced_at=2026-08-07T11:45:50Z
+image_source_head=45b2e785b10ca4604cd6314819ed15f3ff674781

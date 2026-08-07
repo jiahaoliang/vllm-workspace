@@ -1,0 +1,1 @@
+context=bke-cluster-admin@bke-cluster namespace=liangjiahao target=vllm-ascend-ut cpu_only=true
