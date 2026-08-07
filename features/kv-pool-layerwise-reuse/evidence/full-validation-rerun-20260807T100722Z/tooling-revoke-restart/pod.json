@@ -1,0 +1,209 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cni.projectcalico.org/containerID": "a9f3a182b6b7cf17c3a46311b4b1fd10a90cb137d4c795b18a0df78381759c65",
+            "cni.projectcalico.org/podIP": "10.250.40.133/32",
+            "cni.projectcalico.org/podIPs": "10.250.40.133/32",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"vllm-ascend-ut\",\"purpose\":\"unit-test\"},\"name\":\"vllm-ascend-ut\",\"namespace\":\"liangjiahao\"},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"args\":[\"exec sleep infinity\"],\"command\":[\"/bin/bash\",\"-lc\"],\"env\":[{\"name\":\"TORCH_DEVICE_BACKEND_AUTOLOAD\",\"value\":\"0\"},{\"name\":\"PYTHONDONTWRITEBYTECODE\",\"value\":\"1\"},{\"name\":\"PYTEST_ADDOPTS\",\"value\":\"-p no:cacheprovider\"},{\"name\":\"PYTHONUNBUFFERED\",\"value\":\"1\"}],\"image\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z\",\"imagePullPolicy\":\"Never\",\"name\":\"ut\",\"resources\":{\"limits\":{\"cpu\":\"16\",\"memory\":\"32Gi\"},\"requests\":{\"cpu\":\"1\",\"memory\":\"4Gi\"}},\"volumeMounts\":[{\"mountPath\":\"/workspace\",\"name\":\"workspace\"}]}],\"enableServiceLinks\":false,\"nodeName\":\"n1\",\"restartPolicy\":\"Always\",\"terminationGracePeriodSeconds\":10,\"volumes\":[{\"emptyDir\":{\"sizeLimit\":\"8Gi\"},\"name\":\"workspace\"}]}}\n"
+        },
+        "creationTimestamp": "2026-08-07T11:44:43Z",
+        "generation": 1,
+        "labels": {
+            "app": "vllm-ascend-ut",
+            "purpose": "unit-test"
+        },
+        "name": "vllm-ascend-ut",
+        "namespace": "liangjiahao",
+        "resourceVersion": "32673897",
+        "uid": "96ebc23a-e62e-46f5-8428-9438bd8a93a7"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "exec sleep infinity"
+                ],
+                "command": [
+                    "/bin/bash",
+                    "-lc"
+                ],
+                "env": [
+                    {
+                        "name": "TORCH_DEVICE_BACKEND_AUTOLOAD",
+                        "value": "0"
+                    },
+                    {
+                        "name": "PYTHONDONTWRITEBYTECODE",
+                        "value": "1"
+                    },
+                    {
+                        "name": "PYTEST_ADDOPTS",
+                        "value": "-p no:cacheprovider"
+                    },
+                    {
+                        "name": "PYTHONUNBUFFERED",
+                        "value": "1"
+                    }
+                ],
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+                "imagePullPolicy": "Never",
+                "name": "ut",
+                "resources": {
+                    "limits": {
+                        "cpu": "16",
+                        "memory": "32Gi"
+                    },
+                    "requests": {
+                        "cpu": "1",
+                        "memory": "4Gi"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/workspace",
+                        "name": "workspace"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "nodeName": "n1",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 10,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            }
+        ],
+        "volumes": [
+            {
+                "emptyDir": {
+                    "sizeLimit": "8Gi"
+                },
+                "name": "workspace"
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T11:44:44Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T11:44:43Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T11:44:44Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T11:44:44Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-07T11:44:43Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "1",
+                    "memory": "4Gi"
+                },
+                "containerID": "containerd://c01c56e32ce4d52370e00d0c492b8824df94aa61864fe0d28b7f13a25c31e77b",
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+                "imageID": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+                "lastState": {},
+                "name": "ut",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "cpu": "16",
+                        "memory": "32Gi"
+                    },
+                    "requests": {
+                        "cpu": "1",
+                        "memory": "4Gi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-08-07T11:44:44Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 0,
+                        "supplementalGroups": [
+                            0
+                        ],
+                        "uid": 0
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/workspace",
+                        "name": "workspace"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.200.27",
+        "hostIPs": [
+            {
+                "ip": "192.168.200.27"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.250.40.133",
+        "podIPs": [
+            {
+                "ip": "10.250.40.133"
+            }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-08-07T11:44:43Z"
+    }
+}

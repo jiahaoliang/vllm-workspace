@@ -905,6 +905,22 @@ class SmokeRunner:
             lambda value: value < 0,
             "one negative code",
         )
+        restart = self._start_put(
+            revoke_key,
+            [object_size],
+            "negative_revoke_restart",
+        )
+        self._record_case(
+            "negative_revoke_same_key_restart",
+            restart == [0],
+            expected=[0],
+            actual=restart,
+        )
+        self._revoke_put(
+            revoke_key,
+            "negative_revoke_restart",
+            "negative_revoke_same_key_cleanup",
+        )
 
     def cleanup(self) -> bool:
         passed = True

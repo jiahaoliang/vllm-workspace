@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260807T100722Z-tooling-revoke-restart",
+  "scope": "direct ranged revoke same-key restart hard gate",
+  "source": {
+    "control_base": "358710e",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "pod": {
+    "namespace": "liangjiahao",
+    "name": "vllm-ascend-ut",
+    "uid": "96ebc23a-e62e-46f5-8428-9438bd8a93a7",
+    "node": "n1",
+    "ready": true,
+    "restart_count": 0,
+    "cpu_only": true,
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+  },
+  "gates": {
+    "tdd_red_missing_case": true,
+    "focused_green_tests": 1,
+    "range_driver_tests": 6,
+    "deployment_tests": 84,
+    "same_key_restart_result_zero": true,
+    "same_key_cleanup_result_zero": true,
+    "ruff_lint": true,
+    "py_compile": true,
+    "git_diff_check": true,
+    "cache_free_sync": true,
+    "host_pod_tooling_sha256_match": true
+  },
+  "invalidation": {
+    "g0": false,
+    "reason": "The correction changes only the direct ranged negative oracle; G1 had not started."
+  },
+  "superseded_steps": [
+    {
+      "step": "TDD red same-key restart",
+      "exit_code": 1,
+      "classification": "expected TDD red; the required summary case was absent",
+      "replacement": "TDD green same-key restart and complete deployment suite",
+      "replacement_passed": true
+    },
+    {
+      "step": "run tooling Ruff format",
+      "exit_code": 1,
+      "classification": "non-contract extra formatter check would reformat both pre-existing files broadly",
+      "replacement": "host and Pod Ruff lint plus py_compile",
+      "replacement_passed": true
+    },
+    {
+      "step": "assert-pod-cache-free",
+      "exit_code": 1,
+      "classification": "pre-existing Ruff 0.14.0 cache from the earlier native-image UT gate",
+      "replacement": "recorded scoped cache cleanup, Ruff --no-cache rerun, and cache-free assertion",
+      "replacement_passed": true
+    }
+  ],
+  "errors": []
+}

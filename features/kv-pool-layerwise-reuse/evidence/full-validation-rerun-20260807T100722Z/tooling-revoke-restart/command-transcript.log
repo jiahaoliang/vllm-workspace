@@ -1,0 +1,78 @@
+[2026-08-07T12:14:47Z] START TDD red same-key restart
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py TestRangeApiSmoke.test_revoke_allows_same_key_put_session_restart
+[2026-08-07T12:14:47Z] END TDD red same-key restart exit=1 artifact=red.log
+[2026-08-07T12:15:17Z] START TDD green same-key restart
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py TestRangeApiSmoke.test_revoke_allows_same_key_put_session_restart
+[2026-08-07T12:15:17Z] END TDD green same-key restart exit=0 artifact=green.log
+[2026-08-07T12:15:39Z] START run range driver regression file
+COMMAND env PYTHONDONTWRITEBYTECODE=1 python3 features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:15:39Z] END run range driver regression file exit=0 artifact=range-api-tests.log
+[2026-08-07T12:15:39Z] START run tooling Ruff lint
+COMMAND /tmp/vllm-ascend-ruff-0.14.0/bin/ruff check features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:15:39Z] END run tooling Ruff lint exit=0 artifact=ruff-check.log
+[2026-08-07T12:15:40Z] START run tooling Ruff format
+COMMAND /tmp/vllm-ascend-ruff-0.14.0/bin/ruff format --check features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:15:40Z] END run tooling Ruff format exit=1 artifact=ruff-format.log
+[2026-08-07T12:15:40Z] START compile changed tooling Python
+COMMAND env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/pycompile-tooling-revoke-restart python3 -m py_compile features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:15:40Z] END compile changed tooling Python exit=0 artifact=py-compile.log
+[2026-08-07T12:15:41Z] START run tooling git diff check
+COMMAND git diff --check
+[2026-08-07T12:15:41Z] END run tooling git diff check exit=0 artifact=diff-check.log
+[2026-08-07T12:19:34Z] START capture-kube-context
+COMMAND kubectl config current-context -n liangjiahao
+[2026-08-07T12:19:34Z] END capture-kube-context exit=0 artifact=kube-context.txt
+[2026-08-07T12:19:45Z] START capture-ut-pod
+COMMAND kubectl get pod -n liangjiahao vllm-ascend-ut -o json
+[2026-08-07T12:19:45Z] END capture-ut-pod exit=0 artifact=pod.json
+[2026-08-07T12:19:57Z] START assert-ut-pod-contract
+COMMAND jq -er --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z --arg config sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b .metadata.namespace\ ==\ \"liangjiahao\"\ and\ .metadata.name\ ==\ \"vllm-ascend-ut\"\ and\ .status.phase\ ==\ \"Running\"\ and\ .spec.nodeName\ ==\ \"n1\"\ and\ any\(.status.containerStatuses\[\]\?\;\ .name\ ==\ \"ut\"\ and\ .ready\ ==\ true\ and\ .restartCount\ ==\ 0\ and\ .imageID\ ==\ \$config\)\ and\ any\(.spec.containers\[\]\;\ .name\ ==\ \"ut\"\ and\ .image\ ==\ \$image\ and\ \(\(\(.resources.requests\ //\ \{\}\)\ \|\ has\(\"huawei.com/Ascend910\"\)\)\ \|\ not\)\ and\ \(\(\(.resources.limits\ //\ \{\}\)\ \|\ has\(\"huawei.com/Ascend910\"\)\)\ \|\ not\)\)\ and\ all\(.spec.volumes\[\]\?\;\ has\(\"hostPath\"\)\ \|\ not\)\ and\ .spec.automountServiceAccountToken\ ==\ false features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-revoke-restart/pod.json
+[2026-08-07T12:19:57Z] END assert-ut-pod-contract exit=0 artifact=pod-contract.txt
+[2026-08-07T12:20:08Z] START create-control-workspace
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir /workspace/control-validation-20260807T100722Z-revoke-r3
+[2026-08-07T12:20:08Z] END create-control-workspace exit=0 artifact=create-control-workspace.log
+[2026-08-07T12:20:20Z] START sync-control
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ --exclude=\"\*/.pytest_cache\"\ --exclude=\"\*/.ruff_cache\"\ -C\ /root/ljh/vllm-workspace\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-validation-20260807T100722Z-revoke-r3\ -xf\ -
+[2026-08-07T12:20:22Z] END sync-control exit=0 artifact=sync-control.log
+[2026-08-07T12:20:33Z] START run-deployment-tests
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS=-p\ no:cacheprovider python3 -m pytest -q -p no:cacheprovider /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/tests
+[2026-08-07T12:20:35Z] END run-deployment-tests exit=0 artifact=deployment-tests.log
+[2026-08-07T12:20:59Z] START run-pod-ruff-lint
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff check /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:20:59Z] END run-pod-ruff-lint exit=0 artifact=pod-ruff-check.log
+[2026-08-07T12:21:13Z] START run-pod-py-compile
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/pycompile-tooling-revoke-r3 python3 -m py_compile /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:21:14Z] END run-pod-py-compile exit=0 artifact=pod-py-compile.log
+[2026-08-07T12:21:28Z] START assert-pod-cache-free
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ roots=\(Path\(\"/workspace/vllm-ascend\"\)\,Path\(\"/workspace/control-validation-20260807T100722Z-revoke-r3\"\)\)\;\ bad=\[str\(p\)\ for\ root\ in\ roots\ for\ p\ in\ root.rglob\(\"\*\"\)\ if\ p.name\ in\ \{\"__pycache__\"\,\".pytest_cache\"\,\".ruff_cache\"\}\ or\ p.suffix==\".pyc\"\]\;\ assert\ not\ bad\,bad\;\ print\(\"source_cache_artifacts=0\"\)
+[2026-08-07T12:21:29Z] END assert-pod-cache-free exit=1 artifact=pod-cache-check.txt
+[2026-08-07T12:21:53Z] START inspect-ruff-cache
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- find /workspace/vllm-ascend/.ruff_cache -maxdepth 3 -printf %TY-%Tm-%TdT%TH:%TM:%TSZ\ %y\ %p\\n
+[2026-08-07T12:21:53Z] END inspect-ruff-cache exit=0 artifact=ruff-cache-before.txt
+[2026-08-07T12:22:07Z] START clean-isolated-caches
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- rm -rf -- /workspace/vllm-ascend/.ruff_cache /tmp/pycompile-tooling-revoke-r3
+[2026-08-07T12:22:07Z] END clean-isolated-caches exit=0 artifact=cache-cleanup.log
+[2026-08-07T12:22:20Z] START rerun-pod-ruff-no-cache
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff check --no-cache /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:22:20Z] END rerun-pod-ruff-no-cache exit=0 artifact=pod-ruff-check-r2.log
+[2026-08-07T12:22:34Z] START rerun-pod-cache-free
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ roots=\(Path\(\"/workspace/vllm-ascend\"\)\,Path\(\"/workspace/control-validation-20260807T100722Z-revoke-r3\"\)\)\;\ bad=\[str\(p\)\ for\ root\ in\ roots\ for\ p\ in\ root.rglob\(\"\*\"\)\ if\ p.name\ in\ \{\"__pycache__\"\,\".pytest_cache\"\,\".ruff_cache\"\}\ or\ p.suffix==\".pyc\"\]\;\ assert\ not\ bad\,bad\;\ print\(\"source_cache_artifacts=0\"\)
+[2026-08-07T12:22:34Z] END rerun-pod-cache-free exit=0 artifact=pod-cache-check-r2.txt
+[2026-08-07T12:22:41Z] START hash-host-tooling
+COMMAND sha256sum features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:22:41Z] END hash-host-tooling exit=0 artifact=host-tooling-sha256.txt
+[2026-08-07T12:22:53Z] START hash-pod-tooling
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- sha256sum /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-revoke-r3/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:22:53Z] END hash-pod-tooling exit=0 artifact=pod-tooling-sha256.txt
+[2026-08-07T12:23:03Z] START compare-tooling-checksums
+COMMAND python3 -c from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-revoke-restart\"\)\;\ h=\[x.split\(\)\[0\]\ for\ x\ in\ \(root/\"host-tooling-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ p=\[x.split\(\)\[0\]\ for\ x\ in\ \(root/\"pod-tooling-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ assert\ h==p\,\(h\,p\)\;\ print\(\"host_pod_tooling_sha256_match=true\"\)\;\ print\(\"files=2\"\)
+[2026-08-07T12:23:03Z] END compare-tooling-checksums exit=0 artifact=checksum-compare.txt
+[2026-08-07T12:24:14Z] START validate-tooling-summary
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .gates.deployment_tests\ ==\ 84\ and\ .gates.same_key_restart_result_zero\ ==\ true\ and\ .gates.same_key_cleanup_result_zero\ ==\ true\ and\ \(.errors\ \|\ length\ ==\ 0\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-revoke-restart/summary.json
+[2026-08-07T12:24:15Z] END validate-tooling-summary exit=0 artifact=summary-validation.txt
+[2026-08-07T12:24:22Z] START generate-tooling-checksums
+COMMAND python3 -c import\ hashlib\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-revoke-restart\"\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\]
+[2026-08-07T12:24:22Z] END generate-tooling-checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T12:24:28Z] START replay-tooling-checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-revoke-restart/SHA256SUMS
+[2026-08-07T12:24:28Z] END replay-tooling-checksums exit=0 artifact=checksum-replay.log

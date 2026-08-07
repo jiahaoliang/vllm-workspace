@@ -327,6 +327,16 @@ def _check_success_uses_production_setup_multifragment_batches_and_pattern() -> 
     ]
 
 
+def _check_revoke_allows_same_key_put_session_restart() -> None:
+    dependencies, _, _, _, _ = make_dependencies()
+    summary = run_smoke(dependencies, run_negative=True)
+
+    cases = {case["name"]: case for case in summary["cases"]}
+    assert cases["negative_revoke_same_key_restart"]["passed"] is True
+    assert cases["negative_revoke_same_key_restart"]["actual"] == [0]
+    assert cases["negative_revoke_same_key_cleanup"]["passed"] is True
+
+
 def _check_setup_exception_closes_store_and_propagates_failure() -> None:
     dependencies, _, _, _, events = make_dependencies(fail_operation="setup")
     summary = run_smoke(dependencies)
@@ -391,6 +401,9 @@ def _check_cleanup_return_code_failure_makes_summary_fail() -> None:
 class TestRangeApiSmoke(unittest.TestCase):
     def test_success_uses_production_setup_multifragment_batches_and_pattern(self) -> None:
         _check_success_uses_production_setup_multifragment_batches_and_pattern()
+
+    def test_revoke_allows_same_key_put_session_restart(self) -> None:
+        _check_revoke_allows_same_key_put_session_restart()
 
     def test_setup_exception_closes_store_and_propagates_failure(self) -> None:
         _check_setup_exception_closes_store_and_propagates_failure()

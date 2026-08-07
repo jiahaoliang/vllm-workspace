@@ -1,0 +1,15 @@
+E
+======================================================================
+ERROR: test_revoke_allows_same_key_put_session_restart (__main__.TestRangeApiSmoke)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py", line 406, in test_revoke_allows_same_key_put_session_restart
+    _check_revoke_allows_same_key_put_session_restart()
+  File "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py", line 335, in _check_revoke_allows_same_key_put_session_restart
+    assert cases["negative_revoke_same_key_restart"]["passed"] is True
+KeyError: 'negative_revoke_same_key_restart'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (errors=1)
