@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260807T100722Z-tooling-freeze-3bda70d",
+  "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
+  "source": {
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "pod": {
+    "namespace": "liangjiahao",
+    "name": "vllm-ascend-ut",
+    "uid": "96ebc23a-e62e-46f5-8428-9438bd8a93a7",
+    "node": "n1",
+    "ready": true,
+    "restart_count": 0,
+    "cpu_only": true,
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+  },
+  "gates": {
+    "deployment_tests": 84,
+    "ruff_lint": true,
+    "py_compile": true,
+    "cache_free_sync": true,
+    "host_pod_tooling_sha256_match": true,
+    "identity_commit_matches": true,
+    "terminal_step_failures": 0
+  },
+  "frozen_file_sha256": {
+    "validation_identity": "f581055714cb4ee56fe5fecc22f081868d7d266550e71b8222a4faa47f6c2768",
+    "range_api_smoke": "042e69a69d72309ca098413b7689f7adfb3a8e15684a6902652fb2c8cec6d494",
+    "test_range_api_smoke": "3b18cb3a516fc5536308fe93d21a9ac50ca4af92c6e4416fe1456e504b46b269"
+  },
+  "g0_invalidated": false,
+  "g1_started_before_freeze": false,
+  "errors": []
+}

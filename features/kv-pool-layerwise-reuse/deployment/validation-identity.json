@@ -5,7 +5,7 @@
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "4b5e49900a9ea3cd50344cb053747dc9e5a5b07b"
+    "commit": "3bda70d786db46310994afc689af4fc10da4858e"
   },
   "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
   "platform": "linux/arm64",

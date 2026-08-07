@@ -1,0 +1,42 @@
+[2026-08-07T12:27:36Z] START capture-ut-pod
+COMMAND kubectl get pod -n liangjiahao vllm-ascend-ut -o json
+[2026-08-07T12:27:36Z] END capture-ut-pod exit=0 artifact=pod.json
+[2026-08-07T12:27:48Z] START create-control-workspace
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir /workspace/control-validation-20260807T100722Z-tooling-r4
+[2026-08-07T12:27:48Z] END create-control-workspace exit=0 artifact=create-control-workspace.log
+[2026-08-07T12:28:01Z] START sync-control
+COMMAND bash -lc tar\ --exclude=\"\*/__pycache__\"\ --exclude=\"\*.pyc\"\ --exclude=\"\*/.pytest_cache\"\ --exclude=\"\*/.ruff_cache\"\ -C\ /root/ljh/vllm-workspace\ -cf\ -\ workspace.lock.json\ features/kv-pool-layerwise-reuse/Dockerfile.a2\ features/kv-pool-layerwise-reuse/deployment\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ /workspace/control-validation-20260807T100722Z-tooling-r4\ -xf\ -
+[2026-08-07T12:28:02Z] END sync-control exit=0 artifact=sync-control.log
+[2026-08-07T12:28:17Z] START run-deployment-tests
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS=-p\ no:cacheprovider python3 -m pytest -q -p no:cacheprovider /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests
+[2026-08-07T12:28:19Z] END run-deployment-tests exit=0 artifact=deployment-tests.log
+[2026-08-07T12:28:32Z] START run-ruff-lint
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- /workspace/tools/ruff check --no-cache /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py
+[2026-08-07T12:28:32Z] END run-ruff-lint exit=0 artifact=ruff-check.log
+[2026-08-07T12:28:44Z] START run-py-compile
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/pycompile-tooling-r4 python3 -m py_compile /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests/test_validation_identity.py
+[2026-08-07T12:28:45Z] END run-py-compile exit=0 artifact=py-compile.log
+[2026-08-07T12:28:52Z] START hash-host-tooling
+COMMAND sha256sum features/kv-pool-layerwise-reuse/deployment/validation-identity.json features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:28:52Z] END hash-host-tooling exit=0 artifact=host-tooling-sha256.txt
+[2026-08-07T12:29:06Z] START hash-pod-tooling
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- sha256sum /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/validation-identity.json /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py /workspace/control-validation-20260807T100722Z-tooling-r4/features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
+[2026-08-07T12:29:07Z] END hash-pod-tooling exit=0 artifact=pod-tooling-sha256.txt
+[2026-08-07T12:29:15Z] START compare-tooling-checksums
+COMMAND python3 -c from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-freeze-3bda70d\"\)\;\ h=\[x.split\(\)\[0\]\ for\ x\ in\ \(root/\"host-tooling-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ p=\[x.split\(\)\[0\]\ for\ x\ in\ \(root/\"pod-tooling-sha256.txt\"\).read_text\(\).splitlines\(\)\]\;\ assert\ h==p\,\(h\,p\)\;\ print\(\"host_pod_tooling_sha256_match=true\"\)\;\ print\(\"files=3\"\)
+[2026-08-07T12:29:15Z] END compare-tooling-checksums exit=0 artifact=checksum-compare.txt
+[2026-08-07T12:29:25Z] START clean-pycompile-cache
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- rm -rf -- /tmp/pycompile-tooling-r4
+[2026-08-07T12:29:25Z] END clean-pycompile-cache exit=0 artifact=cache-cleanup.log
+[2026-08-07T12:29:38Z] START assert-cache-free
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 python3 -c from\ pathlib\ import\ Path\;\ roots=\(Path\(\"/workspace/vllm-ascend\"\)\,Path\(\"/workspace/control-validation-20260807T100722Z-tooling-r4\"\)\)\;\ bad=\[str\(p\)\ for\ root\ in\ roots\ for\ p\ in\ root.rglob\(\"\*\"\)\ if\ p.name\ in\ \{\"__pycache__\"\,\".pytest_cache\"\,\".ruff_cache\"\}\ or\ p.suffix==\".pyc\"\]\;\ assert\ not\ bad\,bad\;\ print\(\"source_cache_artifacts=0\"\)
+[2026-08-07T12:29:39Z] END assert-cache-free exit=0 artifact=cache-check.txt
+[2026-08-07T12:30:13Z] START validate-summary
+COMMAND jq -e .status\ ==\ \"passed\"\ and\ .validated\ ==\ true\ and\ .tooling_commit\ ==\ \"3bda70d786db46310994afc689af4fc10da4858e\"\ and\ .gates.deployment_tests\ ==\ 84\ and\ .gates.terminal_step_failures\ ==\ 0\ and\ \(.errors\ \|\ length\ ==\ 0\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-freeze-3bda70d/summary.json
+[2026-08-07T12:30:13Z] END validate-summary exit=0 artifact=summary-validation.txt
+[2026-08-07T12:30:23Z] START generate-checksums
+COMMAND python3 -c import\ hashlib\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-freeze-3bda70d\"\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\]
+[2026-08-07T12:30:23Z] END generate-checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T12:30:32Z] START replay-checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/tooling-freeze-3bda70d/SHA256SUMS
+[2026-08-07T12:30:32Z] END replay-checksums exit=0 artifact=checksum-replay.log

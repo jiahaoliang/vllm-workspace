@@ -2,16 +2,17 @@
 
 ## Status And Scope
 
-G0_VERIFIED. vLLM-Ascend ownership tests, deployment tooling, the exact native
-ARM64 image, native-image CPU/mock, and base 1P1D runtime identity gates passed.
-Direct ranged, lease, G4, smoke, stress, and throughput remain unclaimed.
+G0_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
+same-key restart oracle, the exact native ARM64 image, native-image CPU/mock,
+and base 1P1D runtime identity gates passed. Direct ranged, lease, G4, smoke,
+stress, and throughput remain unclaimed.
 
 ## Frozen Identity
 
 | Item | Value |
 | --- | --- |
 | Run ID | `20260807T100722Z` |
-| Tooling base | `4b5e49900a9ea3cd50344cb053747dc9e5a5b07b` |
+| Tooling base | `3bda70d786db46310994afc689af4fc10da4858e` |
 | vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | vLLM-Ascend | `45b2e785b10ca4604cd6314819ed15f3ff674781` |
 | Mooncake | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -33,7 +34,7 @@ Direct ranged, lease, G4, smoke, stress, and throughput remain unclaimed.
 | Source focused green | `43 passed` before the stale-retry audit addition |
 | Source full gate | `495 passed`; Ruff, `py_compile`, `git diff --check` passed |
 | Source publication | local/origin `45b2e785b...`; left/right `0 0` |
-| Deployment tooling | `83 passed`; Ruff, shell, JSON, diff checks passed |
+| Deployment tooling | `84 passed`; same-key restart/cleanup, Ruff, `py_compile`, diff, cache-free sync, and host/Pod SHA256 checks passed |
 | Mooncake checkout | clean read-only detached `df3f74ed...` |
 | BuildKit manifest | SHA256 `f7a0c64c330688d6cd6292c3ef3a1022ace0abff7c468aa1b73cb5fe96be5b52` |
 | Native image | build exit `0`; OCI labels, three Git HEADs, native modules, exact pip allowlist, and seven static Mooncake APIs passed |
@@ -42,6 +43,7 @@ Direct ranged, lease, G4, smoke, stress, and throughput remain unclaimed.
 | UT evidence | `ut/summary.json` passed; checksums replayed; long-running Pod retained |
 | G0 | 7 free physical cards after replacement; exact new 1+1 Pods; dynamic APIs/model/ldd; 1P1D Ready; proxy 1/1; engines stopped; final Master `0/0/0` |
 | G0 evidence | `g0/summary.json` passed; checksums replayed |
+| G1 oracle correction | TDD red/green; `negative_revoke_same_key_restart` and cleanup require `[0]`; `tooling-revoke-restart/summary.json` and checksums passed. G0 unaffected; G1 had not started |
 
 ## Pending Gates
 

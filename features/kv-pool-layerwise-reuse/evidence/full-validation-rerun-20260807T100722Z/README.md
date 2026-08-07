@@ -10,7 +10,7 @@ success.
 - vLLM `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`
 - vLLM-Ascend `45b2e785b10ca4604cd6314819ed15f3ff674781`
 - Mooncake `df3f74ed8ebdb0c935554beea6299a9f11c723e2`
-- Tooling `4b5e49900a9ea3cd50344cb053747dc9e5a5b07b`
+- Tooling `3bda70d786db46310994afc689af4fc10da4858e`
 - Target `linux/arm64` image
   `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z`
 - Runtime namespace `liangjiahao`; BuildKit namespace `default`
@@ -37,6 +37,11 @@ success.
   model/native-library gates passed, Prefill/Decode APIs became Ready, proxy
   discovered exactly 1P1D, engines stopped, and final Master keys/bytes/clients
   returned to `0/0/0`.
+- `tooling-revoke-restart/summary.json`: a post-G0, pre-G1 tooling correction
+  added a hard same-key `PutStart` and cleanup gate after successful revoke.
+  TDD red/green, the complete `84`-test deployment suite, Ruff lint,
+  `py_compile`, cache-free tar sync, host/Pod SHA256 equality, and checksum
+  replay passed. This direct-driver-only correction does not invalidate G0.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

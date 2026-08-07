@@ -802,3 +802,12 @@
   The evidence records the corrected `tokenizer.json` checker target and an
   early selector wait superseded by exact old-Pod deletion plus new UID/imageID
   assertions.
+- Before G1, audit found that the direct ranged negative suite did not prove a
+  same-key `PutStart` after successful revoke. TDD correction
+  `3bda70d786db46310994afc689af4fc10da4858e` added result-zero restart and
+  second-revoke cleanup gates. The cache-excluding tar-synced
+  `liangjiahao/vllm-ascend-ut` run passed all `84` deployment tests, Ruff lint,
+  isolated `py_compile`, host/Pod SHA256 equality, and cache-free checks. The
+  earlier broad formatter result remains a non-contract extra check. An
+  existing Ruff cache was recorded and removed before a `--no-cache` rerun.
+  This direct-driver-only change does not invalidate G0; G1 had not started.

@@ -1,0 +1,3 @@
+f581055714cb4ee56fe5fecc22f081868d7d266550e71b8222a4faa47f6c2768  features/kv-pool-layerwise-reuse/deployment/validation-identity.json
+042e69a69d72309ca098413b7689f7adfb3a8e15684a6902652fb2c8cec6d494  features/kv-pool-layerwise-reuse/deployment/range-api-smoke.py
+3b18cb3a516fc5536308fe93d21a9ac50ca4af92c6e4416fe1456e504b46b269  features/kv-pool-layerwise-reuse/deployment/tests/test_range_api_smoke.py
