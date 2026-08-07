@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run_id": "20260807T100722Z",
+  "captured_at": "2026-08-07T13:43:42Z",
+  "status": "passed",
+  "validated": true,
+  "identity": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "namespace": "liangjiahao",
+    "node": "n1"
+  },
+  "scope": {
+    "python_overlay_required": false,
+    "image_rebuilt": true,
+    "fabric_mem_enabled": false,
+    "mooncake_multi_group": "not_claimed"
+  },
+  "families": {
+    "source": {"status": "passed", "ascend_store_tests": 495},
+    "tooling": {"status": "passed", "deployment_tests": 84},
+    "native_image": {"status": "passed", "platform": "linux/arm64"},
+    "native_image_ut": {"status": "passed", "ascend_store_tests": 495, "deployment_tests": 83},
+    "g0": {"status": "passed", "final_master_empty": true},
+    "g1": {"status": "passed", "cases": 45, "negative_cases": 26, "same_key_restart": true},
+    "lease": {"status": "passed", "stale_code": -707, "fresh_recovery": true},
+    "g4": {"status": "passed", "prefill_layers": 27, "decode_layers": 27, "whole_key_events": 0},
+    "smoke": {"status": "passed", "baseline": 4, "warmup": 5, "direct": 4, "proxy": 4, "correlations": 12},
+    "stress": {"status": "passed", "s1_cases": 4, "s1_keys": 508, "s2_cases": 16, "s2_keys": 288, "s3_cases": 4, "s3_keys": 348, "recorded_steps": 164}
+  },
+  "final_state": {
+    "engines_stopped": true,
+    "master_key_count": 0,
+    "master_allocated_bytes": 0,
+    "master_active_clients": 0,
+    "stress_pods_retained": true,
+    "ut_pod_retained": true,
+    "buildkit_pod_retained": true
+  },
+  "errors": []
+}

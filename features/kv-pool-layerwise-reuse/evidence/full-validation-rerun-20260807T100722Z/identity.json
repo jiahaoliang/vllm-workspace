@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "status": "smoke_verified",
+  "status": "full_verified",
   "run_id": "20260807T100722Z",
   "captured_at": "2026-08-07T10:07:22Z",
+  "completed_at": "2026-08-07T13:43:42Z",
   "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
   "source": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
@@ -31,7 +32,7 @@
     "namespace": "liangjiahao",
     "node": "n1",
     "fabric_mem_enabled": false,
-    "status": "smoke_verified"
+    "status": "full_verified"
   },
   "completed_gates": {
     "ascend_store_tests": 495,
@@ -70,6 +71,26 @@
     "smoke_expected_hit_blocks": 25,
     "smoke_expected_hit_tokens": 3200,
     "smoke_expected_master_key_count": 64,
-    "smoke_final_master_empty": true
+    "smoke_final_master_empty": true,
+    "stress_runtime": true,
+    "stress_recorded_steps": 164,
+    "stress_failed_steps": 0,
+    "stress_topology": true,
+    "stress_s1_case_count": 4,
+    "stress_s1_key_count": 508,
+    "stress_s1_marker_isolation_count": 4,
+    "stress_s2_case_count": 16,
+    "stress_s2_key_count": 288,
+    "stress_s2_marker_isolation_count": 16,
+    "stress_s3_case_count": 4,
+    "stress_s3_key_count": 348,
+    "stress_s3_marker_isolation_count": 4,
+    "stress_whole_key_calls": 0,
+    "stress_checksum_file_count": 392,
+    "stress_checksum_replay": true,
+    "final_engines_stopped": true,
+    "final_master_key_count": 0,
+    "final_master_allocated_bytes": 0,
+    "final_master_active_clients": 0
   }
 }

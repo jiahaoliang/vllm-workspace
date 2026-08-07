@@ -1,6 +1,6 @@
 ﻿# kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-07T18:07:22+08:00
+Captured At: 2026-08-07T21:43:42+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
@@ -11,4 +11,7 @@ Captured At: 2026-08-07T18:07:22+08:00
 Validation control tooling is frozen at
 `3bda70d786db46310994afc689af4fc10da4858e`. Its direct ranged driver requires
 same-key `PutStart` and cleanup to return zero after a successful revoke; the
-cache-free CPU-only Pod gate passed all `84` deployment tests before G1.
+cache-free CPU-only Pod gate passed all `84` deployment tests before G1. Native
+image run `20260807T100722Z` then passed G0, G1, lease, G4, smoke, and stress
+S1-S3. All `164/164` stress steps were green; engines are stopped and the final
+Master is `0/0/0`. The long-running UT Pod and `default/buildkitd` are retained.

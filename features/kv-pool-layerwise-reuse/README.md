@@ -72,10 +72,12 @@
   [implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md](implementation-plans/2026-08-03-python-overlay-full-validation-rerun-20260803T124415Z.md)
 - Previous passed umbrella report:
   [full-validation-rerun-2026-08-03.md](full-validation-rerun-2026-08-03.md)
-- Current single-group backport tracker:
+- Previous single-group backport tracker:
   [implementation-plans/2026-08-04-single-group-backports-overlay-full-validation-20260804T103209Z.md](implementation-plans/2026-08-04-single-group-backports-overlay-full-validation-20260804T103209Z.md)
-- Current passed umbrella report:
-  [full-validation-rerun-2026-08-04.md](full-validation-rerun-2026-08-04.md)
+- Current revoke-ownership implementation plan:
+  [implementation-plans/2026-08-07-mooncake-revoke-ownership-full-validation.md](implementation-plans/2026-08-07-mooncake-revoke-ownership-full-validation.md)
+- Current passed native-image umbrella report:
+  [full-validation-rerun-2026-08-07.md](full-validation-rerun-2026-08-07.md)
 - Per-run machine-readable identity:
   [deployment/validation-identity.json](deployment/validation-identity.json)
 
@@ -89,6 +91,9 @@ Python overlay 重新执行 CPU/mock、G0、G1、lease、G4、smoke 和 S1-S3；
 Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overlay，
 继续复用同一镜像；§5.8 multi-group 明确延期。本次 raw evidence 因 workspace
 安全边界只保留本地，control repo 发布自包含报告、tooling 和状态记录。
+Run `20260807T100722Z` 使用 vLLM-Ascend `45b2e785` 与 Mooncake `df3f74ed`
+重建原生 ARM64 镜像，不使用 Python overlay；source/tooling、G0/G1、lease、G4、
+smoke 与 stress S1-S3 全部通过，最终 Master 为 `0/0/0`。
 
 ### 1P1D Smoke
 
@@ -98,6 +103,8 @@ Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overla
   [deployment/validation-2026-08-03.md](deployment/validation-2026-08-03.md)
 - Current single-group backport report:
   [deployment/validation-2026-08-04.md](deployment/validation-2026-08-04.md)
+- Current native-image revoke-ownership report:
+  [deployment/validation-2026-08-07.md](deployment/validation-2026-08-07.md)
 - Historical report:
   [deployment/validation-2026-07-23.md](deployment/validation-2026-07-23.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
@@ -116,6 +123,9 @@ Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overla
 - Current single-group reports:
   [ranged-api-validation-2026-08-04.md](ranged-api-validation-2026-08-04.md) and
   [ranged-api-g4-validation-2026-08-04.md](ranged-api-g4-validation-2026-08-04.md)
+- Current native-image revoke-ownership reports:
+  [ranged-api-validation-2026-08-07.md](ranged-api-validation-2026-08-07.md) and
+  [ranged-api-g4-validation-2026-08-07.md](ranged-api-g4-validation-2026-08-07.md)
 - Direct driver: [deployment/range-api-smoke.py](deployment/range-api-smoke.py)
 - G4 checker:
   [deployment/check-range-debug-log.py](deployment/check-range-debug-log.py)
@@ -137,6 +147,8 @@ Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overla
   [multi-dp-tp-stress-validation-2026-08-03.md](multi-dp-tp-stress-validation-2026-08-03.md)
 - Current single-group backport report:
   [multi-dp-tp-stress-validation-2026-08-04.md](multi-dp-tp-stress-validation-2026-08-04.md)
+- Current native-image revoke-ownership report:
+  [multi-dp-tp-stress-validation-2026-08-07.md](multi-dp-tp-stress-validation-2026-08-07.md)
 - Evidence index: [evidence/README.md](evidence/README.md)
 
 ### Lease Expiry
@@ -148,6 +160,8 @@ Run `20260804T103209Z` 又验证了 `d5f0ea7f8` 的五文件 single-group overla
   [lease-expiry-validation-2026-08-03.md](lease-expiry-validation-2026-08-03.md)
 - Current single-group backport report:
   [lease-expiry-validation-2026-08-04.md](lease-expiry-validation-2026-08-04.md)
+- Current native-image revoke-ownership report:
+  [lease-expiry-validation-2026-08-07.md](lease-expiry-validation-2026-08-07.md)
 - Driver: [deployment/lease-expiry-test.py](deployment/lease-expiry-test.py)
 - Evidence index: [evidence/README.md](evidence/README.md)
 

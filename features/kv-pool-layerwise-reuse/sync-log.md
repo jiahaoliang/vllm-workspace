@@ -849,3 +849,23 @@
   replacement 60-second retry proved both engine PIDs absent and Master
   `0/0/0`. No smoke runtime gate was rerun because the nonzero step occurred
   only after the complete runner and independent hard-oracle assertion passed.
+- Stress ran once on Prefill DP2/TP2 plus Decode DP1/TP2 with 7 physical cards
+  available and 6 required. S1 passed `4/4` pinned 16K cases at 508 keys, S2
+  passed `16/16` concurrent 8K cases at 288 keys, and S3 passed its pinned 32K
+  proof plus `4/4` concurrent cases at 348 keys. Marker isolation was `4/4`,
+  `16/16`, and `4/4`; both Prefill DP ranks were active, all 27-layer
+  range/commit checks passed, and whole-key calls were zero.
+- All `164/164` stress ledger steps exited zero. The runner stopped both vLLM
+  children, confirmed PID-file absence and refused HTTP endpoints, and retained
+  the six-NPU Pods. A final explicit Mooncake Master restart and rollout then
+  returned key count, allocated bytes, and active clients to `0/0/0`.
+- Stress `SHA256SUMS` covers 392 immutable files and replayed successfully; its
+  manifest digest is
+  `1fd99b15ad418508d0ff97b162fb563f33b3c097aeffbd9f3dc4d8ae3938c88c`.
+  Six self-contained 2026-08-07 family/umbrella reports and final structured
+  state were added. The long-running `liangjiahao/vllm-ascend-ut` Pod and
+  `default/buildkitd` remain retained; `deployment_yaml/` and
+  `dockerfile.vllm23` remain untouched.
+- The evidence-root `SHA256SUMS` covers 797 files and replayed successfully;
+  its manifest digest is
+  `e5a13d163cfd98fe547c44ec22dc6c1c9688a07e42609d885f88935892a37f08`.

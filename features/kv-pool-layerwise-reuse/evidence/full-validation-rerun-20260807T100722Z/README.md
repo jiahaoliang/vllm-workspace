@@ -1,9 +1,9 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: SMOKE_VERIFIED. Source/tooling, the exact native ARM64 image,
-native-image CPU/mock, base 1P1D runtime identity, direct ranged G1, and lease
-expiry/recovery, G4 runtime audit, and 1P1D concurrent smoke are verified. This
-directory does not yet claim stress or throughput success.
+Status: FULL_VERIFIED. Source/tooling, the exact native ARM64 image,
+native-image CPU/mock, base 1P1D runtime identity, direct ranged G1, lease
+expiry/recovery, G4 runtime audit, 1P1D concurrent smoke, and stress S1-S3 are
+verified. This run does not claim benchmark throughput.
 
 ## Frozen Inputs
 
@@ -66,7 +66,18 @@ directory does not yet claim stress or throughput success.
   case, all 12 request/role hit correlations passed, and the frozen pool target
   was 64 keys. An immediate post-rollout metrics read raced the endpoint; the
   retry cleanup proved both engines stopped and final Master `0/0/0`.
+- `stress/overall-summary.json`: Prefill DP2/TP2 and Decode DP1/TP2 passed all
+  topology checks. S1 passed `4/4` pinned 16K cases at 508 keys, S2 passed
+  `16/16` concurrent 8K cases at 288 keys, and S3 passed its pinned proof plus
+  `4/4` concurrent 32K cases at 348 keys. Marker isolation was `4/4`, `16/16`,
+  and `4/4`; both Prefill DP ranks were active, all range/commit gates passed,
+  and whole-key calls were zero. All `164/164` runner steps exited zero.
+- `stress/final-run-state.json` and `final/summary.json`: both vLLM children are
+  stopped while the six-NPU Pods are retained. A final explicit Master restart
+  and rollout produced keys/allocated bytes/active clients `0/0/0`. The 392-file
+  stress checksum replay passed.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records
-its own transcript, structured summary, and checksums.
+its own transcript, structured summary, and checksums. The evidence-root
+`SHA256SUMS` and replay cover the complete published run payload.

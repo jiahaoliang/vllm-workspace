@@ -1,0 +1,10 @@
+INFO 08-07 13:25:19 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-07 13:25:19 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-07 13:25:19 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-07 13:25:19 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-07 13:25:19 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+vllm-ascend source: /vllm-workspace/vllm-ascend/vllm_ascend/__init__.py
+installed vLLM package version: 0.1.dev1+g54503ecec; compatibility lane: main-verified
+coordinator keyword: max_in_flight_tokens
+cross-process block hash seed: 0
+Mooncake session/range APIs: OK

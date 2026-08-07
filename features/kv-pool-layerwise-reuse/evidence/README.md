@@ -9,6 +9,30 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
+## Native Revoke Ownership Full Validation 20260807T100722Z
+
+- Plan:
+  [Mooncake revoke ownership full validation](../implementation-plans/2026-08-07-mooncake-revoke-ownership-full-validation.md)
+- Evidence:
+  [full-validation-rerun-20260807T100722Z](full-validation-rerun-20260807T100722Z/README.md)
+- Umbrella report:
+  [full-validation-rerun-2026-08-07.md](../full-validation-rerun-2026-08-07.md)
+- Family reports:
+  [G1](../ranged-api-validation-2026-08-07.md),
+  [lease](../lease-expiry-validation-2026-08-07.md),
+  [G4](../ranged-api-g4-validation-2026-08-07.md),
+  [1P1D smoke](../deployment/validation-2026-08-07.md), and
+  [stress](../multi-dp-tp-stress-validation-2026-08-07.md).
+- Result: PASSED. Exact rebuilt `linux/arm64` image source is vLLM
+  `54503ece`, vLLM-Ascend `45b2e785`, and Mooncake `df3f74ed`; no Python
+  overlay was used. Source/tooling, native-image UT, G0, G1, lease, G4, smoke,
+  and stress S1-S3 passed. Stress recorded `164/164` green steps and final
+  Master metrics are `0/0/0` with engine children stopped.
+- Stress `SHA256SUMS` digest over 392 files:
+  `1fd99b15ad418508d0ff97b162fb563f33b3c097aeffbd9f3dc4d8ae3938c88c`.
+- Complete run `SHA256SUMS` digest over 797 files:
+  `e5a13d163cfd98fe547c44ec22dc6c1c9688a07e42609d885f88935892a37f08`.
+
 ## Python Overlay Full Validation 20260803T124415Z
 
 - Plan:

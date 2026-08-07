@@ -1,0 +1,18 @@
+{
+  "actions": {
+    "baseline": {
+      "count": 16,
+      "elapsed_seconds": 28.48650026321411,
+      "errors": []
+    },
+    "prepare": {
+      "fixture": "fixture.json"
+    },
+    "proxy-load": {
+      "count": 16,
+      "elapsed_seconds": 16.70458745956421,
+      "errors": []
+    }
+  },
+  "schema_version": 1
+}
