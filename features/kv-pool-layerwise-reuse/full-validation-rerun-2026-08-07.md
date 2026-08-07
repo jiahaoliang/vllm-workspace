@@ -2,10 +2,9 @@
 
 ## Status And Scope
 
-NATIVE_IMAGE_AND_UT_VERIFIED. vLLM-Ascend ownership tests, deployment tooling,
-the exact native ARM64 image, and native-image CPU/mock gates passed. A2 runtime
-families have not run at this checkpoint, so this document does not yet claim
-NPU, smoke, stress, or throughput success.
+G0_VERIFIED. vLLM-Ascend ownership tests, deployment tooling, the exact native
+ARM64 image, native-image CPU/mock, and base 1P1D runtime identity gates passed.
+Direct ranged, lease, G4, smoke, stress, and throughput remain unclaimed.
 
 ## Frozen Identity
 
@@ -41,11 +40,13 @@ NPU, smoke, stress, or throughput success.
 | Image evidence | `image/summary.json` passed; checksums replayed |
 | Native-image UT | new CPU-only Pod/config ID; `495` AscendStore and `83` deployment tests; Ruff lint, `py_compile`, diff, cache-free sync passed |
 | UT evidence | `ut/summary.json` passed; checksums replayed; long-running Pod retained |
+| G0 | 7 free physical cards after replacement; exact new 1+1 Pods; dynamic APIs/model/ldd; 1P1D Ready; proxy 1/1; engines stopped; final Master `0/0/0` |
+| G0 evidence | `g0/summary.json` passed; checksums replayed |
 
 ## Pending Gates
 
 - Run installed-module and direct session/range byte-equality tests.
-- Run G0, G1, lease, G4, smoke, concurrent smoke, and stress S1-S3 serially.
+- Run G1, lease, G4, smoke, concurrent smoke, and stress S1-S3 serially.
 - Assert final empty Master metrics, generate checksums, replay offline reports,
   stop vLLM processes, and publish final reports/state.
 

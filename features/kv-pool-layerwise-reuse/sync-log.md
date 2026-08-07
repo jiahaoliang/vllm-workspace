@@ -792,3 +792,13 @@
   non-contract Ruff formatter result and the first cache-copying tar attempt as
   superseded execution checks; neither changed source or weakened a required
   gate.
+- G0 replaced the retained historical 4+2 engine Pods with exact new-image 1+1
+  base Pods after stopping their vLLM children. Live physical capacity was 7
+  cards after replacement accounting. Both runtime checkers loaded the seven
+  Mooncake APIs from the native image, the read-only no-overlay gate passed,
+  NPU/model/ldd and Master 30000 ms TTL checks passed, both APIs became Ready,
+  and proxy discovery was exactly 1P1D. Both child processes were then stopped;
+  the reset Master reported keys/allocated bytes/active clients `0/0/0`.
+  The evidence records the corrected `tokenizer.json` checker target and an
+  early selector wait superseded by exact old-Pod deletion plus new UID/imageID
+  assertions.

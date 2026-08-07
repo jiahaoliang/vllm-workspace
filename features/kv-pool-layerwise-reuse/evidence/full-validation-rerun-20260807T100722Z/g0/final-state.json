@@ -1,0 +1,15 @@
+{
+  "engines_stopped": true,
+  "metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "retained_pods": {
+    "decode": "decode-engine-deployment-598b59d746-fmbpp",
+    "mooncake-master": "mooncake-master-deployment-78565dfd6f-57vts",
+    "prefill": "prefill-engine-deployment-868546d9f5-g56hb",
+    "proxy": "proxy-server-deployment-54bb6c9585-7fzs5"
+  },
+  "validated": true
+}

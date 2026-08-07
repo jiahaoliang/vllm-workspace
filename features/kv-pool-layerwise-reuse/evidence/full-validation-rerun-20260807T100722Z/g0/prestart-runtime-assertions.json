@@ -1,0 +1,10 @@
+{
+  "ldd_no_missing": true,
+  "lease_ttl_ms": 30000,
+  "metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "validated": true
+}

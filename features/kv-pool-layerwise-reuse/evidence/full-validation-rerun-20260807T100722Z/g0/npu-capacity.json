@@ -1,0 +1,15 @@
+{
+  "allocatable": 8,
+  "available": 7,
+  "base_required": 2,
+  "counted_pods": [
+    {
+      "namespace": "mooncake-main",
+      "pod": "qwen3-8b-agg-01-aggregated-1",
+      "request": 1
+    }
+  ],
+  "resource": "huawei.com/Ascend910",
+  "stress_required": 6,
+  "used_excluding_replaced_engines": 1
+}

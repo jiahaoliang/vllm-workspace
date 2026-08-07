@@ -1,8 +1,9 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: NATIVE_IMAGE_AND_UT_VERIFIED. Source/tooling, the exact native ARM64
-image, and native-image CPU/mock gates are verified. This directory does not
-yet claim A2 runtime, smoke, stress, or throughput success.
+Status: G0_VERIFIED. Source/tooling, the exact native ARM64 image, native-image
+CPU/mock gates, and base 1P1D runtime identity are verified. This directory
+does not yet claim direct ranged, lease, G4, smoke, stress, or throughput
+success.
 
 ## Frozen Inputs
 
@@ -31,6 +32,11 @@ yet claim A2 runtime, smoke, stress, or throughput success.
   tar-synced clean source passed `495` AscendStore tests, cache-free control
   sync passed `83` deployment tests, and Ruff lint, `py_compile`, source diff,
   package/native-path, and cache-pollution gates passed.
+- `g0/summary.json`: live physical capacity was 7 free cards after replacement;
+  new 1+1 Pods used the exact config ID, both dynamic runtime/API checks and
+  model/native-library gates passed, Prefill/Decode APIs became Ready, proxy
+  discovered exactly 1P1D, engines stopped, and final Master keys/bytes/clients
+  returned to `0/0/0`.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

@@ -1,0 +1,5012 @@
+{
+  "kind": "PodList",
+  "apiVersion": "v1",
+  "metadata": {
+    "resourceVersion": "32679888"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "cert-manager-5d4b66d5fb-6wkmc",
+        "namespace": "cert-manager",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cert-manager-controller",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cert-manager-5d4b66d5fb-rcqhl",
+        "namespace": "cert-manager",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "cert-manager-controller",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cert-manager-cainjector-5fb67577f8-6bq55",
+        "namespace": "cert-manager",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cert-manager-cainjector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cert-manager-cainjector-5fb67577f8-gwxkc",
+        "namespace": "cert-manager",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "cert-manager-cainjector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cert-manager-webhook-d8b7d9d5f-46x45",
+        "namespace": "cert-manager",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "cert-manager-webhook",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cert-manager-webhook-d8b7d9d5f-nn9mp",
+        "namespace": "cert-manager",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cert-manager-webhook",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-runtime-containerd-79mzc",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "inject",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "16Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-runtime-containerd-bxjcr",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "inject",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "16Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-runtime-containerd-gkdhz",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-11T11:51:52Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "inject",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "16Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "buildkitd",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "buildkitd",
+            "resources": {
+              "requests": {
+                "cpu": "5",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-hostpath-6dcvz",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "sleep",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-hostpath-kr8x4",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-27T13:21:56Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "sleep",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-hostpath-trwnk",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "sleep",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-070e2800-2f26-4aa3-a6c2-22a7f1a6a939",
+        "namespace": "default",
+        "deletionTimestamp": "2026-08-06T07:14:28Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-0b787b21-b116-4d06-a51f-00c6f04fcbb2",
+        "namespace": "default",
+        "deletionTimestamp": "2026-08-06T05:53:24Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-2aa8d2f8-cbc4-4817-b05a-e12eb219c503",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-29T07:10:52Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-5c409887-15eb-4484-b9b3-748e4b58a8ae",
+        "namespace": "default",
+        "deletionTimestamp": "2026-08-06T04:19:33Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-8b592df8-a6eb-4a9c-9504-7f9830944c0d",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-31T03:12:21Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-93565262-3036-423a-9c80-700263087fd0",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-31T00:13:38Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-dns-check-b9cbef38-5294-4192-a78c-b2956f9f591f",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-29T07:21:06Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "dns-check",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-e2e-dns-1786001085337706745-2",
+        "namespace": "default",
+        "deletionTimestamp": "2026-08-06T07:25:55Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "infernex-e2e-dns-1786001085337706745-2",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-acp-qqvnv",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "acp-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-acp-rh47n",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-27T13:22:46Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "acp-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-acp-tlprj",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "acp-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-tft-5lwxk",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-27T13:21:56Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "tft-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-tft-kslbk",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "tft-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mindio-tft-vkbhj",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "tft-container",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-feature-discovery-l8rm7",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-27T13:21:56Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "npu-feature-discovery",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-feature-discovery-nn8l9",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "npu-feature-discovery",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-feature-discovery-xzmgj",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "npu-feature-discovery",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-gc-c87b7b5b4-lk9rn",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "gc",
+            "resources": {
+              "limits": {
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-gc-c87b7b5b4-xvn4q",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "gc",
+            "resources": {
+              "limits": {
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-master-6ff5bf7bbc-w5gk2",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "master",
+            "resources": {
+              "limits": {
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-worker-47wpj",
+        "namespace": "default",
+        "deletionTimestamp": "2026-07-27T13:21:56Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "worker",
+            "resources": {
+              "limits": {
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "5m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-worker-j6gsm",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "worker",
+            "resources": {
+              "limits": {
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "5m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-node-feature-discovery-worker-v69qn",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "worker",
+            "resources": {
+              "limits": {
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "5m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-operator-7f9cb54f88-8htsc",
+        "namespace": "default",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "npu-operator",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hardware-diagnosis-68c68d8c44-dxq2c",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "hardware-diagnosis",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hardware-monitor-7td76",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": "2026-07-21T06:53:41Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "hardware-monitor",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hardware-monitor-z7chs",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "hardware-monitor",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hardware-monitor-zkqr4",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "hardware-monitor",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "network-performance-exporter-277gl",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "network-performance-exporter",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "network-performance-exporter-hmhp9",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "network-performance-exporter",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "network-performance-exporter-zj7v7",
+        "namespace": "eagle-eye",
+        "deletionTimestamp": "2026-07-21T06:53:41Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "network-performance-exporter",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ai-gateway-controller-854d9c5bcb-5fkf7",
+        "namespace": "envoy-ai-gateway-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "ai-gateway-helm",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ai-gateway-controller-854d9c5bcb-xr476",
+        "namespace": "envoy-ai-gateway-system",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "ai-gateway-helm",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "envoy-gateway-5cd9b797fd-fgqg4",
+        "namespace": "envoy-gateway-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "envoy-gateway",
+            "resources": {
+              "limits": {
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "256Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "envoy-gateway-5cd9b797fd-jp7mp",
+        "namespace": "envoy-gateway-system",
+        "deletionTimestamp": "2026-07-11T11:52:03Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "envoy-gateway",
+            "resources": {
+              "limits": {
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "256Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "envoy-kserve-kserve-ingress-gateway-deaaa49b-6798d78f99-5d4jm",
+        "namespace": "envoy-gateway-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "envoy",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "512Mi"
+              }
+            }
+          },
+          {
+            "name": "shutdown-manager",
+            "resources": {
+              "requests": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "envoy-kserve-kserve-ingress-gateway-deaaa49b-6798d78f99-bx4j6",
+        "namespace": "envoy-gateway-system",
+        "deletionTimestamp": "2026-07-11T11:57:53Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "envoy",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "512Mi"
+              }
+            }
+          },
+          {
+            "name": "shutdown-manager",
+            "resources": {
+              "requests": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-bridge-6f8b4885b5-gkxfc",
+        "namespace": "infernex-bridge-system",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-bridge-6f8b4885b5-k4tqd",
+        "namespace": "infernex-bridge-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mooncake-master-deployment-5cdd546764-4mlgw",
+        "namespace": "infernex-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "mooncake-master",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "redis-server-deployment-67566b9765-jmbfm",
+        "namespace": "infernex-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "redis-server",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "vllm-aggregated-tp4-01-7487ff9cf6-mc7gp",
+        "namespace": "infernex-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "aggregated-engine",
+            "resources": {
+              "limits": {
+                "cpu": "8",
+                "huawei.com/Ascend910": "2",
+                "memory": "128Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "huawei.com/Ascend910": "2",
+                "memory": "64Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "vllm-aggregated-tp4-03-667bd94b59-5s446",
+        "namespace": "infernex-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "aggregated-engine",
+            "resources": {
+              "limits": {
+                "huawei.com/Ascend910": "2"
+              },
+              "requests": {
+                "cpu": "4",
+                "huawei.com/Ascend910": "2",
+                "memory": "64Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ingress-nginx-controller-6s5z2",
+        "namespace": "ingress-nginx",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "controller",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "90Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ingress-nginx-controller-qw2nn",
+        "namespace": "ingress-nginx",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "controller",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "90Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ingress-nginx-controller-vg9qx",
+        "namespace": "ingress-nginx",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "controller",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "90Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "istiod-5779557bdb-ljwb9",
+        "namespace": "istio-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "discovery",
+            "resources": {
+              "requests": {
+                "cpu": "500m",
+                "memory": "2Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-cache-indexer-897b7c988-8ptkc",
+        "namespace": "kserve",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "cache-indexer",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-cache-indexer-897b7c988-x2rnf",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cache-indexer",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-kserve-router-scheduler-c94b77bb6-t68wx",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "main",
+            "resources": {
+              "limits": {
+                "memory": "16Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "memory": "8Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-kserve-router-scheduler-c94b77bb6-xgt2t",
+        "namespace": "kserve",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "main",
+            "resources": {
+              "limits": {
+                "memory": "16Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "memory": "8Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-mooncake-master-55d8647d4f-bssg6",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "mooncake-master",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-mooncake-metadata-6b79bddb6b-2q48j",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "mooncake-metadata",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ex-ag-01-sn-sc-mooncake-metadata-6b79bddb6b-cf77x",
+        "namespace": "kserve",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "mooncake-metadata",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kserve-controller-manager-69d87f7796-x2vvs",
+        "namespace": "kserve",
+        "deletionTimestamp": "2026-07-11T11:52:03Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kserve-controller-manager-69d87f7796-xlx86",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "llmisvc-controller-manager-66bd94dd86-2vplh",
+        "namespace": "kserve",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "llmisvc-controller-manager-66bd94dd86-896gg",
+        "namespace": "kserve",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-device-plugin-d7f4f",
+        "namespace": "kube-system",
+        "deletionTimestamp": "2026-07-11T11:51:52Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "device-plugin-01",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-device-plugin-kgt54",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "device-plugin-01",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-device-plugin-nm45p",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "device-plugin-01",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "calico-kube-controllers-6d75d78f5d-7md9r",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "calico-kube-controllers",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "calico-node-9tgs8",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "calico-node",
+            "resources": {
+              "requests": {
+                "cpu": "250m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "calico-node-b2b7v",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "calico-node",
+            "resources": {
+              "requests": {
+                "cpu": "250m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "calico-node-rtg6v",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "calico-node",
+            "resources": {
+              "requests": {
+                "cpu": "250m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "coredns-6d5b856b65-4wwl9",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "coredns",
+            "resources": {
+              "limits": {
+                "memory": "170Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "70Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "coredns-6d5b856b65-8tkls",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "coredns",
+            "resources": {
+              "limits": {
+                "memory": "170Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "70Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "csi-nfs-controller-5df869884d-945l4",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "csi-provisioner",
+            "resources": {
+              "limits": {
+                "memory": "400Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "csi-resizer",
+            "resources": {
+              "limits": {
+                "memory": "400Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "csi-snapshotter",
+            "resources": {
+              "limits": {
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "liveness-probe",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "nfs",
+            "resources": {
+              "limits": {
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "csi-nfs-node-g8mv7",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "liveness-probe",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "node-driver-registrar",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "nfs",
+            "resources": {
+              "limits": {
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "csi-nfs-node-pknmf",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "liveness-probe",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "node-driver-registrar",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "nfs",
+            "resources": {
+              "limits": {
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "csi-nfs-node-w5qdm",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "liveness-probe",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "node-driver-registrar",
+            "resources": {
+              "limits": {
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "nfs",
+            "resources": {
+              "limits": {
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "etcd-m1",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "etcd",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-apiserver-m1",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "kube-apiserver",
+            "resources": {
+              "requests": {
+                "cpu": "250m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-controller-manager-m1",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "kube-controller-manager",
+            "resources": {
+              "requests": {
+                "cpu": "200m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-proxy-gqd2p",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "kube-proxy",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-proxy-prcwz",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "kube-proxy",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-proxy-q5c6j",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "kube-proxy",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-scheduler-m1",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "kube-scheduler",
+            "resources": {
+              "requests": {
+                "cpu": "100m"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "metrics-server-586f979f47-csfrg",
+        "namespace": "kube-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "metrics-server",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "decode-engine-deployment-85f47466d6-6wn8r",
+        "namespace": "liangjiahao",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "decode-engine",
+            "resources": {
+              "limits": {
+                "huawei.com/Ascend910": "2"
+              },
+              "requests": {
+                "huawei.com/Ascend910": "2"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mooncake-master-deployment-7b66fcd748-mf85j",
+        "namespace": "liangjiahao",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "mooncake-master",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "prefill-engine-deployment-7b8549d6fc-nz28h",
+        "namespace": "liangjiahao",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "prefill-engine",
+            "resources": {
+              "limits": {
+                "huawei.com/Ascend910": "4"
+              },
+              "requests": {
+                "huawei.com/Ascend910": "4"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "proxy-server-deployment-54bb6c9585-7fzs5",
+        "namespace": "liangjiahao",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "proxy-server",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "250m",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "vllm-ascend-ut",
+        "namespace": "liangjiahao",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "ut",
+            "resources": {
+              "limits": {
+                "cpu": "16",
+                "memory": "32Gi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "4Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "lws-controller-manager-78b76f6f5c-tkf7z",
+        "namespace": "lws-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "requests": {
+                "cpu": "1",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-analyzer-65cf77bfc4-6pb7g",
+        "namespace": "mco-system",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "analyzer",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-analyzer-65cf77bfc4-xhhtt",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "analyzer",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-collector-7nptn",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-collector-nc6nb",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-collector-x2d9m",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-kata-deploy-fccjt",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "kube-kata",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-kata-deploy-qjmpd",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "kube-kata",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mco-kata-deploy-qrq65",
+        "namespace": "mco-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "kube-kata",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "ascend-operator-manager-89fc487cb-672qz",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "3Gi"
+              },
+              "requests": {
+                "cpu": "2",
+                "memory": "3Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "clusterd-74d4f8f5d6-pjhk4",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "clusterd",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "noded-lzg7f",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "noded",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "noded-pr94h",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": "2026-07-11T11:51:52Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "noded",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "noded-ztsbs",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "noded",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "resilience-controller-5f88bb8bbc-d85m4",
+        "namespace": "mindx-dl",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "resilience-controller",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "300Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "alertmanager-main-0",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "alertmanager",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              },
+              "requests": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              }
+            }
+          },
+          {
+            "name": "config-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "alertmanager-main-1",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "alertmanager",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              },
+              "requests": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              }
+            }
+          },
+          {
+            "name": "config-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "alertmanager-main-2",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "alertmanager",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              },
+              "requests": {
+                "cpu": "200m",
+                "memory": "400Mi"
+              }
+            }
+          },
+          {
+            "name": "config-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "blackbox-exporter-6d6fbbfc96-vsj4k",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "blackbox-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "module-configmap-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "kube-state-metrics-677558db89-l48sw",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "kube-state-metrics",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "250Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "190Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy-main",
+            "resources": {
+              "limits": {
+                "cpu": "40m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "20m",
+                "memory": "20Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy-self",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "node-exporter-4579t",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "node-exporter",
+            "resources": {}
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "node-exporter-8rnzw",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "node-exporter",
+            "resources": {}
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "node-exporter-swrxv",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "node-exporter",
+            "resources": {}
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "prometheus-k8s-0",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "prometheus",
+            "resources": {
+              "requests": {
+                "memory": "400Mi"
+              }
+            }
+          },
+          {
+            "name": "config-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "prometheus-k8s-1",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "prometheus",
+            "resources": {
+              "requests": {
+                "memory": "400Mi"
+              }
+            }
+          },
+          {
+            "name": "config-reloader",
+            "resources": {
+              "limits": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "prometheus-operator-5cb64c846d-bhw2b",
+        "namespace": "monitoring",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "prometheus-operator",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "100Mi"
+              }
+            }
+          },
+          {
+            "name": "kube-rbac-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "20m",
+                "memory": "40Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "20Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cache-indexer-96dfd4cf-jl8t4",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cache-indexer",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "inference-gateway-istio-6c7bfd9c84-wlzsw",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "istio-proxy",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-epp-867bf76d9b-m8jsb",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "tokenizer",
+            "resources": {
+              "limits": {
+                "cpu": "4",
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "memory": "2Gi"
+              }
+            }
+          },
+          {
+            "name": "epp",
+            "resources": {
+              "limits": {
+                "memory": "16Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "memory": "8Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mooncake-master-deployment-6fb64c5d99-4gxcr",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "mooncake-master",
+            "resources": {
+              "limits": {
+                "cpu": "8"
+              },
+              "requests": {
+                "cpu": "8"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "qwen3-8b-agg-01-aggregated-0",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "aggregated-engine",
+            "resources": {
+              "limits": {
+                "cpu": "8",
+                "huawei.com/Ascend910": "1",
+                "memory": "128Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "huawei.com/Ascend910": "1",
+                "memory": "64Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "qwen3-8b-agg-01-aggregated-1",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "aggregated-engine",
+            "resources": {
+              "limits": {
+                "cpu": "8",
+                "huawei.com/Ascend910": "1",
+                "memory": "128Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "huawei.com/Ascend910": "1",
+                "memory": "64Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "redis-server-deployment-67566b9765-27w2s",
+        "namespace": "mooncake-main",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "redis-server",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "nats-0",
+        "namespace": "nats",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "nats",
+            "resources": {}
+          },
+          {
+            "name": "reloader",
+            "resources": {}
+          },
+          {
+            "name": "prom-exporter",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-dra-plugin-4hk28",
+        "namespace": "npu-dra-driver",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "dra-plugin",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "vcannrt-installer-n8r8p",
+        "namespace": "npu-dra-driver",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "vcannrt-installer",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "256Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-exporter-9d98d",
+        "namespace": "npu-exporter",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "npu-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-exporter-tqfdh",
+        "namespace": "npu-exporter",
+        "deletionTimestamp": "2026-07-11T11:51:52Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "npu-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-exporter-x7qdr",
+        "namespace": "npu-exporter",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "npu-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "1000Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768220-hzqrx",
+        "namespace": "oauth-code-token",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768280-kbbhw",
+        "namespace": "oauth-code-token",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768340-thvj2",
+        "namespace": "oauth-code-token",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "openfuyao-system-controller-5859fcb499-ghd69",
+        "namespace": "openfuyao-system-controller",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "openfuyao-system-controller",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "application-management-service-69b84dcc84-fvh5k",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-proxy",
+            "resources": {}
+          },
+          {
+            "name": "application-management-service",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "console-service-795b657cfc-g5x7b",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "console-service",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "console-website-6f55975497-bnr59",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "console-website",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "50Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-chartmuseum-fdc9848b6-sqvtd",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "chartmuseum",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-core-6ccb9cc968-54b2w",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "core",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-database-0",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "database",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-jobservice-6674444d5d-wr78x",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "jobservice",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-nginx-6449749746-xrgsk",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "nginx",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-portal-78bf65c9-bcvth",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "portal",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-redis-0",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "redis",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "local-harbor-registry-69c575564d-bsqhw",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "registry",
+            "resources": {}
+          },
+          {
+            "name": "registryctl",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "marketplace-service-b64d97558-bdlfv",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-proxy",
+            "resources": {}
+          },
+          {
+            "name": "marketplace-service",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "monitoring-service-6557975996-gcvvx",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-proxy",
+            "resources": {}
+          },
+          {
+            "name": "monitoring-service",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "oauth-server-86b9dfbb7b-tf5kn",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-server",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "100Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "oauth-webhook-6c6849d468-c28s8",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-webhook",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "100Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "plugin-management-service-54dd76b5d-xq4bq",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "oauth-proxy",
+            "resources": {}
+          },
+          {
+            "name": "plugin-management-service",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "user-management-operator-598ff6664d-d59hh",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "user-management-operator",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-terminal-service-6b85579778-85bdw",
+        "namespace": "openfuyao-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "webterminal-controller",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "infernex-elastic-scaler-controller-manager-849998cc6-5z6jt",
+        "namespace": "scaling-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "256Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "resourcescalinggroup-controller-74b49b6597-zh54w",
+        "namespace": "scaling-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "tidal-controller-manager-55f4f58cbc-27dw4",
+        "namespace": "scaling-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "manager",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "128Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "64Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "nginx-deployment-5cdddd755b-4ln8m",
+        "namespace": "scaling-test",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "nginx",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "nginx-deployment-5cdddd755b-dz2df",
+        "namespace": "scaling-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "nginx",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "nginx-deployment-5cdddd755b-prbks",
+        "namespace": "scaling-test",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "nginx",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "500Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768220-dvlf6",
+        "namespace": "session-secret",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768280-jk54n",
+        "namespace": "session-secret",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "cleanup-secrets-29768340-zzhgt",
+        "namespace": "session-secret",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "cleanup",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "volcano-admission-cbff9d7cc-f6kwh",
+        "namespace": "volcano-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "admission",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "volcano-controllers-79bfc9f554-wfx2v",
+        "namespace": "volcano-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "volcano-controllers",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "volcano-scheduler-69d7d6dcd9-pxn4w",
+        "namespace": "volcano-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "volcano-scheduler",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "volcano-scheduler-vnpu-57b96df5d9-mt7w6",
+        "namespace": "volcano-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "volcano-scheduler",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "weight-dispatcher-weight-dispatcher-controller-656bb55f58-sf6sq",
+        "namespace": "weight-dispatcher-system",
+        "deletionTimestamp": "2026-07-11T11:52:23Z"
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "controller-manager",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "weight-dispatcher-weight-dispatcher-controller-656bb55f58-vmxhh",
+        "namespace": "weight-dispatcher-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "controller-manager",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "weight-dispatcher-weight-dispatcher-node-agent-4n2kz",
+        "namespace": "weight-dispatcher-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n2",
+        "containers": [
+          {
+            "name": "node-agent",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "weight-dispatcher-weight-dispatcher-node-agent-gqg4c",
+        "namespace": "weight-dispatcher-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "node-agent",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "weight-dispatcher-weight-dispatcher-node-agent-q9fx8",
+        "namespace": "weight-dispatcher-system",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "node-agent",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-client-update-daemonset-pfg7p",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "npu-client-update",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "200m",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-client-update-daemonset-ppnsb",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "npu-client-update",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "200m",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-device-plugin-daemonset-bxv68",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "npu-device-plugin",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "2Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "npu-device-plugin-daemonset-clb7k",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "npu-device-plugin",
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "1",
+                "memory": "2Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "xpu-exporter-daemonset-qhrvt",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "xpu-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "xpu-exporter-daemonset-txlsp",
+        "namespace": "xpu",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "xpu-exporter",
+            "resources": {
+              "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-agent-msjf4",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "opentelemetry-collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-agent-sk4db",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "opentelemetry-collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-collector-586f6bd8c8-8h56k",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "eagle-eye-tracing-collector",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-coordinating-0",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-coordinating-1",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-data-0",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "1536Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-data-1",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "1536Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-ingest-0",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-ingest-1",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-master-0",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-elasticsearch-master-1",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "elasticsearch",
+            "resources": {
+              "limits": {
+                "cpu": "750m",
+                "ephemeral-storage": "2Gi",
+                "memory": "768Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "50Mi",
+                "memory": "512Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-es-index-cleaner-29764315-sxqwr",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "eagle-eye-tracing-es-index-cleaner",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-es-index-cleaner-29765755-rsjsg",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "eagle-eye-tracing-es-index-cleaner",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-es-index-cleaner-29767195-6q9bj",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "n1",
+        "containers": [
+          {
+            "name": "eagle-eye-tracing-es-index-cleaner",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Succeeded"
+      }
+    },
+    {
+      "metadata": {
+        "name": "eagle-eye-tracing-query-58699766d4-8thvd",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "eagle-eye-tracing-query",
+            "resources": {}
+          },
+          {
+            "name": "eagle-eye-tracing-agent-sidecar",
+            "resources": {}
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "mooncake-master-deployment-5d8987d7cc-cfk64",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "mooncake-master",
+            "resources": {
+              "limits": {
+                "cpu": "8",
+                "memory": "8Gi"
+              },
+              "requests": {
+                "cpu": "2",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "qwen3-8b-aggregated-01-aggregated-0",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "aggregated-engine",
+            "resources": {
+              "limits": {
+                "cpu": "8",
+                "huawei.com/Ascend910": "1",
+                "memory": "64Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "huawei.com/Ascend910": "1",
+                "memory": "32Gi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "redis-server-deployment-f94bb56cc-xgqlm",
+        "namespace": "zxyyy",
+        "deletionTimestamp": null
+      },
+      "spec": {
+        "nodeName": "m1",
+        "containers": [
+          {
+            "name": "redis-server",
+            "resources": {
+              "limits": {
+                "cpu": "200m",
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "100Mi"
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running"
+      }
+    }
+  ]
+}

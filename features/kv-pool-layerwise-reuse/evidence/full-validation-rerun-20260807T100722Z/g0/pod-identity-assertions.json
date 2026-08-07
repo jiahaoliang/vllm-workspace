@@ -1,0 +1,17 @@
+{
+  "validated": true,
+  "pods": [
+    {
+      "name": "decode-engine-deployment-598b59d746-fmbpp",
+      "uid": "4259aa35-b835-4bce-8020-b3a851f5b378",
+      "image_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+      "npu_request": "1"
+    },
+    {
+      "name": "prefill-engine-deployment-868546d9f5-g56hb",
+      "uid": "113b46f3-d46f-44d0-9037-b6e21b796e77",
+      "image_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+      "npu_request": "1"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "errors": [],
+  "gates": {
+    "base_pods": [
+      {
+        "image_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+        "name": "decode-engine-deployment-598b59d746-fmbpp",
+        "npu_request": "1",
+        "uid": "4259aa35-b835-4bce-8020-b3a851f5b378"
+      },
+      {
+        "image_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+        "name": "prefill-engine-deployment-868546d9f5-g56hb",
+        "npu_request": "1",
+        "uid": "113b46f3-d46f-44d0-9037-b6e21b796e77"
+      }
+    ],
+    "decode_api_ready": true,
+    "engines_stopped": true,
+    "final_master_metrics": {
+      "master_active_clients": 0.0,
+      "master_allocated_bytes": 0.0,
+      "master_key_count": 0.0
+    },
+    "master_lease_ttl_ms": 30000,
+    "model_identity_both_roles": true,
+    "mooncake_ldd_no_missing": true,
+    "native_source_no_overlay": true,
+    "physical_npu_available": 7,
+    "prefill_api_ready": true,
+    "proxy_decode_nodes": 1,
+    "proxy_prefill_nodes": 1,
+    "runtime_session_apis": 7,
+    "stress_capacity_available": true
+  },
+  "identity": {
+    "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "namespace": "liangjiahao",
+    "node": "n1",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781"
+  },
+  "retained_pods": {
+    "decode": "decode-engine-deployment-598b59d746-fmbpp",
+    "mooncake-master": "mooncake-master-deployment-78565dfd6f-57vts",
+    "prefill": "prefill-engine-deployment-868546d9f5-g56hb",
+    "proxy": "proxy-server-deployment-54bb6c9585-7fzs5"
+  },
+  "run_id": "20260807T100722Z-g0",
+  "schema_version": 1,
+  "status": "passed",
+  "superseded_steps": [
+    {
+      "classification": "checker used tokenizer_config.json instead of frozen tokenizer.json",
+      "exit_code": 1,
+      "replacement": "Prefill and Decode corrected model identity",
+      "replacement_passed": true,
+      "step": "capture model identity"
+    },
+    {
+      "classification": "selector waits began before exact old-Pod deletion sessions were drained",
+      "exit_code": 0,
+      "replacement": "exact old-Pod deletion plus new UID/imageID Pod assertion",
+      "replacement_passed": true,
+      "step": "wait new Prefill/Decode Running"
+    }
+  ],
+  "validated": true
+}

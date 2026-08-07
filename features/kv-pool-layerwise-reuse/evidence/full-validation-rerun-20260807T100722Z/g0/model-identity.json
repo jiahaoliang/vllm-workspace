@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+AssertionError: {'path': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'config_sha256': '229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75', 'tokenizer_sha256': '31181eaf79394ea26728d95ecb54fe7c8413e6f56085dbabc8b0818134380ec8', 'num_hidden_layers': 27, 'max_position_embeddings': 163840}
+command terminated with exit code 1
