@@ -5,9 +5,9 @@ readonly namespace=liangjiahao
 readonly pod_name=vllm-ascend-ut
 readonly container_name=ut
 readonly node_name=n1
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
-readonly image_source_head=14beaf161cca6f1e044e20529ca96c6554dbbe50
-readonly expected_source_head=d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
+readonly image_source_head=45b2e785b10ca4604cd6314819ed15f3ff674781
+readonly expected_source_head=45b2e785b10ca4604cd6314819ed15f3ff674781
 readonly remote_parent=/workspace
 readonly remote_checkout=${remote_parent}/vllm-ascend
 readonly remote_lock=${remote_parent}/.vllm-ascend-ut.lock
@@ -48,11 +48,6 @@ mapfile -t overlay_files < <(
     vllm_ascend | LC_ALL=C sort
 )
 expected_overlay_files=(
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
-  vllm_ascend/envs.py
 )
 if [[ "${overlay_files[*]}" != "${expected_overlay_files[*]}" ]]; then
   printf 'unexpected Python overlay relative to image source %s:\n' \

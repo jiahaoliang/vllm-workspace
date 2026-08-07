@@ -11,14 +11,8 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873"
-EXPECTED_OVERLAY_FILES = [
-    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py",
-    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
-    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
-    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py",
-    "vllm_ascend/envs.py",
-]
+FINAL_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
+EXPECTED_OVERLAY_FILES: list[str] = []
 
 
 def read(relative: str) -> str:
@@ -79,9 +73,9 @@ class ValidationIdentityTest(unittest.TestCase):
         for component, commit in IDENTITY["image_commits"].items():
             self.assertIn(f'ARG {arg_names[component]}="{commit}"', dockerfile)
 
-    def test_python_overlay_keeps_image_and_final_source_identity_explicit(self):
+    def test_native_image_matches_final_source_without_overlay(self):
         overlay = IDENTITY["python_overlay"]
-        self.assertTrue(overlay["required"])
+        self.assertFalse(overlay["required"])
         self.assertEqual(IDENTITY["commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
         self.assertEqual(
             overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
@@ -89,7 +83,7 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertEqual(overlay["commit"], IDENTITY["commits"]["vllm_ascend"])
         self.assertEqual(overlay["files"], EXPECTED_OVERLAY_FILES)
 
-    def test_overlay_consumers_allow_exact_frozen_files(self):
+    def test_overlay_consumers_require_an_empty_file_set(self):
         consumers = {
             "deployment/sync-vllm-ascend-python.sh": "expected_changed",
             "deployment/run-vllm-ascend-ut.sh": "expected_overlay_files",
@@ -110,12 +104,12 @@ class ValidationIdentityTest(unittest.TestCase):
             ]
             self.assertEqual(actual, EXPECTED_OVERLAY_FILES, path)
 
-    def test_overlay_sync_compares_every_host_and_pod_checksum(self):
+    def test_native_source_gate_does_not_write_python_into_pods(self):
         sync = read("deployment/sync-vllm-ascend-python.sh")
-        self.assertIn('mkdir -p "${destination_dirs[@]}"', sync)
-        self.assertIn('sha256sum "${SOURCE_REPO}/${path}"', sync)
-        self.assertIn('sha256sum "${CONTAINER_SOURCE}/${path}"', sync)
-        self.assertIn("checksum mismatch for ${role} ${path}", sync)
+        self.assertIn("native image source identity passed", sync)
+        self.assertIn("Python overlay is disabled", sync)
+        self.assertNotIn("kubectl exec -i", sync)
+        self.assertNotIn('tar -C "${SOURCE_REPO}"', sync)
 
     def test_stress_readiness_fails_fast_when_engine_process_exits(self):
         runner = read("deployment/run-stress-test.sh")
@@ -147,6 +141,16 @@ class ValidationIdentityTest(unittest.TestCase):
         ]
         for manifest in manifests:
             self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
+
+    def test_fabric_mem_is_explicitly_out_of_scope(self):
+        self.assertFalse(IDENTITY["runtime"]["fabric_mem_enabled"])
+        for manifest in (
+            "deployment/40-prefill-engine.yaml",
+            "deployment/50-decode-engine.yaml",
+            "deployment/stress/40-prefill-engine.yaml",
+            "deployment/stress/50-decode-engine.yaml",
+        ):
+            self.assertNotIn("ASCEND_ENABLE_USE_FABRIC_MEM", read(manifest), manifest)
 
     def test_all_python_workloads_disable_bytecode_writes(self):
         manifests = (

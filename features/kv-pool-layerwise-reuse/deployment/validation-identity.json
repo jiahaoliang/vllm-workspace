@@ -1,13 +1,13 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
-  "run_id": "20260804T103209Z",
+  "run_id": "20260807T100722Z",
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "d2df1843a1f0884da519389b82277edfa455f22b"
+    "commit": "f2ace507464a49f29e645d768bfd8f5d31c86351"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
   "platform": "linux/arm64",
   "vllm_lane": "main-verified",
   "vllm_version_override": null,
@@ -18,25 +18,19 @@
   "buildkit_namespace": "default",
   "commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873",
-    "mooncake": "786c77ff7692bed58dd99971afef87d6b690cbe3"
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "image_commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
-    "mooncake": "786c77ff7692bed58dd99971afef87d6b690cbe3"
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "python_overlay": {
-    "required": true,
-    "base_commit": "14beaf161cca6f1e044e20529ca96c6554dbbe50",
-    "commit": "d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873",
-    "files": [
-      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py",
-      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
-      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
-      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py",
-      "vllm_ascend/envs.py"
-    ]
+    "required": false,
+    "base_commit": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "commit": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "files": []
   },
   "model": {
     "host_path": "/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
@@ -53,7 +47,8 @@
     "stress_max_model_len": 65536,
     "lease_ttl_ms": 30000,
     "lease_wait_margin_ms": 1500,
-    "lease_expired_code": -707
+    "lease_expired_code": -707,
+    "fabric_mem_enabled": false
   },
   "kubernetes": {
     "context": "bke-cluster-admin@bke-cluster",

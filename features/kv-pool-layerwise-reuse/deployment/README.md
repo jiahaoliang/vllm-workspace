@@ -18,10 +18,10 @@ It is not a `MooncakeLayerwiseConnector` P2P deployment. It does not use Redis,
 | Input | Value |
 | --- | --- |
 | Node | `n1` (`Ascend910B4`, 32 GiB per NPU) |
-| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1` |
+| Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z` |
 | vLLM | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
-| vLLM-Ascend | `14beaf161cca6f1e044e20529ca96c6554dbbe50` |
-| Mooncake | `786c77ff7692bed58dd99971afef87d6b690cbe3` |
+| vLLM-Ascend | `45b2e785b10ca4604cd6314819ed15f3ff674781` |
+| Mooncake | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
 | Model in Pod | `/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8` |
 | Namespace | `liangjiahao` |
 
@@ -50,7 +50,7 @@ kubectl -n liangjiahao config current-context
 kubectl get namespace -n liangjiahao "${namespace}"
 kubectl describe node -n liangjiahao n1
 nerdctl -n k8s.io images --digests \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
 du -sh /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 sha256sum \
   /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8/*.safetensors
@@ -174,20 +174,19 @@ kubectl exec -n liangjiahao "${PREFILL_POD}" -c prefill-engine -- \
 The formal run and exact API results are archived in
 [`lease-expiry-20260727T091720Z`](../evidence/lease-expiry-20260727T091720Z/README.md).
 
-## Python source update without Pod replacement
+## Native image source identity
 
-For Python-only changes under `repos/vllm-ascend/vllm_ascend/`, run:
+This validation lane does not permit a Python overlay. Verify that both engine
+Pods use the frozen native image and contain all three exact Git HEADs:
 
 ```bash
 features/kv-pool-layerwise-reuse/deployment/sync-vllm-ascend-python.sh
 ```
 
-The helper compares the working tree with the image commit, stops both vLLM
-processes, copies only added or modified package files, applies exact deletions,
-and runs `compileall`. It deliberately leaves vLLM stopped so both roles can be
-started manually after review. It refuses native, build-system, or dependency
-changes; those require rebuilding the image. Pod replacement also discards all
-synced container-layer changes.
+Despite its historical filename, the helper is now a read-only identity gate.
+It rejects any difference between the image and final vLLM-Ascend commits and
+does not stop processes, create directories, copy files, or delete files in Pods.
+Any source change requires a new source SHA and native image rebuild.
 
 ## Dedicated CPU UT Pod
 

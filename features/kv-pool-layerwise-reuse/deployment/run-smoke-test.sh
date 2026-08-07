@@ -3,11 +3,11 @@ set -uo pipefail
 
 readonly namespace=liangjiahao
 readonly remote_artifact_dir=/tmp/layerwise-smoke
-readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1
+readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
 readonly expected_vllm=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
-readonly image_vllm_ascend=14beaf161cca6f1e044e20529ca96c6554dbbe50
-readonly expected_vllm_ascend=d5f0ea7f8c238009b03bc3d5eeeb19a71d80b873
-readonly expected_mooncake=786c77ff7692bed58dd99971afef87d6b690cbe3
+readonly image_vllm_ascend=45b2e785b10ca4604cd6314819ed15f3ff674781
+readonly expected_vllm_ascend=45b2e785b10ca4604cd6314819ed15f3ff674781
+readonly expected_mooncake=df3f74ed8ebdb0c935554beea6299a9f11c723e2
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly workspace_root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
 
@@ -144,11 +144,6 @@ mapfile -t overlay_files < <(
     "${image_vllm_ascend}" -- vllm_ascend | LC_ALL=C sort
 )
 expected_overlay_files=(
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
-  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
-  vllm_ascend/envs.py
 )
 if [[ "${overlay_files[*]}" != "${expected_overlay_files[*]}" ]]; then
   echo "unexpected Python overlay file set: ${overlay_files[*]}" >&2
