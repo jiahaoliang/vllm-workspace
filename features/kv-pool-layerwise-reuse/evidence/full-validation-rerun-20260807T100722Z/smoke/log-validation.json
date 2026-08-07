@@ -1,0 +1,186 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "phase": "direct_kv_load",
+      "case": 0,
+      "response_id": "cmpl-b6411ca7f8f4ddea",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b6411ca7f8f4ddea-0-901ef737 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:663] Reqid: cmpl-b6411ca7f8f4ddea-0-901ef737, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:683] KV pool load spec created req=cmpl-b6411ca7f8f4ddea-0-901ef737 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "direct_kv_load",
+      "case": 1,
+      "response_id": "cmpl-893863b092195a46",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-893863b092195a46-0-b32b51d1 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:663] Reqid: cmpl-893863b092195a46-0-b32b51d1, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:683] KV pool load spec created req=cmpl-893863b092195a46-0-b32b51d1 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "direct_kv_load",
+      "case": 2,
+      "response_id": "cmpl-bc04d55043c78f6b",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-bc04d55043c78f6b-0-90535c47 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:663] Reqid: cmpl-bc04d55043c78f6b-0-90535c47, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:683] KV pool load spec created req=cmpl-bc04d55043c78f6b-0-90535c47 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "direct_kv_load",
+      "case": 3,
+      "response_id": "cmpl-b25a8b6e1943706e",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b25a8b6e1943706e-0-9983f789 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:663] Reqid: cmpl-b25a8b6e1943706e-0-9983f789, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:26 [pool_scheduler.py:683] KV pool load spec created req=cmpl-b25a8b6e1943706e-0-9983f789 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 0,
+      "response_id": "cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc",
+      "role": "prefiller",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-aa21cffa hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:663] Reqid: cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-aa21cffa, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:683] KV pool load spec created req=cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-aa21cffa vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 0,
+      "response_id": "cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-b3b4cae0 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:663] Reqid: cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-b3b4cae0, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:683] KV pool load spec created req=cmpl-88d930d5-30d1-4e56-9e3b-f5ec5df950fc-0-b3b4cae0 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 1,
+      "response_id": "cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f",
+      "role": "prefiller",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-941c05cb hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:663] Reqid: cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-941c05cb, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:683] KV pool load spec created req=cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-941c05cb vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 1,
+      "response_id": "cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-9ae1c8dd hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:663] Reqid: cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-9ae1c8dd, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:683] KV pool load spec created req=cmpl-598d7bd4-dab4-47f9-b1a2-907e8862dd4f-0-9ae1c8dd vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 2,
+      "response_id": "cmpl-0e861eab-d13b-49e1-9693-32369064361a",
+      "role": "prefiller",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-8a021992 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:663] Reqid: cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-8a021992, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:683] KV pool load spec created req=cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-8a021992 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 2,
+      "response_id": "cmpl-0e861eab-d13b-49e1-9693-32369064361a",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-ac7e02df hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:663] Reqid: cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-ac7e02df, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:683] KV pool load spec created req=cmpl-0e861eab-d13b-49e1-9693-32369064361a-0-ac7e02df vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 3,
+      "response_id": "cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863",
+      "role": "prefiller",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-8260aac1 hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:663] Reqid: cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-8260aac1, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=5016) INFO 08-07 13:15:28 [pool_scheduler.py:683] KV pool load spec created req=cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-8260aac1 vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    },
+    {
+      "phase": "proxy_kv_load",
+      "case": 3,
+      "response_id": "cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863",
+      "role": "decoder",
+      "hit_blocks": true,
+      "hit_tokens": true,
+      "layerwise_load": true,
+      "matched_lines": [
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-acabef4d hit_blocks=25/25 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:663] Reqid: cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-acabef4d, Total tokens 3215, kvpool hit tokens: 3200, need to load: 3200",
+        "(EngineCore pid=4212) INFO 08-07 13:15:29 [pool_scheduler.py:683] KV pool load spec created req=cmpl-ce68b21c-6d2d-4a31-840a-9c18ae18f863-0-acabef4d vllm_cached=0 kvpool_cached=3200 need_to_allocate=3200 load_async=False use_layerwise=True"
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

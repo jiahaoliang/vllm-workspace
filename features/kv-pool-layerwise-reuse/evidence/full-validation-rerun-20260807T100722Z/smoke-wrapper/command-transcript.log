@@ -1,0 +1,96 @@
+[2026-08-07T13:10:25Z] START preflight stop Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-07T13:10:25Z] END preflight stop Prefill exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-stop-prefill.log
+[2026-08-07T13:10:25Z] START preflight stop Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-598b59d746-fmbpp -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-07T13:10:25Z] END preflight stop Decode exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-stop-decode.log
+[2026-08-07T13:10:25Z] START preflight wait Prefill NPU release
+COMMAND wait_npu_release prefill-engine-deployment-868546d9f5-g56hb prefill-engine
+[2026-08-07T13:10:26Z] END preflight wait Prefill NPU release exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-prefill-npu-released.log
+[2026-08-07T13:10:26Z] START preflight wait Decode NPU release
+COMMAND wait_npu_release decode-engine-deployment-598b59d746-fmbpp decode-engine
+[2026-08-07T13:10:26Z] END preflight wait Decode NPU release exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-decode-npu-released.log
+[2026-08-07T13:10:26Z] START preflight restart Master
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-07T13:10:26Z] END preflight restart Master exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-master-restart.log
+[2026-08-07T13:10:26Z] START preflight wait Master
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-07T13:10:29Z] END preflight wait Master exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-master-rollout.log
+[2026-08-07T13:10:29Z] START capture preflight Master
+COMMAND capture_metrics
+[2026-08-07T13:10:29Z] END capture preflight Master exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight.metrics
+[2026-08-07T13:10:29Z] START assert preflight Master empty
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight.metrics
+[2026-08-07T13:10:29Z] END assert preflight Master empty exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/preflight-assert.log
+[2026-08-07T13:10:29Z] START start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- env PYTHONDONTWRITEBYTECODE=1 /opt/vllm-layerwise/start-prefill.sh
+[2026-08-07T13:10:33Z] END start Prefill exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/start-prefill.log
+[2026-08-07T13:10:33Z] START wait Prefill
+COMMAND wait_http prefill-engine-deployment-868546d9f5-g56hb prefill-engine http://127.0.0.1:8100/v1/models
+[2026-08-07T13:12:21Z] END wait Prefill exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/wait-prefill.log
+[2026-08-07T13:12:21Z] START start Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-598b59d746-fmbpp -c decode-engine -- env PYTHONDONTWRITEBYTECODE=1 /opt/vllm-layerwise/start-decode.sh
+[2026-08-07T13:12:24Z] END start Decode exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/start-decode.log
+[2026-08-07T13:12:24Z] START wait Decode
+COMMAND wait_http decode-engine-deployment-598b59d746-fmbpp decode-engine http://127.0.0.1:8200/v1/models
+[2026-08-07T13:14:09Z] END wait Decode exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/wait-decode.log
+[2026-08-07T13:14:09Z] START wait Prefill Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-868546d9f5-g56hb --timeout=1800s
+[2026-08-07T13:14:10Z] END wait Prefill Ready exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/ready-prefill.log
+[2026-08-07T13:14:10Z] START wait Decode Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/decode-engine-deployment-598b59d746-fmbpp --timeout=1800s
+[2026-08-07T13:14:10Z] END wait Decode Ready exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/ready-decode.log
+[2026-08-07T13:14:10Z] START wait proxy
+COMMAND wait_http prefill-engine-deployment-868546d9f5-g56hb prefill-engine http://vllm-proxy-service:8000/health
+[2026-08-07T13:14:10Z] END wait proxy exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/wait-proxy.log
+[2026-08-07T13:14:10Z] START run formal smoke
+COMMAND /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment/run-smoke-test.sh /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke
+[2026-08-07T13:15:34Z] END run formal smoke exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/run-smoke.log
+[2026-08-07T13:15:34Z] START assert smoke contract
+COMMAND python3 -c $'\nimport json, sys\nfrom pathlib import Path\nroot = Path(sys.argv[1])\nsummary = json.loads((root / "concurrent-summary.json").read_text())\nassert summary["status"] == "passed" and summary["validated"] is True and summary["diagnosis"] == "passed"\nassert summary["concurrency"] == 4 and summary["block_size"] == 128\nassert summary["expected_hit_blocks"] == 25 and summary["expected_hit_tokens"] == 3200\nassert summary["expected_master_key_count"] == 64\nexpected_counts = {"empty_pool_baseline": 4, "warmup": 5, "direct_kv_load": 4, "proxy_kv_load": 4}\nfor name, count in expected_counts.items():\n    phase = summary["phases"][name]\n    assert phase["status"] == "passed" and phase["validated"] is True and len(phase["cases"]) == count\n    for case in phase["cases"]:\n        assert case["http_status"] == 200 and case["validated"] is True\n        checks = case["hard_gate_checks"]\n        assert checks["validated"] is True and checks["generated_token_count_match"] is True\n        assert checks["marker_token_prefix_match"] is True and checks["text_marker_prefix_match"] is True\n        assert checks["isolated"] is True and checks["foreign_markers"] == []\n        assert checks["prompt_tokens_match"] is True and checks["completion_tokens_match"] is True\n        assert checks["finish_reason_match"] is True and checks["errors"] == []\nlog_validation = json.loads((root / "log-validation.json").read_text())\nassert log_validation["passed"] is True and len(log_validation["checks"]) == 12\nassert all(check["passed"] for check in log_validation["checks"])\nmetrics = (root / "mooncake-master.metrics").read_text()\nassert "master_key_count 64" in metrics\nprint(json.dumps({"validated": True, "case_count": 17, "hit_correlation_checks": 12, "marker_isolation": True, "master_key_count": 64}, indent=2, sort_keys=True))' /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke
+[2026-08-07T13:15:34Z] END assert smoke contract exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/smoke-contract.json
+[2026-08-07T13:15:34Z] START stop Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-07T13:15:36Z] END stop Prefill exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/stop-prefill.log
+[2026-08-07T13:15:36Z] START stop Decode
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-598b59d746-fmbpp -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-07T13:15:39Z] END stop Decode exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/stop-decode.log
+[2026-08-07T13:15:39Z] START wait Prefill NPU release
+COMMAND wait_npu_release prefill-engine-deployment-868546d9f5-g56hb prefill-engine
+[2026-08-07T13:15:39Z] END wait Prefill NPU release exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/prefill-npu-released.log
+[2026-08-07T13:15:39Z] START wait Decode NPU release
+COMMAND wait_npu_release decode-engine-deployment-598b59d746-fmbpp decode-engine
+[2026-08-07T13:15:40Z] END wait Decode NPU release exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/decode-npu-released.log
+[2026-08-07T13:15:40Z] START restart Master for cleanup
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-07T13:15:40Z] END restart Master for cleanup exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/master-restart.log
+[2026-08-07T13:15:40Z] START wait Master cleanup
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-07T13:15:45Z] END wait Master cleanup exit=0 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/master-rollout.log
+[2026-08-07T13:15:45Z] START capture final Master
+COMMAND capture_metrics
+[2026-08-07T13:15:46Z] END capture final Master exit=1 artifact=/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/final-empty.metrics
+[2026-08-07T13:16:54Z] START wait-failure-cleanup-master
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-07T13:16:54Z] END wait-failure-cleanup-master exit=0 artifact=failure-cleanup-master-rollout.log
+[2026-08-07T13:17:16Z] START assert-prefill-stopped
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-prefill.pid\;\ \!\ pgrep\ -f\ \"\[v\]llm.entrypoints.openai.api_server\"
+[2026-08-07T13:17:17Z] END assert-prefill-stopped exit=0 artifact=final-prefill-stopped.log
+[2026-08-07T13:17:32Z] START assert-decode-stopped
+COMMAND kubectl exec -n liangjiahao decode-engine-deployment-598b59d746-fmbpp -c decode-engine -- bash -lc test\ \!\ -e\ /tmp/vllm-decode.pid\;\ \!\ pgrep\ -f\ \"\[v\]llm.entrypoints.openai.api_server\"
+[2026-08-07T13:17:32Z] END assert-decode-stopped exit=0 artifact=final-decode-stopped.log
+[2026-08-07T13:17:51Z] START capture-final-master-r2
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-868546d9f5-g56hb -c prefill-engine -- python3 -c $'import time; from urllib.request import urlopen; deadline=time.monotonic()+60; last=None\nwhile time.monotonic()<deadline:\n try:\n  print(urlopen("http://mooncake-master-service:9003/metrics",timeout=5).read().decode(),end=""); raise SystemExit(0)\n except Exception as exc: last=exc; time.sleep(0.5)\nraise SystemExit(f"metrics timeout: {last}")'
+[2026-08-07T13:17:51Z] END capture-final-master-r2 exit=0 artifact=final-empty-r2.metrics
+[2026-08-07T13:18:01Z] START assert-final-master-r2
+COMMAND python3 -c import\ sys\;\ values=\{\}\;\ \[values.__setitem__\(parts\[0\]\,float\(parts\[1\]\)\)\ for\ line\ in\ open\(sys.argv\[1\]\)\ if\ len\(parts:=line.split\(\)\)==2\ and\ parts\[0\]\ in\ \{\"master_key_count\"\,\"master_allocated_bytes\"\,\"master_active_clients\"\}\]\;\ assert\ values==\{\"master_key_count\":0.0\,\"master_allocated_bytes\":0.0\,\"master_active_clients\":0.0\}\,values\;\ print\(values\) features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/final-empty-r2.metrics
+[2026-08-07T13:18:01Z] END assert-final-master-r2 exit=0 artifact=final-empty-r2-assert.log
+[2026-08-07T13:18:48Z] START validate-summary
+COMMAND jq -e .status==\"passed\"\ and\ .validated==true\ and\ .gates.runtime_runner_exit==0\ and\ .gates.case_count==17\ and\ .gates.hit_correlation_checks==12\ and\ .gates.marker_isolation==true\ and\ .gates.master_empty_after_retry==true\ and\ \(.superseded_steps\|length\)==1\ and\ \(.errors\|length\)==0 features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/summary.json
+[2026-08-07T13:18:48Z] END validate-summary exit=0 artifact=summary-validation.txt
+[2026-08-07T13:19:20Z] START generate-checksums
+COMMAND python3 -c import\ hashlib\;\ from\ pathlib\ import\ Path\;\ root=Path\(\"features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper\"\)\;\ excluded=\{\"SHA256SUMS\"\,\"steps.jsonl\"\,\"command-transcript.log\"\,\"checksum-replay.log\"\}\;\ files=sorted\(p\ for\ p\ in\ root.iterdir\(\)\ if\ p.is_file\(\)\ and\ p.name\ not\ in\ excluded\)\;\ \[print\(hashlib.sha256\(p.read_bytes\(\)\).hexdigest\(\)+\"\ \ \"+p.as_posix\(\)\)\ for\ p\ in\ files\]
+[2026-08-07T13:19:20Z] END generate-checksums exit=0 artifact=SHA256SUMS
+[2026-08-07T13:19:27Z] START replay-checksums
+COMMAND sha256sum -c features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke-wrapper/SHA256SUMS
+[2026-08-07T13:19:27Z] END replay-checksums exit=0 artifact=checksum-replay.log

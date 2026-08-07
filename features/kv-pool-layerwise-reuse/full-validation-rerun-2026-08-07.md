@@ -2,11 +2,11 @@
 
 ## Status And Scope
 
-G4_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
+SMOKE_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
 same-key restart oracle, the exact native ARM64 image, native-image CPU/mock,
 base 1P1D runtime identity, direct ranged G1, and lease expiry/recovery gates
-passed. The 27-layer G4 runtime audit also passed. Smoke, stress, and throughput
-remain unclaimed.
+passed. The 27-layer G4 runtime audit and 1P1D concurrent smoke also passed.
+Stress and throughput remain unclaimed.
 
 ## Frozen Identity
 
@@ -49,10 +49,11 @@ remain unclaimed.
 | Lease | live TTL `30000ms`; waits `31500.128ms` and `31500.090ms`; stale ranged read `[-707]`; fresh get exact two-layer recovery; Master `0/0/0` before and after reset |
 | G4 attempt 1 | Runtime request/checker passed, but evidence-local assertion rejected valid extra `usage.prompt_tokens_details: null`; failure cleanup stopped engines and reset Master `0/0/0`; corrected validator replay passed |
 | G4 rerun | `27/27` Prefill saves and `27/27` Decode loads; each key `147456 == 131072+16384`; final-layer commit `[0,0,0,0]` follows save; whole-key `0`; Decode hit `512/512`; 41 runtime steps green; final Master `0/0/0` |
+| 1P1D smoke | 4 cold baseline + 5 warmup + 4 direct load + 4 proxy load cases all passed; 12/12 hit correlations; marker/token/usage/finish-reason isolation; expected pool 64 keys; engines stopped and retry cleanup Master `0/0/0` |
 
 ## Pending Gates
 
-- Run smoke, concurrent smoke, and stress S1-S3 serially.
+- Run stress S1-S3 serially.
 - Assert final empty Master metrics, generate checksums, replay offline reports,
   stop vLLM processes, and publish final reports/state.
 

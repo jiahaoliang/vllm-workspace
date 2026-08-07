@@ -1,0 +1,9 @@
+artifacts: /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke
+prefiller: prefill-engine-deployment-868546d9f5-g56hb
+decoder: decode-engine-deployment-598b59d746-fmbpp
+running concurrent KV cache smoke test
+prompt layout: 12 shared blocks + 13 unique blocks per case
+concurrent KV-load correctness: direct decoder and proxy phases validated 4/4 cases
+smoke artifacts: /tmp/layerwise-smoke
+KV hit log validation passed: 12 role/case checks
+concurrent KV cache smoke test passed; artifacts: /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/full-validation-rerun-20260807T100722Z/smoke

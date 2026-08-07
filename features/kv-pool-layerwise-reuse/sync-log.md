@@ -839,3 +839,13 @@
   hit correlation, and post-request Master metrics were 4 keys, 15925248 bytes,
   and 2 active clients. Both engines were stopped and reset Master ended at
   `0/0/0`.
+- The formal 1P1D smoke runner passed with exit `0`: four cold baseline, five
+  warmup, four direct load, and four proxy concurrent cases all satisfied
+  marker token/text prefixes, foreign-marker exclusion, prompt/completion
+  usage, generated token count, and finish reason. All `12` request/role hit
+  correlations passed at 25 blocks and 3200 tokens; the expected Master key
+  count was 64. The wrapper's immediate metrics read raced the endpoint after
+  a successful cleanup rollout; its failure trap reset Master again, and the
+  replacement 60-second retry proved both engine PIDs absent and Master
+  `0/0/0`. No smoke runtime gate was rerun because the nonzero step occurred
+  only after the complete runner and independent hard-oracle assertion passed.

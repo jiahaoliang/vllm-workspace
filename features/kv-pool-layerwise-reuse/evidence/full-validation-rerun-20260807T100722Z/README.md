@@ -1,9 +1,9 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: G4_VERIFIED. Source/tooling, the exact native ARM64 image,
+Status: SMOKE_VERIFIED. Source/tooling, the exact native ARM64 image,
 native-image CPU/mock, base 1P1D runtime identity, direct ranged G1, and lease
-expiry/recovery and G4 runtime audit are verified. This directory does not yet
-claim smoke, stress, or throughput success.
+expiry/recovery, G4 runtime audit, and 1P1D concurrent smoke are verified. This
+directory does not yet claim stress or throughput success.
 
 ## Frozen Inputs
 
@@ -60,6 +60,12 @@ claim smoke, stress, or throughput success.
   two-fragment byte sum, final-layer commit results were all zero and ordered
   after save, whole-key calls were zero, Decode hit correlation was `512/512`,
   and final Master metrics were `0/0/0` after stopping both engines.
+- `smoke/concurrent-summary.json` and `smoke-wrapper/summary.json`: all 17
+  runtime cases passed across cold baseline, warmup, direct load, and proxy
+  concurrent load. Marker/token/usage/finish-reason isolation passed for every
+  case, all 12 request/role hit correlations passed, and the frozen pool target
+  was 64 keys. An immediate post-rollout metrics read raced the endpoint; the
+  retry cleanup proved both engines stopped and final Master `0/0/0`.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

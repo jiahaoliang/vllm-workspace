@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "gate": "smoke",
+  "status": "passed",
+  "validated": true,
+  "run_id": "20260807T100722Z-smoke",
+  "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
+  "gates": {
+    "runtime_runner_exit": 0,
+    "case_count": 17,
+    "empty_pool_baseline_cases": 4,
+    "warmup_cases": 5,
+    "direct_load_cases": 4,
+    "proxy_load_cases": 4,
+    "hit_correlation_checks": 12,
+    "marker_isolation": true,
+    "expected_hit_blocks": 25,
+    "expected_hit_tokens": 3200,
+    "expected_master_key_count": 64,
+    "all_hard_oracles_passed": true,
+    "engines_stopped": true,
+    "master_empty_before": true,
+    "master_empty_after_retry": true
+  },
+  "superseded_steps": [
+    {
+      "step": "capture final Master",
+      "exit_code": 1,
+      "classification": "Master metrics endpoint race immediately after a successful rollout",
+      "replacement": "failure cleanup reset, rollout wait, stopped-PID assertions, and 60-second retry metrics capture",
+      "replacement_passed": true
+    }
+  ],
+  "errors": []
+}

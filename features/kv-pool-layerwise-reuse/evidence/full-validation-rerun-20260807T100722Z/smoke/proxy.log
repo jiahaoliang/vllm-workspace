@@ -1,0 +1,714 @@
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+2026-07-30 17:08:42,752 - __main__ - INFO - K8s vLLM service discovery started.
+2026-07-30 17:08:42,752 - __main__ - INFO - Proxy initialized: 0 prefiller nodes, 0 decoder nodes.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-07-30 17:08:52,859 - __main__ - INFO - Added prefiller node 10.250.40.133:8100
+2026-07-30 17:08:52,878 - __main__ - INFO - Added decoder node 10.250.40.210:8200
+2026-07-31 10:11:27,973 - __main__ - INFO - Added prefiller node 10.250.40.149:8100
+2026-07-31 10:11:27,973 - __main__ - INFO - Removed prefiller node 10.250.40.133:8100 (marked as overloaded)
+2026-07-31 10:16:07,997 - __main__ - INFO - Removed prefiller node 10.250.40.149:8100 (marked as overloaded)
+2026-07-31 10:32:18,100 - __main__ - INFO - Added prefiller node 10.250.40.140:8100
+2026-07-31 10:34:18,121 - __main__ - INFO - Added decoder node 10.250.40.223:8200
+2026-07-31 10:34:18,121 - __main__ - INFO - Removed decoder node 10.250.40.210:8200 (marked as overloaded)
+INFO:     127.0.0.1:52946 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52954 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:47026 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-07-31 11:12:57,785 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:59818 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:13:21,262 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:50472 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-07-31 11:24:15,788 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:17,956 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:18,426 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:20,585 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:21,300 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:23,523 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:24,386 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:26,636 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:27,433 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50472 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:29,653 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:37,267 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:37,269 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:37,270 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:37,270 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:40206 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40228 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40230 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40216 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-07-31 11:24:40,667 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:40,673 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:40,675 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-07-31 11:24:40,677 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39010 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:46128 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40372 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60056 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:39816 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:39292 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52220 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52220 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 10:47:45,685 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:47:47,855 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:47:48,497 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:47:50,656 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:47:51,620 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:47:53,873 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:47:54,722 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:47:56,992 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:47:57,848 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:47:59,943 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:05,176 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:05,178 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:05,179 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:05,182 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53990 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53998 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:54020 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:54008 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 10:48:08,407 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:08,411 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:08,412 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 10:48:08,414 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:43606 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:44022 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33226 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42620 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53108 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60570 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60580 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51954 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51962 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40522 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40528 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52220 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52234 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45858 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45874 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:56376 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:56384 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:58858 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:58860 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51036 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51140 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37274 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37274 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 11:15:51,770 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37274 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:15:54,052 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:15:54,501 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37274 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:15:56,766 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:15:57,485 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37274 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:15:59,818 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:00,482 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37274 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:16:02,817 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:03,480 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37274 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:16:05,884 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:11,234 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:11,236 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:11,238 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:11,238 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:35322 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35346 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35334 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35360 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:16:14,975 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:14,980 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:14,981 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:16:14,983 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53990 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52452 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52452 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 11:33:13,004 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52452 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:15,132 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:15,719 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52452 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:17,868 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:18,711 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52452 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:20,831 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:21,653 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52452 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:23,956 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:24,809 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52452 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:27,187 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:32,490 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:32,492 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:32,493 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:32,494 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:33678 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33682 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33710 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33694 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:33:35,977 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:35,981 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:35,983 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:33:35,985 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:55432 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53884 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53884 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 11:47:09,467 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53884 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:11,822 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:12,308 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53884 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:14,531 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:15,395 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53884 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:17,735 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:18,595 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53884 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:20,825 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:21,570 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53884 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:23,855 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:28,908 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:28,910 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:28,910 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:28,911 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37024 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37042 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37030 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37028 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 11:47:32,418 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:32,423 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:32,425 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 11:47:32,426 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52828 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45992 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45992 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 12:06:20,529 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45992 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:22,748 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:23,200 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45992 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:25,460 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:26,145 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45992 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:28,320 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:29,006 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45992 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:31,139 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:31,918 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45992 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:34,199 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:39,332 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:39,335 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:39,335 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:39,336 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:41036 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:41044 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:41056 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:41072 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 12:06:42,730 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:42,734 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:42,735 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 12:06:42,736 - httpx - INFO - HTTP Request: POST http://10.250.40.223:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53072 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52328 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42774 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 13:12:20,484 - __main__ - INFO - Removed prefiller node 10.250.40.140:8100 (marked as overloaded)
+2026-08-03 13:12:20,485 - __main__ - INFO - Removed decoder node 10.250.40.223:8200 (marked as overloaded)
+2026-08-03 13:12:30,501 - __main__ - INFO - Added prefiller node 10.250.40.140:8100
+2026-08-03 13:12:30,512 - __main__ - INFO - Added decoder node 10.250.40.213:8200
+INFO:     10.250.40.140:35032 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35038 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:34386 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 13:36:12,893 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:51268 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:36:36,597 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:60028 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:50862 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:50862 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 13:43:22,918 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50862 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:24,922 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:25,546 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50862 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:27,529 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:28,508 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50862 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:30,785 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:31,744 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50862 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:33,869 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:34,855 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50862 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:37,086 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:42,269 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:42,271 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:42,272 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:42,275 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:52972 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52996 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52998 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52986 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 13:43:45,364 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:45,369 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:45,370 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:43:45,371 - httpx - INFO - HTTP Request: POST http://10.250.40.213:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 13:49:10,710 - __main__ - INFO - Added decoder node 10.250.40.217:8200
+2026-08-03 13:49:10,710 - __main__ - INFO - Removed decoder node 10.250.40.213:8200 (marked as overloaded)
+INFO:     10.250.40.140:42072 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42086 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:34454 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:36766 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45830 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:55428 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:46386 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:58306 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:43750 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53772 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 14:01:45,941 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53772 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:47,328 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53776 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:49,790 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53792 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:52,164 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53804 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:54,509 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53806 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:56,837 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53820 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:01:58,780 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:01:59,044 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:01:59,151 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53832 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:00,974 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:01,355 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53848 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:03,309 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:03,687 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53852 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:05,584 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:06,038 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53866 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:08,115 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:08,572 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53872 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:10,562 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:10,806 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53888 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:12,749 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:13,204 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53892 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:14,986 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:15,399 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53894 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:16,991 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53906 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:17,439 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:18,309 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53920 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:02:21,514 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:22,057 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:22,986 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:23,799 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:24,068 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:02:24,335 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:49566 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35546 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37968 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:50824 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-03 14:08:37,137 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50824 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:08:45,933 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:08:55,070 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50832 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:08:59,890 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50834 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:09:09,626 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:09:09,887 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-03 14:09:13,866 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:50850 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-03 14:09:23,079 - httpx - INFO - HTTP Request: POST http://10.250.40.217:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:40198 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 09:26:26,706 - __main__ - INFO - Added decoder node 10.250.40.240:8200
+2026-08-04 09:26:26,707 - __main__ - INFO - Removed decoder node 10.250.40.217:8200 (marked as overloaded)
+INFO:     10.250.40.140:36998 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:37010 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60852 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 10:00:50,314 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48958 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:01:15,663 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39062 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:39062 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 10:06:05,520 - __main__ - WARNING - Prefiller call failed on attempt 1 for /v1/completions: All connection attempts failed
+2026-08-04 10:06:05,523 - __main__ - WARNING - Prefiller call failed on attempt 2 for /v1/completions: All connection attempts failed
+2026-08-04 10:06:05,527 - __main__ - WARNING - Prefiller call failed on attempt 3 for /v1/completions: All connection attempts failed
+2026-08-04 10:06:05,527 - __main__ - ERROR - Prefiller failed after 3 attempts requesting to /v1/completions.
+2026-08-04 10:06:05,527 - __main__ - ERROR - Error in proxy completion handler for /v1/completions: All connection attempts failed
+2026-08-04 10:06:05,529 - __main__ - ERROR - Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 101, in handle_async_request
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 78, in handle_async_request
+    stream = await self._connect(request)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 124, in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_backends/auto.py", line 31, in connect_tcp
+    return await self._backend.connect_tcp(
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_backends/anyio.py", line 113, in connect_tcp
+    with map_exceptions(exc_map):
+  File "/usr/local/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: All connection attempts failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/k8s_proxy_server_example.py", line 923, in _proxy_openai_request
+    await _invoke_prefiller_and_update_body(
+  File "/app/k8s_proxy_server_example.py", line 800, in _invoke_prefiller_and_update_body
+    resp = await _forward_prefill_once(prefill_req)
+  File "/app/k8s_proxy_server_example.py", line 634, in _forward_prefill_once
+    resp = await req.client.post(req.endpoint,
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1859, in post
+    return await self.request(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+  File "/usr/local/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: All connection attempts failed
+
+INFO:     10.250.40.140:39062 - "POST /v1/completions HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 101, in handle_async_request
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 78, in handle_async_request
+    stream = await self._connect(request)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_async/connection.py", line 124, in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_backends/auto.py", line 31, in connect_tcp
+    return await self._backend.connect_tcp(
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_backends/anyio.py", line 113, in connect_tcp
+    with map_exceptions(exc_map):
+  File "/usr/local/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: All connection attempts failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 410, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1160, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 105, in app
+    response = await f(request)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 431, in app
+    raw_response = await run_endpoint_function(
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 313, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/app/k8s_proxy_server_example.py", line 598, in wrapper
+    return task_handler.result()
+  File "/app/k8s_proxy_server_example.py", line 1088, in completions
+    return await _proxy_openai_request("/v1/completions", request)
+  File "/app/k8s_proxy_server_example.py", line 923, in _proxy_openai_request
+    await _invoke_prefiller_and_update_body(
+  File "/app/k8s_proxy_server_example.py", line 800, in _invoke_prefiller_and_update_body
+    resp = await _forward_prefill_once(prefill_req)
+  File "/app/k8s_proxy_server_example.py", line 634, in _forward_prefill_once
+    resp = await req.client.post(req.endpoint,
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1859, in post
+    return await self.request(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+  File "/usr/local/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/local/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: All connection attempts failed
+INFO:     10.250.40.140:35620 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:36566 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:36566 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 10:14:13,803 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36566 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:16,041 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:16,570 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36566 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:18,739 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:19,612 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36566 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:21,800 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:22,722 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36566 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:24,813 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:25,619 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36566 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:27,850 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:33,091 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:33,094 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:33,095 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:33,096 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:33230 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33262 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33254 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:33242 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:14:36,397 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:36,402 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:36,403 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 10:14:36,404 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45652 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:45664 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 10:58:05,568 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45678 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 10:58:08,136 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:47392 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:47394 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 11:03:49,927 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:47406 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:03:52,299 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:57778 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:57782 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 11:10:07,835 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39154 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:10:10,173 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:37678 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:48122 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:48122 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 11:16:23,272 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48122 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:25,559 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:26,117 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48122 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:28,311 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:29,160 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48122 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:31,508 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:32,340 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48122 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:34,661 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:35,556 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:48122 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:37,838 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:43,241 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:43,244 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:43,245 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:43,246 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:46010 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:46040 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:46024 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:46056 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 11:16:46,740 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:46,745 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:46,746 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:16:46,747 - httpx - INFO - HTTP Request: POST http://10.250.40.240:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 11:21:37,305 - __main__ - INFO - Removed prefiller node 10.250.40.140:8100 (marked as overloaded)
+2026-08-04 11:21:37,306 - __main__ - INFO - Removed decoder node 10.250.40.240:8200 (marked as overloaded)
+2026-08-04 11:21:47,321 - __main__ - INFO - Added prefiller node 10.250.40.140:8100
+2026-08-04 11:21:47,332 - __main__ - INFO - Added decoder node 10.250.40.250:8200
+2026-08-04 11:38:37,845 - __main__ - INFO - Added decoder node 10.250.40.149:8200
+2026-08-04 11:38:37,845 - __main__ - INFO - Removed decoder node 10.250.40.250:8200 (marked as overloaded)
+2026-08-04 11:53:18,167 - __main__ - INFO - Removed decoder node 10.250.40.149:8200 (marked as overloaded)
+2026-08-04 11:53:38,182 - __main__ - INFO - Added decoder node 10.250.40.149:8200
+2026-08-04 12:04:38,236 - __main__ - INFO - Removed prefiller node 10.250.40.140:8100 (marked as overloaded)
+2026-08-04 12:04:38,237 - __main__ - INFO - Removed decoder node 10.250.40.149:8200 (marked as overloaded)
+2026-08-04 12:19:58,321 - __main__ - INFO - Added prefiller node 10.250.40.140:8100
+2026-08-04 12:19:58,332 - __main__ - INFO - Added decoder node 10.250.40.149:8200
+INFO:     10.250.40.140:60286 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60300 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51370 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:52996 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:48934 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:35742 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:43432 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42848 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42926 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53346 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 12:32:29,163 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53346 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:30,792 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53348 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:33,291 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53364 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:35,825 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53356 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:38,416 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53376 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:40,736 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:40,985 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53378 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:41,002 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:43,079 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:43,441 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53394 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:45,565 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:45,960 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53398 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:48,140 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:48,415 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53400 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:50,782 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:51,037 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53406 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:53,134 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:53,614 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53408 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:55,849 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:56,142 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53424 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:32:58,152 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:32:58,717 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53436 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:33:00,810 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:01,267 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53440 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:33:02,962 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53454 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:33:03,371 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:04,471 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53468 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:33:07,448 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:08,493 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:09,416 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:09,680 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:33:09,946 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45306 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:59874 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:51796 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:42212 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-04 12:39:37,748 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:42212 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:39:47,151 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:39:58,140 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:42218 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:40:03,676 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:42220 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:40:13,699 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:40:13,961 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-04 12:40:19,580 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:42230 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-04 12:40:28,872 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:38170 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40600 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:40616 - "GET /listEndPoints HTTP/1.1" 200 OK
+INFO:     10.250.40.140:36478 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:36484 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-07 12:53:42,827 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:36498 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 12:54:08,206 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:60524 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:60528 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-07 13:04:36,583 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:60534 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:04:38,847 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:45396 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:39236 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.250.40.140:39236 - "GET /listEndPoints HTTP/1.1" 200 OK
+2026-08-07 13:15:14,394 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39236 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:16,419 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:16,698 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39236 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:18,707 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:19,165 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39236 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:21,165 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:21,633 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39236 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:23,591 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:24,069 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:39236 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:26,060 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:29,273 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:29,275 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:29,276 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:29,277 - httpx - INFO - HTTP Request: POST http://10.250.40.140:8100/v1/completions "HTTP/1.1 200 OK"
+INFO:     10.250.40.140:53340 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53348 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53352 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     10.250.40.140:53326 - "POST /v1/completions HTTP/1.1" 200 OK
+2026-08-07 13:15:31,701 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:31,705 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:31,706 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
+2026-08-07 13:15:31,708 - httpx - INFO - HTTP Request: POST http://10.250.40.149:8200/v1/completions "HTTP/1.1 200 OK"
