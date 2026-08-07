@@ -825,3 +825,17 @@
   ranged read returned exact `-707`, and fresh get recovered exact two-layer
   bytes. All `13` recorded execution steps were green, cleanup returned Master
   to `0/0/0`, and the post-family reset was also empty.
+- G4 attempt 1 completed a valid HTTP 200 runtime request and the stable
+  27-layer checker passed, but an evidence-local assertion compared the whole
+  response `usage` object and rejected the valid extra
+  `prompt_tokens_details: null` field. The failure trap stopped both vLLM
+  children and reset Master to `0/0/0`. A focused standalone validator changed
+  only that check to exact prompt/completion/total fields and replayed the
+  captured attempt successfully; the failed attempt remains checksummed.
+- The complete G4 rerun then passed all `41` runtime steps. Prefill save and
+  Decode load each covered layers `0..26`; for every layer and key,
+  `147456 == 131072 + 16384 == result`. Final-layer commit `[0,0,0,0]`
+  followed the last save, whole-key calls were zero, Decode logged `512/512`
+  hit correlation, and post-request Master metrics were 4 keys, 15925248 bytes,
+  and 2 active clients. Both engines were stopped and reset Master ended at
+  `0/0/0`.

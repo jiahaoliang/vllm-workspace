@@ -1,9 +1,9 @@
 # Full Validation Evidence 20260807T100722Z
 
-Status: LEASE_VERIFIED. Source/tooling, the exact native ARM64 image,
+Status: G4_VERIFIED. Source/tooling, the exact native ARM64 image,
 native-image CPU/mock, base 1P1D runtime identity, direct ranged G1, and lease
-expiry/recovery are verified. This directory does not yet claim G4, smoke,
-stress, or throughput success.
+expiry/recovery and G4 runtime audit are verified. This directory does not yet
+claim smoke, stress, or throughput success.
 
 ## Frozen Inputs
 
@@ -50,6 +50,16 @@ stress, or throughput success.
 - `lease/family-summary.json`: both waits exceeded the live 30 second TTL by
   the frozen 1.5 second margin, stale ranged read returned exact `-707`, fresh
   get recovered both layers, and Master stayed `0/0/0` before and after reset.
+- `g4-attempt1-tooling/failure-summary.json`: the runtime request and range
+  checker passed, but an evidence-local assertion rejected the valid extra
+  `usage.prompt_tokens_details: null` field. Failure cleanup stopped both
+  engines and reset Master to `0/0/0`; the corrected validator replayed the
+  captured runtime evidence successfully.
+- `g4/summary.json`: the complete rerun passed all 41 runtime steps. Prefill
+  save and Decode load covered layers `0..26`; every per-key result equaled its
+  two-fragment byte sum, final-layer commit results were all zero and ordered
+  after save, whole-key calls were zero, Decode hit correlation was `512/512`,
+  and final Master metrics were `0/0/0` after stopping both engines.
 
 The structured run identity is in `identity.json`; frozen source and tooling
 file hashes are in `source-tooling-sha256.txt`. Each completed family records

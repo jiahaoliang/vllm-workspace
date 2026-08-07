@@ -1,0 +1,22 @@
+{
+  "decode_hit_tokens": 512,
+  "key_count": 4,
+  "num_layers": 27,
+  "per_key_byte_equality": true,
+  "post_request_metrics": {
+    "master_active_clients": 2.0,
+    "master_allocated_bytes": 15925248.0,
+    "master_batch_put_end_requests_total": 1.0,
+    "master_batch_put_start_requests_total": 1.0,
+    "master_key_count": 4.0
+  },
+  "pre_request_metrics": {
+    "master_active_clients": 2.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "prefill_commits": 1,
+  "response_id": "cmpl-45215c9a-3863-42fa-b51e-7f30fe9bf4ab",
+  "validated": true,
+  "whole_key_calls": 0
+}

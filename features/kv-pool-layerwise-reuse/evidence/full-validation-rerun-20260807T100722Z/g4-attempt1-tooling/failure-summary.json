@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "tooling_failed",
+  "validated": false,
+  "run_id": "20260807T100722Z-g4-attempt1",
+  "classification": "validation tooling assertion defect",
+  "production_source_defect": false,
+  "runtime_request_completed": true,
+  "runtime_observations": {
+    "http_status": 200,
+    "prefill_range_layers": 27,
+    "decode_range_layers": 27,
+    "prefill_commit_count": 1,
+    "per_key_byte_equality": true,
+    "whole_key_calls": 0,
+    "decode_hit_tokens": 512,
+    "prompt_tokens": 525,
+    "completion_tokens": 16
+  },
+  "failure": {
+    "step": "assert G4 contract",
+    "exit_code": 1,
+    "cause": "The runner compared the whole usage object and rejected the valid extra prompt_tokens_details null field.",
+    "fix": "Compare prompt_tokens, completion_tokens, and total_tokens individually.",
+    "rerun_scope": "complete G4 family from stopped engines and empty Master"
+  },
+  "cleanup": {
+    "prefill_stopped": true,
+    "decode_stopped": true,
+    "master_reset": true,
+    "master_key_count": 0,
+    "master_allocated_bytes": 0,
+    "master_active_clients": 0
+  },
+  "errors": [
+    "G4 is not claimed from this attempt."
+  ]
+}

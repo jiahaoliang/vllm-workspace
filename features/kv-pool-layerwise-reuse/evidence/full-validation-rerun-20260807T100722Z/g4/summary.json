@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "gate": "G4",
+  "status": "passed",
+  "validated": true,
+  "source_head": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+  "mooncake_head": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+  "tooling_commit": "3bda70d786db46310994afc689af4fc10da4858e",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+  "config_id": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+  "num_layers": 27,
+  "prefill_range_events": 27,
+  "prefill_commits": 1,
+  "decode_range_events": 27,
+  "per_key_byte_equality": true,
+  "whole_key_calls": 0,
+  "decode_hit_tokens": 512,
+  "response_id": "cmpl-636bbafb-7f5c-4620-b6fd-90061a63cb18",
+  "engines_stopped": true,
+  "master_empty": true,
+  "errors": []
+}

@@ -2,10 +2,11 @@
 
 ## Status And Scope
 
-LEASE_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
+G4_VERIFIED. vLLM-Ascend ownership tests, deployment tooling including the
 same-key restart oracle, the exact native ARM64 image, native-image CPU/mock,
 base 1P1D runtime identity, direct ranged G1, and lease expiry/recovery gates
-passed. G4, smoke, stress, and throughput remain unclaimed.
+passed. The 27-layer G4 runtime audit also passed. Smoke, stress, and throughput
+remain unclaimed.
 
 ## Frozen Identity
 
@@ -46,10 +47,12 @@ passed. G4, smoke, stress, and throughput remain unclaimed.
 | G1 oracle correction | TDD red/green; `negative_revoke_same_key_restart` and cleanup require `[0]`; `tooling-revoke-restart/summary.json` and checksums passed. G0 unaffected; G1 had not started |
 | Direct G1 | `45/45` cases and `26/26` negative cases; 3 keys, 4 layers, 2 fragments; same-key restart/cleanup `[0]`; per-key result bytes and final SHA256 equality; Master `0/0/0` before cleanup reset and after reset |
 | Lease | live TTL `30000ms`; waits `31500.128ms` and `31500.090ms`; stale ranged read `[-707]`; fresh get exact two-layer recovery; Master `0/0/0` before and after reset |
+| G4 attempt 1 | Runtime request/checker passed, but evidence-local assertion rejected valid extra `usage.prompt_tokens_details: null`; failure cleanup stopped engines and reset Master `0/0/0`; corrected validator replay passed |
+| G4 rerun | `27/27` Prefill saves and `27/27` Decode loads; each key `147456 == 131072+16384`; final-layer commit `[0,0,0,0]` follows save; whole-key `0`; Decode hit `512/512`; 41 runtime steps green; final Master `0/0/0` |
 
 ## Pending Gates
 
-- Run G4, smoke, concurrent smoke, and stress S1-S3 serially.
+- Run smoke, concurrent smoke, and stress S1-S3 serially.
 - Assert final empty Master metrics, generate checksums, replay offline reports,
   stop vLLM processes, and publish final reports/state.
 
