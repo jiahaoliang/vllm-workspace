@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 1
-updated_at: 2026-08-08T21:08:10+08:00
+generation: 2
+updated_at: 2026-08-09T05:36:35+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,9 +49,9 @@ updated_at: 2026-08-08T21:08:10+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` functional control parent | `4afdc30bd6976e34495c773be55f931f0ff4db41` | transition parent pushed as `origin/kv-pool-layerwise-reuse=4afdc30bd6976e34495c773be55f931f0ff4db41` |
+| control repo | `kv-pool-layerwise-reuse` functional control parent | `a468b71d1c808e636ca07d85b2990b6e6d682854` | transition parent pushed as `origin/kv-pool-layerwise-reuse=a468b71d1c808e636ca07d85b2990b6e6d682854` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
-| `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
+| `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `d74269a08e48e3b5b097f9a34f5c421696ddda40` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=d74269a08e48e3b5b097f9a34f5c421696ddda40` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
 
 ## Image Identity
@@ -63,39 +63,41 @@ updated_at: 2026-08-08T21:08:10+08:00
 | Base manifest digest | `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351` |
 | Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py` |
 | Patched file SHA256 | `384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040` |
-| Patched source commit | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
-| Derived image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z` |
+| Patched source commit | `d74269a08e48e3b5b097f9a34f5c421696ddda40` |
+| Derived image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z` |
 | Platform | `linux/arm64` |
-| Derived manifest digest | `sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c` |
+| Derived manifest digest | `sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd` |
+| Derived config digest | `sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb` |
 | vLLM source label | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
-| vLLM-Ascend source label | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
+| vLLM-Ascend source label | `d74269a08e48e3b5b097f9a34f5c421696ddda40` |
 | Mooncake source label | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
-| Derived-image/run ID | `20260808T121828Z` |
+| Derived-image/run ID | `20260808T203742Z` |
 
 ## Functional Acceptance
 
 | Gate | Required result | Actual result | Evidence |
 | --- | --- | --- | --- |
-| Focused CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/pytest-layerwise-model-runner.log`; `cpu/pytest-deployment-performance.log` |
-| Complete AscendStore CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/pytest-ascend-store-and-mla.log` |
-| Ruff | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/ruff-check.log` |
-| Python compilation | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/py-compile.log` |
-| `git diff --check` | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/git-diff-check.log` |
-| `kv_producer` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/producer-reuse/`; `npu/summary.json` |
-| `kv_both` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/both-reuse/`; `npu/summary.json` |
-| Physical-slot/memory-factor proof | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/REPORT.md`; `validation-config.json` |
-| Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/validator.log`; `REPORT.md` |
-| Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/summary.json`; per-case `final-assert.log` |
+| Focused CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/cpu/pytest-layerwise-roles.log`; `cpu/pytest-model-runner-layer-reuse.log`; `cpu/pytest-deployment-performance.log`; `cpu/pytest-performance-harness.log` |
+| Complete AscendStore CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/cpu/pytest-ascend-store.log` |
+| Ruff | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/cpu/ruff-check.log`; `cpu/ruff-format.log` |
+| Python compilation | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/cpu/python-compile.log` |
+| `git diff --check` | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/cpu/git-diff-check.log` |
+| `kv_producer` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/producer-reuse/`; `npu/summary.json` |
+| `kv_both` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/both-reuse/`; `npu/summary.json` |
+| Physical-slot/memory-factor proof | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/REPORT.md`; `validation-config.json`; `npu/producer-reuse/vllm-prefill.log` |
+| Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/validator.log`; `REPORT.md` |
+| Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
+| Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
 
 ## Evidence Identity
 
 | Field | Value |
 | --- | --- |
-| Evidence root | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z` |
-| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/SHA256SUMS` |
-| Root `SHA256SUMS` digest | `15459826acdfca8e875169cf408dd1c5d80c84c43977ef93e16e7e9d7ed5b603` |
-| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/REPORT.md` |
-| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/validation-config.json` |
+| Evidence root | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z` |
+| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/SHA256SUMS` |
+| Root `SHA256SUMS` digest | `121a11b331cffeb4d031dac21637d70c0395d83ee971b07a138e4d4f4e03f449` |
+| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/REPORT.md` |
+| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/validation-config.json` |
 
 ## Authorized Performance Scope
 
@@ -136,7 +138,7 @@ The functional-validation session must update this file in one final step:
 1. Replace every placeholder with verified immutable values.
 2. Record all required gates as `PASS`.
 3. Replay the evidence checksum manifest.
-4. Increment `generation` from 0 to 1.
+4. Increment `generation` monotonically for every new immutable handoff.
 5. Set `placeholders_remaining: false` after all placeholder values are gone.
 6. Set `updated_at` to the completion timestamp.
 7. Set `status: READY_FOR_PERFORMANCE_VALIDATION` and `ready: true` last.
@@ -149,8 +151,10 @@ all unverified fields fail-closed.
 
 ## Blocker
 
-None. The earlier correctness defect is preserved in failure/diagnostic
-evidence and resolved by vLLM-Ascend `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7`.
+None. The initial partial-load correctness defect is preserved in historical
+performance diagnostics and resolved by vLLM-Ascend
+`d74269a08e48e3b5b097f9a34f5c421696ddda40`; generation-2 functional evidence
+includes an exact 4096-token pure-consumer Decode regression canary.
 
 ## Listener Message Template
 
