@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "20260808T093917Z",
+  "namespace": "liangjiahao",
+  "runtime_node": "n1",
+  "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+  "source": {
+    "control": "6aa170083694d15aa9df0057bae29428177d6239",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "2d179d07c86e5f820fd6591c0c7fdef2b5132c14",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "image": {
+    "reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-2d179d07-df3f74ed-20260808T085132Z",
+    "platform": "linux/arm64",
+    "manifest_digest": "sha256:e4333425928a1566f07e03e19744e7a88a48a379bbb00afffe8d4e3c8e8bfb01",
+    "config_digest": "sha256:b073f5891dcb131d9c9082e375acb3b192220ec7b4d6a1e2ab958a8b95a6737a"
+  },
+  "request": {
+    "prompt_tokens": 525,
+    "max_tokens": 16,
+    "temperature": 0,
+    "seed": 2026072304
+  },
+  "reuse": {
+    "backend": "mooncake",
+    "use_layerwise": true,
+    "layerwise_num_shared_buffers": 3,
+    "functional_layerwise_prefetch_layers": 1
+  }
+}

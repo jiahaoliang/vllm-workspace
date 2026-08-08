@@ -1,0 +1,26 @@
+{
+  "direct_patch_parent_config_digest": "sha256:6cd13b04a4bea4668f386d1c53986e73430727b64588047f6f41f21dfa41ad7b",
+  "direct_patch_parent_manifest_digest": "sha256:fb3013fdf023e4f7385434f0861c924efbe17c50cadef36c361b8b2ba4259824",
+  "errors": [],
+  "final_config_digest": "sha256:b073f5891dcb131d9c9082e375acb3b192220ec7b4d6a1e2ab958a8b95a6737a",
+  "final_manifest_digest": "sha256:e4333425928a1566f07e03e19744e7a88a48a379bbb00afffe8d4e3c8e8bfb01",
+  "layer_descriptor_count": 27,
+  "metadata_correction_layer_descriptors_unchanged": true,
+  "native_runtime_base_config_digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+  "native_runtime_base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+  "patch_diff_id": "sha256:cfbcd50ff16ce3279255adb953af769020bbbfb3f3248b8693825891359689f3",
+  "patch_layer_digest": "sha256:f225b9279bd546f0711933a464f47b34ab6ee42bf3e27e5cfa9704eda126b818",
+  "platform": "linux/arm64",
+  "pre_metadata_config_digest": "sha256:febadf8cdeba76763e61a12860056a9b9650bf7a1337f25e978e7fb69cb72aab",
+  "pre_metadata_manifest_digest": "sha256:016a8ce2784fb159fe8e1fb581c5f867bcc0b00e4fc9e8d9a11dbc1d4fca8a61",
+  "production_file_hashes_equal": true,
+  "production_files_compared": 7,
+  "schema_version": 1,
+  "source_labels": {
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "2d179d07c86e5f820fd6591c0c7fdef2b5132c14"
+  },
+  "status": "passed",
+  "validated": true
+}

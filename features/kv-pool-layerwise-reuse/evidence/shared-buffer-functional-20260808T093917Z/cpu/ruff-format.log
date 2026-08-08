@@ -1,0 +1,8 @@
+context=bke-cluster-admin@bke-cluster
+namespace=liangjiahao
+pod=vllm-ascend-ut
+image_source_head=2d179d07c86e5f820fd6591c0c7fdef2b5132c14
+source_head=2d179d07c86e5f820fd6591c0c7fdef2b5132c14
+source_branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+source_dirty=false
+13 files already formatted

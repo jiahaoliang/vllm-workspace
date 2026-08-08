@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-status: WAITING_FOR_FUNCTIONAL_VALIDATION
+status: BLOCKED
 ready: false
 placeholders_remaining: true
 generation: 0
-updated_at: 2026-08-08T11:47:33+08:00
+updated_at: 2026-08-08T17:55:00+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -143,7 +143,21 @@ all unverified fields fail-closed.
 
 ## Blocker
 
-`PENDING`
+Functional run `20260808T093917Z` found a reproducible production correctness
+defect with vLLM-Ascend `2d179d07c86e5f820fd6591c0c7fdef2b5132c14` and derived
+image manifest
+`sha256:e4333425928a1566f07e03e19744e7a88a48a379bbb00afffe8d4e3c8e8bfb01`.
+With the same deterministic request (`temperature=0`, fixed seed), the no-reuse
+baseline returned the expected continuation, while `kv_producer` and `kv_both`
+with Mooncake layerwise shared buffers returned corrupted, unequal text. The
+same mismatch exists in both `20260808T083140Z` and `20260808T093917Z`.
+
+Evidence:
+`features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T093917Z/REPORT.md`.
+
+DP1 and DP2 are not authorized. A production-source fix, new derived image,
+complete functional rerun, checksum replay, and generation-1 ready transition
+are required before performance validation can begin.
 
 ## Listener Message Template
 
