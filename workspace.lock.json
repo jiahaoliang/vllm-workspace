@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-08T19:27:48+08:00",
+  "updated_at": "2026-08-08T20:25:26+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,8 +21,8 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
-      "purpose": "Mooncake layerwise KVPool source with compute-side shared-buffer reuse and separate full-prefix/HBM-tail Mooncake load metadata"
+      "commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+      "purpose": "Mooncake layerwise KVPool shared-buffer reuse with separate load metadata and row-identity failure filtering"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

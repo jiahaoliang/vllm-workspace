@@ -11,13 +11,14 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "1829639a1e019d3ed34055787febc7ee89fb0f68"
+FINAL_SOURCE_COMMIT = "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7"
 BASE_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
 PATCHED_FILES = {
     "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
+    "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
@@ -111,14 +112,14 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertEqual(
             IDENTITY["base_image_commits"]["vllm_ascend"], BASE_SOURCE_COMMIT
         )
-        self.assertEqual(derived["creation"], "nerdctl_commit_seven_python_patches")
+        self.assertEqual(derived["creation"], "nerdctl_commit_eight_python_patches")
         self.assertEqual(
             derived["metadata_correction"], "config_manifest_only_oci_import"
         )
         self.assertEqual(
             {item["path"] for item in derived["patched_files"]}, PATCHED_FILES
         )
-        self.assertEqual(len(derived["patched_files"]), 7)
+        self.assertEqual(len(derived["patched_files"]), 8)
         for item in derived["patched_files"]:
             self.assertRegex(item["sha256"], r"^[0-9a-f]{64}$")
         self.assertRegex(derived["patched_files_sha256"], r"^[0-9a-f]{64}$")

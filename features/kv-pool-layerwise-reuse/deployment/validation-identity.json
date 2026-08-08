@@ -1,13 +1,13 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
-  "run_id": "20260808T111904Z",
+  "run_id": "20260808T121828Z",
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "cb51efbcb4a69ace9536d4fcabf1d87e02404d56"
+    "commit": "a31f868f676ced1406d1ff917f2433003a973e28"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-1829639a-df3f74ed-20260808T111904Z",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
   "platform": "linux/arm64",
   "vllm_lane": "main-verified",
   "vllm_version_override": null,
@@ -18,12 +18,12 @@
   "buildkit_namespace": "default",
   "commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+    "vllm_ascend": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "image_commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+    "vllm_ascend": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "base_image_commits": {
@@ -32,7 +32,7 @@
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "derived_image": {
-    "creation": "nerdctl_commit_seven_python_patches",
+    "creation": "nerdctl_commit_eight_python_patches",
     "base_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
     "base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
     "base_config_digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
@@ -54,6 +54,10 @@
         "sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3"
       },
       {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
+        "sha256": "7649e19fe127a7300af02ed9df364ed22012c77da6a15c366b9a3ad27113e36a"
+      },
+      {
         "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
         "sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040"
       },
@@ -66,21 +70,21 @@
         "sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22"
       }
     ],
-    "patched_files_sha256": "8badc0e5cd49e2e2e3600c9012b9326ec113c2fab527fbabf22d3885b686f439",
-    "patched_source_commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
-    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-1829639a-20260808T111904Z",
-    "commit_manifest_digest": "sha256:8148da50b293a315e5a133085a007cb1b2ce588f97584cb5d5bce9d945c85bb2",
-    "commit_config_digest": "sha256:8b88cc3c8f59e4606758353810a648af0a8a6e8b63fb19876aeaf682ea86710b",
-    "patch_layer_digest": "sha256:f24d67f3891e8107cf55765e2ebd63a87488fcd8db773c22ec19d462fc4ea409",
-    "patch_diff_id": "sha256:7b8f2be1fbd0895cd72c9ffb9ec0fc758c12c76df9bacc42b91b48f05ed50f32",
+    "patched_files_sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db",
+    "patched_source_commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-a3c97358-20260808T121828Z",
+    "commit_manifest_digest": "sha256:af474f50dcf3b12149afea1d8ad34dae3289fe9d03f29c85a6f3a8165a074a3d",
+    "commit_config_digest": "sha256:8945f2b27e1ccaaa4747fdbb59020f628843f29ba033ba2be2d64fde5dfba2f1",
+    "patch_layer_digest": "sha256:8a9d8c9985383ac2f5786a55b6422965b0fc5663a8229a811fac6b3f3bc54d76",
+    "patch_diff_id": "sha256:1f1e1ac2355af81df1ee0d27c7e2a0bf4d289d784d8373c16e317d49972b8223",
     "metadata_correction": "config_manifest_only_oci_import",
-    "manifest_digest": "sha256:ed0e622f05739bf5202eb18c4565aa4f7f82e653213c49b2379d93f2700034c3",
-    "config_digest": "sha256:2bcbaa5ea4b59874f03e8c6c6cc169edece8cac52faa5ea9f7a5313f074a3ff9"
+    "manifest_digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+    "config_digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3"
   },
   "python_overlay": {
     "required": false,
-    "base_commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
-    "commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+    "base_commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
     "files": []
   },
   "model": {

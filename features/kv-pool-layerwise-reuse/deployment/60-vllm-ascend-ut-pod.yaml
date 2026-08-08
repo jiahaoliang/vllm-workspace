@@ -14,7 +14,7 @@ spec:
   enableServiceLinks: false
   containers:
     - name: ut
-      image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-1829639a-df3f74ed-20260808T111904Z
+      image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z
       imagePullPolicy: Never
       command: ["/bin/bash", "-lc"]
       args: ["exec sleep infinity"]

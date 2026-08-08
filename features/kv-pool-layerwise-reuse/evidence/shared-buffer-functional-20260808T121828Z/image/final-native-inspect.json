@@ -1,0 +1,2093 @@
+[
+  {
+    "Image": {
+      "CreatedAt": "2026-08-08T12:22:55.231710792Z",
+      "Labels": {
+        "io.cri-containerd.image": "managed"
+      },
+      "Name": "docker.io/library/vllm-ascend/kv-pool-layerwise-label-fix-a3c97358:metadata-corrected",
+      "Target": {
+        "annotations": {
+          "org.opencontainers.image.ref.name": "metadata-corrected"
+        },
+        "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3735
+      },
+      "UpdatedAt": "2026-08-08T12:22:55.234905639Z"
+    },
+    "ImageConfig": {
+      "architecture": "arm64",
+      "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+      "config": {
+        "ArgsEscaped": true,
+        "Cmd": [
+          "/bin/bash"
+        ],
+        "Entrypoint": [
+          "/bin/bash",
+          "-c",
+          "    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \"$@\"",
+          "--"
+        ],
+        "Env": [
+          "PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "LCCL_DETERMINISTIC=0",
+          "LCCL_PARALLEL=0",
+          "ATB_CXX_ABI=1",
+          "DEBIAN_FRONTEND=noninteractive",
+          "SOC_VERSION=ascend910b1",
+          "COMPILE_CUSTOM_KERNELS=1",
+          "TASK_QUEUE_ENABLE=1",
+          "OMP_NUM_THREADS=1"
+        ],
+        "Labels": {
+          "org.opencontainers.image.base.digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+          "org.opencontainers.image.base.name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+          "org.opencontainers.image.creation": "nerdctl-commit-eight-python-patches",
+          "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "org.opencontainers.image.patch.ascend-store-connector.sha256": "7b55f8d5bd56a1edcd94eb629c383410bd1d8293d83727a3641abfb84993ca56",
+          "org.opencontainers.image.patch.attention-utils.sha256": "ebf1d53368925d966d219b0c954ba221d278626e9945209b5230db8ff19c806a",
+          "org.opencontainers.image.patch.config-data.sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3",
+          "org.opencontainers.image.patch.kv-transfer.sha256": "7649e19fe127a7300af02ed9df364ed22012c77da6a15c366b9a3ad27113e36a",
+          "org.opencontainers.image.patch.layerwise-config.sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040",
+          "org.opencontainers.image.patch.mla-v1.sha256": "0e7c64fd572bc32234972c402fb7a42098b56288703be5e91570b0d026f70bfb",
+          "org.opencontainers.image.patch.path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py,/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+          "org.opencontainers.image.patch.pool-scheduler.sha256": "06e8ad911c20b956811053f463fbe86c4435ae052235180817896acda1b9269a",
+          "org.opencontainers.image.patch.pool-worker.sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22",
+          "org.opencontainers.image.patch.sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db",
+          "org.opencontainers.image.patch.source-commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.title": "vLLM Ascend layerwise KV pool",
+          "org.opencontainers.image.validation.run": "20260808T121828Z",
+          "org.opencontainers.image.version": "22.04",
+          "org.opencontainers.image.vllm-ascend.commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "org.opencontainers.image.vllm.compatibility-lane": "main-verified"
+        },
+        "WorkingDir": "/workspace"
+      },
+      "created": "2026-08-08T20:21:22.783232036+08:00",
+      "history": [
+        {
+          "created": "2026-06-29T10:38:39.31571004Z",
+          "created_by": "/bin/sh -c #(nop)  ARG RELEASE",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.377513194Z",
+          "created_by": "/bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.424300507Z",
+          "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.version=22.04",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:42.154842832Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:a517741c956f6a7e4b7cb0efd9bc418ce3cc54eb49b5314080ff606a7430ac2a in / "
+        },
+        {
+          "created": "2026-06-29T10:38:42.449574326Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_DETERMINISTIC=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_PARALLEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_CXX_ABI=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "RUN /bin/bash -c apt-get update     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y         apt-transport-https         ca-certificates         bash         libc6         libsqlite3-dev         gcc         g++         make         cmake         git         vim         wget         jq         curl         build-essential         libnuma-dev     && apt-get clean     && rm -rf /var/lib/apt/lists/*     && rm -rf /var/tmp/*     && rm -rf /tmp/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:45:05.293100743Z",
+          "created_by": "COPY /usr/local/python3.12.13 /usr/local/python3.12.13 # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:32.86512194Z",
+          "created_by": "COPY /usr/local/Ascend /usr/local/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.264009057Z",
+          "created_by": "COPY /etc/Ascend /etc/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "RUN /bin/bash -c CANN_TOOLKIT_ENV_FILE=\"/usr/local/Ascend/ascend-toolkit/set_env.sh\" &&     CANN_BISHENG_ENV_FILE=\"/usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh\" &&     CANN_NNAL_ENV_FILE=\"/usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}\" &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> ~/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "ENTRYPOINT [\"/bin/bash\" \"-c\" \"    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \\\"$@\\\"\" \"--\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG BUILD_JOBS=32",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG SOC_VERSION=ascend910b1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG COMPILE_CUSTOM_KERNELS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_REPO=https://github.com/vllm-project/vllm.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMPATIBILITY_LANE=main-verified",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ENV DEBIAN_FRONTEND=noninteractive SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 TASK_QUEUE_ENABLE=1 OMP_NUM_THREADS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:17.428586108Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     apt-get update -y;     apt-get install -y         ca-certificates         git         vim         wget         unzip         net-tools         gcc         g++         cmake         numactl         libnuma-dev         libibverbs-dev         libjemalloc2         libhiredis-dev         clang-15;     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20;     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:28.898218034Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_REPO}\" /vllm-workspace/vllm;     git -C /vllm-workspace/vllm fetch --depth 1         origin \"${VLLM_COMMIT}\";     git -C /vllm-workspace/vllm checkout --detach \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" =         \"${VLLM_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:45.936134684Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_ASCEND_REPO}\" /vllm-workspace/vllm-ascend;     git -C /vllm-workspace/vllm-ascend fetch --depth 1         origin \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend checkout --detach         \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" =         \"${VLLM_ASCEND_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:24:01.199122408Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${MOONCAKE_REPO}\" /vllm-workspace/Mooncake;     git -C /vllm-workspace/Mooncake fetch --depth 1         origin \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake checkout --detach         \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" =         \"${MOONCAKE_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:25:16.423048961Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh         /vllm-workspace/Mooncake/mooncake_installer.sh;     cd /vllm-workspace/Mooncake;     bash mooncake_installer.sh -y;     apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:12.477686246Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cd /vllm-workspace/Mooncake;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     export LD_LIBRARY_PATH=\"/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:${LD_LIBRARY_PATH:-}\";     cmake -S . -B build         -DUSE_ASCEND_DIRECT=ON         -DBUILD_UNIT_TESTS=OFF         -DBUILD_EXAMPLES=OFF         -DBUILD_BENCHMARK=OFF         -DWITH_STORE_RUST=OFF;     cmake --build build --parallel \"${BUILD_JOBS}\";     cmake --install build;     ldconfig;     rm -rf build # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:13.070550931Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c pip config set global.index-url \"${PIP_INDEX_URL}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:38:40.35311079Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     VLLM_TARGET_DEVICE=empty python3 -m pip install         -e \"/vllm-workspace/vllm[audio]\"         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:16.136876336Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     export PIP_EXTRA_INDEX_URL=\"https://mirrors.huaweicloud.com/ascend/repos/pypi\";     export VLLM_BATCH_INVARIANT=1;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     set +u;     source /usr/local/Ascend/nnal/atb/set_env.sh;     set -u;     python3 -m pip install         -e /vllm-workspace/vllm-ascend         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton triton-ascend;     python3 -m pip install         triton-ascend==3.2.1         --extra-index-url         https://mirrors.huaweicloud.com/ascend/repos/pypi;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     python3 -m pip install         modelscope         'ray>=2.47.1,<=2.48.0'         'protobuf>3.20.0';     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:49.334296Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     store_modules=(         /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so     );     test -f \"${store_modules[0]}\";     for api_name in         batch_put_session_start         batch_put_from_multi_buffer_ranges         batch_put_session_end         batch_put_session_revoke         batch_get_session_start         batch_get_into_multi_buffer_ranges         batch_get_session_end;     do         grep -F -q \"${api_name}\" < <(strings \"${store_modules[0]}\");     done # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >\"${pip_check_output}\" 2>&1; then         cat \"${pip_check_output}\";     else         cat \"${pip_check_output}\";         grep -E -v '^(ms-service-profiler 26\\.0\\.0 requires (matplotlib|msguard|openpyxl), which is not installed\\.|te 0\\.4\\.0 requires (ml-dtypes|tornado), which is not installed\\.|mindstudio-kpp 0\\.0\\.0\\.dev0 requires plotly, which is not installed\\.|ms-service-profiler 26\\.0\\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\\.33\\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\\.44\\.0\\.|ms-service-profiler 26\\.0\\.0 has requirement pandas~=2\\.2, but you have pandas 3\\.0\\.5\\.|prometheus-fastapi-instrumentator 8\\.1\\.0 has requirement starlette<2\\.0\\.0,>=1\\.0\\.0, but you have starlette 0\\.50\\.0\\.|opencv-python-headless 5\\.0\\.0\\.93 has requirement numpy>=2; python_version >= \"3\\.9\", but you have numpy 1\\.26\\.4\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi\\[standard\\]<0\\.137\\.0,>=0\\.133\\.0, but you have fastapi 0\\.123\\.10\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement starlette>=1\\.0\\.1, but you have starlette 0\\.50\\.0\\.|te 0\\.4\\.0 is not supported on this platform)$'             \"${pip_check_output}\" >\"${unexpected_pip_check}\" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat \"${unexpected_pip_check}\" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f \"${pip_check_output}\" \"${unexpected_pip_check}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" = \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" = \"${VLLM_ASCEND_COMMIT}\";     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" = \"${MOONCAKE_COMMIT}\";     python3 -c 'import importlib.metadata as m; packages=(\"vllm\", \"vllm-ascend\", \"torch\", \"torch-npu\", \"triton-ascend\"); print(\"\\n\".join(f\"{name}={m.version(name)}\" for name in packages))';     python3 -c 'import glob; paths=glob.glob(\"/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so\"); assert len(paths) == 1, paths; print(f\"mooncake-store={paths[0]}\")';     python3 -c 'import glob; paths=glob.glob(\"/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so\", recursive=True); assert paths, \"vllm-ascend native extension missing\"; print(\"\\n\".join(paths))' # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "LABEL org.opencontainers.image.title=vLLM Ascend layerwise KV pool org.opencontainers.image.vllm.commit=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 org.opencontainers.image.vllm.compatibility-lane=main-verified org.opencontainers.image.vllm-ascend.commit=45b2e785b10ca4604cd6314819ed15f3ff674781 org.opencontainers.image.mooncake.commit=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.133533382Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c echo 'export LD_PRELOAD=/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2:${LD_PRELOAD:-}' >> /root/.bashrc &&     echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib' >> /root/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "Patch cumulative Mooncake shared-buffer reuse at vLLM-Ascend a3c97358",
+          "created": "2026-08-08T20:21:22.783232036+08:00",
+          "created_by": "/bin/sleep infinity"
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "OCI config metadata correction after nerdctl commit",
+          "created": "2026-08-08T12:20:00Z",
+          "created_by": "LABEL cumulative Mooncake shared-buffer patch provenance",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "diff_ids": [
+          "sha256:349cd24b7d434a8beb71a40f461c42b9f58e19b2637af5065f91bb019759cb91",
+          "sha256:13a2d029c2022680c03a9c5cf2a23384fc2bc85ad5f31590a068be3e49d56eaf",
+          "sha256:75e134312dbb6553d6e5210c065e696edd5a6b4b3cb2d5ddaa064c978984f5d5",
+          "sha256:1d962b9b0737d5234f8aa1e0115496bdbc3bdd6e8d88d27a68a6c33936e1f001",
+          "sha256:c73d7b49fa4e2ff453c418024dfa5f5b1d10312ef7500e76bae1cab25c96a688",
+          "sha256:e32388e13f8292fb4ea13776b97c17d9e9486c3c3e39974e94ccdcf745ca4357",
+          "sha256:aa7d5fe064ee2047fd10e0d6be99898b065615696f542c106ffe945c41e7190a",
+          "sha256:0c223429d09bf6d4011103f2a36de15b35c5ba62208a646f9e7ea411bdc85325",
+          "sha256:20d389e9077ce98e72c3bf580991489f5443f7a1a027ff6e67e9184e072d0a07",
+          "sha256:cafaa23b0737bfce1a5c0377b22b7420f4ef8bc985b3be3ff974d208ede54266",
+          "sha256:41d34fe5fa0b0c102e553ff667e61813d16e666a8ba2adf4c437130156835b06",
+          "sha256:8238fbaaaf8e224ab90cb6bb6ccdcb8b035dd1a268fab8c83d37de944e23214f",
+          "sha256:ae41d12801735b4f6c758214a9afbb41b928c2b99dfc006503237824d368f1f2",
+          "sha256:11d7104458a611a49040ae0b9b26bc1abdb0c9d0a2174f16c42e7e596df7360e",
+          "sha256:571da12a220377f7340638bce45eda16e01de98bb12f36937455cd7b7d62f559",
+          "sha256:5731b290bb21225a99628dfa19926dd8f4788d0078ea7e33e4cb7ab5a4c23d32",
+          "sha256:1797f99f6caaff3314a8507ff52f5af34d774607d7eea3552ef02daf8fefaa21",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:a7514039654bc222044f09405601f094e3a453b3be29b21ec48069742f7457aa",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:1f1e1ac2355af81df1ee0d27c7e2a0bf4d289d784d8373c16e317d49972b8223"
+        ],
+        "type": "layers"
+      }
+    },
+    "ImageConfigDesc": {
+      "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+      "mediaType": "application/vnd.docker.container.image.v1+json",
+      "size": 40931
+    },
+    "Manifest": {
+      "config": {
+        "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 40931
+      },
+      "layers": [
+        {
+          "digest": "sha256:119d19e001bafa21919289095e1dbfac64f1e16d2469dd14c2d2a520039d26d9",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 27613184
+        },
+        {
+          "digest": "sha256:046ecf94a962d36e34dea7e7a54f242088712a7e4073a882b4a672ca14b53108",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 146755014
+        },
+        {
+          "digest": "sha256:4a10f4eea91bd68fac4181d4db2d0b5a30a756d138481b8649b7e0cbea185f5e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 181491733
+        },
+        {
+          "digest": "sha256:d61f1e100a1a16287e63ca9b3edceedbd7ff419fea603fbfc0015eab464bbaec",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 4116423071
+        },
+        {
+          "digest": "sha256:455d2f7cdd44cd66a48bcd90e7ab58e285bbb4719c0ca65a74c5aa29b012b853",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 215
+        },
+        {
+          "digest": "sha256:afa84ee83909bf5a3c077fa0547ade5aa650999c9e2d1189bc9b568b73f317dd",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1904
+        },
+        {
+          "digest": "sha256:a8c7cc4a4d2a8cfb509ce7aed750ded8c82484ab6e828a0e73d135eaa9529053",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 99
+        },
+        {
+          "digest": "sha256:e8b76cc0071ee43db1773b262144dacbc510e48330f6700be55f9347354bc16a",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209643516
+        },
+        {
+          "digest": "sha256:7035c92ff8346452d9fb5dad86e5b65d4b5f2168c708a707476e796ae9f12761",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 89654065
+        },
+        {
+          "digest": "sha256:0d41b28ba372dc17223acd80d4f655087f08ccd46e8a6d8868840b38c325bb07",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 50948689
+        },
+        {
+          "digest": "sha256:ec44d75f0053d9621a733f785e3f5dadddb0fb00826a712dde673a1d665cacf4",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 103779729
+        },
+        {
+          "digest": "sha256:a55df222675cf77aa03396a71c2bd8e3091f567bb84fdae2a1a3976916c11017",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209626112
+        },
+        {
+          "digest": "sha256:8a0cc1aaf3ffe8ba0c3856c8f6a49a4a098b23fc006e3b37b58cd907bce7a689",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 178654535
+        },
+        {
+          "digest": "sha256:0143da3c8947911733ec982954960c07ac5f0d054a816920b3fb8dab5021a2d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 238
+        },
+        {
+          "digest": "sha256:d30a6c1554917d5fceca404978b03c1d3f925a968bc220248212c26eb92f295d",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 446982570
+        },
+        {
+          "digest": "sha256:51fa859a4452179c068795eb109f6216db2be47ea35345aca4521c81a49f28d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 904325137
+        },
+        {
+          "digest": "sha256:80f5736adcabb614b8ccb61f64ae85cfab7ec56c0b803e3f228ecd7cc35ad85e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 94133171
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:47a0628f9152b03475c40ea93a6325103d889a85bb719e912bb08e7a60794724",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1726
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:8a9d8c9985383ac2f5786a55b6422965b0fc5663a8229a811fac6b3f3bc54d76",
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 85791
+        }
+      ],
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "schemaVersion": 2
+    },
+    "ManifestDesc": {
+      "annotations": {
+        "org.opencontainers.image.ref.name": "metadata-corrected"
+      },
+      "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 3735
+    },
+    "size": 19104206848
+  },
+  {
+    "Image": {
+      "CreatedAt": "2026-08-08T12:23:15.933862167Z",
+      "Labels": {
+        "io.cri-containerd.image": "managed"
+      },
+      "Name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
+      "Target": {
+        "annotations": {
+          "org.opencontainers.image.ref.name": "metadata-corrected"
+        },
+        "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3735
+      },
+      "UpdatedAt": "2026-08-08T12:23:15.933862167Z"
+    },
+    "ImageConfig": {
+      "architecture": "arm64",
+      "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+      "config": {
+        "ArgsEscaped": true,
+        "Cmd": [
+          "/bin/bash"
+        ],
+        "Entrypoint": [
+          "/bin/bash",
+          "-c",
+          "    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \"$@\"",
+          "--"
+        ],
+        "Env": [
+          "PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "LCCL_DETERMINISTIC=0",
+          "LCCL_PARALLEL=0",
+          "ATB_CXX_ABI=1",
+          "DEBIAN_FRONTEND=noninteractive",
+          "SOC_VERSION=ascend910b1",
+          "COMPILE_CUSTOM_KERNELS=1",
+          "TASK_QUEUE_ENABLE=1",
+          "OMP_NUM_THREADS=1"
+        ],
+        "Labels": {
+          "org.opencontainers.image.base.digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+          "org.opencontainers.image.base.name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+          "org.opencontainers.image.creation": "nerdctl-commit-eight-python-patches",
+          "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "org.opencontainers.image.patch.ascend-store-connector.sha256": "7b55f8d5bd56a1edcd94eb629c383410bd1d8293d83727a3641abfb84993ca56",
+          "org.opencontainers.image.patch.attention-utils.sha256": "ebf1d53368925d966d219b0c954ba221d278626e9945209b5230db8ff19c806a",
+          "org.opencontainers.image.patch.config-data.sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3",
+          "org.opencontainers.image.patch.kv-transfer.sha256": "7649e19fe127a7300af02ed9df364ed22012c77da6a15c366b9a3ad27113e36a",
+          "org.opencontainers.image.patch.layerwise-config.sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040",
+          "org.opencontainers.image.patch.mla-v1.sha256": "0e7c64fd572bc32234972c402fb7a42098b56288703be5e91570b0d026f70bfb",
+          "org.opencontainers.image.patch.path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py,/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+          "org.opencontainers.image.patch.pool-scheduler.sha256": "06e8ad911c20b956811053f463fbe86c4435ae052235180817896acda1b9269a",
+          "org.opencontainers.image.patch.pool-worker.sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22",
+          "org.opencontainers.image.patch.sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db",
+          "org.opencontainers.image.patch.source-commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.title": "vLLM Ascend layerwise KV pool",
+          "org.opencontainers.image.validation.run": "20260808T121828Z",
+          "org.opencontainers.image.version": "22.04",
+          "org.opencontainers.image.vllm-ascend.commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "org.opencontainers.image.vllm.compatibility-lane": "main-verified"
+        },
+        "WorkingDir": "/workspace"
+      },
+      "created": "2026-08-08T20:21:22.783232036+08:00",
+      "history": [
+        {
+          "created": "2026-06-29T10:38:39.31571004Z",
+          "created_by": "/bin/sh -c #(nop)  ARG RELEASE",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.377513194Z",
+          "created_by": "/bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.424300507Z",
+          "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.version=22.04",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:42.154842832Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:a517741c956f6a7e4b7cb0efd9bc418ce3cc54eb49b5314080ff606a7430ac2a in / "
+        },
+        {
+          "created": "2026-06-29T10:38:42.449574326Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_DETERMINISTIC=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_PARALLEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_CXX_ABI=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "RUN /bin/bash -c apt-get update     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y         apt-transport-https         ca-certificates         bash         libc6         libsqlite3-dev         gcc         g++         make         cmake         git         vim         wget         jq         curl         build-essential         libnuma-dev     && apt-get clean     && rm -rf /var/lib/apt/lists/*     && rm -rf /var/tmp/*     && rm -rf /tmp/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:45:05.293100743Z",
+          "created_by": "COPY /usr/local/python3.12.13 /usr/local/python3.12.13 # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:32.86512194Z",
+          "created_by": "COPY /usr/local/Ascend /usr/local/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.264009057Z",
+          "created_by": "COPY /etc/Ascend /etc/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "RUN /bin/bash -c CANN_TOOLKIT_ENV_FILE=\"/usr/local/Ascend/ascend-toolkit/set_env.sh\" &&     CANN_BISHENG_ENV_FILE=\"/usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh\" &&     CANN_NNAL_ENV_FILE=\"/usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}\" &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> ~/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "ENTRYPOINT [\"/bin/bash\" \"-c\" \"    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \\\"$@\\\"\" \"--\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG BUILD_JOBS=32",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG SOC_VERSION=ascend910b1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG COMPILE_CUSTOM_KERNELS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_REPO=https://github.com/vllm-project/vllm.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMPATIBILITY_LANE=main-verified",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ENV DEBIAN_FRONTEND=noninteractive SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 TASK_QUEUE_ENABLE=1 OMP_NUM_THREADS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:17.428586108Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     apt-get update -y;     apt-get install -y         ca-certificates         git         vim         wget         unzip         net-tools         gcc         g++         cmake         numactl         libnuma-dev         libibverbs-dev         libjemalloc2         libhiredis-dev         clang-15;     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20;     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:28.898218034Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_REPO}\" /vllm-workspace/vllm;     git -C /vllm-workspace/vllm fetch --depth 1         origin \"${VLLM_COMMIT}\";     git -C /vllm-workspace/vllm checkout --detach \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" =         \"${VLLM_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:45.936134684Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_ASCEND_REPO}\" /vllm-workspace/vllm-ascend;     git -C /vllm-workspace/vllm-ascend fetch --depth 1         origin \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend checkout --detach         \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" =         \"${VLLM_ASCEND_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:24:01.199122408Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${MOONCAKE_REPO}\" /vllm-workspace/Mooncake;     git -C /vllm-workspace/Mooncake fetch --depth 1         origin \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake checkout --detach         \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" =         \"${MOONCAKE_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:25:16.423048961Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh         /vllm-workspace/Mooncake/mooncake_installer.sh;     cd /vllm-workspace/Mooncake;     bash mooncake_installer.sh -y;     apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:12.477686246Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cd /vllm-workspace/Mooncake;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     export LD_LIBRARY_PATH=\"/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:${LD_LIBRARY_PATH:-}\";     cmake -S . -B build         -DUSE_ASCEND_DIRECT=ON         -DBUILD_UNIT_TESTS=OFF         -DBUILD_EXAMPLES=OFF         -DBUILD_BENCHMARK=OFF         -DWITH_STORE_RUST=OFF;     cmake --build build --parallel \"${BUILD_JOBS}\";     cmake --install build;     ldconfig;     rm -rf build # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:13.070550931Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c pip config set global.index-url \"${PIP_INDEX_URL}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:38:40.35311079Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     VLLM_TARGET_DEVICE=empty python3 -m pip install         -e \"/vllm-workspace/vllm[audio]\"         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:16.136876336Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     export PIP_EXTRA_INDEX_URL=\"https://mirrors.huaweicloud.com/ascend/repos/pypi\";     export VLLM_BATCH_INVARIANT=1;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     set +u;     source /usr/local/Ascend/nnal/atb/set_env.sh;     set -u;     python3 -m pip install         -e /vllm-workspace/vllm-ascend         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton triton-ascend;     python3 -m pip install         triton-ascend==3.2.1         --extra-index-url         https://mirrors.huaweicloud.com/ascend/repos/pypi;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     python3 -m pip install         modelscope         'ray>=2.47.1,<=2.48.0'         'protobuf>3.20.0';     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:49.334296Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     store_modules=(         /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so     );     test -f \"${store_modules[0]}\";     for api_name in         batch_put_session_start         batch_put_from_multi_buffer_ranges         batch_put_session_end         batch_put_session_revoke         batch_get_session_start         batch_get_into_multi_buffer_ranges         batch_get_session_end;     do         grep -F -q \"${api_name}\" < <(strings \"${store_modules[0]}\");     done # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >\"${pip_check_output}\" 2>&1; then         cat \"${pip_check_output}\";     else         cat \"${pip_check_output}\";         grep -E -v '^(ms-service-profiler 26\\.0\\.0 requires (matplotlib|msguard|openpyxl), which is not installed\\.|te 0\\.4\\.0 requires (ml-dtypes|tornado), which is not installed\\.|mindstudio-kpp 0\\.0\\.0\\.dev0 requires plotly, which is not installed\\.|ms-service-profiler 26\\.0\\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\\.33\\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\\.44\\.0\\.|ms-service-profiler 26\\.0\\.0 has requirement pandas~=2\\.2, but you have pandas 3\\.0\\.5\\.|prometheus-fastapi-instrumentator 8\\.1\\.0 has requirement starlette<2\\.0\\.0,>=1\\.0\\.0, but you have starlette 0\\.50\\.0\\.|opencv-python-headless 5\\.0\\.0\\.93 has requirement numpy>=2; python_version >= \"3\\.9\", but you have numpy 1\\.26\\.4\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi\\[standard\\]<0\\.137\\.0,>=0\\.133\\.0, but you have fastapi 0\\.123\\.10\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement starlette>=1\\.0\\.1, but you have starlette 0\\.50\\.0\\.|te 0\\.4\\.0 is not supported on this platform)$'             \"${pip_check_output}\" >\"${unexpected_pip_check}\" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat \"${unexpected_pip_check}\" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f \"${pip_check_output}\" \"${unexpected_pip_check}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" = \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" = \"${VLLM_ASCEND_COMMIT}\";     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" = \"${MOONCAKE_COMMIT}\";     python3 -c 'import importlib.metadata as m; packages=(\"vllm\", \"vllm-ascend\", \"torch\", \"torch-npu\", \"triton-ascend\"); print(\"\\n\".join(f\"{name}={m.version(name)}\" for name in packages))';     python3 -c 'import glob; paths=glob.glob(\"/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so\"); assert len(paths) == 1, paths; print(f\"mooncake-store={paths[0]}\")';     python3 -c 'import glob; paths=glob.glob(\"/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so\", recursive=True); assert paths, \"vllm-ascend native extension missing\"; print(\"\\n\".join(paths))' # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "LABEL org.opencontainers.image.title=vLLM Ascend layerwise KV pool org.opencontainers.image.vllm.commit=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 org.opencontainers.image.vllm.compatibility-lane=main-verified org.opencontainers.image.vllm-ascend.commit=45b2e785b10ca4604cd6314819ed15f3ff674781 org.opencontainers.image.mooncake.commit=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.133533382Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c echo 'export LD_PRELOAD=/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2:${LD_PRELOAD:-}' >> /root/.bashrc &&     echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib' >> /root/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "Patch cumulative Mooncake shared-buffer reuse at vLLM-Ascend a3c97358",
+          "created": "2026-08-08T20:21:22.783232036+08:00",
+          "created_by": "/bin/sleep infinity"
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "OCI config metadata correction after nerdctl commit",
+          "created": "2026-08-08T12:20:00Z",
+          "created_by": "LABEL cumulative Mooncake shared-buffer patch provenance",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "diff_ids": [
+          "sha256:349cd24b7d434a8beb71a40f461c42b9f58e19b2637af5065f91bb019759cb91",
+          "sha256:13a2d029c2022680c03a9c5cf2a23384fc2bc85ad5f31590a068be3e49d56eaf",
+          "sha256:75e134312dbb6553d6e5210c065e696edd5a6b4b3cb2d5ddaa064c978984f5d5",
+          "sha256:1d962b9b0737d5234f8aa1e0115496bdbc3bdd6e8d88d27a68a6c33936e1f001",
+          "sha256:c73d7b49fa4e2ff453c418024dfa5f5b1d10312ef7500e76bae1cab25c96a688",
+          "sha256:e32388e13f8292fb4ea13776b97c17d9e9486c3c3e39974e94ccdcf745ca4357",
+          "sha256:aa7d5fe064ee2047fd10e0d6be99898b065615696f542c106ffe945c41e7190a",
+          "sha256:0c223429d09bf6d4011103f2a36de15b35c5ba62208a646f9e7ea411bdc85325",
+          "sha256:20d389e9077ce98e72c3bf580991489f5443f7a1a027ff6e67e9184e072d0a07",
+          "sha256:cafaa23b0737bfce1a5c0377b22b7420f4ef8bc985b3be3ff974d208ede54266",
+          "sha256:41d34fe5fa0b0c102e553ff667e61813d16e666a8ba2adf4c437130156835b06",
+          "sha256:8238fbaaaf8e224ab90cb6bb6ccdcb8b035dd1a268fab8c83d37de944e23214f",
+          "sha256:ae41d12801735b4f6c758214a9afbb41b928c2b99dfc006503237824d368f1f2",
+          "sha256:11d7104458a611a49040ae0b9b26bc1abdb0c9d0a2174f16c42e7e596df7360e",
+          "sha256:571da12a220377f7340638bce45eda16e01de98bb12f36937455cd7b7d62f559",
+          "sha256:5731b290bb21225a99628dfa19926dd8f4788d0078ea7e33e4cb7ab5a4c23d32",
+          "sha256:1797f99f6caaff3314a8507ff52f5af34d774607d7eea3552ef02daf8fefaa21",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:a7514039654bc222044f09405601f094e3a453b3be29b21ec48069742f7457aa",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:1f1e1ac2355af81df1ee0d27c7e2a0bf4d289d784d8373c16e317d49972b8223"
+        ],
+        "type": "layers"
+      }
+    },
+    "ImageConfigDesc": {
+      "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+      "mediaType": "application/vnd.docker.container.image.v1+json",
+      "size": 40931
+    },
+    "Manifest": {
+      "config": {
+        "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 40931
+      },
+      "layers": [
+        {
+          "digest": "sha256:119d19e001bafa21919289095e1dbfac64f1e16d2469dd14c2d2a520039d26d9",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 27613184
+        },
+        {
+          "digest": "sha256:046ecf94a962d36e34dea7e7a54f242088712a7e4073a882b4a672ca14b53108",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 146755014
+        },
+        {
+          "digest": "sha256:4a10f4eea91bd68fac4181d4db2d0b5a30a756d138481b8649b7e0cbea185f5e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 181491733
+        },
+        {
+          "digest": "sha256:d61f1e100a1a16287e63ca9b3edceedbd7ff419fea603fbfc0015eab464bbaec",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 4116423071
+        },
+        {
+          "digest": "sha256:455d2f7cdd44cd66a48bcd90e7ab58e285bbb4719c0ca65a74c5aa29b012b853",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 215
+        },
+        {
+          "digest": "sha256:afa84ee83909bf5a3c077fa0547ade5aa650999c9e2d1189bc9b568b73f317dd",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1904
+        },
+        {
+          "digest": "sha256:a8c7cc4a4d2a8cfb509ce7aed750ded8c82484ab6e828a0e73d135eaa9529053",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 99
+        },
+        {
+          "digest": "sha256:e8b76cc0071ee43db1773b262144dacbc510e48330f6700be55f9347354bc16a",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209643516
+        },
+        {
+          "digest": "sha256:7035c92ff8346452d9fb5dad86e5b65d4b5f2168c708a707476e796ae9f12761",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 89654065
+        },
+        {
+          "digest": "sha256:0d41b28ba372dc17223acd80d4f655087f08ccd46e8a6d8868840b38c325bb07",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 50948689
+        },
+        {
+          "digest": "sha256:ec44d75f0053d9621a733f785e3f5dadddb0fb00826a712dde673a1d665cacf4",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 103779729
+        },
+        {
+          "digest": "sha256:a55df222675cf77aa03396a71c2bd8e3091f567bb84fdae2a1a3976916c11017",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209626112
+        },
+        {
+          "digest": "sha256:8a0cc1aaf3ffe8ba0c3856c8f6a49a4a098b23fc006e3b37b58cd907bce7a689",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 178654535
+        },
+        {
+          "digest": "sha256:0143da3c8947911733ec982954960c07ac5f0d054a816920b3fb8dab5021a2d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 238
+        },
+        {
+          "digest": "sha256:d30a6c1554917d5fceca404978b03c1d3f925a968bc220248212c26eb92f295d",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 446982570
+        },
+        {
+          "digest": "sha256:51fa859a4452179c068795eb109f6216db2be47ea35345aca4521c81a49f28d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 904325137
+        },
+        {
+          "digest": "sha256:80f5736adcabb614b8ccb61f64ae85cfab7ec56c0b803e3f228ecd7cc35ad85e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 94133171
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:47a0628f9152b03475c40ea93a6325103d889a85bb719e912bb08e7a60794724",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1726
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:8a9d8c9985383ac2f5786a55b6422965b0fc5663a8229a811fac6b3f3bc54d76",
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 85791
+        }
+      ],
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "schemaVersion": 2
+    },
+    "ManifestDesc": {
+      "annotations": {
+        "org.opencontainers.image.ref.name": "metadata-corrected"
+      },
+      "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 3735
+    },
+    "size": 19104206848
+  },
+  {
+    "Image": {
+      "CreatedAt": "2026-08-08T12:22:55.232433896Z",
+      "Labels": {
+        "io.cri-containerd.image": "managed"
+      },
+      "Name": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+      "Target": {
+        "annotations": {
+          "org.opencontainers.image.ref.name": "metadata-corrected"
+        },
+        "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3735
+      },
+      "UpdatedAt": "2026-08-08T12:22:55.232433896Z"
+    },
+    "ImageConfig": {
+      "architecture": "arm64",
+      "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+      "config": {
+        "ArgsEscaped": true,
+        "Cmd": [
+          "/bin/bash"
+        ],
+        "Entrypoint": [
+          "/bin/bash",
+          "-c",
+          "    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \"$@\"",
+          "--"
+        ],
+        "Env": [
+          "PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "LCCL_DETERMINISTIC=0",
+          "LCCL_PARALLEL=0",
+          "ATB_CXX_ABI=1",
+          "DEBIAN_FRONTEND=noninteractive",
+          "SOC_VERSION=ascend910b1",
+          "COMPILE_CUSTOM_KERNELS=1",
+          "TASK_QUEUE_ENABLE=1",
+          "OMP_NUM_THREADS=1"
+        ],
+        "Labels": {
+          "org.opencontainers.image.base.digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+          "org.opencontainers.image.base.name": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+          "org.opencontainers.image.creation": "nerdctl-commit-eight-python-patches",
+          "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "org.opencontainers.image.patch.ascend-store-connector.sha256": "7b55f8d5bd56a1edcd94eb629c383410bd1d8293d83727a3641abfb84993ca56",
+          "org.opencontainers.image.patch.attention-utils.sha256": "ebf1d53368925d966d219b0c954ba221d278626e9945209b5230db8ff19c806a",
+          "org.opencontainers.image.patch.config-data.sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3",
+          "org.opencontainers.image.patch.kv-transfer.sha256": "7649e19fe127a7300af02ed9df364ed22012c77da6a15c366b9a3ad27113e36a",
+          "org.opencontainers.image.patch.layerwise-config.sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040",
+          "org.opencontainers.image.patch.mla-v1.sha256": "0e7c64fd572bc32234972c402fb7a42098b56288703be5e91570b0d026f70bfb",
+          "org.opencontainers.image.patch.path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py,/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+          "org.opencontainers.image.patch.pool-scheduler.sha256": "06e8ad911c20b956811053f463fbe86c4435ae052235180817896acda1b9269a",
+          "org.opencontainers.image.patch.pool-worker.sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22",
+          "org.opencontainers.image.patch.sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db",
+          "org.opencontainers.image.patch.source-commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.title": "vLLM Ascend layerwise KV pool",
+          "org.opencontainers.image.validation.run": "20260808T121828Z",
+          "org.opencontainers.image.version": "22.04",
+          "org.opencontainers.image.vllm-ascend.commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+          "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "org.opencontainers.image.vllm.compatibility-lane": "main-verified"
+        },
+        "WorkingDir": "/workspace"
+      },
+      "created": "2026-08-08T20:21:22.783232036+08:00",
+      "history": [
+        {
+          "created": "2026-06-29T10:38:39.31571004Z",
+          "created_by": "/bin/sh -c #(nop)  ARG RELEASE",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.377513194Z",
+          "created_by": "/bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:39.424300507Z",
+          "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.version=22.04",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-06-29T10:38:42.154842832Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:a517741c956f6a7e4b7cb0efd9bc418ce3cc54eb49b5314080ff606a7430ac2a in / "
+        },
+        {
+          "created": "2026-06-29T10:38:42.449574326Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_HOME=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_TOOLKIT_LATEST_HOME=/usr/local/Ascend/ascend-toolkit/latest",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/python/site-packages:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe:/usr/local/Ascend/cann-9.0.1/python/site-packages:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_AICPU_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.1/opp",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV TOOLCHAIN_HOME=/usr/local/Ascend/cann-9.0.1/toolkit",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV CMAKE_PREFIX_PATH=/usr/local/Ascend/cann-9.0.1/toolkit/tools/tikicpulib/lib/cmake:/usr/local/Ascend/cann-9.0.1/lib64/cmake",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_HOME_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV PATH=/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/bin:/usr/local/Ascend/ascend-toolkit/latest/bin:/usr/local/Ascend/ascend-toolkit/latest/compiler/ccec_compiler/bin:/usr/local/Ascend/ascend-toolkit/latest/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.0.1/tools/msobjdump:/usr/local/Ascend/cann-9.0.1/bin:/usr/local/Ascend/cann-9.0.1/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.0.1/tools/profiler/bin:/usr/local/Ascend/cann-9.0.1/tools/ascend_system_advisor/asys:/usr/local/python3.12.13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_KERNEL_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_RUNNER_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_STREAM_SYNC_EVERY_OPERATION_ENABLE=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_LOCAL_COUNT=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_OPSRUNNER_KERNEL_CACHE_GLOABL_COUNT=5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_WORKSPACE_MEM_ALLOC_ALG_TYPE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_COMPARE_TILING_EVERY_KERNEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_SHARE_MEMORY_NAME_SUFFIX=",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_MATMUL_SHUFFLE_K_ENABLE=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_DETERMINISTIC=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV LCCL_PARALLEL=0",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "ENV ATB_CXX_ABI=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:28:36.427655428Z",
+          "created_by": "RUN /bin/bash -c apt-get update     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y         apt-transport-https         ca-certificates         bash         libc6         libsqlite3-dev         gcc         g++         make         cmake         git         vim         wget         jq         curl         build-essential         libnuma-dev     && apt-get clean     && rm -rf /var/lib/apt/lists/*     && rm -rf /var/tmp/*     && rm -rf /tmp/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:45:05.293100743Z",
+          "created_by": "COPY /usr/local/python3.12.13 /usr/local/python3.12.13 # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:32.86512194Z",
+          "created_by": "COPY /usr/local/Ascend /usr/local/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.264009057Z",
+          "created_by": "COPY /etc/Ascend /etc/Ascend # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "RUN /bin/bash -c CANN_TOOLKIT_ENV_FILE=\"/usr/local/Ascend/ascend-toolkit/set_env.sh\" &&     CANN_BISHENG_ENV_FILE=\"/usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh\" &&     CANN_NNAL_ENV_FILE=\"/usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}\" &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_TOOLKIT_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_BISHENG_ENV_FILE}\" >> ~/.bashrc &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> /etc/profile &&     echo \"source ${CANN_NNAL_ENV_FILE}\" >> ~/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-07-07T16:46:33.391558837Z",
+          "created_by": "ENTRYPOINT [\"/bin/bash\" \"-c\" \"    source /usr/local/Ascend/ascend-toolkit/set_env.sh &&     source /usr/local/Ascend/cann-9.0.1/share/info/ascendnpu-ir/bin/set_env.sh &&     source /usr/local/Ascend/nnal/atb/set_env.sh --cxx_abi=${ATB_CXX_ABI:-1}&&     exec \\\"$@\\\"\" \"--\"]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "SHELL [/bin/bash -c]",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG BUILD_JOBS=32",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG SOC_VERSION=ascend910b1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG COMPILE_CUSTOM_KERNELS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_REPO=https://github.com/vllm-project/vllm.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_COMPATIBILITY_LANE=main-verified",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ARG MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "ENV DEBIAN_FRONTEND=noninteractive SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 TASK_QUEUE_ENABLE=1 OMP_NUM_THREADS=1",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:22:40.980394557Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:17.428586108Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     apt-get update -y;     apt-get install -y         ca-certificates         git         vim         wget         unzip         net-tools         gcc         g++         cmake         numactl         libnuma-dev         libibverbs-dev         libjemalloc2         libhiredis-dev         clang-15;     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 20;     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 20;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:28.898218034Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_REPO}\" /vllm-workspace/vllm;     git -C /vllm-workspace/vllm fetch --depth 1         origin \"${VLLM_COMMIT}\";     git -C /vllm-workspace/vllm checkout --detach \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" =         \"${VLLM_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:23:45.936134684Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${VLLM_ASCEND_REPO}\" /vllm-workspace/vllm-ascend;     git -C /vllm-workspace/vllm-ascend fetch --depth 1         origin \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend checkout --detach         \"${VLLM_ASCEND_COMMIT}\";     git -C /vllm-workspace/vllm-ascend submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" =         \"${VLLM_ASCEND_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:24:01.199122408Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     git clone --depth 1 --no-checkout         \"${MOONCAKE_REPO}\" /vllm-workspace/Mooncake;     git -C /vllm-workspace/Mooncake fetch --depth 1         origin \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake checkout --detach         \"${MOONCAKE_COMMIT}\";     git -C /vllm-workspace/Mooncake submodule update         --init --recursive --depth 1;     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" =         \"${MOONCAKE_COMMIT}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:25:16.423048961Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cp /vllm-workspace/vllm-ascend/tools/mooncake_installer.sh         /vllm-workspace/Mooncake/mooncake_installer.sh;     cd /vllm-workspace/Mooncake;     bash mooncake_installer.sh -y;     apt-get install -y libmsgpack-dev libzstd-dev libxxhash-dev;     rm -rf /var/cache/apt/* /var/lib/apt/lists/* # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:12.477686246Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     cd /vllm-workspace/Mooncake;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     export LD_LIBRARY_PATH=\"/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/devlib:/usr/local/Ascend/ascend-toolkit/latest/$(uname -m)-linux/lib64:${LD_LIBRARY_PATH:-}\";     cmake -S . -B build         -DUSE_ASCEND_DIRECT=ON         -DBUILD_UNIT_TESTS=OFF         -DBUILD_EXAMPLES=OFF         -DBUILD_BENCHMARK=OFF         -DWITH_STORE_RUST=OFF;     cmake --build build --parallel \"${BUILD_JOBS}\";     cmake --install build;     ldconfig;     rm -rf build # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:34:13.070550931Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c pip config set global.index-url \"${PIP_INDEX_URL}\" # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T10:38:40.35311079Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     VLLM_TARGET_DEVICE=empty python3 -m pip install         -e \"/vllm-workspace/vllm[audio]\"         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:16.136876336Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     export PIP_EXTRA_INDEX_URL=\"https://mirrors.huaweicloud.com/ascend/repos/pypi\";     export VLLM_BATCH_INVARIANT=1;     source /usr/local/Ascend/ascend-toolkit/set_env.sh;     set +u;     source /usr/local/Ascend/nnal/atb/set_env.sh;     set -u;     python3 -m pip install         -e /vllm-workspace/vllm-ascend         --extra-index-url https://download.pytorch.org/whl/cpu/;     python3 -m pip uninstall -y triton triton-ascend;     python3 -m pip install         triton-ascend==3.2.1         --extra-index-url         https://mirrors.huaweicloud.com/ascend/repos/pypi;     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euxo pipefail;     python3 -m pip install         modelscope         'ray>=2.47.1,<=2.48.0'         'protobuf>3.20.0';     python3 -m pip cache purge # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:48.905978956Z",
+          "created_by": "ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/Ascend/cann-9.0.1/lib64:/usr/local/Ascend/cann-9.0.1/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.0.1/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.0.1/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/lib:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/examples:/usr/local/Ascend/nnal/atb/latest/atb/cxx_abi_1/tests/atbopstest:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64:/usr/local/Ascend/ascend-toolkit/latest/tools/aml/lib64/plugin:/usr/local/Ascend/ascend-toolkit/latest/lib64:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/opskernel:/usr/local/Ascend/ascend-toolkit/latest/lib64/plugin/nnengine:/usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/op_tiling:/usr/local/python3.12.13/lib:",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:49.334296Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     store_modules=(         /usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so     );     test -f \"${store_modules[0]}\";     for api_name in         batch_put_session_start         batch_put_from_multi_buffer_ranges         batch_put_session_end         batch_put_session_revoke         batch_get_session_start         batch_get_into_multi_buffer_ranges         batch_get_session_end;     do         grep -F -q \"${api_name}\" < <(strings \"${store_modules[0]}\");     done # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c set -euo pipefail;     pip_check_output=/tmp/pip-check.txt;     unexpected_pip_check=/tmp/unexpected-pip-check.txt;     if python3 -m pip check >\"${pip_check_output}\" 2>&1; then         cat \"${pip_check_output}\";     else         cat \"${pip_check_output}\";         grep -E -v '^(ms-service-profiler 26\\.0\\.0 requires (matplotlib|msguard|openpyxl), which is not installed\\.|te 0\\.4\\.0 requires (ml-dtypes|tornado), which is not installed\\.|mindstudio-kpp 0\\.0\\.0\\.dev0 requires plotly, which is not installed\\.|ms-service-profiler 26\\.0\\.0 has requirement opentelemetry-exporter-otlp-proto-(grpc|http)==1\\.33\\.1, but you have opentelemetry-exporter-otlp-proto-(grpc|http) 1\\.44\\.0\\.|ms-service-profiler 26\\.0\\.0 has requirement pandas~=2\\.2, but you have pandas 3\\.0\\.5\\.|prometheus-fastapi-instrumentator 8\\.1\\.0 has requirement starlette<2\\.0\\.0,>=1\\.0\\.0, but you have starlette 0\\.50\\.0\\.|opencv-python-headless 5\\.0\\.0\\.93 has requirement numpy>=2; python_version >= \"3\\.9\", but you have numpy 1\\.26\\.4\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement fastapi\\[standard\\]<0\\.137\\.0,>=0\\.133\\.0, but you have fastapi 0\\.123\\.10\\.|vllm 0\\.1\\.dev1\\+g54503ecec\\.empty has requirement starlette>=1\\.0\\.1, but you have starlette 0\\.50\\.0\\.|te 0\\.4\\.0 is not supported on this platform)$'             \"${pip_check_output}\" >\"${unexpected_pip_check}\" || true;         if [[ -s ${unexpected_pip_check} ]]; then             echo 'unexpected pip check issues:' >&2;             cat \"${unexpected_pip_check}\" >&2;             exit 1;         fi;         echo 'pip check reported only frozen known compatibility issues';     fi;     rm -f \"${pip_check_output}\" \"${unexpected_pip_check}\";     test \"$(git -C /vllm-workspace/vllm rev-parse HEAD)\" = \"${VLLM_COMMIT}\";     test \"$(git -C /vllm-workspace/vllm-ascend rev-parse HEAD)\" = \"${VLLM_ASCEND_COMMIT}\";     test \"$(git -C /vllm-workspace/Mooncake rev-parse HEAD)\" = \"${MOONCAKE_COMMIT}\";     python3 -c 'import importlib.metadata as m; packages=(\"vllm\", \"vllm-ascend\", \"torch\", \"torch-npu\", \"triton-ascend\"); print(\"\\n\".join(f\"{name}={m.version(name)}\" for name in packages))';     python3 -c 'import glob; paths=glob.glob(\"/usr/local/Ascend/cann-9.0.1/python/site-packages/mooncake/store*.so\"); assert len(paths) == 1, paths; print(f\"mooncake-store={paths[0]}\")';     python3 -c 'import glob; paths=glob.glob(\"/vllm-workspace/vllm-ascend/vllm_ascend/**/*.so\", recursive=True); assert paths, \"vllm-ascend native extension missing\"; print(\"\\n\".join(paths))' # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:50.943168174Z",
+          "created_by": "LABEL org.opencontainers.image.title=vLLM Ascend layerwise KV pool org.opencontainers.image.vllm.commit=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 org.opencontainers.image.vllm.compatibility-lane=main-verified org.opencontainers.image.vllm-ascend.commit=45b2e785b10ca4604cd6314819ed15f3ff674781 org.opencontainers.image.mooncake.commit=df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+          "empty_layer": true
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.133533382Z",
+          "created_by": "RUN |11 PIP_INDEX_URL=https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple BUILD_JOBS=32 SOC_VERSION=ascend910b1 COMPILE_CUSTOM_KERNELS=1 VLLM_REPO=https://github.com/vllm-project/vllm.git VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 VLLM_COMPATIBILITY_LANE=main-verified VLLM_ASCEND_REPO=https://github.com/jiahaoliang/vllm-ascend.git VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 MOONCAKE_REPO=https://github.com/ascend-direct-dev/Mooncake.git MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 /bin/bash -c echo 'export LD_PRELOAD=/usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2:${LD_PRELOAD:-}' >> /root/.bashrc &&     echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib' >> /root/.bashrc # buildkit"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "WORKDIR /workspace"
+        },
+        {
+          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-08-07T11:30:51.145617855Z",
+          "created_by": "CMD [\"/bin/bash\"]",
+          "empty_layer": true
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "Patch cumulative Mooncake shared-buffer reuse at vLLM-Ascend a3c97358",
+          "created": "2026-08-08T20:21:22.783232036+08:00",
+          "created_by": "/bin/sleep infinity"
+        },
+        {
+          "author": "jiahaoliang <gzliangjiahao@gmail.com>",
+          "comment": "OCI config metadata correction after nerdctl commit",
+          "created": "2026-08-08T12:20:00Z",
+          "created_by": "LABEL cumulative Mooncake shared-buffer patch provenance",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "diff_ids": [
+          "sha256:349cd24b7d434a8beb71a40f461c42b9f58e19b2637af5065f91bb019759cb91",
+          "sha256:13a2d029c2022680c03a9c5cf2a23384fc2bc85ad5f31590a068be3e49d56eaf",
+          "sha256:75e134312dbb6553d6e5210c065e696edd5a6b4b3cb2d5ddaa064c978984f5d5",
+          "sha256:1d962b9b0737d5234f8aa1e0115496bdbc3bdd6e8d88d27a68a6c33936e1f001",
+          "sha256:c73d7b49fa4e2ff453c418024dfa5f5b1d10312ef7500e76bae1cab25c96a688",
+          "sha256:e32388e13f8292fb4ea13776b97c17d9e9486c3c3e39974e94ccdcf745ca4357",
+          "sha256:aa7d5fe064ee2047fd10e0d6be99898b065615696f542c106ffe945c41e7190a",
+          "sha256:0c223429d09bf6d4011103f2a36de15b35c5ba62208a646f9e7ea411bdc85325",
+          "sha256:20d389e9077ce98e72c3bf580991489f5443f7a1a027ff6e67e9184e072d0a07",
+          "sha256:cafaa23b0737bfce1a5c0377b22b7420f4ef8bc985b3be3ff974d208ede54266",
+          "sha256:41d34fe5fa0b0c102e553ff667e61813d16e666a8ba2adf4c437130156835b06",
+          "sha256:8238fbaaaf8e224ab90cb6bb6ccdcb8b035dd1a268fab8c83d37de944e23214f",
+          "sha256:ae41d12801735b4f6c758214a9afbb41b928c2b99dfc006503237824d368f1f2",
+          "sha256:11d7104458a611a49040ae0b9b26bc1abdb0c9d0a2174f16c42e7e596df7360e",
+          "sha256:571da12a220377f7340638bce45eda16e01de98bb12f36937455cd7b7d62f559",
+          "sha256:5731b290bb21225a99628dfa19926dd8f4788d0078ea7e33e4cb7ab5a4c23d32",
+          "sha256:1797f99f6caaff3314a8507ff52f5af34d774607d7eea3552ef02daf8fefaa21",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:a7514039654bc222044f09405601f094e3a453b3be29b21ec48069742f7457aa",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:1f1e1ac2355af81df1ee0d27c7e2a0bf4d289d784d8373c16e317d49972b8223"
+        ],
+        "type": "layers"
+      }
+    },
+    "ImageConfigDesc": {
+      "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+      "mediaType": "application/vnd.docker.container.image.v1+json",
+      "size": 40931
+    },
+    "Manifest": {
+      "config": {
+        "digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 40931
+      },
+      "layers": [
+        {
+          "digest": "sha256:119d19e001bafa21919289095e1dbfac64f1e16d2469dd14c2d2a520039d26d9",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 27613184
+        },
+        {
+          "digest": "sha256:046ecf94a962d36e34dea7e7a54f242088712a7e4073a882b4a672ca14b53108",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 146755014
+        },
+        {
+          "digest": "sha256:4a10f4eea91bd68fac4181d4db2d0b5a30a756d138481b8649b7e0cbea185f5e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 181491733
+        },
+        {
+          "digest": "sha256:d61f1e100a1a16287e63ca9b3edceedbd7ff419fea603fbfc0015eab464bbaec",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 4116423071
+        },
+        {
+          "digest": "sha256:455d2f7cdd44cd66a48bcd90e7ab58e285bbb4719c0ca65a74c5aa29b012b853",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 215
+        },
+        {
+          "digest": "sha256:afa84ee83909bf5a3c077fa0547ade5aa650999c9e2d1189bc9b568b73f317dd",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1904
+        },
+        {
+          "digest": "sha256:a8c7cc4a4d2a8cfb509ce7aed750ded8c82484ab6e828a0e73d135eaa9529053",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 99
+        },
+        {
+          "digest": "sha256:e8b76cc0071ee43db1773b262144dacbc510e48330f6700be55f9347354bc16a",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209643516
+        },
+        {
+          "digest": "sha256:7035c92ff8346452d9fb5dad86e5b65d4b5f2168c708a707476e796ae9f12761",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 89654065
+        },
+        {
+          "digest": "sha256:0d41b28ba372dc17223acd80d4f655087f08ccd46e8a6d8868840b38c325bb07",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 50948689
+        },
+        {
+          "digest": "sha256:ec44d75f0053d9621a733f785e3f5dadddb0fb00826a712dde673a1d665cacf4",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 103779729
+        },
+        {
+          "digest": "sha256:a55df222675cf77aa03396a71c2bd8e3091f567bb84fdae2a1a3976916c11017",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 209626112
+        },
+        {
+          "digest": "sha256:8a0cc1aaf3ffe8ba0c3856c8f6a49a4a098b23fc006e3b37b58cd907bce7a689",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 178654535
+        },
+        {
+          "digest": "sha256:0143da3c8947911733ec982954960c07ac5f0d054a816920b3fb8dab5021a2d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 238
+        },
+        {
+          "digest": "sha256:d30a6c1554917d5fceca404978b03c1d3f925a968bc220248212c26eb92f295d",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 446982570
+        },
+        {
+          "digest": "sha256:51fa859a4452179c068795eb109f6216db2be47ea35345aca4521c81a49f28d7",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 904325137
+        },
+        {
+          "digest": "sha256:80f5736adcabb614b8ccb61f64ae85cfab7ec56c0b803e3f228ecd7cc35ad85e",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 94133171
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:47a0628f9152b03475c40ea93a6325103d889a85bb719e912bb08e7a60794724",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 1726
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "size": 32
+        },
+        {
+          "digest": "sha256:8a9d8c9985383ac2f5786a55b6422965b0fc5663a8229a811fac6b3f3bc54d76",
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 85791
+        }
+      ],
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "schemaVersion": 2
+    },
+    "ManifestDesc": {
+      "annotations": {
+        "org.opencontainers.image.ref.name": "metadata-corrected"
+      },
+      "digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 3735
+    },
+    "size": 19104206848
+  }
+]
