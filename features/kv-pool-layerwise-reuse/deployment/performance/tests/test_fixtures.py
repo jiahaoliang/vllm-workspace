@@ -69,6 +69,19 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
     assert "request_count=32" in text
+    assert (
+        "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate"
+        in text
+    )
+    assert (
+        "from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever" in text
+    )
+    assert (
+        "from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer" in text
+    )
+    assert "type=NaivePartitioner" in text
+    assert "type=LocalAPIRunner" in text
+    assert "type=OpenICLInferTask" in text
 
 
 def test_fixture_corruption_breaks_checksum_replay(tmp_path: Path) -> None:

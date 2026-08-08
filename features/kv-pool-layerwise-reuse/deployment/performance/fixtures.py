@@ -217,14 +217,18 @@ def write_aisbench_config(
     if not dataset_path.is_file():
         raise FileNotFoundError(dataset_path)
     text = f'''from ais_bench.benchmark.datasets import CustomDataset
-from ais_bench.benchmark.inferencers import GenInferencer
 from ais_bench.benchmark.models import VLLMCustomAPI
-from ais_bench.benchmark.retrievers import ZeroRetriever
-from ais_bench.benchmark.templates import PromptTemplate
+from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer
+from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate
+from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever
+from ais_bench.benchmark.partitioners import NaivePartitioner
+from ais_bench.benchmark.runners.local_api import LocalAPIRunner
+from ais_bench.benchmark.tasks import OpenICLInferTask
 
 mode = "perf"
 pressure = True
 summarizer = dict(type="stable_stage")
+request_count={request_count}
 
 models = [dict(
     attr="service",
@@ -248,9 +252,19 @@ datasets = [dict(
     infer_cfg=dict(
         prompt_template=dict(type=PromptTemplate, template="{{question}}"),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, request_count={request_count}),
+        inferencer=dict(type=GenInferencer),
     ),
 )]
+
+infer = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalAPIRunner,
+        max_num_workers={point.concurrency},
+        task=dict(type=OpenICLInferTask),
+    ),
+)
+work_dir={str((output_path.parent / "aisbench-output").resolve())!r}
 '''
     compile(text, str(output_path), "exec")
     output_path.parent.mkdir(parents=True, exist_ok=True)
