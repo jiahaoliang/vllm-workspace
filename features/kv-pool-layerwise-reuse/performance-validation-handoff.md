@@ -1,16 +1,16 @@
 ---
 schema_version: 1
-status: BLOCKED
-ready: false
-placeholders_remaining: true
-generation: 0
-updated_at: 2026-08-08T17:55:00+08:00
+status: READY_FOR_PERFORMANCE_VALIDATION
+ready: true
+placeholders_remaining: false
+generation: 1
+updated_at: 2026-08-08T21:08:10+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
 
 本文件是功能验证 session 与性能验证 session 之间的 fail-closed handoff。
-当前仅提供框架；所有 `PENDING` 字段都必须在功能验收完成后用不可变证据替换。
+本 generation 已用不可变源码、镜像和功能 evidence 完成验收。
 
 ## Listener Contract
 
@@ -19,7 +19,8 @@ updated_at: 2026-08-08T17:55:00+08:00
 1. Front matter 同时为
    `status: READY_FOR_PERFORMANCE_VALIDATION` 和 `ready: true`。
 2. `generation` 大于 0，且 `placeholders_remaining: false`。
-3. `Source Identity` 中的四个 commit 与本地 checkout/remote 复核一致。
+3. `Source Identity` 中的 control commit 等于当前 handoff-only transition
+   的直接父提交，三个 nested source commit 与本地 checkout/remote 复核一致。
 4. 镜像 platform、manifest digest 和 source labels 与 `Image Identity` 一致。
 5. `Functional Acceptance` 所有 required gate 均为 `PASS`。
 6. evidence 根 `SHA256SUMS` 回放成功，且 handoff 中记录的 digest 一致。
@@ -48,61 +49,66 @@ updated_at: 2026-08-08T17:55:00+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` | `PENDING` | `PENDING` |
-| `repos/vllm` | frozen dependency | `PENDING` | `PENDING` |
-| `repos/vllm-ascend` | implementation branch | `PENDING` | `PENDING` |
-| `repos/Mooncake` | read-only collaborator baseline | `PENDING` | `PENDING` |
+| control repo | `kv-pool-layerwise-reuse` functional control parent | `4afdc30bd6976e34495c773be55f931f0ff4db41` | transition parent pushed as `origin/kv-pool-layerwise-reuse=4afdc30bd6976e34495c773be55f931f0ff4db41` |
+| `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
+| `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
+| `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
 
 ## Image Identity
 
 | Field | Value |
 | --- | --- |
-| Base image reference | `PENDING` |
-| Base manifest digest | `PENDING` |
-| Patched file path | `PENDING` |
-| Patched file SHA256 | `PENDING` |
-| Patched source commit | `PENDING` |
-| Derived image reference | `PENDING` |
-| Platform | `PENDING` |
-| Derived manifest digest | `PENDING` |
-| vLLM source label | `PENDING` |
-| vLLM-Ascend source label | `PENDING` |
-| Mooncake source label | `PENDING` |
-| Derived-image/run ID | `PENDING` |
+| Image delivery mode | `ready-image` |
+| Base image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z` |
+| Base manifest digest | `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351` |
+| Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py` |
+| Patched file SHA256 | `384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040` |
+| Patched source commit | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
+| Derived image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z` |
+| Platform | `linux/arm64` |
+| Derived manifest digest | `sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c` |
+| vLLM source label | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
+| vLLM-Ascend source label | `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7` |
+| Mooncake source label | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
+| Derived-image/run ID | `20260808T121828Z` |
 
 ## Functional Acceptance
 
 | Gate | Required result | Actual result | Evidence |
 | --- | --- | --- | --- |
-| Focused CPU/mock UT | PASS | `PENDING` | `PENDING` |
-| Complete AscendStore CPU/mock UT | PASS | `PENDING` | `PENDING` |
-| Ruff | PASS | `PENDING` | `PENDING` |
-| Python compilation | PASS | `PENDING` | `PENDING` |
-| `git diff --check` | PASS | `PENDING` | `PENDING` |
-| `kv_producer` Mooncake/NPU correctness | PASS | `PENDING` | `PENDING` |
-| `kv_both` Mooncake/NPU correctness | PASS | `PENDING` | `PENDING` |
-| Physical-slot/memory-factor proof | PASS | `PENDING` | `PENDING` |
-| Reuse-mate save-gate timeout/corruption check | PASS | `PENDING` | `PENDING` |
-| Final Mooncake resource cleanup | PASS | `PENDING` | `PENDING` |
+| Focused CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/pytest-layerwise-model-runner.log`; `cpu/pytest-deployment-performance.log` |
+| Complete AscendStore CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/pytest-ascend-store-and-mla.log` |
+| Ruff | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/ruff-check.log` |
+| Python compilation | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/py-compile.log` |
+| `git diff --check` | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/cpu/git-diff-check.log` |
+| `kv_producer` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/producer-reuse/`; `npu/summary.json` |
+| `kv_both` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/both-reuse/`; `npu/summary.json` |
+| Physical-slot/memory-factor proof | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/REPORT.md`; `validation-config.json` |
+| Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/validator.log`; `REPORT.md` |
+| Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/npu/summary.json`; per-case `final-assert.log` |
 
 ## Evidence Identity
 
 | Field | Value |
 | --- | --- |
-| Evidence root | `PENDING` |
-| Root `SHA256SUMS` path | `PENDING` |
-| Root `SHA256SUMS` digest | `PENDING` |
-| Functional validation report | `PENDING` |
-| Validation config snapshot | `PENDING` |
+| Evidence root | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z` |
+| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/SHA256SUMS` |
+| Root `SHA256SUMS` digest | `15459826acdfca8e875169cf408dd1c5d80c84c43977ef93e16e7e9d7ed5b603` |
+| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/REPORT.md` |
+| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T121828Z/validation-config.json` |
 
 ## Authorized Performance Scope
 
 After this handoff becomes ready, performance validation may use only:
 
 - the exact source and image identities frozen above;
-- `backend=mooncake` and `use_layerwise=true`;
-- `layerwise_num_shared_buffers=3`;
-- `kv_producer` and `kv_both` roles;
+- Mooncake `BULK` with `backend=mooncake` and `use_layerwise=false`;
+- Mooncake `LAYERWISE` with `backend=mooncake` and `use_layerwise=true`;
+- Prefill `REUSE3` with `backend=mooncake`, `use_layerwise=true`,
+  `layerwise_num_shared_buffers=3`, and `kv_producer`;
+- the no-reuse pure-consumer Decode companion required by DP1/DP2;
+- functional validation of `kv_producer` and `kv_both` roles;
+- namespace `liangjiahao`;
 - model, topology, hardware and namespace explicitly frozen by the final
   validation config snapshot.
 
@@ -127,15 +133,15 @@ This handoff does not authorize or claim coverage for:
 
 The functional-validation session must update this file in one final step:
 
-1. Replace every `PENDING` with verified immutable values.
+1. Replace every placeholder with verified immutable values.
 2. Record all required gates as `PASS`.
 3. Replay the evidence checksum manifest.
 4. Increment `generation` from 0 to 1.
 5. Set `placeholders_remaining: false` after all placeholder values are gone.
 6. Set `updated_at` to the completion timestamp.
 7. Set `status: READY_FOR_PERFORMANCE_VALIDATION` and `ready: true` last.
-8. Commit the populated handoff together with, or after, the final validation
-   report and recheck remote equality.
+8. Commit only this populated handoff as the direct child of the recorded
+   functional control commit and recheck remote identity/reachability.
 
 If a production-source defect or invalid functional run prevents acceptance,
 set `status: BLOCKED`, keep `ready: false`, record the blocker below, and leave
@@ -143,21 +149,8 @@ all unverified fields fail-closed.
 
 ## Blocker
 
-Functional run `20260808T093917Z` found a reproducible production correctness
-defect with vLLM-Ascend `2d179d07c86e5f820fd6591c0c7fdef2b5132c14` and derived
-image manifest
-`sha256:e4333425928a1566f07e03e19744e7a88a48a379bbb00afffe8d4e3c8e8bfb01`.
-With the same deterministic request (`temperature=0`, fixed seed), the no-reuse
-baseline returned the expected continuation, while `kv_producer` and `kv_both`
-with Mooncake layerwise shared buffers returned corrupted, unequal text. The
-same mismatch exists in both `20260808T083140Z` and `20260808T093917Z`.
-
-Evidence:
-`features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T093917Z/REPORT.md`.
-
-DP1 and DP2 are not authorized. A production-source fix, new derived image,
-complete functional rerun, checksum replay, and generation-1 ready transition
-are required before performance validation can begin.
+None. The earlier correctness defect is preserved in failure/diagnostic
+evidence and resolved by vLLM-Ascend `a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7`.
 
 ## Listener Message Template
 
