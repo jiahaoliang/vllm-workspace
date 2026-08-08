@@ -47,6 +47,9 @@ REQUIRED_COMPONENTS = (
     "repos/vllm-ascend",
     "repos/Mooncake",
 )
+HANDOFF_TRANSITION_PATH = (
+    "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
+)
 REQUIRED_GATES = (
     "Focused CPU/mock UT",
     "Complete AscendStore CPU/mock UT",
@@ -170,8 +173,10 @@ def _table(text: str, heading: str) -> list[dict[str, str]]:
     table_lines = [line for line in lines if line.startswith("|")]
     if not table_lines:
         return []
-    rows = [[cell.strip().replace("`", "") for cell in line.strip("|").split("|")]
-            for line in table_lines]
+    rows = [
+        [cell.strip().replace("`", "") for cell in line.strip("|").split("|")]
+        for line in table_lines
+    ]
     headers = rows[0]
     if len(headers) != len(set(headers)):
         raise HandoffError(f"duplicate table header in {heading}")
@@ -276,7 +281,58 @@ def _validate_sources(state: HandoffState, workspace: Path) -> list[str]:
             text=True,
         )
         actual = result.stdout.strip() if result.returncode == 0 else "unavailable"
-        if actual != expected:
+        control_transition_error = None
+        if component == "control repo" and actual != expected:
+            revision = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(repository),
+                    "rev-list",
+                    "--parents",
+                    "-n",
+                    "1",
+                    "HEAD",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            revision_parts = revision.stdout.strip().split()
+            is_direct_child = (
+                revision.returncode == 0
+                and len(revision_parts) == 2
+                and revision_parts[1] == expected
+            )
+            if is_direct_child:
+                changed = subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(repository),
+                        "diff-tree",
+                        "--no-commit-id",
+                        "--name-only",
+                        "-r",
+                        "HEAD",
+                    ],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                changed_paths = tuple(changed.stdout.splitlines())
+                if changed.returncode != 0 or changed_paths != (
+                    HANDOFF_TRANSITION_PATH,
+                ):
+                    control_transition_error = (
+                        "control repo transition is not handoff-only: "
+                        + ", ".join(changed_paths)
+                    )
+                else:
+                    actual = expected
+        if control_transition_error:
+            errors.append(control_transition_error)
+        elif actual != expected:
             errors.append(
                 f"source HEAD mismatch: {component}: expected {expected}, got {actual}"
             )
@@ -319,8 +375,7 @@ def validate_handoff(state: HandoffState, workspace: Path) -> list[str]:
     if any(gate not in state.gates for gate in REQUIRED_GATES):
         errors.append("Functional Acceptance table is incomplete")
     if any(
-        not state.image_fields.get(field)
-        or state.image_fields.get(field) == "PENDING"
+        not state.image_fields.get(field) or state.image_fields.get(field) == "PENDING"
         for field in REQUIRED_IMAGE_FIELDS
     ):
         errors.append("Image Identity table is incomplete")

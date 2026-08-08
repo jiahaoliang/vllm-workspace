@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -19,6 +20,56 @@ READY_SCOPE = """## Authorized Performance Scope
 - no-reuse pure-consumer Decode companion;
 - namespace `liangjiahao`.
 """
+
+
+HANDOFF_PATH = Path(
+    "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
+)
+
+
+def _git(workspace: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(workspace), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _init_control_repo(workspace: Path) -> str:
+    _git(workspace, "init")
+    _git(workspace, "config", "user.name", "Performance Test")
+    _git(workspace, "config", "user.email", "performance@example.com")
+    handoff_path = workspace / HANDOFF_PATH
+    handoff_path.parent.mkdir(parents=True)
+    handoff_path.write_text("generation: 0\n", encoding="utf-8")
+    _git(workspace, "add", str(HANDOFF_PATH))
+    _git(workspace, "commit", "-m", "functional control")
+    return _git(workspace, "rev-parse", "HEAD")
+
+
+def _control_state(path: Path, expected: str) -> handoff.HandoffState:
+    return handoff.HandoffState(
+        path=path,
+        digest="handoff-sha",
+        status="READY_FOR_PERFORMANCE_VALIDATION",
+        ready=True,
+        generation=1,
+        placeholders_remaining=False,
+        authorized_scope=(),
+        gates={},
+        evidence_fields={},
+        source_rows={
+            "control repo": {
+                "Component": "control repo",
+                "Commit": expected,
+                "Remote equality": f"transition-parent={expected}",
+            }
+        },
+        image_fields={},
+        contains_pending=False,
+    )
 
 
 def test_waiting_handoff_is_rejected(tmp_path: Path) -> None:
@@ -238,3 +289,49 @@ updated_at: 2026-08-08T12:00:00+08:00
     errors = handoff.validate_handoff(handoff.parse_handoff(path), tmp_path)
 
     assert any("source HEAD mismatch: control repo" in error for error in errors)
+
+
+def test_control_source_accepts_direct_handoff_only_transition(
+    tmp_path: Path,
+) -> None:
+    expected = _init_control_repo(tmp_path)
+    path = tmp_path / HANDOFF_PATH
+    path.write_text("generation: 1\n", encoding="utf-8")
+    _git(tmp_path, "add", str(HANDOFF_PATH))
+    _git(tmp_path, "commit", "-m", "publish ready handoff")
+
+    errors = handoff._validate_sources(_control_state(path, expected), tmp_path)
+
+    assert errors == []
+
+
+def test_control_source_rejects_non_parent_commit(tmp_path: Path) -> None:
+    expected = _init_control_repo(tmp_path)
+    unrelated = tmp_path / "functional-evidence.txt"
+    unrelated.write_text("complete\n", encoding="utf-8")
+    _git(tmp_path, "add", unrelated.name)
+    _git(tmp_path, "commit", "-m", "later functional state")
+    path = tmp_path / HANDOFF_PATH
+    path.write_text("generation: 1\n", encoding="utf-8")
+    _git(tmp_path, "add", str(HANDOFF_PATH))
+    _git(tmp_path, "commit", "-m", "publish ready handoff")
+
+    errors = handoff._validate_sources(_control_state(path, expected), tmp_path)
+
+    assert any("source HEAD mismatch: control repo" in error for error in errors)
+
+
+def test_control_source_rejects_transition_with_other_paths(
+    tmp_path: Path,
+) -> None:
+    expected = _init_control_repo(tmp_path)
+    path = tmp_path / HANDOFF_PATH
+    path.write_text("generation: 1\n", encoding="utf-8")
+    unrelated = tmp_path / "unrelated.txt"
+    unrelated.write_text("changed\n", encoding="utf-8")
+    _git(tmp_path, "add", str(HANDOFF_PATH), unrelated.name)
+    _git(tmp_path, "commit", "-m", "mixed transition")
+
+    errors = handoff._validate_sources(_control_state(path, expected), tmp_path)
+
+    assert any("transition is not handoff-only" in error for error in errors)
