@@ -7,7 +7,7 @@ readonly container_name=ut
 readonly node_name=n1
 readonly expected_image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z
 readonly image_source_head=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7
-readonly expected_source_head=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7
+readonly expected_source_head=d74269a08e48e3b5b097f9a34f5c421696ddda40
 readonly remote_parent=/workspace
 readonly remote_checkout=${remote_parent}/vllm-ascend
 readonly remote_lock=${remote_parent}/.vllm-ascend-ut.lock
@@ -48,6 +48,7 @@ mapfile -t overlay_files < <(
     vllm_ascend | LC_ALL=C sort
 )
 expected_overlay_files=(
+  vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
 )
 if [[ "${overlay_files[*]}" != "${expected_overlay_files[*]}" ]]; then
   printf 'unexpected Python overlay relative to image source %s:\n' \

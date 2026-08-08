@@ -887,3 +887,26 @@
   origin left-right is `0 0`. Functional NPU validation is tracked separately
   as run `20260808T042014Z` and must finish before the performance handoff can
   become ready.
+
+## 2026-08-09
+
+- Preserved the isolated generation-1 performance failure showing that a pure
+  Decode consumer requested the process-local key
+  `model@decode-request_lastblock_31@0` while the Prefill-produced partial block
+  was content-addressed as `model@0b@0`.
+- Added the focused red/green regression
+  `test_no_reuse_consumer_uses_block_hash_for_partial_range` and made the
+  smallest production correction in `pool_worker.py`: only the initial remote
+  partial load uses the block hash, while later incremental Decode loads retain
+  the request-scoped snapshot.
+- The regression passed `1`, the Mooncake layer-session class passed `26`,
+  worker/scheduler/transfer tests passed `306`, and the complete AscendStore
+  suite passed `514`. Ruff lint/format, in-memory Python compilation, and
+  `git diff --check` passed.
+- Published DCO commit
+  `d74269a08e48e3b5b097f9a34f5c421696ddda40` normally to
+  `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`; local and
+  origin left-right is `0 0`. The old `a3c97358` image remains the CPU/mock UT
+  base with an exact allowlisted `pool_worker.py` overlay. A new committed image
+  and generation-2 functional handoff are required before performance restarts
+  from a new run root.
