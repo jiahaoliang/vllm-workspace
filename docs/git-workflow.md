@@ -38,6 +38,18 @@
 
 示例：
 
+```bash
+cd repos/vllm-ascend
+git fetch collaborator
+git switch kv_offload
+git rebase collaborator/kv_offload
+git push origin kv_offload
+cd ../..
+./scripts/lock-repos.sh
+```
+
+PowerShell 环境的等价命令：
+
 ```powershell
 cd repos\vllm-ascend
 git fetch collaborator

@@ -19,8 +19,23 @@ feature-specific 内容必须放在对应 feature branch 的 `features/<feature>
 
 1. 在源码仓库 commit。
 2. push 到对应远端。
-3. 回到根仓库运行 `.\scripts\lock-repos.ps1`。
+3. 回到根仓库运行 `./scripts/lock-repos.sh`；PowerShell 环境运行 `.\scripts\lock-repos.ps1`。
 4. 在 feature branch 更新相关 `features/<feature>/` 状态或同步日志。
 5. 提交根仓库。
 
 未提交的 WIP 不属于可恢复进度。
+
+## Linux 维护入口
+
+Linux 维护脚本要求 Bash 4+、Git 2.23+ 和 jq 1.6+。`bootstrap-repos.sh` 与 `restore-repos.sh` 都按 `workspace.lock.json` 恢复精确 commit；已有源码仓库不干净时会拒绝修改。
+
+```bash
+./scripts/bootstrap-repos.sh
+./scripts/status-all.sh
+./scripts/lock-repos.sh
+./scripts/restore-repos.sh
+./scripts/validate-workspace.sh
+./scripts/tests/test-linux-maintenance-scripts.sh
+```
+
+`status-all.sh` 在任一源码仓库缺失或 HEAD 与 lock 不匹配时返回非零；dirty 状态会展示，但不会单独使状态检查失败。
