@@ -57,13 +57,18 @@ updated_at: 2026-08-08T11:47:33+08:00
 
 | Field | Value |
 | --- | --- |
-| Image reference | `PENDING` |
+| Base image reference | `PENDING` |
+| Base manifest digest | `PENDING` |
+| Patched file path | `PENDING` |
+| Patched file SHA256 | `PENDING` |
+| Patched source commit | `PENDING` |
+| Derived image reference | `PENDING` |
 | Platform | `PENDING` |
-| Manifest digest | `PENDING` |
+| Derived manifest digest | `PENDING` |
 | vLLM source label | `PENDING` |
 | vLLM-Ascend source label | `PENDING` |
 | Mooncake source label | `PENDING` |
-| Build/run ID | `PENDING` |
+| Derived-image/run ID | `PENDING` |
 
 ## Functional Acceptance
 

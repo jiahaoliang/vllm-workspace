@@ -51,6 +51,8 @@ does not redesign slot release for a pure consumer.
   hardware support.
 - Making throughput, latency, capacity or scaling claims during functional
   validation.
+- Rebuilding the existing native ARM64 image from the Dockerfile for this
+  single-Python-file change.
 
 ## Design
 
@@ -178,8 +180,13 @@ For both roles, capture evidence that:
   required final state.
 
 The run uses explicit `-n liangjiahao` for every test workload command. It
-freezes exact source, image, model, topology and hardware identity before
-execution and archives checksummed raw evidence.
+freezes exact source, derived image, base image, patched-file checksum, model,
+topology and hardware identity before execution and archives checksummed raw
+evidence. The E2E image is created by copying the validated
+`layerwise_config.py` into the existing
+`kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z`
+image and committing that container with `nerdctl commit`; it must not be
+reported as a native rebuild.
 
 ### Excluded Validation Claims
 
@@ -198,6 +205,10 @@ Functional validation may transition it to
 gates pass, exact source/image identities are frozen, the evidence manifest is
 replayed and every placeholder is replaced. The transition sets `ready: true`
 last and increments the handoff generation.
+
+Image identity includes the base image manifest digest, patched file path and
+SHA256, source commit containing that exact file, derived image reference and
+derived manifest digest.
 
 The separate performance session must independently recheck the handoff,
 source/image identity and evidence checksum before creating performance

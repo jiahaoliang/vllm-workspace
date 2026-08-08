@@ -6,7 +6,7 @@
 
 **Architecture:** Extend only `get_gva_layerwise_config()` in production code so a Mooncake layerwise candidate reaches the existing memory-accounting and tensor-merge path. Preserve memcache behavior, reject a pure Mooncake consumer only when it supplies a non-null shared-buffer option, and reuse the existing Mooncake range/session and reuse-mate save-gate implementation.
 
-**Tech Stack:** Python 3.12, pytest, vLLM/vLLM-Ascend, Mooncake, Ruff, Kubernetes, BuildKit, nerdctl, ARM64 Ascend A2.
+**Tech Stack:** Python 3.12, pytest, vLLM/vLLM-Ascend, Mooncake, Ruff, Kubernetes, nerdctl/containerd, ARM64 Ascend A2.
 
 ## Global Constraints
 
@@ -18,6 +18,9 @@
 - A pure Mooncake `kv_consumer` with a non-null `layerwise_num_shared_buffers` fails at startup; absence or null preserves one buffer per layer.
 - Do not add simultaneous memcache/Mooncake priority or conflict handling.
 - vLLM remains fixed at `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` and Mooncake remains read-only at `df3f74ed8ebdb0c935554beea6299a9f11c723e2`.
+- Do not rebuild the E2E image. Patch only the validated `layerwise_config.py`
+  into `kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z`
+  and use `nerdctl commit` to create the reusable derived image.
 - UT, serving and validation workloads use explicit namespace `liangjiahao`; only `buildkitd` uses `default`.
 - CPU/mock UT uses a dedicated CPU-only Pod, tar synchronization, `PYTHONDONTWRITEBYTECODE=1`, and disabled pytest cache.
 - Preserve unrelated `deployment_yaml/`, `dockerfile.vllm23`, the untracked research snapshot, historical evidence and retained Pods.
@@ -34,7 +37,7 @@
 - Consumes: `get_gva_layerwise_config(kv_transfer_config: Any) -> dict[str, Any] | None`.
 - Produces: executable role/default/error expectations for direct and `MultiConnector` Mooncake configurations.
 
-- [ ] **Step 1: Replace the memcache-only test with explicit configuration builders**
+- [x] **Step 1: Replace the memcache-only test with explicit configuration builders**
 
 Add a helper local to the test module:
 
@@ -62,7 +65,7 @@ def _make_transfer_config(
     )
 ```
 
-- [ ] **Step 2: Add role/default/error tests**
+- [x] **Step 2: Add role/default/error tests**
 
 Add these focused contracts:
 
@@ -93,7 +96,7 @@ def test_gva_config_allows_mooncake_pure_consumer_without_reuse_option():
 
 Retain a memcache assertion, add `use_layerwise=false` and unsupported-backend assertions, and make one `MultiConnector` contain a single Mooncake AscendStore child whose config is returned.
 
-- [ ] **Step 3: Tar-sync the dirty TDD checkout to an isolated CPU-only Pod directory**
+- [x] **Step 3: Tar-sync the dirty TDD checkout to an isolated CPU-only Pod directory**
 
 Run only after verifying context, namespace, Pod name and CPU-only contract:
 
@@ -105,7 +108,7 @@ tar --exclude=.git --exclude=__pycache__ --exclude=.pytest_cache --exclude=.ruff
 
 Record local HEAD, branch and dirty status beside the test log.
 
-- [ ] **Step 4: Run the focused test and prove the red state**
+- [x] **Step 4: Run the focused test and prove the red state**
 
 ```bash
 kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/vllm-ascend-shared-buffer-tdd python3 -m pytest -q -p no:cacheprovider /workspace/vllm-ascend-shared-buffer-tdd/tests/ut/distributed/ascend_store/test_layerwise_config.py
@@ -124,7 +127,7 @@ Expected result: the new Mooncake save-capable assertions fail because the curre
 - Consumes: `is_kv_save_role(kv_role: str, consumer_is_to_put: bool) -> bool` from `config_data.py`.
 - Produces: the unchanged `get_gva_layerwise_config(...) -> dict | None` API with Mooncake role gating.
 
-- [ ] **Step 1: Implement the smallest production change**
+- [x] **Step 1: Implement the smallest production change**
 
 Import `is_kv_save_role` from `config_data`. Replace the memcache-only return block with:
 
@@ -150,13 +153,13 @@ Import `is_kv_save_role` from `config_data`. Replace the memcache-only return bl
 
 Do not modify any other production source file.
 
-- [ ] **Step 2: Re-sync the isolated Pod directory and prove the focused test is green**
+- [x] **Step 2: Re-sync the isolated Pod directory and prove the focused test is green**
 
 Repeat the Task 1 tar sync after removing and recreating only
 `/workspace/vllm-ascend-shared-buffer-tdd`, then rerun the same explicit pytest
 target. Expected result: every test in `test_layerwise_config.py` passes.
 
-- [ ] **Step 3: Update the user guide**
+- [x] **Step 3: Update the user guide**
 
 Document that Mooncake compute-side shared-buffer reuse is supported only for
 the three save-capable configurations in this version, that absence/null keeps
@@ -164,7 +167,7 @@ one buffer per layer, and that a pure consumer with a non-null value fails at
 startup. Keep the existing memcache text and general layerwise transfer support
 unchanged.
 
-- [ ] **Step 4: Run changed-file static checks in the Pod**
+- [x] **Step 4: Run changed-file static checks in the Pod**
 
 ```bash
 kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/vllm-ascend-shared-buffer-tdd /workspace/tools/ruff check /workspace/vllm-ascend-shared-buffer-tdd/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py /workspace/vllm-ascend-shared-buffer-tdd/tests/ut/distributed/ascend_store/test_layerwise_config.py
@@ -187,14 +190,14 @@ Expected result: all commands exit zero and no cache/bytecode is written into th
 **Interfaces:**
 - Produces: one signed-off vLLM-Ascend source commit pushed to the current personal-fork branch, plus control metadata that records the exact SHA.
 
-- [ ] **Step 1: Run focused worker/model-runner reuse tests**
+- [x] **Step 1: Run focused worker/model-runner reuse tests**
 
 Inspect exact collected names first, then run the existing methods covering
 `_get_layerwise_kv_cache_memory_info` and
 `_merge_kv_cache_tensors_for_layer_reuse` in the isolated Pod checkout. Do not
 invent class or method names; preserve the collected-target output in evidence.
 
-- [ ] **Step 2: Run the complete AscendStore CPU/mock suite**
+- [x] **Step 2: Run the complete AscendStore CPU/mock suite**
 
 ```bash
 kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/vllm-ascend-shared-buffer-tdd python3 -m pytest -q -p no:cacheprovider /workspace/vllm-ascend-shared-buffer-tdd/tests/ut/distributed/ascend_store
@@ -203,14 +206,14 @@ kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=
 Expected result: zero failures or errors. A skip is accepted only if it is the
 existing opt-in real Mooncake/NPU benchmark and its reason is recorded.
 
-- [ ] **Step 3: Re-run Ruff, Python compilation and diff checks after the full suite**
+- [x] **Step 3: Re-run Ruff, Python compilation and diff checks after the full suite**
 
 Run `/workspace/tools/ruff check` on both changed Python files, compile the
 production file with bytecode redirected outside the checkout or disabled, and
 run `git diff --check`. Confirm the source repo contains only the three approved
 source/test/doc changes.
 
-- [ ] **Step 4: Commit and push vLLM-Ascend**
+- [x] **Step 4: Commit and push vLLM-Ascend**
 
 ```bash
 git -C repos/vllm-ascend add -- vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py tests/ut/distributed/ascend_store/test_layerwise_config.py docs/source/user_guide/feature_guide/layerwise_kv_pool.md
@@ -221,7 +224,7 @@ git -C repos/vllm-ascend rev-list --left-right --count HEAD...origin/feature/moo
 
 Expected left/right count: `0 0`.
 
-- [ ] **Step 5: Refresh control identity**
+- [x] **Step 5: Refresh control identity**
 
 Run `pwsh -File scripts/lock-repos.ps1` when available. If PowerShell is not
 installed, update only the vLLM-Ascend commit/branch/purpose fields in
@@ -229,10 +232,9 @@ installed, update only the vLLM-Ascend commit/branch/purpose fields in
 compare all three recorded commits to their checkouts. Update `repo-state.md`
 and `sync-log.md` with the source commit and CPU gate results.
 
-### Task 4: Freeze And Build The Native ARM64 Image
+### Task 4: Freeze And Create The Derived ARM64 Image
 
 **Files:**
-- Modify: `features/kv-pool-layerwise-reuse/Dockerfile.a2`
 - Modify: `features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml`
 - Modify: `features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml`
 - Modify: `features/kv-pool-layerwise-reuse/deployment/60-vllm-ascend-ut-pod.yaml`
@@ -243,16 +245,16 @@ and `sync-log.md` with the source commit and CPU gate results.
 
 **Interfaces:**
 - Consumes: pushed vLLM-Ascend source SHA and fixed vLLM/Mooncake SHAs.
-- Produces: a provenance-bearing native `linux/arm64` image and frozen validation identity.
+- Produces: a provenance-bearing derived `linux/arm64` image and frozen validation identity.
 
-- [ ] **Step 1: Create the run identity and tracker**
+- [x] **Step 1: Create the run identity and tracker**
 
 Derive `run_id=$(date -u +%Y%m%dT%H%M%SZ)`. Create the evidence directory and
 a dated tracker that records the four Git identities, dirty state, remote
 left/right counts, Kubernetes context, exact namespace, model path/hash,
 physical NPU allocation, image tag and every gate below.
 
-- [ ] **Step 2: Make the existing start script accept an explicit validation config**
+- [x] **Step 2: Make the existing start script accept an explicit validation config**
 
 In `10-runtime-config.yaml`, set a shell variable before the API-server command:
 
@@ -268,9 +270,9 @@ quoted as one CLI argument.
 
 - [ ] **Step 3: Freeze source/image pins and commit control state**
 
-Update `Dockerfile.a2`, the Prefill and UT Pod image references, the UT runner
-source/image expectations, and `validation-identity.json` to the new source SHA
-and set `vllm_ascend_short=$(git -C repos/vllm-ascend rev-parse --short=8 HEAD)`.
+Update the Prefill and UT Pod image references, the UT runner source/image
+expectations, and `validation-identity.json` to the new source SHA and set
+`vllm_ascend_short=$(git -C repos/vllm-ascend rev-parse --short=8 HEAD)`.
 Use this exact tag expression:
 
 ```text
@@ -278,28 +280,31 @@ docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-${vllm_ascend_s
 ```
 
 Run deployment focused tests and `git diff --check`. Commit only the approved
-control/tooling paths before the build.
+control/tooling paths before creating the derived image.
 
-- [ ] **Step 4: Verify and start shared BuildKit infrastructure**
+- [x] **Step 4: Verify the base image and patch input**
 
-Inspect `/root/buildkitd.yaml`, record its SHA256, then use explicit namespace:
+Inspect the existing base image in containerd namespace `k8s.io`. Record its
+platform, manifest/config digests and labels. Prove the local patch file is from
+the clean pushed vLLM-Ascend commit and record its SHA256:
 
 ```bash
-kubectl apply -n default -f /root/buildkitd.yaml
-kubectl wait -n default --for=condition=Ready pod/buildkitd --timeout=300s
-kubectl get pod -n default buildkitd -o json
+nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
+git -C repos/vllm-ascend show 2770cd3ae66522c2eccb1c568889a55137836c0d:vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py | sha256sum
 ```
 
-Record the builder node architecture and prove the worker platform is native
-ARM64.
+The committed source blob SHA256 must equal the working-tree file SHA256.
 
-- [ ] **Step 5: Build and inspect the image**
+- [ ] **Step 5: Patch one Python file, commit and inspect the derived image**
 
-Use `BUILDKIT_HOST='kube-pod://buildkitd?namespace=default'`,
-`CONTAINERD_NAMESPACE=k8s.io`, exact three commit build args, `--progress=plain`
-and the frozen tag. Verify with `nerdctl -n k8s.io image inspect` that platform,
-manifest digest, labels and in-image Git HEADs match. Run the image's static
-Mooncake seven-symbol gate and installed dependency/source checks.
+Create an explicitly named temporary container from the base image, copy only
+`/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py`
+into it with `nerdctl cp`, and verify its in-container SHA256. Use
+`nerdctl -n k8s.io commit` with labels for the base manifest digest, patch
+SHA256 and source commit to create the frozen derived tag. Inspect the derived
+platform, manifest digest and labels; run an import/config probe proving the
+patched behavior. Remove only the exact temporary container after commit. Do
+not claim a native rebuild.
 
 ### Task 5: Real Mooncake/NPU Correctness Validation
 
@@ -313,7 +318,7 @@ Mooncake seven-symbol gate and installed dependency/source checks.
 - Consumes: frozen image and `PREFILL_KV_TRANSFER_CONFIG` override.
 - Produces: checksummed correctness evidence for `kv_producer` and `kv_both` with three shared buffers.
 
-- [ ] **Step 1: Run the native-image CPU gate**
+- [ ] **Step 1: Run the derived-image CPU gate**
 
 Apply the updated UT Pod manifest in `liangjiahao`, retain the CPU-only contract,
 and use the updated runner for the focused tests, complete AscendStore suite,
@@ -360,7 +365,7 @@ save/load layers, and no timeout, foreign data or session leak.
 
 Stop the Prefill child, restart Master, wait for empty metrics, and require
 `master_key_count=0`, `master_allocated_bytes=0`, and
-`master_active_clients=0`. Retain the named Pods and `default/buildkitd`; do not
+`master_active_clients=0`. Retain the named Pods and any existing `default/buildkitd`; do not
 delete the namespace.
 
 ### Task 6: Evidence, Handoff And Final Publication

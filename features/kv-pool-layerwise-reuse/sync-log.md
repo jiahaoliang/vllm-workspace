@@ -869,3 +869,21 @@
 - The evidence-root `SHA256SUMS` covers 797 files and replayed successfully;
   its manifest digest is
   `e5a13d163cfd98fe547c44ec22dc6c1c9688a07e42609d885f88935892a37f08`.
+
+## 2026-08-08
+
+- Added compute-side `layerwise_num_shared_buffers` selection for Mooncake
+  save-capable roles in vLLM-Ascend commit
+  `2770cd3ae66522c2eccb1c568889a55137836c0d`. The production delta is confined
+  to `layerwise_config.py`; memcache and public backend/session interfaces are
+  unchanged.
+- TDD red proved the missing Mooncake producer path and pure-consumer startup
+  rejection. The clean tar-synced CPU-only `liangjiahao/vllm-ascend-ut` source
+  gate then passed `20` focused layerwise-config tests, `504` complete
+  AscendStore tests and `2` model-runner reuse targets. Ruff, `py_compile`, and
+  `git diff --check` passed.
+- Normally pushed the source commit to
+  `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`; local and
+  origin left-right is `0 0`. Functional NPU validation is tracked separately
+  as run `20260808T042014Z` and must finish before the performance handoff can
+  become ready.

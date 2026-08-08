@@ -11,7 +11,12 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
+FINAL_SOURCE_COMMIT = "2770cd3ae66522c2eccb1c568889a55137836c0d"
+BASE_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
+PATCHED_FILE = (
+    "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/"
+    "ascend_store/layerwise_config.py"
+)
 EXPECTED_OVERLAY_FILES: list[str] = []
 
 
@@ -20,6 +25,25 @@ def read(relative: str) -> str:
 
 
 class ValidationIdentityTest(unittest.TestCase):
+    def test_prefill_transfer_config_default_and_override_are_stable(self):
+        runtime_config = read("deployment/10-runtime-config.yaml")
+        default_config = (
+            '{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer",'
+            '"kv_load_failure_policy":"fail","kv_connector_extra_config":{'
+            '"backend":"mooncake","use_layerwise":true,'
+            '"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}'
+        )
+        self.assertIn(
+            "kv_transfer_config=${PREFILL_KV_TRANSFER_CONFIG:-'"
+            + default_config
+            + "'}",
+            runtime_config,
+        )
+        self.assertEqual(
+            runtime_config.count('--kv-transfer-config "${kv_transfer_config}"'),
+            1,
+        )
+
     def test_main_verified_vllm_lane_does_not_force_release_compatibility(self):
         self.assertEqual(IDENTITY["vllm_lane"], "main-verified")
         self.assertIsNone(IDENTITY["vllm_version_override"])
@@ -44,7 +68,7 @@ class ValidationIdentityTest(unittest.TestCase):
             self.assertIn("inspect.signature(get_kv_cache_coordinator)", text, config)
             self.assertIn(IDENTITY["vllm_coordinator_keyword"], text, config)
 
-    def test_workspace_lock_and_dockerfile_match_frozen_source_identity(self):
+    def test_workspace_lock_and_dockerfile_match_source_identities(self):
         lock = json.loads(
             (ROOT / "workspace.lock.json").read_text(encoding="utf-8-sig")
         )
@@ -70,13 +94,20 @@ class ValidationIdentityTest(unittest.TestCase):
         }
         for component, commit in IDENTITY["commits"].items():
             self.assertEqual(lock["repos"][lock_names[component]]["commit"], commit)
-        for component, commit in IDENTITY["image_commits"].items():
+        for component, commit in IDENTITY["base_image_commits"].items():
             self.assertIn(f'ARG {arg_names[component]}="{commit}"', dockerfile)
 
-    def test_native_image_matches_final_source_without_overlay(self):
+    def test_derived_image_matches_final_source_without_runtime_overlay(self):
         overlay = IDENTITY["python_overlay"]
+        derived = IDENTITY["derived_image"]
         self.assertFalse(overlay["required"])
         self.assertEqual(IDENTITY["commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
+        self.assertEqual(IDENTITY["image_commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
+        self.assertEqual(IDENTITY["base_image_commits"]["vllm_ascend"], BASE_SOURCE_COMMIT)
+        self.assertEqual(derived["creation"], "nerdctl_commit_single_python_patch")
+        self.assertEqual(derived["patched_file"], PATCHED_FILE)
+        self.assertRegex(derived["patched_file_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(derived["patched_source_commit"], FINAL_SOURCE_COMMIT)
         self.assertEqual(
             overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
         )
@@ -84,11 +115,7 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertEqual(overlay["files"], EXPECTED_OVERLAY_FILES)
 
     def test_overlay_consumers_require_an_empty_file_set(self):
-        consumers = {
-            "deployment/sync-vllm-ascend-python.sh": "expected_changed",
-            "deployment/run-vllm-ascend-ut.sh": "expected_overlay_files",
-            "deployment/run-smoke-test.sh": "expected_overlay_files",
-        }
+        consumers = {"deployment/run-vllm-ascend-ut.sh": "expected_overlay_files"}
         for path, array_name in consumers.items():
             text = read(path)
             match = re.search(
@@ -130,17 +157,23 @@ class ValidationIdentityTest(unittest.TestCase):
             runner.index('"${output_dir}/current-engine-image.json"'),
         )
 
-    def test_all_feature_manifests_use_the_pinned_image_and_lane(self):
-        manifests = [
-            "deployment/30-mooncake-master.yaml",
+    def test_validation_manifests_use_derived_or_base_image_by_role(self):
+        derived_manifests = [
             "deployment/40-prefill-engine.yaml",
-            "deployment/50-decode-engine.yaml",
             "deployment/60-vllm-ascend-ut-pod.yaml",
+        ]
+        for manifest in derived_manifests:
+            self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
+
+        base_manifests = [
+            "deployment/30-mooncake-master.yaml",
+            "deployment/50-decode-engine.yaml",
             "deployment/stress/40-prefill-engine.yaml",
             "deployment/stress/50-decode-engine.yaml",
         ]
-        for manifest in manifests:
-            self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
+        base_image = IDENTITY["derived_image"]["base_image"]
+        for manifest in base_manifests:
+            self.assertIn(f"image: {base_image}", read(manifest), manifest)
 
     def test_fabric_mem_is_explicitly_out_of_scope(self):
         self.assertFalse(IDENTITY["runtime"]["fabric_mem_enabled"])
@@ -185,12 +218,7 @@ class ValidationIdentityTest(unittest.TestCase):
             self.assertIn('os.environ.get("PYTHONDONTWRITEBYTECODE")', text, config)
 
     def test_runners_and_runtime_checkers_match_identity_and_new_session_api(self):
-        runner_paths = [
-            "deployment/run-smoke-test.sh",
-            "deployment/run-stress-test.sh",
-            "deployment/run-vllm-ascend-ut.sh",
-            "deployment/sync-vllm-ascend-python.sh",
-        ]
+        runner_paths = ["deployment/run-vllm-ascend-ut.sh"]
         for path in runner_paths:
             text = read(path)
             self.assertIn(IDENTITY["image"], text, path)
@@ -311,9 +339,9 @@ class ValidationIdentityTest(unittest.TestCase):
 
     def test_stress_summary_embeds_exact_source_identity(self):
         runner = read("deployment/run-stress-test.sh")
-        for commit in IDENTITY["commits"].values():
+        for commit in IDENTITY["base_image_commits"].values():
             self.assertIn(commit, runner)
-        self.assertIn(IDENTITY["image_commits"]["vllm_ascend"], runner)
+        self.assertIn(IDENTITY["base_image_commits"]["vllm_ascend"], runner)
 
     def test_stress_capacity_snapshot_excludes_unrelated_pod_secrets(self):
         runner = read("deployment/run-stress-test.sh")

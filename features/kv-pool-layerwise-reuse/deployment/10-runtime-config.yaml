@@ -39,6 +39,7 @@ data:
 
     pid_file=/tmp/vllm-prefill.pid
     log_file=/tmp/vllm-prefill.log
+    kv_transfer_config=${PREFILL_KV_TRANSFER_CONFIG:-'{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}'}
 
     if [[ -e "${pid_file}" ]]; then
       old_pid="$(<"${pid_file}")"
@@ -73,7 +74,7 @@ data:
       --max-num-seqs 4 \
       --no-enable-prefix-caching \
       --gpu-memory-utilization 0.90 \
-      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}' \
+      --kv-transfer-config "${kv_transfer_config}" \
       >"${log_file}" 2>&1 </dev/null &
 
     new_pid=$!
