@@ -179,7 +179,7 @@ def _table(text: str, heading: str) -> list[dict[str, str]]:
     for row in rows[2:]:
         if len(row) != len(headers):
             raise HandoffError(f"malformed table row in {heading}")
-        values.append(dict(zip(headers, row, strict=True)))
+        values.append(dict(zip(headers, row)))
     return values
 
 

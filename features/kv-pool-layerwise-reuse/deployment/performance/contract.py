@@ -153,7 +153,7 @@ def adaptive_stop(
     if len(history) < 3:
         return StopDecision(False)
     transitions: list[bool] = []
-    for previous, current in zip(history[-3:-1], history[-2:], strict=True):
+    for previous, current in zip(history[-3:-1], history[-2:]):
         if previous.throughput <= 0 or previous.p95_latency <= 0:
             transitions.append(False)
             continue

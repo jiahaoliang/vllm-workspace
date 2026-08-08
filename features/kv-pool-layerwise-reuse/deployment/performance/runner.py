@@ -810,7 +810,6 @@ def _apply_variant_block(
     for path, description in zip(
         paths,
         ("apply-runtime-config", "apply-prefill", "apply-decode"),
-        strict=True,
     ):
         command_runner.run(
             Command(
