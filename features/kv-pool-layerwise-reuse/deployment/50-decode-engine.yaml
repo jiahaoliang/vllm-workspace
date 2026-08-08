@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: decode-engine
-          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z
           imagePullPolicy: Never
           command: ["/bin/bash", "-lc"]
           args: ["exec sleep infinity"]

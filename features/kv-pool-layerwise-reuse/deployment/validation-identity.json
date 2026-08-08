@@ -1,13 +1,13 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
-  "run_id": "20260808T121828Z",
+  "run_id": "20260808T203742Z",
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "a31f868f676ced1406d1ff917f2433003a973e28"
+    "commit": "b0dc1b087c6ef09958ce5ac2d0c63405f9b1faf7"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z",
   "platform": "linux/arm64",
   "vllm_lane": "main-verified",
   "vllm_version_override": null,
@@ -18,12 +18,12 @@
   "buildkit_namespace": "default",
   "commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "vllm_ascend": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "image_commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "vllm_ascend": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "base_image_commits": {
@@ -67,25 +67,30 @@
       },
       {
         "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
-        "sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22"
+        "sha256": "ef18371a5bde62a27080d4d74bc351358b12338c61328fd947684a461f502fb0"
       }
     ],
-    "patched_files_sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db",
-    "patched_source_commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
-    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-a3c97358-20260808T121828Z",
-    "commit_manifest_digest": "sha256:af474f50dcf3b12149afea1d8ad34dae3289fe9d03f29c85a6f3a8165a074a3d",
-    "commit_config_digest": "sha256:8945f2b27e1ccaaa4747fdbb59020f628843f29ba033ba2be2d64fde5dfba2f1",
-    "patch_layer_digest": "sha256:8a9d8c9985383ac2f5786a55b6422965b0fc5663a8229a811fac6b3f3bc54d76",
-    "patch_diff_id": "sha256:1f1e1ac2355af81df1ee0d27c7e2a0bf4d289d784d8373c16e317d49972b8223",
+    "patched_files_sha256": "7fd7860a94110cad2dc9c4c70d0162f3160bf942457778a04adcc944de2d7fe6",
+    "patched_source_commit": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-d74269a0-20260808T203742Z",
+    "commit_manifest_digest": "sha256:757f82b41f7c68cd02b95a345e62df0a86a8a1f7b7ee3688d39759554d3f341a",
+    "commit_config_digest": "sha256:88b2802de954f2cb7085caeb1dc8357b8a7b12397ce9c246ce69d0a3e8bb54c3",
+    "patch_layer_digest": "sha256:90d01363463e302bddd91c25f8c24b204b40d23f320a5d6559875ae335dae098",
+    "patch_diff_id": "sha256:253d456a76f24d59e7fe8d9f12d44d779ddce80e4d7cb0742030f43bf7bc925a",
     "metadata_correction": "config_manifest_only_oci_import",
-    "manifest_digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
-    "config_digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3"
+    "manifest_digest": "sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd",
+    "config_digest": "sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb"
   },
   "python_overlay": {
-    "required": false,
+    "required": true,
+    "scope": "cpu_mock_ut_only",
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
+    "image_config_digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
     "base_commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
-    "commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
-    "files": []
+    "commit": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "files": [
+      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py"
+    ]
   },
   "model": {
     "host_path": "/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",

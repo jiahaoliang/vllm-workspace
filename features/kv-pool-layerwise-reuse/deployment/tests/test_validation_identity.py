@@ -11,7 +11,7 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7"
+FINAL_SOURCE_COMMIT = "d74269a08e48e3b5b097f9a34f5c421696ddda40"
 BASE_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
 PATCHED_FILES = {
     "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py",
@@ -23,7 +23,9 @@ PATCHED_FILES = {
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
 }
-EXPECTED_OVERLAY_FILES: list[str] = []
+EXPECTED_OVERLAY_FILES = [
+    "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py"
+]
 
 
 def read(relative: str) -> str:
@@ -106,7 +108,8 @@ class ValidationIdentityTest(unittest.TestCase):
     def test_derived_image_matches_final_source_without_runtime_overlay(self):
         overlay = IDENTITY["python_overlay"]
         derived = IDENTITY["derived_image"]
-        self.assertFalse(overlay["required"])
+        self.assertTrue(overlay["required"])
+        self.assertEqual(overlay["scope"], "cpu_mock_ut_only")
         self.assertEqual(IDENTITY["commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
         self.assertEqual(IDENTITY["image_commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
         self.assertEqual(
@@ -135,13 +138,13 @@ class ValidationIdentityTest(unittest.TestCase):
             "config_digest",
         ):
             self.assertRegex(derived[digest_field], r"^sha256:[0-9a-f]{64}$")
-        self.assertEqual(
+        self.assertNotEqual(
             overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
         )
         self.assertEqual(overlay["commit"], IDENTITY["commits"]["vllm_ascend"])
         self.assertEqual(overlay["files"], EXPECTED_OVERLAY_FILES)
 
-    def test_overlay_consumers_require_an_empty_file_set(self):
+    def test_overlay_consumers_require_the_exact_cpu_mock_file_set(self):
         consumers = {"deployment/run-vllm-ascend-ut.sh": "expected_overlay_files"}
         for path, array_name in consumers.items():
             text = read(path)
@@ -187,14 +190,18 @@ class ValidationIdentityTest(unittest.TestCase):
     def test_validation_manifests_use_derived_or_base_image_by_role(self):
         derived_manifests = [
             "deployment/40-prefill-engine.yaml",
-            "deployment/60-vllm-ascend-ut-pod.yaml",
+            "deployment/50-decode-engine.yaml",
         ]
         for manifest in derived_manifests:
             self.assertIn(f"image: {IDENTITY['image']}", read(manifest), manifest)
 
+        self.assertIn(
+            f"image: {IDENTITY['python_overlay']['image']}",
+            read("deployment/60-vllm-ascend-ut-pod.yaml"),
+        )
+
         base_manifests = [
             "deployment/30-mooncake-master.yaml",
-            "deployment/50-decode-engine.yaml",
             "deployment/stress/40-prefill-engine.yaml",
             "deployment/stress/50-decode-engine.yaml",
         ]
@@ -248,7 +255,7 @@ class ValidationIdentityTest(unittest.TestCase):
         runner_paths = ["deployment/run-vllm-ascend-ut.sh"]
         for path in runner_paths:
             text = read(path)
-            self.assertIn(IDENTITY["image"], text, path)
+            self.assertIn(IDENTITY["python_overlay"]["image"], text, path)
             self.assertIn(IDENTITY["commits"]["vllm_ascend"], text, path)
             self.assertIn(IDENTITY["python_overlay"]["base_commit"], text, path)
         checked_paths = [
