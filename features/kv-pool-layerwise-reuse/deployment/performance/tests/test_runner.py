@@ -51,6 +51,23 @@ def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
         if call.description in {"apply-client", "wait-client", "client-identity", "bootstrap-client"}:
             assert "liangjiahao" in call.argv
 
+    bootstrap = next(call for call in fake.calls if call.description == "bootstrap-client")
+    bootstrap_text = " ".join(bootstrap.argv)
+    assert "/usr/local/python3.12.13/bin/python3.12" in bootstrap_text
+    assert "--index-url https://pypi.org/simple" in bootstrap_text
+    assert "venv --system-site-packages" in bootstrap_text
+    assert "--no-deps -e" in bootstrap_text
+    assert "requirements/runtime.txt" in bootstrap_text
+    assert "requirements/api.txt" in bootstrap_text
+    assert "TORCH_DEVICE_BACKEND_AUTOLOAD=0" in bootstrap_text
+    assert any(call.description == "configure-chroot-dns" for call in fake.calls)
+    devices = next(
+        call for call in fake.calls if call.description == "configure-chroot-devices"
+    )
+    devices_text = " ".join(devices.argv)
+    assert "dev/null" in devices_text
+    assert "dev/urandom" in devices_text
+
 
 def test_run_checks_handoff_before_any_command(tmp_path: Path) -> None:
     fake = FakeCommandRunner()
@@ -115,12 +132,19 @@ def test_aisbench_manifest_is_cpu_only_on_m1() -> None:
     assert pod["metadata"]["namespace"] == "liangjiahao"
     assert pod["metadata"]["name"] == "layerwise-performance-aisbench"
     assert pod["spec"]["nodeName"] == "m1"
-    assert container["image"].endswith("45b2e785-df3f74ed-20260807T100722Z")
+    assert container["image"] == "docker.io/library/vllm-ascend:latest"
     assert pod["metadata"]["annotations"]["performance.vllm.ai/source-image"].endswith(
         "45b2e785-df3f74ed-20260807T100722Z"
     )
     assert pod["metadata"]["annotations"]["performance.vllm.ai/repo-digest"] == (
         "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351"
+    )
+    assert pod["metadata"]["annotations"]["performance.vllm.ai/config-digest"] == (
+        "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+    )
+    assert (
+        pod["metadata"]["annotations"]["performance.vllm.ai/execution-mode"]
+        == "exact-rootfs-chroot"
     )
     assert resources == {
         "requests": {"cpu": "4", "memory": "16Gi"},

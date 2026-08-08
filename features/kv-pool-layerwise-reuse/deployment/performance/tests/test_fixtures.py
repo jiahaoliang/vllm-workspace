@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from performance.contract import WorkloadPoint
+import pytest
+
 from performance import fixtures
+from performance.contract import WorkloadPoint
 
 
 class FakeTokenizer:
@@ -19,6 +21,27 @@ class FakeTokenizer:
         return [ord(character) - 0x400 for character in text]
 
 
+class MergingTokenizer:
+    vocab_size = 48
+    all_special_ids: list[int] = []
+    name_or_path = "merging-tokenizer"
+
+    def decode(self, token_ids: list[int], **_: object) -> str:
+        return "".join(
+            chr(65 + token_id) if token_id < 16 else chr(0x400 + token_id)
+            for token_id in token_ids
+        )
+
+    def encode(self, text: str, **_: object) -> list[int]:
+        values = [
+            ord(character) - 65 if ord(character) < 128 else ord(character) - 0x400
+            for character in text
+        ]
+        if len(values) > 1 and all(value < 16 for value in values[:2]):
+            return [47, *values[2:]]
+        return values
+
+
 def test_exact_roundtrip_and_unique_first_block() -> None:
     tokenizer = FakeTokenizer()
     records = [
@@ -29,6 +52,30 @@ def test_exact_roundtrip_and_unique_first_block() -> None:
     assert all(len(record.token_ids) == 4096 for record in records)
     assert all(tokenizer.encode(record.text) == list(record.token_ids) for record in records)
     assert len({record.token_ids[:128] for record in records}) == 4
+
+
+def test_generator_avoids_single_token_values_that_merge_in_sequences() -> None:
+    record = fixtures.build_prompt(MergingTokenizer(), 4096, 3, 20260808)
+
+    assert len(record.token_ids) == 4096
+    assert MergingTokenizer().encode(record.text) == list(record.token_ids)
+
+
+def test_fixture_scans_tokenizer_alphabet_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = 0
+    original = fixtures.find_roundtrip_tokens
+
+    def counted(tokenizer: object, minimum: int = 16) -> tuple[int, ...]:
+        nonlocal calls
+        calls += 1
+        return original(tokenizer, minimum)
+
+    monkeypatch.setattr(fixtures, "find_roundtrip_tokens", counted)
+    fixtures.write_fixture(FakeTokenizer(), 128, 4, 20260808, tmp_path)
+
+    assert calls == 1
 
 
 def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import random
@@ -7,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from performance.contract import WorkloadPoint, sample_counts
+from performance.contract import INPUT_TOKENS, WorkloadPoint, sample_counts
 
 
 BLOCK_SIZE = 128
@@ -35,6 +36,7 @@ class FixtureManifest:
     formal_ids: tuple[tuple[str, ...], ...]
     partition_files: dict[str, Path]
     metadata_file: Path
+    manifest_file: Path
     checksum_file: Path
     checksums: dict[str, str]
 
@@ -53,16 +55,33 @@ def _decode(tokenizer: Any, token_ids: list[int]) -> str:
 
 def find_roundtrip_tokens(tokenizer: Any, minimum: int = 16) -> tuple[int, ...]:
     special = set(getattr(tokenizer, "all_special_ids", ()))
-    stable: list[int] = []
+    candidates: list[int] = []
     for token_id in range(int(tokenizer.vocab_size)):
         if token_id in special:
             continue
         text = _decode(tokenizer, [token_id])
-        if text and _encode(tokenizer, text) == [token_id]:
+        if (
+            len(text) == 1
+            and ord(text) > 127
+            and _encode(tokenizer, text) == [token_id]
+            and _encode(tokenizer, text * 64) == [token_id] * 64
+        ):
+            candidates.append(token_id)
+            if len(candidates) == 512:
+                break
+    stable: list[int] = []
+    for token_id in candidates:
+        if all(
+            _encode(tokenizer, _decode(tokenizer, [other, token_id]))
+            == [other, token_id]
+            and _encode(tokenizer, _decode(tokenizer, [token_id, other]))
+            == [token_id, other]
+            for other in stable
+        ):
             stable.append(token_id)
             if len(stable) == minimum:
                 return tuple(stable)
-    raise ValueError(f"tokenizer has fewer than {minimum} single-token round trips")
+    raise ValueError(f"tokenizer has fewer than {minimum} sequence-stable tokens")
 
 
 def _index_prefix(index: int, alphabet: tuple[int, ...], width: int = 16) -> list[int]:
@@ -84,10 +103,11 @@ def build_prompt(
     input_tokens: int,
     request_index: int,
     seed: int,
+    stable_tokens: tuple[int, ...] | None = None,
 ) -> PromptRecord:
     if input_tokens < BLOCK_SIZE:
         raise ValueError(f"input_tokens must be at least {BLOCK_SIZE}")
-    stable = find_roundtrip_tokens(tokenizer)
+    stable = stable_tokens or find_roundtrip_tokens(tokenizer)
     token_ids = _index_prefix(request_index, stable)
     randomizer = random.Random(f"{seed}:{input_tokens}:{request_index}")
     token_ids.extend(
@@ -122,6 +142,7 @@ def write_fixture(
     concurrency: int,
     seed: int,
     output_dir: Path,
+    stable_tokens: tuple[int, ...] | None = None,
 ) -> FixtureManifest:
     warmup_count, formal_count, repetitions = sample_counts(concurrency)
     root = output_dir / f"tokens-{input_tokens}-c{concurrency}"
@@ -133,13 +154,20 @@ def write_fixture(
     partition_ids: dict[str, tuple[str, ...]] = {}
     metadata_file = root / "metadata.jsonl"
     request_index = 0
+    stable = stable_tokens or find_roundtrip_tokens(tokenizer)
     with metadata_file.open("x", encoding="utf-8") as metadata_stream:
         for partition, count in partition_sizes:
             path = root / f"{partition}.jsonl"
             ids: list[str] = []
             with path.open("x", encoding="utf-8") as partition_stream:
                 for _ in range(count):
-                    record = build_prompt(tokenizer, input_tokens, request_index, seed)
+                    record = build_prompt(
+                        tokenizer,
+                        input_tokens,
+                        request_index,
+                        seed,
+                        stable_tokens=stable,
+                    )
                     request_index += 1
                     ids.append(record.request_id)
                     partition_stream.write(
@@ -175,6 +203,31 @@ def write_fixture(
             partition_ids[partition] = tuple(ids)
     checksum_paths = [*partition_files.values(), metadata_file]
     checksums = {path.name: _digest(path) for path in checksum_paths}
+    manifest_file = root / "manifest.json"
+    manifest_file.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "input_tokens": input_tokens,
+                "concurrency": concurrency,
+                "seed": seed,
+                "tokenizer_identity": str(
+                    getattr(tokenizer, "name_or_path", type(tokenizer).__name__)
+                ),
+                "warmup_ids": partition_ids["warmup"],
+                "formal_ids": [
+                    partition_ids[f"formal-{index}"]
+                    for index in range(1, repetitions + 1)
+                ],
+                "artifact_checksums": checksums,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    checksums[manifest_file.name] = _digest(manifest_file)
     checksum_file = root / "SHA256SUMS"
     checksum_file.write_text(
         "".join(f"{digest}  {name}\n" for name, digest in sorted(checksums.items())),
@@ -191,6 +244,7 @@ def write_fixture(
         ),
         partition_files=partition_files,
         metadata_file=metadata_file,
+        manifest_file=manifest_file,
         checksum_file=checksum_file,
         checksums=checksums,
     )
@@ -270,3 +324,57 @@ work_dir={str((output_path.parent / "aisbench-output").resolve())!r}
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(text, encoding="utf-8")
     return output_path
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    generate = subparsers.add_parser("generate")
+    generate.add_argument("--tokenizer", type=Path, required=True)
+    generate.add_argument("--output", type=Path, required=True)
+    generate.add_argument("--concurrency", type=int, default=64)
+    generate.add_argument("--seed", type=int, default=20260808)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer, trust_remote_code=True)
+    tokenizer.model_max_length = 65536
+    stable_tokens = find_roundtrip_tokens(tokenizer)
+    args.output.mkdir(parents=True, exist_ok=True)
+    tokenizer_files = sorted(path for path in args.tokenizer.iterdir() if path.is_file())
+    (args.output / "tokenizer-identity.json").write_text(
+        json.dumps(
+            {
+                "path": str(args.tokenizer.resolve()),
+                "class": type(tokenizer).__name__,
+                "vocab_size": tokenizer.vocab_size,
+                "model_max_length_for_validation": tokenizer.model_max_length,
+                "files": {
+                    path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                    for path in tokenizer_files
+                },
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    for input_tokens in INPUT_TOKENS:
+        write_fixture(
+            tokenizer,
+            input_tokens,
+            args.concurrency,
+            args.seed,
+            args.output,
+            stable_tokens=stable_tokens,
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

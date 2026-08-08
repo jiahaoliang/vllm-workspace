@@ -40,6 +40,12 @@
 
 ## Local Snapshots
 
+- Workspace Issue #1 performance requirement:
+  - Source: <https://github.com/jiahaoliang/vllm-workspace/issues/1>
+  - Snapshot: `snapshots/issue-1-performance-validation-2026-08-08.md`
+- AISBench performance/stable-stage contract:
+  - Source: <https://github.com/AISBench/benchmark/tree/3fd27b4a5fd022fcb5484fb084307f49955491ba>
+  - Snapshot: `snapshots/aisbench-performance-contract-2026-08-08.md`
 - `snapshots/rfc-33398-layerwise-kv-offload.md`
 - `snapshots/rfc-33980-sparse-attention-kv-offload.md`
 - `snapshots/ader47-vllm-ascend-674594c5-kv-pool-layerwise-reuse.md`

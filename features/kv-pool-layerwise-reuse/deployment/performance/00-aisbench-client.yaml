@@ -6,7 +6,9 @@
     "namespace": "liangjiahao",
     "annotations": {
       "performance.vllm.ai/source-image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
-      "performance.vllm.ai/repo-digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351"
+      "performance.vllm.ai/repo-digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+      "performance.vllm.ai/config-digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+      "performance.vllm.ai/execution-mode": "exact-rootfs-chroot"
     },
     "labels": {
       "app": "layerwise-performance-aisbench",
@@ -22,13 +24,14 @@
     "containers": [
       {
         "name": "aisbench",
-        "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+        "image": "docker.io/library/vllm-ascend:latest",
         "imagePullPolicy": "Never",
         "command": ["/bin/bash", "-lc"],
         "args": ["exec sleep infinity"],
         "env": [
           {"name": "PYTHONDONTWRITEBYTECODE", "value": "1"},
-          {"name": "PYTHONUNBUFFERED", "value": "1"}
+          {"name": "PYTHONUNBUFFERED", "value": "1"},
+          {"name": "CLIENT_ROOTFS", "value": "/performance-workspace/rootfs"}
         ],
         "resources": {
           "requests": {"cpu": "4", "memory": "16Gi"},

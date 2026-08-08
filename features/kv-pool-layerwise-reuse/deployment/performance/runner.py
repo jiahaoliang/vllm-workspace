@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -71,6 +72,19 @@ def _append(path: Path, event: dict[str, object]) -> None:
         stream.write(json.dumps(record, sort_keys=True) + "\n")
 
 
+def _write_checksums(root: Path) -> None:
+    paths = sorted(
+        path for path in root.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
+    )
+    (root / "SHA256SUMS").write_text(
+        "".join(
+            f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(root)}\n"
+            for path in paths
+        ),
+        encoding="utf-8",
+    )
+
+
 def prepare(command_runner: Runner, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     _append(
@@ -80,17 +94,25 @@ def prepare(command_runner: Runner, output_dir: Path) -> None:
     manifest = Path(__file__).with_name("00-aisbench-client.yaml")
     bootstrap = r'''
 set -euo pipefail
-root=/performance-workspace
+root=/client-tools
 src=${root}/src/benchmark
 venv=${root}/venv
+python=/usr/local/python3.12.13/bin/python3.12
+export TORCH_DEVICE_BACKEND_AUTOLOAD=0
 mkdir -p "${root}/provenance" "${root}/src"
-python3 --version | tee "${root}/provenance/python-version.txt"
-python3 -m pip install --disable-pip-version-check --no-cache-dir \
-  --target "${root}/uv-bootstrap" uv==0.12.3 \
-  2>&1 | tee "${root}/provenance/uv-install.log"
+"${python}" --version | tee "${root}/provenance/python-version.txt"
+if [[ ! -x ${root}/uv-bootstrap/bin/uv ]]; then
+  "${python}" -m pip install --disable-pip-version-check --no-cache-dir \
+    --index-url https://pypi.org/simple \
+    --target "${root}/uv-bootstrap" uv==0.12.3 \
+    2>&1 | tee "${root}/provenance/uv-install.log"
+fi
 uv=${root}/uv-bootstrap/bin/uv
 "${uv}" --version | tee "${root}/provenance/uv-version.txt"
-"${uv}" venv --python /usr/local/python3.12.13/bin/python3 "${venv}"
+printf '%s\n' \
+  'stdlib venv overlay; uv 0.12.3 cannot discover the custom-prefix interpreter' \
+  >"${root}/provenance/venv-method.txt"
+"${python}" -m venv --system-site-packages "${venv}"
 if [[ ! -d ${src}/.git ]]; then
   git clone https://github.com/AISBench/benchmark.git "${src}"
 fi
@@ -98,19 +120,76 @@ git -C "${src}" fetch origin 3fd27b4a5fd022fcb5484fb084307f49955491ba
 git -C "${src}" checkout --detach 3fd27b4a5fd022fcb5484fb084307f49955491ba
 test "$(git -C "${src}" rev-parse HEAD)" = \
   3fd27b4a5fd022fcb5484fb084307f49955491ba
-"${uv}" pip install --python "${venv}/bin/python" \
-  -e "${src}" -r "${src}/requirements/api.txt" \
+"${venv}/bin/python" -m pip install --disable-pip-version-check \
+  --no-deps -e "${src}" \
   2>&1 | tee "${root}/provenance/aisbench-install.log"
+"${venv}/bin/python" -m pip install --disable-pip-version-check \
+  -r "${src}/requirements/runtime.txt" \
+  2>&1 | tee "${root}/provenance/runtime-install.log"
+"${venv}/bin/python" -m pip install --disable-pip-version-check \
+  -r "${src}/requirements/api.txt" \
+  2>&1 | tee "${root}/provenance/api-install.log"
 "${venv}/bin/python" -c \
   'import ais_bench.benchmark as b; print(b.__version__)' \
   | tee "${root}/provenance/aisbench-version.txt"
 "${venv}/bin/python" -c \
   'from ais_bench.benchmark.models import VLLMCustomAPI; from ais_bench.benchmark.datasets import CustomDataset; from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer; print("imports: OK")' \
   | tee "${root}/provenance/import-smoke.txt"
-"${uv}" pip freeze --python "${venv}/bin/python" \
+"${venv}/bin/python" -m pip freeze \
   >"${root}/provenance/requirements.freeze.txt"
 git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
 '''.strip()
+    exact_image = (
+        "docker.io/library/vllm-ascend:"
+        "kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
+    )
+    exact_config_digest = (
+        "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+    )
+    rootfs_sync = f'''
+set -euo pipefail
+marker=/performance-workspace/rootfs/.performance-image-config-digest
+if kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
+  test -f "${{marker}}"; then
+  actual=$(kubectl exec -n liangjiahao layerwise-performance-aisbench \
+    -c aisbench -- cat "${{marker}}")
+  test "${{actual}}" = {exact_config_digest!r}
+  exit 0
+fi
+existing=$(kubectl exec -n liangjiahao layerwise-performance-aisbench \
+  -c aisbench -- find /performance-workspace/rootfs -mindepth 1 -print -quit)
+test -z "${{existing}}"
+mount_dir=$(mktemp -d /tmp/layerwise-client-rootfs.XXXXXX)
+cleanup_mount() {{
+  ctr --namespace k8s.io images unmount "${{mount_dir}}" >/dev/null 2>&1 || true
+  rmdir "${{mount_dir}}" >/dev/null 2>&1 || true
+}}
+trap cleanup_mount EXIT
+ctr --namespace k8s.io images mount {exact_image!r} "${{mount_dir}}"
+tar --numeric-owner -C "${{mount_dir}}" -cf - . | \
+  kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
+    -c aisbench -- tar --numeric-owner \
+    -C /performance-workspace/rootfs -xf -
+kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
+  sh -c 'printf "%s\\n" "$1" >"$2"' sh \
+  {exact_config_digest!r} "${{marker}}"
+'''.strip()
+    tokenizer_copy = r'''
+set -euo pipefail
+kubectl exec -n liangjiahao deployment/prefill-engine-deployment \
+  -c prefill-engine -- tar \
+  -C /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 -cf - \
+  config.json configuration.json configuration_deepseek.py generation_config.json \
+  tokenization_deepseek_fast.py tokenizer.json tokenizer_config.json | \
+kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
+  -c aisbench -- tar -C /performance-workspace/rootfs/client-tools/tokenizer -xf -
+'''.strip()
+    tooling_sync = (
+        "set -euo pipefail; "
+        f"tar -C {str(Path(__file__).resolve().parent.parent)!r} -cf - performance | "
+        "kubectl exec -i -n liangjiahao layerwise-performance-aisbench "
+        "-c aisbench -- tar -C /performance-workspace/rootfs/client-tools/tooling -xf -"
+    )
     commands = (
         Command(("kubectl", "config", "current-context"), description="kube-context"),
         Command(
@@ -146,6 +225,7 @@ git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
             ),
             description="client-identity",
         ),
+        Command(("bash", "-c", rootfs_sync), description="sync-exact-client-rootfs"),
         Command(
             (
                 "kubectl",
@@ -156,11 +236,143 @@ git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
                 "-c",
                 "aisbench",
                 "--",
-                "bash",
-                "-lc",
+                "mkdir",
+                "-p",
+                "/performance-workspace/rootfs/client-tools/tokenizer",
+                "/performance-workspace/rootfs/client-tools/tooling",
+            ),
+            description="prepare-client-directories",
+        ),
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "cp",
+                "/etc/resolv.conf",
+                "/performance-workspace/rootfs/etc/resolv.conf",
+            ),
+            description="configure-chroot-dns",
+        ),
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "sh",
+                "-c",
+                "test -c /performance-workspace/rootfs/dev/null || "
+                "mknod -m 666 /performance-workspace/rootfs/dev/null c 1 3; "
+                "test -c /performance-workspace/rootfs/dev/random || "
+                "mknod -m 666 /performance-workspace/rootfs/dev/random c 1 8; "
+                "test -c /performance-workspace/rootfs/dev/urandom || "
+                "mknod -m 666 /performance-workspace/rootfs/dev/urandom c 1 9",
+            ),
+            description="configure-chroot-devices",
+        ),
+        Command(("bash", "-c", tokenizer_copy), description="copy-tokenizer"),
+        Command(("bash", "-c", tooling_sync), description="sync-performance-tooling"),
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "chroot",
+                "/performance-workspace/rootfs",
+                "/bin/bash",
+                "-c",
                 bootstrap,
             ),
             description="bootstrap-client",
+        ),
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "rm",
+                "-rf",
+                "--",
+                "/performance-workspace/rootfs/client-tools/fixtures",
+            ),
+            description="reset-client-fixtures",
+        ),
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "chroot",
+                "/performance-workspace/rootfs",
+                "env",
+                "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+                "PYTHONDONTWRITEBYTECODE=1",
+                "PYTHONPATH=/client-tools/tooling",
+                "/client-tools/venv/bin/python",
+                "-m",
+                "performance.fixtures",
+                "generate",
+                "--tokenizer",
+                "/client-tools/tokenizer",
+                "--output",
+                "/client-tools/fixtures",
+                "--concurrency",
+                "64",
+                "--seed",
+                "20260808",
+            ),
+            description="generate-fixtures",
+        ),
+        Command(
+            (
+                "kubectl",
+                "cp",
+                "-n",
+                "liangjiahao",
+                "-c",
+                "aisbench",
+                "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/provenance",
+                str(output_dir / "client-provenance"),
+            ),
+            description="archive-client-provenance",
+        ),
+        Command(
+            (
+                "kubectl",
+                "cp",
+                "-n",
+                "liangjiahao",
+                "-c",
+                "aisbench",
+                "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures",
+                str(output_dir / "fixtures"),
+            ),
+            description="archive-fixtures",
         ),
     )
     try:
@@ -187,6 +399,7 @@ git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
         output_dir / "steps.jsonl",
         {"phase": "prepare", "status": "completed", "server_authorized": False},
     )
+    _write_checksums(output_dir)
 
 
 def run(
