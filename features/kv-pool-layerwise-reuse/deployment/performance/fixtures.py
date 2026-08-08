@@ -342,11 +342,35 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--output", type=Path, required=True)
     generate.add_argument("--concurrency", type=int, default=64)
     generate.add_argument("--seed", type=int, default=20260808)
+    config = subparsers.add_parser("config")
+    config.add_argument("--topology", choices=("dp1", "dp2"), required=True)
+    config.add_argument("--input-tokens", type=int, required=True)
+    config.add_argument("--output-tokens", type=int, required=True)
+    config.add_argument("--variant", choices=("bulk", "layerwise", "reuse3"), required=True)
+    config.add_argument("--concurrency", type=int, required=True)
+    config.add_argument("--dataset", type=Path, required=True)
+    config.add_argument("--request-count", type=int, required=True)
+    config.add_argument("--output", type=Path, required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "config":
+        point = WorkloadPoint(
+            args.topology,
+            args.input_tokens,
+            args.output_tokens,
+            args.variant,
+            args.concurrency,
+        )
+        write_aisbench_config(
+            point,
+            args.dataset,
+            args.output,
+            request_count=args.request_count,
+        )
+        return 0
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer, trust_remote_code=True)

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import argparse
-import json
+import csv
 import hashlib
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+
+from performance.contract import WorkloadPoint, stable_measurement_valid
 
 
 REQUIRED_ROOT_FILES = (
@@ -51,6 +54,136 @@ def _load_json(path: Path) -> dict[str, object]:
     if not isinstance(value, dict):
         raise ValueError(f"JSON artifact is not an object: {path}")
     return value
+
+
+def _metric_number(value: object) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    match = re.match(r"^\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+))", str(value))
+    if match is None:
+        raise ValueError(f"metric value is not numeric: {value!r}")
+    return float(match.group(1))
+
+
+def _stable_value(common: dict[str, object], name: str) -> float:
+    stages = common.get(name)
+    if not isinstance(stages, dict) or "stable" not in stages:
+        raise ValueError(f"AISBench common metric lacks stable stage: {name}")
+    return _metric_number(stages["stable"])
+
+
+def summarize_aisbench_attempt(
+    raw: Path,
+    point: WorkloadPoint,
+    request_count: int,
+    image_digest: str,
+) -> dict[str, object]:
+    common_paths = [
+        path
+        for path in raw.rglob(f"{point.variant}.json")
+        if "performances" in path.parts
+    ]
+    csv_paths = [
+        path
+        for path in raw.rglob(f"{point.variant}.csv")
+        if "performances" in path.parts
+    ]
+    detail_paths = list(raw.rglob(f"{point.variant}_details.jsonl"))
+    errors: list[str] = []
+    if len(common_paths) != 1:
+        errors.append(f"expected one AISBench common JSON, got {len(common_paths)}")
+    if len(csv_paths) != 1:
+        errors.append(f"expected one AISBench request CSV, got {len(csv_paths)}")
+    if len(detail_paths) != 1:
+        errors.append(f"expected one AISBench details JSONL, got {len(detail_paths)}")
+    if errors:
+        return {
+            "valid": False,
+            "image_digest": image_digest,
+            "errors": errors,
+            "metrics": {},
+        }
+    common = _load_json(common_paths[0])
+    metrics: dict[str, float] = {}
+    for source, target in (
+        ("Input Token Throughput", "Input Token Throughput"),
+        ("Request Throughput", "Request Throughput"),
+        ("Concurrency", "Achieved Concurrency"),
+        ("Output Token Throughput", "Output Token Throughput"),
+    ):
+        try:
+            metrics[target] = _stable_value(common, source)
+        except ValueError as error:
+            errors.append(str(error))
+    try:
+        duration_ms = _stable_value(common, "Benchmark Duration")
+        failed_requests = _stable_value(common, "Failed Requests")
+        success_requests = _stable_value(common, "Success Requests")
+    except ValueError as error:
+        errors.append(str(error))
+        duration_ms = 0.0
+        failed_requests = -1.0
+        success_requests = -1.0
+    request_metrics: dict[str, dict[str, str]] = {}
+    with csv_paths[0].open(newline="", encoding="utf-8") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("Stage") == "stable":
+                request_metrics[row.get("Performance Parameters", "")] = row
+    for source, target in (
+        ("TTFT", "TTFT P95"),
+        ("E2EL", "E2EL P95"),
+        ("TPOT", "TPOT P95"),
+        ("ITL", "ITL P95"),
+    ):
+        row = request_metrics.get(source)
+        if row is not None and row.get("P95") not in (None, ""):
+            metrics[target] = _metric_number(row["P95"])
+    e2el = request_metrics.get("E2EL", {})
+    max_e2el_ms = _metric_number(e2el.get("Max", 0))
+    detail_count = 0
+    success_count = 0
+    with detail_paths[0].open(encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            try:
+                detail = json.loads(line)
+            except json.JSONDecodeError:
+                errors.append(f"malformed AISBench detail line {line_number}")
+                continue
+            detail_count += 1
+            if detail.get("success") is True:
+                success_count += 1
+            if detail.get("input_tokens") != point.input_tokens:
+                errors.append(f"input token mismatch in detail line {line_number}")
+            if detail.get("output_tokens") != point.output_tokens:
+                errors.append(f"output token mismatch in detail line {line_number}")
+    if detail_count != request_count:
+        errors.append(
+            f"AISBench detail count mismatch: expected {request_count}, got {detail_count}"
+        )
+    if success_count != request_count:
+        errors.append(
+            f"AISBench success count mismatch: expected {request_count}, got {success_count}"
+        )
+    if failed_requests != 0 or success_requests != request_count:
+        errors.append("AISBench common request counts do not match the attempt contract")
+    stable_valid = stable_measurement_valid(max_e2el_ms, duration_ms)
+    if not stable_valid:
+        errors.append("stable benchmark duration is insufficient")
+    return {
+        "valid": not errors,
+        "image_digest": image_digest,
+        "errors": errors,
+        "metrics": metrics,
+        "request_count": request_count,
+        "detail_count": detail_count,
+        "success_count": success_count,
+        "benchmark_duration_ms": duration_ms,
+        "max_e2el_ms": max_e2el_ms,
+        "stable_duration_valid": stable_valid,
+        "raw_common": str(common_paths[0].relative_to(raw)),
+        "raw_request_metrics": str(csv_paths[0].relative_to(raw)),
+        "raw_details": str(detail_paths[0].relative_to(raw)),
+    }
 
 
 def _validate_checksums(root: Path) -> list[str]:

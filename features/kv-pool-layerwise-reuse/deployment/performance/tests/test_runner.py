@@ -67,6 +67,10 @@ def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
     devices_text = " ".join(devices.argv)
     assert "dev/null" in devices_text
     assert "dev/urandom" in devices_text
+    tokenizer_link = next(
+        call for call in fake.calls if call.description == "link-tokenizer-model-path"
+    )
+    assert "/client-tools/tokenizer" in " ".join(tokenizer_link.argv)
 
 
 def test_run_checks_handoff_before_any_command(tmp_path: Path) -> None:
@@ -76,6 +80,77 @@ def test_run_checks_handoff_before_any_command(tmp_path: Path) -> None:
         runner.run(fake, waiting_state(tmp_path), tmp_path, topology="dp1")
 
     assert fake.calls == []
+
+
+def test_checksum_manifest_excludes_itself(tmp_path: Path) -> None:
+    (tmp_path / "artifact.txt").write_text("value\n", encoding="utf-8")
+
+    runner._write_checksums(tmp_path)
+
+    lines = (tmp_path / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 1
+    assert lines[0].endswith("  artifact.txt")
+
+
+def test_subprocess_runner_resumes_command_numbering(tmp_path: Path) -> None:
+    (tmp_path / "commands" / "0007-prior").mkdir(parents=True)
+
+    command_runner = runner.SubprocessCommandRunner(tmp_path)
+
+    assert command_runner.command_index == 7
+
+
+def test_physical_capacity_ignores_vnpu_and_replaced_engines() -> None:
+    nodes = {
+        "items": [
+            {
+                "metadata": {"name": "n1"},
+                "status": {
+                    "allocatable": {
+                        "huawei.com/Ascend910": "8",
+                        "huawei.com/vnpu-number": "64",
+                    }
+                },
+            }
+        ]
+    }
+    pods = {
+        "items": [
+            {
+                "metadata": {"labels": {"app": "prefill"}},
+                "spec": {
+                    "nodeName": "n1",
+                    "containers": [
+                        {
+                            "resources": {
+                                "requests": {"huawei.com/Ascend910": "4"}
+                            }
+                        }
+                    ],
+                },
+                "status": {"phase": "Running"},
+            },
+            {
+                "metadata": {"labels": {"app": "other"}},
+                "spec": {
+                    "nodeName": "n1",
+                    "containers": [
+                        {
+                            "resources": {
+                                "requests": {
+                                    "huawei.com/Ascend910": "1",
+                                    "huawei.com/vnpu-number": "63",
+                                }
+                            }
+                        }
+                    ],
+                },
+                "status": {"phase": "Running"},
+            },
+        ]
+    }
+
+    assert runner._available_test_npus(nodes, pods) == 7
 
 
 def test_run_rejects_incomplete_ready_handoff_before_any_command(
@@ -121,6 +196,31 @@ def test_three_formal_repetitions_have_distinct_raw_directories(
     descriptions = [call.description for call in fake.calls]
     assert descriptions.count("reset-master") == 4
     assert len(list(tmp_path.glob("points/**/formal-*/attempt-*/raw"))) == 3
+
+
+def test_point_lifecycle_uses_real_namespaced_aisbench_commands(tmp_path: Path) -> None:
+    fake = FakeCommandRunner()
+    point = WorkloadPoint("dp2", 16384, 1, "reuse3", 32)
+
+    runner.execute_point(fake, point, tmp_path)
+
+    assert all(
+        call.argv[0] == "kubectl"
+        or (call.argv[0] == "bash" and call.description == "aisbench")
+        for call in fake.calls
+    )
+    assert all("liangjiahao" in " ".join(call.argv) for call in fake.calls)
+    assert not any("benchmark" in call.argv for call in fake.calls)
+    aisbench = next(call for call in fake.calls if call.description == "aisbench")
+    assert "chroot" in aisbench.argv
+    assert "/performance-workspace/rootfs" in aisbench.argv
+    assert "prefill-npu-timeseries.log" in aisbench.argv[2]
+    assert "mooncake-timeseries.metrics" in aisbench.argv[2]
+    config = next(
+        call for call in fake.calls if call.description == "render-aisbench-config"
+    )
+    assert "performance.fixtures" in config.argv
+    assert "--request-count" in config.argv
 
 
 def test_aisbench_manifest_is_cpu_only_on_m1() -> None:

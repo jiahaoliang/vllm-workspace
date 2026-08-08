@@ -142,3 +142,36 @@ def test_fixture_corruption_breaks_checksum_replay(tmp_path: Path) -> None:
     assert fixtures.replay_fixture(manifest) == [
         "fixture checksum mismatch: formal-2.jsonl"
     ]
+
+
+def test_config_cli_writes_attempt_local_metadata(tmp_path: Path) -> None:
+    dataset = tmp_path / "dataset.jsonl"
+    dataset.write_text('{"question":"x","answer":""}\n', encoding="utf-8")
+
+    result = fixtures.main(
+        [
+            "config",
+            "--topology",
+            "dp2",
+            "--input-tokens",
+            "16384",
+            "--output-tokens",
+            "1",
+            "--variant",
+            "reuse3",
+            "--concurrency",
+            "32",
+            "--dataset",
+            str(dataset),
+            "--request-count",
+            "256",
+            "--output",
+            str(tmp_path / "config.py"),
+        ]
+    )
+
+    assert result == 0
+    assert json.loads((tmp_path / "dataset.jsonl.meta.json").read_text())[
+        "request_count"
+    ] == 256
+    assert "batch_size=32" in (tmp_path / "config.py").read_text()

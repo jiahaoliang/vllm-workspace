@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from performance import report
+from performance.contract import WorkloadPoint
 
 
 POINT = "dp1-4096-bulk-o1-c1"
@@ -136,3 +137,58 @@ def test_raw_report_keeps_repetitions_and_direct_ratios(valid_tree: Path) -> Non
     assert "p-value" not in text
     assert "confidence interval" not in text
     assert "Performance PASS" not in text
+
+
+def test_aisbench_raw_summary_requires_exact_tokens_and_stable_duration(
+    tmp_path: Path,
+) -> None:
+    raw = tmp_path / "raw"
+    performance = raw / "aisbench-output" / "performances" / "service"
+    performance.mkdir(parents=True)
+    (performance / "bulk.json").write_text(
+        json.dumps(
+            {
+                "Input Token Throughput": {"stable": "4096 token/s"},
+                "Request Throughput": {"stable": "2 req/s"},
+                "Concurrency": {"stable": 4},
+                "Output Token Throughput": {"stable": "2 token/s"},
+                "Benchmark Duration": {"stable": "4000 ms"},
+                "Failed Requests": {"stable": 0},
+                "Success Requests": {"stable": 2},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (performance / "bulk.csv").write_text(
+        "Performance Parameters,Stage,Average,Max,P95,N\n"
+        "E2EL,stable,1.0 ms,1000 ms,900 ms,2\n"
+        "TTFT,stable,1.0 ms,900 ms,800 ms,2\n",
+        encoding="utf-8",
+    )
+    (performance / "bulk_details.jsonl").write_text(
+        "".join(
+            json.dumps(
+                {
+                    "success": True,
+                    "input_tokens": 4096,
+                    "output_tokens": 1,
+                }
+            )
+            + "\n"
+            for _ in range(2)
+        ),
+        encoding="utf-8",
+    )
+
+    summary = report.summarize_aisbench_attempt(
+        raw,
+        WorkloadPoint("dp1", 4096, 1, "bulk", 4),
+        request_count=2,
+        image_digest="sha256:image",
+    )
+
+    assert summary["valid"] is True
+    metrics = summary["metrics"]
+    assert isinstance(metrics, dict)
+    assert metrics["E2EL P95"] == 900
+    assert metrics["Input Token Throughput"] == 4096
