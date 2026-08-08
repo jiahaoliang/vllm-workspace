@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-09T04:33:51+08:00
+Captured At: 2026-08-09T05:23:00+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
@@ -19,6 +19,18 @@ snapshot. The focused regression passed `1`, the Mooncake layer-session class
 passed `26`, worker/scheduler/transfer tests passed `306`, and the complete
 AscendStore suite passed `514`. Ruff, `py_compile`, and `git diff --check`
 passed. Source commit `d74269a08` is clean, DCO-signed, pushed, and has
-local/origin left-right `0 0`. A new image and generation-2 functional
-acceptance are pending; prior generation-1 performance evidence remains bound
-to `a3c97358c` and must not be resumed.
+local/origin left-right `0 0`.
+
+Generation-2 run `20260808T203742Z` created native `linux/arm64` image
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z`
+with manifest `sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd`.
+All eight cumulative production files match the checkout. CPU/mock gates passed
+`514` AscendStore, `20` role/default, `3` model-runner, `145`
+deployment/performance, and `60` performance harness tests. Real-NPU baseline,
+`kv_producer`, and `kv_both` cold/warm all passed. The exact DP1 4096-token
+Prefill to pure-consumer Decode canary passed with 32/32 block hits, 4095 remote
+load tokens, `vllm_cached=0`, and no KV load failure. All NPU processes exited,
+final Master metrics are `0/0/0`, and the 115-file evidence manifest replayed
+with digest `121a11b331cffeb4d031dac21637d70c0395d83ee971b07a138e4d4f4e03f449`.
+Prior generation-1 performance evidence remains bound to `a3c97358c` and must
+not be resumed.

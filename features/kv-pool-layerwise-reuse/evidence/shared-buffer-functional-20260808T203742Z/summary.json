@@ -1,0 +1,40 @@
+{
+  "cpu_mock": {
+    "ascend_store_passed": 514,
+    "deployment_performance_passed": 145,
+    "layerwise_role_passed": 20,
+    "model_runner_layer_reuse_passed": 3,
+    "performance_harness_passed": 60,
+    "status": "passed"
+  },
+  "errors": [],
+  "final_master_metrics": {
+    "master_active_clients": 0,
+    "master_allocated_bytes": 0,
+    "master_key_count": 0
+  },
+  "image": {
+    "config_digest": "sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb",
+    "manifest_digest": "sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd",
+    "platform": "linux/arm64",
+    "reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z",
+    "status": "passed"
+  },
+  "npu": {
+    "exact_4096_pure_consumer_canary": "passed",
+    "kv_both_cold_warm": "passed",
+    "kv_producer_reuse": "passed",
+    "no_reuse_baseline": "passed",
+    "runner_steps": 61,
+    "status": "passed"
+  },
+  "run_id": "20260808T203742Z",
+  "schema_version": 1,
+  "source": {
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "d74269a08e48e3b5b097f9a34f5c421696ddda40"
+  },
+  "status": "passed",
+  "validated": true
+}

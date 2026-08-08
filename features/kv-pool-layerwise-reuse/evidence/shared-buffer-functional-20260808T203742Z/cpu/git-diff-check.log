@@ -1,0 +1,4 @@
+source_command=git -C repos/vllm-ascend diff --check a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7..d74269a08e48e3b5b097f9a34f5c421696ddda40
+source_exit_code=0
+control_command=git diff --check
+control_exit_code=0

@@ -1,0 +1,128 @@
+{
+  "schema_version": 8,
+  "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
+  "run_id": "20260808T203742Z",
+  "attempt": 1,
+  "tooling_base": {
+    "branch": "kv-pool-layerwise-reuse",
+    "commit": "b0dc1b087c6ef09958ce5ac2d0c63405f9b1faf7"
+  },
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z",
+  "platform": "linux/arm64",
+  "vllm_lane": "main-verified",
+  "vllm_version_override": null,
+  "vllm_release_tag": "v0.25.1",
+  "vllm_package_version": "0.1.dev1+g54503ecec.empty",
+  "vllm_coordinator_keyword": "max_in_flight_tokens",
+  "namespace": "liangjiahao",
+  "buildkit_namespace": "default",
+  "commits": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "image_commits": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "base_image_commits": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "45b2e785b10ca4604cd6314819ed15f3ff674781",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "derived_image": {
+    "creation": "nerdctl_commit_eight_python_patches",
+    "base_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+    "base_config_digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+    "patched_files": [
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py",
+        "sha256": "0e7c64fd572bc32234972c402fb7a42098b56288703be5e91570b0d026f70bfb"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py",
+        "sha256": "ebf1d53368925d966d219b0c954ba221d278626e9945209b5230db8ff19c806a"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py",
+        "sha256": "7b55f8d5bd56a1edcd94eb629c383410bd1d8293d83727a3641abfb84993ca56"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
+        "sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py",
+        "sha256": "7649e19fe127a7300af02ed9df364ed22012c77da6a15c366b9a3ad27113e36a"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
+        "sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+        "sha256": "06e8ad911c20b956811053f463fbe86c4435ae052235180817896acda1b9269a"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+        "sha256": "ef18371a5bde62a27080d4d74bc351358b12338c61328fd947684a461f502fb0"
+      }
+    ],
+    "patched_files_sha256": "7fd7860a94110cad2dc9c4c70d0162f3160bf942457778a04adcc944de2d7fe6",
+    "patched_source_commit": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-d74269a0-20260808T203742Z",
+    "commit_manifest_digest": "sha256:757f82b41f7c68cd02b95a345e62df0a86a8a1f7b7ee3688d39759554d3f341a",
+    "commit_config_digest": "sha256:88b2802de954f2cb7085caeb1dc8357b8a7b12397ce9c246ce69d0a3e8bb54c3",
+    "patch_layer_digest": "sha256:90d01363463e302bddd91c25f8c24b204b40d23f320a5d6559875ae335dae098",
+    "patch_diff_id": "sha256:253d456a76f24d59e7fe8d9f12d44d779ddce80e4d7cb0742030f43bf7bc925a",
+    "metadata_correction": "config_manifest_only_oci_import",
+    "manifest_digest": "sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd",
+    "config_digest": "sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb"
+  },
+  "python_overlay": {
+    "required": true,
+    "scope": "cpu_mock_ut_only",
+    "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
+    "image_config_digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+    "base_commit": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "commit": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+    "files": [
+      "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py"
+    ]
+  },
+  "model": {
+    "host_path": "/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "pod_path": "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "served_name": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+    "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669",
+    "num_layers": 27,
+    "max_position_embeddings": 163840
+  },
+  "runtime": {
+    "block_size": 128,
+    "base_max_model_len": 4096,
+    "stress_max_model_len": 65536,
+    "lease_ttl_ms": 30000,
+    "lease_wait_margin_ms": 1500,
+    "lease_expired_code": -707,
+    "fabric_mem_enabled": false
+  },
+  "kubernetes": {
+    "context": "bke-cluster-admin@bke-cluster",
+    "node": "n1",
+    "builder_node": "m1",
+    "builder_platform": "linux/arm64"
+  },
+  "session_apis": [
+    "batch_put_session_start",
+    "batch_put_from_multi_buffer_ranges",
+    "batch_put_session_end",
+    "batch_put_session_revoke",
+    "batch_get_session_start",
+    "batch_get_into_multi_buffer_ranges",
+    "batch_get_session_end"
+  ]
+}

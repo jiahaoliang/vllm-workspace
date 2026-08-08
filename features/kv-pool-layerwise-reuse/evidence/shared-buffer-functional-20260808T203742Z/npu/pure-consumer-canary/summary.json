@@ -1,0 +1,33 @@
+{
+  "block_hits": "32/32",
+  "commit_results_zero": true,
+  "completion_tokens": 1,
+  "decode_role": "kv_consumer",
+  "decode_shared_buffers_configured": false,
+  "errors": [],
+  "final_metrics": {
+    "master_active_clients": 0.0,
+    "master_allocated_bytes": 0.0,
+    "master_key_count": 0.0
+  },
+  "http_200_prefill_decode": true,
+  "initial_partial_tail_tokens": 127,
+  "kv_load_failure_absent": true,
+  "kvpool_hit_tokens": 4095,
+  "npu_processes_released": true,
+  "post_metrics": {
+    "master_active_clients": 4.0,
+    "master_allocated_bytes": 127401984.0,
+    "master_key_count": 32.0
+  },
+  "prefill_role": "kv_producer",
+  "prefill_save_layers": 27,
+  "prompt_tokens": 4096,
+  "request_id": "cmpl-8acb056b-ca84-4166-a71d-6c47cdfb0d11-0-a410b95c",
+  "schema_version": 1,
+  "status": "passed",
+  "topology": "dp1",
+  "validated": true,
+  "variant": "layerwise",
+  "vllm_cached_tokens": 0
+}

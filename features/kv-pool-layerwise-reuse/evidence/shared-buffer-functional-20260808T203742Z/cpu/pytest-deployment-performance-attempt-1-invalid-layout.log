@@ -1,0 +1,13 @@
+
+==================================== ERRORS ====================================
+_ ERROR collecting layerwise-deployment-tests-20260808T203742Z/tests/test_validation_identity.py _
+layerwise-deployment-tests-20260808T203742Z/tests/test_validation_identity.py:12: in <module>
+    ROOT = FEATURE_DIR.parents[1]
+/usr/local/python3.12.13/lib/python3.12/pathlib.py:282: in __getitem__
+    raise IndexError(idx)
+E   IndexError: 1
+=========================== short test summary info ============================
+ERROR layerwise-deployment-tests-20260808T203742Z/tests/test_validation_identity.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.84s
+command terminated with exit code 2

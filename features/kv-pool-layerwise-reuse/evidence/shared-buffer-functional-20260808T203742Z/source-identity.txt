@@ -1,0 +1,13 @@
+control_branch=kv-pool-layerwise-reuse
+control_image_freeze_commit=fb2474c66b871e6c93750603ee9189ee4add4759
+control_remote_left_right=0 0
+vllm_commit=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
+vllm_ascend_branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+vllm_ascend_commit=d74269a08e48e3b5b097f9a34f5c421696ddda40
+vllm_ascend_dirty=false
+vllm_ascend_remote_left_right=0 0
+mooncake_commit=df3f74ed8ebdb0c935554beea6299a9f11c723e2
+image=docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z
+image_manifest=sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd
+image_config=sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb
+platform=linux/arm64

@@ -1,0 +1,48 @@
+context=bke-cluster-admin@bke-cluster
+namespace=liangjiahao
+pod=vllm-ascend-ut
+image_source_head=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7
+source_head=d74269a08e48e3b5b097f9a34f5c421696ddda40
+source_branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+source_dirty=false
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestNPUWorker.test_sparse_c8_layer_reuse_memory_factor_counts_complete_slots _
+
+self = <tests.ut.worker.a2.test_worker_v1.TestNPUWorker testMethod=test_sparse_c8_layer_reuse_memory_factor_counts_complete_slots>
+
+    def test_sparse_c8_layer_reuse_memory_factor_counts_complete_slots(self):
+        from vllm_ascend.core.kv_cache_interface import (
+            AscendMLAAttentionSpec,
+            AscendSFAIndexerCacheSpec,
+        )
+>       from vllm_ascend.worker.worker import NPUWorker
+
+tests/ut/worker/a2/test_worker_v1.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+vllm_ascend/patch/worker/patch_weight_utils.py:80: in patched_import
+    module = original_import(name, globals, locals, fromlist, level)
+vllm_ascend/worker/worker.py:29: in <module>
+    from torch_npu.op_plugin.atb._atb_ops import _register_atb_extensions
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'torch_npu.op_plugin.atb._atb_ops'
+globals = {'Any': typing.Any, 'NoneType': <class 'NoneType'>, '__builtins__': {'ArithmeticError': <class 'ArithmeticError'>, 'As...seException'>, ...}, '__cached__': '/workspace/vllm-ascend/vllm_ascend/worker/__pycache__/worker.cpython-312.pyc', ...}
+locals = {'Any': typing.Any, 'NoneType': <class 'NoneType'>, '__builtins__': {'ArithmeticError': <class 'ArithmeticError'>, 'As...seException'>, ...}, '__cached__': '/workspace/vllm-ascend/vllm_ascend/worker/__pycache__/worker.cpython-312.pyc', ...}
+fromlist = ('_register_atb_extensions',), level = 0
+
+    def patched_import(name, globals=None, locals=None, fromlist=(), level=0):
+>       module = original_import(name, globals, locals, fromlist, level)
+E       ModuleNotFoundError: No module named 'torch_npu.op_plugin'
+
+vllm_ascend/patch/worker/patch_weight_utils.py:80: ModuleNotFoundError
+=============================== warnings summary ===============================
+../../usr/local/python3.12.13/lib/python3.12/site-packages/torch/jit/_script.py:362: 14 warnings
+  /usr/local/python3.12.13/lib/python3.12/site-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/worker/a2/test_worker_v1.py::TestNPUWorker::test_sparse_c8_layer_reuse_memory_factor_counts_complete_slots
+1 failed, 14 warnings in 0.33s
+command terminated with exit code 1

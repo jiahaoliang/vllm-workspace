@@ -910,3 +910,28 @@
   base with an exact allowlisted `pool_worker.py` overlay. A new committed image
   and generation-2 functional handoff are required before performance restarts
   from a new run root.
+- Created generation-2 native `linux/arm64` image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z`
+  from the frozen `45b2e785` base by patching all eight cumulative production
+  Python files and using `nerdctl commit`. The final manifest is
+  `sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd`,
+  config is `sha256:7277450f383361eae3481c09be913522e0fa62a11d9c78eaf753a5542f4783eb`,
+  and every in-image file hash matches `d74269a08`.
+- Re-ran the generation-2 CPU/mock gates through the dedicated CPU-only UT Pod:
+  `514` AscendStore, `20` role/default, `3` model-runner, `145`
+  deployment/performance, and `60` performance harness tests passed. Ruff,
+  in-memory compile, and diff checks passed. The separate worker import
+  diagnostic retains the known missing `torch_npu.op_plugin.atb` CPU-image
+  limitation; the real-NPU startup gate supplies the required memory-factor
+  proof.
+- Real-NPU run `20260808T203742Z` passed no-reuse baseline, `kv_producer`, and
+  `kv_both` cold/warm with exact response equality and 61/61 runner steps. A new
+  DP1 4096-token producer to pure-consumer Decode canary hit 32/32 blocks,
+  loaded 4095 tokens with `vllm_cached=0`, returned HTTP 200 with exact usage,
+  and did not reproduce the old 127-token KV load failure.
+- Both NPU process groups exited and final Mooncake Master metrics returned to
+  `0/0/0`. The generation-2 evidence root contains 115 checksummed files; root
+  `SHA256SUMS` digest
+  `121a11b331cffeb4d031dac21637d70c0395d83ee971b07a138e4d4f4e03f449`
+  replayed successfully. Formal performance must start from a new run root and
+  must not resume the generation-1 `a3c97358` run.

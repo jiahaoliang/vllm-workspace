@@ -1,0 +1,27 @@
+{
+  "ascend_store_passed": 514,
+  "deployment_performance_passed": 145,
+  "errors": [],
+  "git_diff_check": "passed",
+  "image_source_head": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+  "layerwise_role_passed": 20,
+  "model_runner_layer_reuse_passed": 3,
+  "performance_harness_passed": 60,
+  "python_compile": "passed",
+  "ruff_check": "passed",
+  "ruff_format": "passed",
+  "schema_version": 1,
+  "source_dirty": false,
+  "source_head": "d74269a08e48e3b5b097f9a34f5c421696ddda40",
+  "status": "passed",
+  "superseded_attempts": [
+    "pytest-performance-harness-attempt-1-invalid-target.log",
+    "pytest-deployment-performance-attempt-1-invalid-layout.log"
+  ],
+  "worker_memory_factor_cpu_diagnostic": {
+    "required": false,
+    "result": "environment_limited_before_test_body",
+    "reason": "CPU-only image does not provide torch_npu.op_plugin.atb",
+    "replacement_hard_gate": "real NPU startup reports 27 logical layers, 5 physical slots, factor 5.400"
+  }
+}
