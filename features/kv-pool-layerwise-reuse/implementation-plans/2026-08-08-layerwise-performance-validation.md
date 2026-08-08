@@ -44,6 +44,7 @@ features/kv-pool-layerwise-reuse/deployment/performance/
   runner.py
   report.py
   run-performance-test.sh
+  run-performance-ut.sh
   tests/
     test_handoff.py
     test_contract.py
@@ -64,6 +65,8 @@ Responsibilities:
 - runner.py implements prepare, wait, and resumable run, plus lifecycle, metrics, failure capture, and restoration.
 - report.py verifies the evidence tree and renders per-repetition raw tables and direct ratios.
 - run-performance-test.sh only resolves paths and invokes python3 -m performance.runner.
+- run-performance-ut.sh tar-syncs only the control-repo performance package to
+  the dedicated CPU-only UT Pod and executes explicit targets there.
 
 Also create:
 
@@ -82,6 +85,7 @@ Update references/sources.md and evidence/README.md. Generated evidence uses the
 **Files:**
 - Create: features/kv-pool-layerwise-reuse/deployment/performance/__init__.py
 - Create: features/kv-pool-layerwise-reuse/deployment/performance/handoff.py
+- Create: features/kv-pool-layerwise-reuse/deployment/performance/run-performance-ut.sh
 - Test: features/kv-pool-layerwise-reuse/deployment/performance/tests/test_handoff.py
 
 **Interfaces:**
@@ -108,10 +112,13 @@ def test_ready_handoff_requires_decode_companion_authorization(tmp_path):
 
 - [ ] **Step 2: Run the focused target in the UT Pod and prove red**
 
+For this first red only, tar-sync the performance directory to a fresh
+/workspace/layerwise-performance-red-$RUN_ID directory with explicit
+kubectl exec -n liangjiahao, then execute:
+
 ~~~bash
-features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- \
-  python3 -m pytest -q -p no:cacheprovider \
-  features/kv-pool-layerwise-reuse/deployment/performance/tests/test_handoff.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider \
+  tests/test_handoff.py
 ~~~
 
 Expected: collection fails because performance.handoff does not exist.
@@ -165,12 +172,21 @@ def test_bad_evidence_checksum_is_rejected(tmp_path):
 
 check writes one JSON result. wait polls every 10 seconds and appends UTC timestamp, inode, mtime, size, SHA256, generation, status, ready, and validation errors to observations.jsonl. BLOCKED is recorded but never accepted. Every content or generation change triggers full revalidation.
 
-- [ ] **Step 6: Run tests and commit**
+- [ ] **Step 6: Add the dedicated performance UT helper**
+
+Mirror the existing Pod identity and tar-safety checks, but sync only
+deployment/performance to /workspace/layerwise-performance-tests. Require
+namespace liangjiahao, Pod vllm-ascend-ut, container ut, CPU-only resources,
+no hostPath, explicit command after --, PYTHONDONTWRITEBYTECODE=1, and
+PYTHONPATH=/workspace. Do not modify or invoke the nested-source UT runner.
+
+- [ ] **Step 7: Run tests and commit**
 
 ~~~bash
 git add -- \
   features/kv-pool-layerwise-reuse/deployment/performance/__init__.py \
   features/kv-pool-layerwise-reuse/deployment/performance/handoff.py \
+  features/kv-pool-layerwise-reuse/deployment/performance/run-performance-ut.sh \
   features/kv-pool-layerwise-reuse/deployment/performance/tests/test_handoff.py
 git commit -m "test(perf): add fail-closed handoff listener"
 ~~~
@@ -591,9 +607,9 @@ Issue snapshot records exact configurations and AISBench requirement. AISBench s
 - [ ] **Step 4: Run the full performance CPU gate**
 
 ~~~bash
-features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- \
+features/kv-pool-layerwise-reuse/deployment/performance/run-performance-ut.sh -- \
   python3 -m pytest -q -p no:cacheprovider \
-  features/kv-pool-layerwise-reuse/deployment/performance/tests
+  performance/tests
 ~~~
 
 Also run Python compilation, changed-file Ruff, shell syntax, git diff --check, and a static namespace scan.
