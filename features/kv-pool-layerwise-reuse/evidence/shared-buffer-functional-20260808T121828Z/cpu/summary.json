@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "source_head": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+  "source_dirty": false,
+  "image_source_head": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+  "ascend_store_and_mla_passed": 514,
+  "layerwise_model_runner_passed": 30,
+  "deployment_performance_mock_passed": 129,
+  "performance_harness_passed": 44,
+  "ruff_check": "passed",
+  "ruff_format_full_files": 14,
+  "ruff_format_kv_transfer_range": "1990-2300",
+  "python_compile": "passed",
+  "git_diff_check": "passed"
+}

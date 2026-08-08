@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "run_id": "20260808T121828Z",
+  "namespace": "liangjiahao",
+  "tooling": {
+    "branch": "kv-pool-layerwise-reuse",
+    "commit": "c8c3a242db83d78196d6ea2181fc848024eaba4f",
+    "remote_left_right": [0, 0]
+  },
+  "source": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm_ascend_remote_left_right": [0, 0]
+  },
+  "image": {
+    "reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-a3c97358-df3f74ed-20260808T121828Z",
+    "platform": "linux/arm64",
+    "manifest_digest": "sha256:32b379315a80c590dbaa563310fe70f8ee15a901abc9a67a9ad18c46fa22ef3c",
+    "config_digest": "sha256:17b133d3e8ff668f567150ba755a587709e7d600c4bad3f6423f30b77b14f7f3",
+    "base_reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+    "base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+    "creation": "nerdctl_commit_eight_python_patches",
+    "patched_files_sha256": "eb6c18c8a7ad1bdf39a03ea2c163583f686760d2c43f55c72525ba00faa1c5db"
+  },
+  "model": {
+    "path": "/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "served_name": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+    "config_sha256": "229913ea2a346ccdb571bb3cb23414ca3a0ee1a9455fe88a15a5788bc837cb75",
+    "tokenizer_sha256": "41f3bf64213da8c012d8bd0871a58a1fdf70463e8f08f110ddbb1082f529f669",
+    "num_layers": 27
+  },
+  "runtime": {
+    "node": "n1",
+    "physical_npu": 6,
+    "block_size": 128,
+    "max_model_len": 4096,
+    "layerwise_num_shared_buffers": 3,
+    "physical_slots": 5,
+    "memory_factor": 5.4,
+    "roles": ["kv_producer", "kv_both"]
+  },
+  "request": {
+    "prompt_tokens": 525,
+    "completion_tokens": 16,
+    "temperature": 0,
+    "seed": 2026072304
+  }
+}

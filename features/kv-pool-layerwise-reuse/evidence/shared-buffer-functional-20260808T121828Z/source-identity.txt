@@ -1,0 +1,8 @@
+control_head=c8c3a242db83d78196d6ea2181fc848024eaba4f
+control_branch=kv-pool-layerwise-reuse
+control_remote_left_right=0	0
+vllm_head=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5
+vllm_ascend_head=a3c97358ccca51e6d9441c66ea5d4ff1bd1645e7
+vllm_ascend_branch=feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723
+vllm_ascend_remote_left_right=0	0
+mooncake_head=df3f74ed8ebdb0c935554beea6299a9f11c723e2
