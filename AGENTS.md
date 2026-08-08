@@ -57,8 +57,9 @@
 - 不要依赖未提交 WIP 作为可恢复进度。
 - 跨机器恢复只保证已提交且可 fetch 的 commit。
 - `workspace.lock.json` 是机器可读的恢复依据。
-- 更新源码仓库 commit 后，运行 `.\scripts\lock-repos.ps1` 刷新锁文件。
-- 恢复 workspace 时，运行 `.\scripts\restore-repos.ps1`，再运行 `.\scripts\status-all.ps1` 检查状态。
+- Linux 更新源码仓库 commit 后，运行 `./scripts/lock-repos.sh` 刷新锁文件；PowerShell 使用 `.\scripts\lock-repos.ps1`。
+- Linux 恢复 workspace 时，运行 `./scripts/restore-repos.sh`，再运行 `./scripts/status-all.sh` 检查状态；PowerShell 使用对应的 `.ps1` 入口。
+- Linux 维护脚本要求 Bash 4+、Git 2.23+ 和 jq 1.6+；执行公共脚本回归测试使用 `./scripts/tests/test-linux-maintenance-scripts.sh`。
 
 ## 外部资料
 

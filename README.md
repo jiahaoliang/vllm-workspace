@@ -18,6 +18,18 @@
 
 ## 常用命令
 
+Linux 需要 Bash 4+、Git 2.23+ 和 jq 1.6+：
+
+```bash
+./scripts/bootstrap-repos.sh
+./scripts/status-all.sh
+./scripts/lock-repos.sh
+./scripts/restore-repos.sh
+./scripts/validate-workspace.sh
+```
+
+PowerShell 环境使用等价入口：
+
 ```powershell
 .\scripts\bootstrap-repos.ps1
 .\scripts\status-all.ps1
@@ -26,7 +38,14 @@
 .\scripts\validate-workspace.ps1
 ```
 
-跨机器恢复时，先 clone 本仓库，再运行：
+跨机器恢复时，先 clone 本仓库；Linux 运行：
+
+```bash
+./scripts/restore-repos.sh
+./scripts/status-all.sh
+```
+
+PowerShell 运行：
 
 ```powershell
 .\scripts\restore-repos.ps1
@@ -34,3 +53,4 @@
 ```
 
 可恢复进度以 `workspace.lock.json` 中记录的已提交 commit 为准，不包含未提交 WIP。
+Linux 的 `restore-repos.sh` 和 `bootstrap-repos.sh` 都恢复精确 lock；如果已有源码仓库包含未提交改动，脚本会在 fetch 或 checkout 前拒绝执行。

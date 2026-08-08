@@ -39,11 +39,21 @@ $requiredPaths = @(
     "docs/workspace-guide.md",
     "docs/git-workflow.md",
     "docs/repo-map.md",
+    "scripts/common.ps1",
     "scripts/bootstrap-repos.ps1",
     "scripts/lock-repos.ps1",
     "scripts/restore-repos.ps1",
     "scripts/status-all.ps1",
-    "scripts/sync-kv-offload.ps1"
+    "scripts/sync-kv-offload.ps1",
+    "scripts/validate-workspace.ps1",
+    "scripts/common.sh",
+    "scripts/bootstrap-repos.sh",
+    "scripts/lock-repos.sh",
+    "scripts/restore-repos.sh",
+    "scripts/status-all.sh",
+    "scripts/sync-kv-offload.sh",
+    "scripts/validate-workspace.sh",
+    "scripts/tests/test-linux-maintenance-scripts.sh"
 )
 
 foreach ($relativePath in $requiredPaths) {
