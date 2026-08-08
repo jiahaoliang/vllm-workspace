@@ -270,6 +270,15 @@ def write_aisbench_config(
         raise ValueError("request_count must be positive")
     if not dataset_path.is_file():
         raise FileNotFoundError(dataset_path)
+    dataset_path.with_name(dataset_path.name + ".meta.json").write_text(
+        json.dumps(
+            {"request_count": request_count, "sampling_mode": "default"},
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     text = f'''from ais_bench.benchmark.datasets import CustomDataset
 from ais_bench.benchmark.models import VLLMCustomAPI
 from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer
@@ -282,7 +291,6 @@ from ais_bench.benchmark.tasks import OpenICLInferTask
 mode = "perf"
 pressure = True
 summarizer = dict(type="stable_stage")
-request_count={request_count}
 
 models = [dict(
     attr="service",

@@ -115,7 +115,11 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     assert "temperature=0" in text
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
-    assert "request_count=32" in text
+    meta = json.loads(
+        dataset.with_name(dataset.name + ".meta.json").read_text(encoding="utf-8")
+    )
+    assert meta == {"request_count": 32, "sampling_mode": "default"}
+    assert "request_count=32" not in text
     assert (
         "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate"
         in text
