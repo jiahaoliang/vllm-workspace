@@ -2,8 +2,8 @@
 
 ## Status
 
-Approved in chat on 2026-08-08 and written for final user review. Execution
-must not begin until the user approves this written version.
+Approved by the user on 2026-08-08. Execution is authorized to continue without
+further human intervention, subject to the fail-closed gates in this document.
 
 This document is the authoritative sequence and gate plan for completing the
 Mooncake `layerwise_num_shared_buffers=3` functional work and then running the
