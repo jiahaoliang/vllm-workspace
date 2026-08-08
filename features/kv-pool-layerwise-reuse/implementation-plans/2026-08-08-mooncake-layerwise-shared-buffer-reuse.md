@@ -268,7 +268,7 @@ configurations without changing production source. Add a deployment unit test
 that proves the default JSON remains unchanged and the environment override is
 quoted as one CLI argument.
 
-- [ ] **Step 3: Freeze source/image pins and commit control state**
+- [x] **Step 3: Freeze source/image pins and commit control state**
 
 Update the Prefill and UT Pod image references, the UT runner source/image
 expectations, and `validation-identity.json` to the new source SHA and set
@@ -295,16 +295,18 @@ git -C repos/vllm-ascend show 2770cd3ae66522c2eccb1c568889a55137836c0d:vllm_asce
 
 The committed source blob SHA256 must equal the working-tree file SHA256.
 
-- [ ] **Step 5: Patch one Python file, commit and inspect the derived image**
+- [x] **Step 5: Patch one Python file, commit and inspect the derived image**
 
 Create an explicitly named temporary container from the base image, copy only
 `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py`
 into it with `nerdctl cp`, and verify its in-container SHA256. Use
-`nerdctl -n k8s.io commit` with labels for the base manifest digest, patch
-SHA256 and source commit to create the frozen derived tag. Inspect the derived
-platform, manifest digest and labels; run an import/config probe proving the
-patched behavior. Remove only the exact temporary container after commit. Do
-not claim a native rebuild.
+`nerdctl -n k8s.io commit` to create the frozen derived filesystem layer. If
+the installed commit implementation does not preserve container labels, change
+only the OCI config and its manifest descriptor to add labels for the base
+manifest digest, patch SHA256 and source commit; prove every layer descriptor
+is unchanged. Inspect the final platform, manifest digest and labels; run an
+import/config probe proving the patched behavior. Remove only the exact
+temporary container after commit. Do not claim a native rebuild.
 
 ### Task 5: Real Mooncake/NPU Correctness Validation
 
@@ -318,7 +320,7 @@ not claim a native rebuild.
 - Consumes: frozen image and `PREFILL_KV_TRANSFER_CONFIG` override.
 - Produces: checksummed correctness evidence for `kv_producer` and `kv_both` with three shared buffers.
 
-- [ ] **Step 1: Run the derived-image CPU gate**
+- [x] **Step 1: Run the derived-image CPU gate**
 
 Apply the updated UT Pod manifest in `liangjiahao`, retain the CPU-only contract,
 and use the updated runner for the focused tests, complete AscendStore suite,

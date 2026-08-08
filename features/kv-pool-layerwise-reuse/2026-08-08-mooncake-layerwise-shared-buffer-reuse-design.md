@@ -186,7 +186,10 @@ evidence. The E2E image is created by copying the validated
 `layerwise_config.py` into the existing
 `kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z`
 image and committing that container with `nerdctl commit`; it must not be
-reported as a native rebuild.
+reported as a native rebuild. If the installed `nerdctl commit` does not
+preserve container labels, a metadata-only OCI config/manifest correction may
+add the required provenance labels only when every filesystem layer descriptor
+remains byte-for-byte unchanged.
 
 ### Excluded Validation Claims
 

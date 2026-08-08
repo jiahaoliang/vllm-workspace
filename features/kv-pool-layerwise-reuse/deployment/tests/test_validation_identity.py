@@ -105,9 +105,23 @@ class ValidationIdentityTest(unittest.TestCase):
         self.assertEqual(IDENTITY["image_commits"]["vllm_ascend"], FINAL_SOURCE_COMMIT)
         self.assertEqual(IDENTITY["base_image_commits"]["vllm_ascend"], BASE_SOURCE_COMMIT)
         self.assertEqual(derived["creation"], "nerdctl_commit_single_python_patch")
+        self.assertEqual(
+            derived["metadata_correction"], "config_manifest_only_oci_import"
+        )
         self.assertEqual(derived["patched_file"], PATCHED_FILE)
         self.assertRegex(derived["patched_file_sha256"], r"^[0-9a-f]{64}$")
         self.assertEqual(derived["patched_source_commit"], FINAL_SOURCE_COMMIT)
+        for digest_field in (
+            "base_manifest_digest",
+            "base_config_digest",
+            "commit_manifest_digest",
+            "commit_config_digest",
+            "patch_layer_digest",
+            "patch_diff_id",
+            "manifest_digest",
+            "config_digest",
+        ):
+            self.assertRegex(derived[digest_field], r"^sha256:[0-9a-f]{64}$")
         self.assertEqual(
             overlay["base_commit"], IDENTITY["image_commits"]["vllm_ascend"]
         )

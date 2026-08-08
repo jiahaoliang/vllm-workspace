@@ -5,9 +5,9 @@
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "3bda70d786db46310994afc689af4fc10da4858e"
+    "commit": "bee99b69c089d286cd1299386aa9d2a17105c208"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-2770cd3a-df3f74ed-20260808T042014Z",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-2770cd3a-df3f74ed-20260808T042014Z-r1",
   "platform": "linux/arm64",
   "vllm_lane": "main-verified",
   "vllm_version_override": null,
@@ -39,8 +39,13 @@
     "patched_file": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
     "patched_file_sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040",
     "patched_source_commit": "2770cd3ae66522c2eccb1c568889a55137836c0d",
-    "manifest_digest": "PENDING",
-    "config_digest": "PENDING"
+    "commit_manifest_digest": "sha256:c8a87536f542ba6bad9561426377d890dadfd44058ef99eebe7d3867e4b48aab",
+    "commit_config_digest": "sha256:5eae96ec858624672fdaa6f77b872cd0a54d94bb2378eeadd211580dc99bf610",
+    "patch_layer_digest": "sha256:e9233320b6ed9fcbc23e788b43773528ab1a340902414020f625b6f8ccd01da8",
+    "patch_diff_id": "sha256:418ad546c06a558a10298d8bd1171555dee225ab73564fbd2731f6eb9a77dd93",
+    "metadata_correction": "config_manifest_only_oci_import",
+    "manifest_digest": "sha256:3f1f3d71941f66f006a2c2eb341d036007c3eb8c1abf4634559b69daba06f1a0",
+    "config_digest": "sha256:cc66c08e15326c05d60e4fe5b3ac147a266282808d36d625c52d9e457ba88e77"
   },
   "python_overlay": {
     "required": false,
