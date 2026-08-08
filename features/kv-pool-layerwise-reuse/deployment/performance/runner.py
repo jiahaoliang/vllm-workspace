@@ -580,6 +580,50 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
     command_runner.run(
         Command(("bash", "-c", script), description="sync-formal-tooling")
     )
+    command_runner.run(
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "sh",
+                "-c",
+                'set -eu; mkdir -p "$1"; chmod "$2" "$1"; '
+                'test "$(stat -c %a "$1")" = "$2"',
+                "sh",
+                "/performance-workspace/rootfs/dev/shm",
+                "1777",
+            ),
+            description="prepare-client-shared-memory",
+        )
+    )
+    command_runner.run(
+        Command(
+            (
+                "kubectl",
+                "exec",
+                "-n",
+                "liangjiahao",
+                "layerwise-performance-aisbench",
+                "-c",
+                "aisbench",
+                "--",
+                "sh",
+                "-c",
+                'set -eu; mkdir -p "$1"; cp "$2" "$1/meminfo"; '
+                'test -s "$1/meminfo"',
+                "sh",
+                "/performance-workspace/rootfs/proc",
+                "/proc/meminfo",
+            ),
+            description="prepare-client-procfs",
+        )
+    )
     marker = command_runner.run(
         Command(
             (
@@ -683,8 +727,7 @@ def _capture_pre_run_state(
                 "kubectl",
                 "get",
                 "pods",
-                "-n",
-                "liangjiahao",
+                "--all-namespaces",
                 "-o",
                 "json",
             ),
@@ -807,6 +850,25 @@ def _apply_variant_block(
     environment: RunEnvironment,
     output_dir: Path,
 ) -> None:
+    old_pods: dict[str, tuple[str, ...]] = {}
+    for role in ("prefill", "decode"):
+        names = command_runner.run(
+            Command(
+                (
+                    "kubectl",
+                    "get",
+                    "pods",
+                    "-n",
+                    environment.namespace,
+                    "-l",
+                    f"app={role}",
+                    "-o",
+                    "name",
+                ),
+                description=f"capture-old-{role}-pods",
+            )
+        )
+        old_pods[role] = tuple(name for name in names.splitlines() if name)
     for path, description in zip(
         paths,
         ("apply-runtime-config", "apply-prefill", "apply-decode"),
@@ -825,6 +887,26 @@ def _apply_variant_block(
                 description=description,
             )
         )
+    for role in ("prefill", "decode"):
+        for pod_name in old_pods[role]:
+            if not pod_name.startswith("pod/"):
+                raise RuntimeError(f"unexpected Kubernetes Pod name: {pod_name}")
+            command_runner.run(
+                Command(
+                    (
+                        "kubectl",
+                        "wait",
+                        "-n",
+                        environment.namespace,
+                        "--for=delete",
+                        pod_name,
+                        "--timeout=300s",
+                    ),
+                    description=f"wait-old-{role}-deleted",
+                )
+            )
+    for command in _master_rollout_commands(environment):
+        command_runner.run(command)
     for role in ("prefill", "decode"):
         command_runner.run(
             Command(
@@ -935,6 +1017,52 @@ print(json.dumps(body, sort_keys=True))
         sends_inference=True,
         description="correctness-canary",
     )
+
+
+def _run_variant_canary(
+    command_runner: Runner,
+    point: WorkloadPoint,
+    environment: RunEnvironment,
+    output_dir: Path,
+) -> None:
+    try:
+        for command in _master_live_assertion_commands(environment):
+            command_runner.run(command)
+        _run_and_save(
+            command_runner,
+            _canary_command(point, environment),
+            output_dir
+            / "canaries"
+            / f"{point.topology}-{point.input_tokens}-{point.variant}.json",
+        )
+    except BaseException as error:
+        point_name = f"{point.topology}-{point.input_tokens}-{point.variant}"
+        failure = _new_attempt(
+            output_dir / "canary-failures" / point_name,
+            "failure",
+        )
+        _append(
+            failure / "state.jsonl",
+            {
+                "status": "failed",
+                "error": type(error).__name__,
+                "message": str(error),
+            },
+        )
+        for command, filename in _diagnostic_commands(environment):
+            try:
+                _capture(command_runner, command, failure, filename)
+            except Exception as diagnostic_error:
+                _append(
+                    failure / "state.jsonl",
+                    {
+                        "status": "diagnostic_failed",
+                        "description": command.description,
+                        "error": type(diagnostic_error).__name__,
+                        "message": str(diagnostic_error),
+                    },
+                )
+        raise
 
 
 def _stop_engines(command_runner: Runner, environment: RunEnvironment) -> list[str]:
@@ -1085,10 +1213,22 @@ def run(
         archived_handoff = json.loads(handoff_path.read_text(encoding="utf-8"))
         if archived_handoff.get("sha256") != state.digest:
             raise handoff.HandoffError("handoff changed since the original topology run")
+        checksum_errors = report.validate_checksums(output_dir)
+        if checksum_errors:
+            raise RuntimeError(
+                "resume checksum validation failed: " + "; ".join(checksum_errors)
+            )
         topologies = existing_contract.get("topologies", [])
-        if not isinstance(topologies, list) or topology in topologies:
+        if (
+            not isinstance(topologies, list)
+            or any(not isinstance(value, str) for value in topologies)
+            or len(set(topologies)) != len(topologies)
+            or (topology in topologies and topologies[-1] != topology)
+        ):
             raise ValueError(f"topology is already present or malformed: {topology}")
-        prior_topologies = [str(value) for value in topologies]
+        prior_topologies = list(topologies)
+        if prior_topologies and prior_topologies[-1] == topology:
+            prior_topologies.pop()
     _sync_client_tooling(command_runner, output_dir)
     _capture_identity(command_runner, state, output_dir)
     inputs = _capture_pre_run_state(command_runner, output_dir)
@@ -1117,11 +1257,22 @@ def run(
         raise image.ImageContractError("server image changed since the original topology run")
     points = build_matrix(topology)
     prior_points = existing_contract.get("expected_points", [])
-    provisional_points = (
-        [str(value) for value in prior_points]
-        if isinstance(prior_points, list)
-        else []
-    )
+    if not isinstance(prior_points, list) or any(
+        not isinstance(value, str) for value in prior_points
+    ):
+        raise ValueError("existing run contract points are malformed")
+    retained_prior_points = [
+        value for value in prior_points if not value.startswith(f"{topology}-")
+    ]
+    existing_stops = existing_contract.get("adaptive_stops", [])
+    if not isinstance(existing_stops, list) or any(
+        not isinstance(value, dict) for value in existing_stops
+    ):
+        raise ValueError("existing run contract adaptive stops are malformed")
+    retained_prior_stops = [
+        value for value in existing_stops if value.get("topology") != topology
+    ]
+    provisional_points = list(retained_prior_points)
     provisional_points.extend(_point_id(point) for point in points)
     _write_json(
         output_dir / "run-contract.json",
@@ -1131,6 +1282,7 @@ def run(
             "expected_points": provisional_points,
             "formal_repetitions": 3,
             "raw_characterization_only": True,
+            "adaptive_stops": retained_prior_stops,
         },
     )
     environment = RunEnvironment(
@@ -1138,14 +1290,8 @@ def run(
         image_digest=image_identity.digest,
     )
     performance_configmaps: set[str] = set()
-    existing_points = existing_contract.get("expected_points", [])
-    existing_stops = existing_contract.get("adaptive_stops", [])
-    executed_points: list[str] = (
-        list(existing_points) if isinstance(existing_points, list) else []
-    )
-    stop_decisions: list[dict[str, object]] = (
-        list(existing_stops) if isinstance(existing_stops, list) else []
-    )
+    executed_points = list(retained_prior_points)
+    stop_decisions: list[dict[str, object]] = list(retained_prior_stops)
     run_error: BaseException | None = None
     try:
         for input_tokens in INPUT_TOKENS:
@@ -1193,12 +1339,11 @@ def run(
                     environment,
                     output_dir,
                 )
-                _run_and_save(
+                _run_variant_canary(
                     command_runner,
-                    _canary_command(representative, environment),
-                    output_dir
-                    / "canaries"
-                    / f"{topology}-{input_tokens}-{variant}.json",
+                    representative,
+                    environment,
+                    output_dir,
                 )
                 for output_tokens in dict.fromkeys(
                     point.output_tokens for point in block_points
@@ -1295,6 +1440,46 @@ def _new_attempt(root: Path, phase: str) -> Path:
     return attempt
 
 
+def _prior_phase_state(
+    point_root: Path, phase: str, image_digest: str, formal_count: int
+) -> tuple[dict[str, object] | None, int | None]:
+    summaries: list[tuple[int, Path, dict[str, object]]] = []
+    valid: list[dict[str, object]] = []
+    for path in (point_root / phase).glob("attempt-*/raw/summary.json"):
+        try:
+            summary = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as error:
+            raise RuntimeError(f"malformed prior summary: {path}") from error
+        if not isinstance(summary, dict):
+            raise RuntimeError(f"prior summary is not an object: {path}")
+        if summary.get("image_digest") != image_digest:
+            raise RuntimeError(f"prior summary image digest drift: {path}")
+        attempt_name = path.parent.parent.name
+        attempt_text = attempt_name.removeprefix("attempt-")
+        if not attempt_text.isdigit():
+            raise RuntimeError(f"malformed prior attempt name: {attempt_name}")
+        summaries.append((int(attempt_text), path, summary))
+        if summary.get("valid") is True:
+            valid.append(summary)
+    if len(valid) > 1:
+        raise RuntimeError(f"multiple valid prior summaries for phase: {phase}")
+    if valid:
+        return valid[0], None
+    if not summaries:
+        return None, None
+    _, path, latest = max(summaries, key=lambda item: item[0])
+    errors = [str(error) for error in latest.get("errors", [])]
+    request_count = latest.get("request_count")
+    if (
+        errors == ["stable benchmark duration is insufficient"]
+        and isinstance(request_count, int)
+        and not isinstance(request_count, bool)
+        and 0 < request_count < formal_count
+    ):
+        return None, min(request_count * 2, formal_count)
+    raise RuntimeError(f"prior attempt is not resumable: {path}")
+
+
 def _invoke(command_runner: Runner, command: Command, attempt: Path) -> str:
     _append(
         attempt / "state.jsonl",
@@ -1321,8 +1506,19 @@ def _capture(
 
 
 def _master_empty_script() -> str:
-    return '''from urllib.request import urlopen
-text = urlopen("http://mooncake-master-service:9003/metrics", timeout=10).read().decode()
+    return '''import time
+from urllib.error import URLError
+from urllib.request import urlopen
+for attempt in range(60):
+    try:
+        text = urlopen(
+            "http://mooncake-master-service:9003/metrics", timeout=10
+        ).read().decode()
+        break
+    except URLError:
+        if attempt == 59:
+            raise
+        time.sleep(1)
 values = {}
 for line in text.splitlines():
     fields = line.split()
@@ -1349,6 +1545,24 @@ for url in (
 '''
 
 
+def _master_remove_all_script() -> str:
+    return '''import json
+from urllib.request import Request, urlopen
+request = Request(
+    "http://mooncake-master-service:9003/api/v1/remove_all?force=true",
+    data=b"",
+    method="POST",
+)
+with urlopen(request, timeout=30) as response:
+    assert response.status == 200, response.status
+    body = json.loads(response.read())
+assert body.get("success") is True, body
+removed_count = body.get("removed_count")
+assert isinstance(removed_count, int) and removed_count >= 0, body
+print(json.dumps(body, sort_keys=True))
+'''
+
+
 def _client_python(environment: RunEnvironment, script: str) -> Command:
     return Command(
         (
@@ -1368,6 +1582,60 @@ def _client_python(environment: RunEnvironment, script: str) -> Command:
             "-c",
             script,
         )
+    )
+
+
+def _master_live_assertion_commands(
+    environment: RunEnvironment,
+) -> tuple[Command, ...]:
+    master_empty = _client_python(environment, _master_empty_script())
+    reconnect = _client_python(environment, _http_ok_script())
+    return (
+        Command(master_empty.argv, description="assert-master-empty"),
+        Command(reconnect.argv, description="assert-engine-reconnect"),
+    )
+
+
+def _master_rollout_commands(environment: RunEnvironment) -> tuple[Command, ...]:
+    master_empty = _client_python(environment, _master_empty_script())
+    return (
+        Command(
+            (
+                "kubectl",
+                "rollout",
+                "restart",
+                "-n",
+                environment.namespace,
+                environment.master_resource,
+            ),
+            mutates_server=True,
+            description="reset-master",
+        ),
+        Command(
+            (
+                "kubectl",
+                "rollout",
+                "status",
+                "-n",
+                environment.namespace,
+                environment.master_resource,
+                "--timeout=300s",
+            ),
+            description="wait-master",
+        ),
+        Command(master_empty.argv, description="assert-master-empty"),
+    )
+
+
+def _master_cleanup_commands(environment: RunEnvironment) -> tuple[Command, ...]:
+    remove_all = _client_python(environment, _master_remove_all_script())
+    return (
+        Command(
+            remove_all.argv,
+            mutates_server=True,
+            description="remove-all-keys",
+        ),
+        *_master_live_assertion_commands(environment),
     )
 
 
@@ -1503,37 +1771,14 @@ def _attempt_commands(
         "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
         "PYTHONDONTWRITEBYTECODE=1",
         "/client-tools/venv/bin/ais_bench",
+        "-m",
+        "perf",
+        "--num-warmups",
+        "0",
         f"{chroot_attempt}/config.py",
     )
-    master_empty = _client_python(environment, _master_empty_script())
-    reconnect = _client_python(environment, _http_ok_script())
     return (
-        Command(
-            (
-                "kubectl",
-                "rollout",
-                "restart",
-                "-n",
-                namespace,
-                environment.master_resource,
-            ),
-            mutates_server=True,
-            description="reset-master",
-        ),
-        Command(
-            (
-                "kubectl",
-                "rollout",
-                "status",
-                "-n",
-                namespace,
-                environment.master_resource,
-                "--timeout=300s",
-            ),
-            description="wait-master",
-        ),
-        Command(master_empty.argv, description="assert-master-empty"),
-        Command(reconnect.argv, description="assert-engine-reconnect"),
+        *_master_cleanup_commands(environment),
         Command(
             (
                 "kubectl",
@@ -1686,25 +1931,44 @@ def execute_point(
     current_attempt = point_root
     formal_summaries: list[dict[str, object]] = []
     try:
-        for phase, request_count in phases:
-            current_attempt = _new_attempt(point_root, phase)
-            attempt_token = hashlib.sha256(
-                str(current_attempt.resolve()).encode("utf-8")
-            ).hexdigest()[:16]
-            remote_attempt = f"{_point_id(point)}/{phase}/{attempt_token}"
-            for command in _attempt_commands(
-                point, phase, request_count, remote_attempt, environment
-            ):
-                if command.description in {"aisbench", "archive-aisbench"}:
-                    argv = tuple(
-                        str(current_attempt / "raw") if value == "__LOCAL_RAW__" else value
-                        for value in command.argv
-                    )
-                    command = Command(argv, description=command.description)
-                _invoke(command_runner, command, current_attempt)
-            for command, filename in _diagnostic_commands(environment):
-                _capture(command_runner, command, current_attempt, filename)
-            if environment.image_digest:
+        for phase, initial_request_count in phases:
+            prior_summary, resumed_request_count = (
+                _prior_phase_state(
+                    point_root,
+                    phase,
+                    environment.image_digest,
+                    formal_count,
+                )
+                if environment.image_digest
+                else (None, None)
+            )
+            if prior_summary is not None:
+                if phase.startswith("formal-"):
+                    formal_summaries.append(prior_summary)
+                continue
+            request_count = resumed_request_count or initial_request_count
+            while True:
+                current_attempt = _new_attempt(point_root, phase)
+                attempt_token = hashlib.sha256(
+                    str(current_attempt.resolve()).encode("utf-8")
+                ).hexdigest()[:16]
+                remote_attempt = f"{_point_id(point)}/{phase}/{attempt_token}"
+                for command in _attempt_commands(
+                    point, phase, request_count, remote_attempt, environment
+                ):
+                    if command.description in {"aisbench", "archive-aisbench"}:
+                        argv = tuple(
+                            str(current_attempt / "raw")
+                            if value == "__LOCAL_RAW__"
+                            else value
+                            for value in command.argv
+                        )
+                        command = Command(argv, description=command.description)
+                    _invoke(command_runner, command, current_attempt)
+                for command, filename in _diagnostic_commands(environment):
+                    _capture(command_runner, command, current_attempt, filename)
+                if not environment.image_digest:
+                    break
                 summary = report.summarize_aisbench_attempt(
                     current_attempt / "raw",
                     point,
@@ -1712,13 +1976,27 @@ def execute_point(
                     environment.image_digest,
                 )
                 _write_json(current_attempt / "raw" / "summary.json", summary)
-                if summary.get("valid") is not True:
-                    raise RuntimeError(
-                        "invalid AISBench attempt: "
-                        + "; ".join(str(error) for error in summary.get("errors", []))
+                if summary.get("valid") is True:
+                    if phase.startswith("formal-"):
+                        formal_summaries.append(summary)
+                    break
+                errors = [str(error) for error in summary.get("errors", [])]
+                if (
+                    errors == ["stable benchmark duration is insufficient"]
+                    and request_count < formal_count
+                ):
+                    next_request_count = min(request_count * 2, formal_count)
+                    _append(
+                        current_attempt / "state.jsonl",
+                        {
+                            "status": "insufficient_stable_duration",
+                            "request_count": request_count,
+                            "next_request_count": next_request_count,
+                        },
                     )
-                if phase.startswith("formal-"):
-                    formal_summaries.append(summary)
+                    request_count = next_request_count
+                    continue
+                raise RuntimeError("invalid AISBench attempt: " + "; ".join(errors))
     except Exception as error:
         _append(
             current_attempt / "state.jsonl",
@@ -1736,21 +2014,6 @@ def execute_point(
                     "wide",
                 ),
                 description="capture-failure",
-            )
-        )
-        restore_argv = (
-            "kubectl",
-            "apply",
-            "-n",
-            environment.namespace,
-            "-f",
-            str(environment.restore_manifest or output_dir / "pre-run-state"),
-        )
-        command_runner.run(
-            Command(
-                restore_argv,
-                mutates_server=True,
-                description="restore-pre-run-state",
             )
         )
         raise

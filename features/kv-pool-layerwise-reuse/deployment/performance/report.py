@@ -117,11 +117,13 @@ def summarize_aisbench_attempt(
             errors.append(str(error))
     try:
         duration_ms = _stable_value(common, "Benchmark Duration")
+        total_requests = _stable_value(common, "Total Requests")
         failed_requests = _stable_value(common, "Failed Requests")
         success_requests = _stable_value(common, "Success Requests")
     except ValueError as error:
         errors.append(str(error))
         duration_ms = 0.0
+        total_requests = -1.0
         failed_requests = -1.0
         success_requests = -1.0
     request_metrics: dict[str, dict[str, str]] = {}
@@ -164,7 +166,13 @@ def summarize_aisbench_attempt(
         errors.append(
             f"AISBench success count mismatch: expected {request_count}, got {success_count}"
         )
-    if failed_requests != 0 or success_requests != request_count:
+    common_counts = (total_requests, failed_requests, success_requests)
+    if (
+        any(value != int(value) for value in common_counts)
+        or failed_requests != 0
+        or success_requests != total_requests
+        or not 0 < total_requests <= request_count
+    ):
         errors.append("AISBench common request counts do not match the attempt contract")
     stable_valid = stable_measurement_valid(max_e2el_ms, duration_ms)
     if not stable_valid:
@@ -175,6 +183,7 @@ def summarize_aisbench_attempt(
         "errors": errors,
         "metrics": metrics,
         "request_count": request_count,
+        "stable_request_count": int(total_requests),
         "detail_count": detail_count,
         "success_count": success_count,
         "benchmark_duration_ms": duration_ms,
@@ -186,7 +195,7 @@ def summarize_aisbench_attempt(
     }
 
 
-def _validate_checksums(root: Path) -> list[str]:
+def validate_checksums(root: Path) -> list[str]:
     manifest = root / "SHA256SUMS"
     if not manifest.is_file():
         return ["missing root evidence: SHA256SUMS"]
@@ -209,7 +218,7 @@ def _validate_checksums(root: Path) -> list[str]:
 
 
 def validate_evidence(root: Path) -> list[str]:
-    errors = _validate_checksums(root)
+    errors = validate_checksums(root)
     for name in REQUIRED_ROOT_FILES:
         if not (root / name).is_file():
             errors.append(f"missing root evidence: {name}")

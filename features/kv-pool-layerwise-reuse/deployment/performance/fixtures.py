@@ -279,24 +279,33 @@ def write_aisbench_config(
         + "\n",
         encoding="utf-8",
     )
-    text = f'''from ais_bench.benchmark.datasets import CustomDataset
+    text = f'''from ais_bench.benchmark.calculators import StablePerfMetricCalculator
+from ais_bench.benchmark.datasets import CustomDataset
 from ais_bench.benchmark.models import VLLMCustomAPI
 from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer
 from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate
 from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever
 from ais_bench.benchmark.partitioners import NaivePartitioner
-from ais_bench.benchmark.runners.local_api import LocalAPIRunner
-from ais_bench.benchmark.tasks import OpenICLInferTask
+from ais_bench.benchmark.runners import LocalRunner
+from ais_bench.benchmark.summarizers import DefaultPerfSummarizer
+from ais_bench.benchmark.tasks import OpenICLApiInferTask
 
 mode = "perf"
-pressure = True
-summarizer = dict(type="stable_stage")
+summarizer = dict(
+    attr="performance",
+    type=DefaultPerfSummarizer,
+    calculator=dict(
+        type=StablePerfMetricCalculator,
+        stats_list=["Average", "Min", "Max", "Median", "P75", "P90", "P95", "P99"],
+    ),
+)
 
 models = [dict(
+    abbr={point.variant!r},
     attr="service",
     type=VLLMCustomAPI,
     stream=True,
-    retry=0,
+    retry=1,
     url={endpoint!r},
     model="vllm-ascend/DeepSeek-V2-Lite-W8A8",
     path="/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
@@ -321,9 +330,9 @@ datasets = [dict(
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
-        type=LocalAPIRunner,
+        type=LocalRunner,
         max_num_workers={point.concurrency},
-        task=dict(type=OpenICLInferTask),
+        task=dict(type=OpenICLApiInferTask),
     ),
 )
 work_dir={str((output_path.parent / "aisbench-output").resolve())!r}

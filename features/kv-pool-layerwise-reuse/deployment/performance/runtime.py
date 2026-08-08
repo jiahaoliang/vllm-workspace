@@ -47,7 +47,9 @@ def _render_deployment(
         container.setdefault("resources", {}).setdefault(resource_type, {})[
             "huawei.com/Ascend910"
         ] = str(npus)
-    volumes = [volume for volume in pod_spec["volumes"] if volume["name"] == "runtime-config"]
+    volumes = [
+        volume for volume in pod_spec["volumes"] if volume["name"] == "runtime-config"
+    ]
     if len(volumes) != 1:
         raise ValueError("deployment must have exactly one runtime-config volume")
     volumes[0]["configMap"]["name"] = configmap_name
@@ -57,9 +59,11 @@ def _render_deployment(
 def _kv_transfer_config(role: str, point: WorkloadPoint) -> dict[str, Any]:
     if role not in {"prefill", "decode"}:
         raise ValueError(f"unsupported server role: {role}")
-    settings = VARIANTS[point.variant].prefill if role == "prefill" else VARIANTS[
-        point.variant
-    ].decode
+    settings = (
+        VARIANTS[point.variant].prefill
+        if role == "prefill"
+        else VARIANTS[point.variant].decode
+    )
     extra = {"backend": "mooncake", **settings, "lookup_rpc_port": 0}
     if role == "decode":
         extra["consumer_is_to_load"] = True
@@ -124,7 +128,9 @@ def server_argv(role: str, point: WorkloadPoint) -> tuple[str, ...]:
             "--gpu-memory-utilization",
             str(RUNTIME_CONSTANTS["gpu_memory_utilization"]),
             "--kv-transfer-config",
-            json.dumps(_kv_transfer_config(role, point), separators=(",", ":"), sort_keys=True),
+            json.dumps(
+                _kv_transfer_config(role, point), separators=(",", ":"), sort_keys=True
+            ),
         )
     )
     return tuple(argv)
@@ -170,22 +176,48 @@ def _runtime_identity(point: WorkloadPoint, image: str) -> dict[str, Any]:
 
 
 def _check_runtime_script() -> str:
-    return '''import argparse
+    return """import argparse
 import json
 from pathlib import Path
 
-import vllm_ascend
-from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.layerwise_config import (
-    get_layerwise_kv_cache_num_tensors,
-)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--role", choices=("prefill", "decode"), required=True)
+parser.add_argument(
+    "--identity",
+    type=Path,
+    default=Path("/opt/vllm-layerwise/runtime-identity.json"),
+)
 args = parser.parse_args()
-identity = json.loads(Path("/opt/vllm-layerwise/runtime-identity.json").read_text())
+identity = json.loads(args.identity.read_text())
 logical_layers = identity["logical_layers"]
 extra = identity[f"{args.role}_kv"]["kv_connector_extra_config"]
-slots = get_layerwise_kv_cache_num_tensors(logical_layers, extra) or logical_layers
+shared_value = extra.get("layerwise_num_shared_buffers")
+if shared_value is None:
+    slots = logical_layers
+else:
+    shared = int(shared_value)
+    independent_value = extra.get("layerwise_independent_layers")
+    if independent_value is None:
+        independent = [0, logical_layers - 1]
+    elif isinstance(independent_value, str):
+        if independent_value.strip().lower() == "all":
+            independent = list(range(logical_layers))
+        else:
+            independent = [
+                int(value.strip())
+                for value in independent_value.split(",")
+                if value.strip()
+            ]
+    elif isinstance(independent_value, int):
+        independent = [independent_value]
+    else:
+        independent = [int(value) for value in independent_value]
+    independent = sorted({
+        value + logical_layers if value < 0 else value for value in independent
+    })
+    assert all(0 <= value < logical_layers for value in independent)
+    reused_layers = logical_layers - len(independent)
+    slots = len(independent) + shared if reused_layers > shared else logical_layers
 factor = logical_layers / slots
 assert slots == identity[f"{args.role}_physical_slots"]
 assert factor == identity[f"{args.role}_logical_memory_factor"]
@@ -194,9 +226,11 @@ print(json.dumps({
     "logical_layers": logical_layers,
     "physical_slots": slots,
     "logical_memory_factor": factor,
-    "vllm_ascend_source": str(Path(vllm_ascend.__file__).resolve()),
+    "vllm_ascend_source": str(Path(
+        "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"
+    )),
 }, sort_keys=True))
-'''
+"""
 
 
 def render_resources(
@@ -211,9 +245,9 @@ def render_resources(
     data = configmap.setdefault("data", {})
     data["start-prefill.sh"] = _start_script("prefill", point)
     data["start-decode.sh"] = _start_script("decode", point)
-    data["runtime-identity.json"] = json.dumps(
-        _runtime_identity(point, image), indent=2, sort_keys=True
-    ) + "\n"
+    data["runtime-identity.json"] = (
+        json.dumps(_runtime_identity(point, image), indent=2, sort_keys=True) + "\n"
+    )
     data["check-runtime.py"] = _check_runtime_script()
     prefill = _render_deployment(
         inputs.prefill_deployment, image, topology.prefill_npus, configmap_name
@@ -259,7 +293,9 @@ def validate_unique_difference(
     normalized: str | None = None
     for variant, resources in variants.items():
         try:
-            identity = json.loads(resources.runtime_configmap["data"]["runtime-identity.json"])
+            identity = json.loads(
+                resources.runtime_configmap["data"]["runtime-identity.json"]
+            )
         except (KeyError, TypeError, json.JSONDecodeError):
             errors.append(f"runtime identity is missing or malformed: {variant}")
             continue

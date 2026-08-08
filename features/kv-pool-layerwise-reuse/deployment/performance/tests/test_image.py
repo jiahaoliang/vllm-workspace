@@ -91,6 +91,8 @@ def test_ready_image_avoids_materialization(tmp_path: Path) -> None:
             " commit ",
         )
     )
+    probe = next(command for command in runner.commands if "run" in command)
+    assert probe[probe.index("--net") + 1] == "none"
 
 
 def test_patch_mode_requires_hash_before_mutation(tmp_path: Path) -> None:

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+from pathlib import Path
+import subprocess
+import sys
 
 from performance import runtime
 from performance.contract import WorkloadPoint
@@ -39,9 +42,7 @@ def base_inputs() -> runtime.RuntimeInputs:
         }
 
     return runtime.RuntimeInputs(
-        prefill_deployment=deployment(
-            "prefill-engine-deployment", "prefill-engine"
-        ),
+        prefill_deployment=deployment("prefill-engine-deployment", "prefill-engine"),
         decode_deployment=deployment("decode-engine-deployment", "decode-engine"),
         runtime_configmap={
             "apiVersion": "v1",
@@ -110,9 +111,10 @@ def test_unique_difference_rejects_hidden_runtime_drift() -> None:
         "image@sha256:x",
     )
 
-    assert runtime.validate_unique_difference(
-        {"layerwise": layerwise, "reuse3": reuse3}
-    ) == []
+    assert (
+        runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3})
+        == []
+    )
     reuse3.decode_deployment["spec"]["template"]["spec"]["nodeName"] = "m2"
     assert any(
         "non-experimental runtime drift" in error
@@ -136,3 +138,37 @@ def test_reuse3_runtime_identity_freezes_slots_and_memory_factor() -> None:
     assert identity["prefill_logical_memory_factor"] == 5.4
     assert identity["decode_physical_slots"] == 27
     compile(data["check-runtime.py"], "check-runtime.py", "exec")
+
+
+def test_runtime_check_avoids_loading_a_second_npu_runtime(tmp_path: Path) -> None:
+    for variant in ("bulk", "layerwise", "reuse3"):
+        rendered = runtime.render_resources(
+            base_inputs(),
+            WorkloadPoint("dp1", 4096, 1, variant, 1),
+            "image@sha256:x",
+        )
+        data = rendered.runtime_configmap["data"]
+        script = data["check-runtime.py"]
+        assert "import vllm_ascend" not in script
+        identity = tmp_path / f"{variant}.json"
+        identity.write_text(data["runtime-identity.json"], encoding="utf-8")
+        for role in ("prefill", "decode"):
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    script,
+                    "--role",
+                    role,
+                    "--identity",
+                    str(identity),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            checked = json.loads(result.stdout)
+            assert (
+                checked["physical_slots"]
+                == json.loads(data["runtime-identity.json"])[f"{role}_physical_slots"]
+            )

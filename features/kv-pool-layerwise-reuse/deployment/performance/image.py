@@ -69,6 +69,8 @@ def verify_import(
             "k8s.io",
             "run",
             "--rm",
+            "--net",
+            "none",
             "--entrypoint",
             "python3",
             reference,

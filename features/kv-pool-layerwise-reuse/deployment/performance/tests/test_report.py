@@ -153,8 +153,9 @@ def test_aisbench_raw_summary_requires_exact_tokens_and_stable_duration(
                 "Concurrency": {"stable": 4},
                 "Output Token Throughput": {"stable": "2 token/s"},
                 "Benchmark Duration": {"stable": "4000 ms"},
+                "Total Requests": {"stable": 1},
                 "Failed Requests": {"stable": 0},
-                "Success Requests": {"stable": 2},
+                "Success Requests": {"stable": 1},
             }
         ),
         encoding="utf-8",
@@ -188,6 +189,7 @@ def test_aisbench_raw_summary_requires_exact_tokens_and_stable_duration(
     )
 
     assert summary["valid"] is True
+    assert summary["stable_request_count"] == 1
     metrics = summary["metrics"]
     assert isinstance(metrics, dict)
     assert metrics["E2EL P95"] == 900

@@ -108,10 +108,15 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     text = output.read_text(encoding="utf-8")
     compile(text, str(output), "exec")
     assert "stream=True" in text
-    assert "retry=0" in text
+    assert "retry=1" in text
+    assert "pressure" not in text
     assert "batch_size=4" in text
     assert "request_rate=0" in text
     assert "max_out_len=128" in text
+    assert text.count("abbr='bulk'") == 2
+    assert 'attr="performance"' in text
+    assert "type=DefaultPerfSummarizer" in text
+    assert "type=StablePerfMetricCalculator" in text
     assert "temperature=0" in text
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
@@ -131,8 +136,10 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
         "from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer" in text
     )
     assert "type=NaivePartitioner" in text
-    assert "type=LocalAPIRunner" in text
-    assert "type=OpenICLInferTask" in text
+    assert "from ais_bench.benchmark.runners import LocalRunner" in text
+    assert "from ais_bench.benchmark.tasks import OpenICLApiInferTask" in text
+    assert "type=LocalRunner" in text
+    assert "type=OpenICLApiInferTask" in text
 
 
 def test_fixture_corruption_breaks_checksum_replay(tmp_path: Path) -> None:
