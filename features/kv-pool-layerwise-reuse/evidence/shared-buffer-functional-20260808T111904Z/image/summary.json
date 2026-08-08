@@ -1,0 +1,30 @@
+{
+  "base_config_digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+  "base_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
+  "base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
+  "errors": [],
+  "final_config_digest": "sha256:2bcbaa5ea4b59874f03e8c6c6cc169edece8cac52faa5ea9f7a5313f074a3ff9",
+  "final_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-1829639a-df3f74ed-20260808T111904Z",
+  "final_manifest_digest": "sha256:ed0e622f05739bf5202eb18c4565aa4f7f82e653213c49b2379d93f2700034c3",
+  "layer_descriptor_count": 22,
+  "metadata_correction_layer_descriptors_unchanged": true,
+  "patch_diff_id": "sha256:7b8f2be1fbd0895cd72c9ffb9ec0fc758c12c76df9bacc42b91b48f05ed50f32",
+  "patch_layer_digest": "sha256:f24d67f3891e8107cf55765e2ebd63a87488fcd8db773c22ec19d462fc4ea409",
+  "patched_files_sha256": "8badc0e5cd49e2e2e3600c9012b9326ec113c2fab527fbabf22d3885b686f439",
+  "platform": "linux/arm64",
+  "pre_metadata_config_digest": "sha256:8b88cc3c8f59e4606758353810a648af0a8a6e8b63fb19876aeaf682ea86710b",
+  "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-1829639a-20260808T111904Z",
+  "pre_metadata_manifest_digest": "sha256:8148da50b293a315e5a133085a007cb1b2ce588f97584cb5d5bce9d945c85bb2",
+  "production_file_hashes_equal": true,
+  "production_files_compared": 7,
+  "schema_version": 1,
+  "source_dirty": false,
+  "source_head": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+  "source_labels": {
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "1829639a1e019d3ed34055787febc7ee89fb0f68"
+  },
+  "status": "passed",
+  "validated": true
+}

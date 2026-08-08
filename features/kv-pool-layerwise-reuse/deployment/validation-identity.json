@@ -1,13 +1,13 @@
 {
-  "schema_version": 4,
+  "schema_version": 6,
   "base_image": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
-  "run_id": "20260808T042014Z",
+  "run_id": "20260808T111904Z",
   "attempt": 1,
   "tooling_base": {
     "branch": "kv-pool-layerwise-reuse",
-    "commit": "bee99b69c089d286cd1299386aa9d2a17105c208"
+    "commit": "cb51efbcb4a69ace9536d4fcabf1d87e02404d56"
   },
-  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-2770cd3a-df3f74ed-20260808T042014Z-r1",
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-1829639a-df3f74ed-20260808T111904Z",
   "platform": "linux/arm64",
   "vllm_lane": "main-verified",
   "vllm_version_override": null,
@@ -18,12 +18,12 @@
   "buildkit_namespace": "default",
   "commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "2770cd3ae66522c2eccb1c568889a55137836c0d",
+    "vllm_ascend": "1829639a1e019d3ed34055787febc7ee89fb0f68",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "image_commits": {
     "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-    "vllm_ascend": "2770cd3ae66522c2eccb1c568889a55137836c0d",
+    "vllm_ascend": "1829639a1e019d3ed34055787febc7ee89fb0f68",
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "base_image_commits": {
@@ -32,25 +32,55 @@
     "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
   },
   "derived_image": {
-    "creation": "nerdctl_commit_single_python_patch",
+    "creation": "nerdctl_commit_seven_python_patches",
     "base_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
     "base_manifest_digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
     "base_config_digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
-    "patched_file": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
-    "patched_file_sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040",
-    "patched_source_commit": "2770cd3ae66522c2eccb1c568889a55137836c0d",
-    "commit_manifest_digest": "sha256:c8a87536f542ba6bad9561426377d890dadfd44058ef99eebe7d3867e4b48aab",
-    "commit_config_digest": "sha256:5eae96ec858624672fdaa6f77b872cd0a54d94bb2378eeadd211580dc99bf610",
-    "patch_layer_digest": "sha256:e9233320b6ed9fcbc23e788b43773528ab1a340902414020f625b6f8ccd01da8",
-    "patch_diff_id": "sha256:418ad546c06a558a10298d8bd1171555dee225ab73564fbd2731f6eb9a77dd93",
+    "patched_files": [
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py",
+        "sha256": "0e7c64fd572bc32234972c402fb7a42098b56288703be5e91570b0d026f70bfb"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py",
+        "sha256": "ebf1d53368925d966d219b0c954ba221d278626e9945209b5230db8ff19c806a"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py",
+        "sha256": "7b55f8d5bd56a1edcd94eb629c383410bd1d8293d83727a3641abfb84993ca56"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py",
+        "sha256": "e9819771b1f26b1e860a9bc03968e721dddd85e04de23cab9ec063ad9008d6c3"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py",
+        "sha256": "384fe5c2fd5deb785d151be15edc6c4ae0cd32cce75a2cb502aab802f9420040"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py",
+        "sha256": "06e8ad911c20b956811053f463fbe86c4435ae052235180817896acda1b9269a"
+      },
+      {
+        "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+        "sha256": "aa7b5f5b4740f982ca3cb6741581df2365ec0035b805a0cc6cb858c721a9fd22"
+      }
+    ],
+    "patched_files_sha256": "8badc0e5cd49e2e2e3600c9012b9326ec113c2fab527fbabf22d3885b686f439",
+    "patched_source_commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+    "pre_metadata_image": "docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-1829639a-20260808T111904Z",
+    "commit_manifest_digest": "sha256:8148da50b293a315e5a133085a007cb1b2ce588f97584cb5d5bce9d945c85bb2",
+    "commit_config_digest": "sha256:8b88cc3c8f59e4606758353810a648af0a8a6e8b63fb19876aeaf682ea86710b",
+    "patch_layer_digest": "sha256:f24d67f3891e8107cf55765e2ebd63a87488fcd8db773c22ec19d462fc4ea409",
+    "patch_diff_id": "sha256:7b8f2be1fbd0895cd72c9ffb9ec0fc758c12c76df9bacc42b91b48f05ed50f32",
     "metadata_correction": "config_manifest_only_oci_import",
-    "manifest_digest": "sha256:3f1f3d71941f66f006a2c2eb341d036007c3eb8c1abf4634559b69daba06f1a0",
-    "config_digest": "sha256:cc66c08e15326c05d60e4fe5b3ac147a266282808d36d625c52d9e457ba88e77"
+    "manifest_digest": "sha256:ed0e622f05739bf5202eb18c4565aa4f7f82e653213c49b2379d93f2700034c3",
+    "config_digest": "sha256:2bcbaa5ea4b59874f03e8c6c6cc169edece8cac52faa5ea9f7a5313f074a3ff9"
   },
   "python_overlay": {
     "required": false,
-    "base_commit": "2770cd3ae66522c2eccb1c568889a55137836c0d",
-    "commit": "2770cd3ae66522c2eccb1c568889a55137836c0d",
+    "base_commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
+    "commit": "1829639a1e019d3ed34055787febc7ee89fb0f68",
     "files": []
   },
   "model": {
