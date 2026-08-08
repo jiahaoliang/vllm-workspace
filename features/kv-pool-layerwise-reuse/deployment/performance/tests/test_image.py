@@ -23,9 +23,9 @@ class FakeRunner:
                         "RepoDigests": ["derived@sha256:abc"],
                         "Config": {
                             "Labels": {
-                                "vllm.source": "vllm-sha",
-                                "vllm-ascend.source": "ascend-sha",
-                                "mooncake.source": "mooncake-sha",
+                                "org.opencontainers.image.vllm.commit": "vllm-sha",
+                                "org.opencontainers.image.vllm-ascend.commit": "ascend-sha",
+                                "org.opencontainers.image.mooncake.commit": "mooncake-sha",
                             }
                         },
                     }
@@ -82,7 +82,14 @@ def test_ready_image_avoids_materialization(tmp_path: Path) -> None:
     assert not any(
         forbidden in text
         for text in command_text
-        for forbidden in ("buildctl", "docker build", "nerdctl build", " create ", " cp ", " commit ")
+        for forbidden in (
+            "buildctl",
+            "docker build",
+            "nerdctl build",
+            " create ",
+            " cp ",
+            " commit ",
+        )
     )
 
 
@@ -99,7 +106,9 @@ def test_patch_mode_requires_hash_before_mutation(tmp_path: Path) -> None:
     runner = FakeRunner()
 
     try:
-        image.resolve_server_image(replace(state, image_fields=fields), runner, tmp_path)
+        image.resolve_server_image(
+            replace(state, image_fields=fields), runner, tmp_path
+        )
     except image.ImageContractError as error:
         assert "Patched file SHA256" in str(error)
     else:
@@ -129,7 +138,9 @@ def test_patch_failure_removes_temporary_container(tmp_path: Path) -> None:
 
     runner = FailingPatchRunner()
     try:
-        image.resolve_server_image(replace(state, image_fields=fields), runner, tmp_path)
+        image.resolve_server_image(
+            replace(state, image_fields=fields), runner, tmp_path
+        )
     except RuntimeError as error:
         assert str(error) == "copy failed"
     else:

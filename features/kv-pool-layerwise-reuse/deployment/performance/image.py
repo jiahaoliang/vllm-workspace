@@ -31,16 +31,22 @@ class ImageIdentity:
 
 
 LABEL_FIELDS = {
-    "vllm.source": "vLLM source label",
-    "vllm-ascend.source": "vLLM-Ascend source label",
-    "mooncake.source": "Mooncake source label",
+    "org.opencontainers.image.vllm.commit": "vLLM source label",
+    "org.opencontainers.image.vllm-ascend.commit": "vLLM-Ascend source label",
+    "org.opencontainers.image.mooncake.commit": "Mooncake source label",
 }
 
 
 def _inspect(reference: str, runner: CommandRunner) -> dict[str, object]:
-    raw = runner.run(("nerdctl", "--namespace", "k8s.io", "image", "inspect", reference))
+    raw = runner.run(
+        ("nerdctl", "--namespace", "k8s.io", "image", "inspect", reference)
+    )
     parsed = json.loads(raw)
-    if not isinstance(parsed, list) or len(parsed) != 1 or not isinstance(parsed[0], dict):
+    if (
+        not isinstance(parsed, list)
+        or len(parsed) != 1
+        or not isinstance(parsed[0], dict)
+    ):
         raise ImageContractError("nerdctl image inspect did not return one image")
     return parsed[0]
 
@@ -149,7 +155,9 @@ def resolve_server_image(
     reference = fields.get("Derived image reference", "")
     digest = fields.get("Derived manifest digest", "")
     if not reference or not digest:
-        raise ImageContractError("ready-image mode requires derived reference and digest")
+        raise ImageContractError(
+            "ready-image mode requires derived reference and digest"
+        )
     inspected = _inspect(reference, runner)
     platform = f"{inspected.get('Os', '')}/{inspected.get('Architecture', '')}"
     if platform != fields.get("Platform") or platform != "linux/arm64":
@@ -163,7 +171,9 @@ def resolve_server_image(
     labels = config.get("Labels", {}) if isinstance(config, dict) else {}
     if not isinstance(labels, dict):
         raise ImageContractError("image source labels are unavailable")
-    expected_labels = {key: fields.get(field, "") for key, field in LABEL_FIELDS.items()}
+    expected_labels = {
+        key: fields.get(field, "") for key, field in LABEL_FIELDS.items()
+    }
     if any(labels.get(key) != value for key, value in expected_labels.items()):
         raise ImageContractError("image source labels do not match handoff")
     patched_file = fields.get("Patched file path", "")
