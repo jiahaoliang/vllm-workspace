@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 5
-updated_at: 2026-08-10T01:01:01+08:00
+generation: 6
+updated_at: 2026-08-10T01:25:39+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,7 +49,7 @@ updated_at: 2026-08-10T01:01:01+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` performance control parent | `7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc` | transition parent pushed as `origin/kv-pool-layerwise-reuse=7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc` |
+| control repo | `kv-pool-layerwise-reuse` performance control parent | `57bd3591d7192e32a7f11f39a421e9e5203ebdf0` | transition parent pushed as `origin/kv-pool-layerwise-reuse=57bd3591d7192e32a7f11f39a421e9e5203ebdf0` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `5355559175f9998f5d70866734fb79569dfc86f9` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -88,7 +88,7 @@ updated_at: 2026-08-10T01:01:01+08:00
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validator.log`; `npu/pure-consumer-canary/validator.log`; `REPORT.md` |
 | Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
 | Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
-| Performance runtime capacity CPU/mock | PASS | PASS | control parent `7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc`; `deployment/performance/tests/test_runtime.py`; complete performance harness `68 passed` |
+| Performance runtime capacity CPU/mock | PASS | PASS | control parent `57bd3591d7192e32a7f11f39a421e9e5203ebdf0`; `deployment/performance/tests/test_runtime.py`; complete performance harness `68 passed`; AISBench 3.1.0 `build_dataset_from_cfg` smoke accepted 8-request metadata |
 
 ## Evidence Identity
 
@@ -120,6 +120,8 @@ After this handoff becomes ready, performance validation may use only:
 - one 8-request warmup wave and one 8-request formal wave per point;
 - `DefaultPerfMetricCalculator`, `total` stage, one formal repetition, and no
   automatic retry;
+- AISBench `sampling_mode=default`; single-wave and total-stage semantics are
+  frozen by `run-contract.json`, not encoded as a custom AISBench sample mode;
 - three server starts in BULK, LAYERWISE, REUSE3 order;
 - 10-second point telemetry, lightweight point diagnostics, and complete
   Prefill/Decode logs once per variant;
@@ -167,13 +169,17 @@ all unverified fields fail-closed.
 None. The TP2 REUSE3 non-save-owner save-gate defect is preserved in the
 diagnostic performance root `/tmp/layerwise-performance-20260809T010429Z` and
 resolved by vLLM-Ascend
-`5355559175f9998f5d70866734fb79569dfc86f9`. Generation-5 retains the
+`5355559175f9998f5d70866734fb79569dfc86f9`. Generation-6 retains the
 generation-4 functional evidence and
 includes both the real-thread TP non-save-owner CPU regression and an exact
 4096-token TP2 REUSE3 producer to pure-consumer Decode NPU canary.
 
 The invalid performance root `/tmp/layerwise-performance-20260809T010429Z`
-must not be resumed. Generation 5 freezes the rapid five-point contract and
+must not be resumed. Generation 6 also rejects the diagnostic roots
+`/tmp/layerwise-performance-rapid-20260809T170330Z` and
+`/tmp/layerwise-performance-rapid-20260809T170900Z`; the latter exposed and
+preserves the unsupported AISBench sample-mode failure. Generation 6 freezes
+the corrected rapid five-point contract and
 128 GiB per serving rank, and requires a new performance run root.
 
 ## Listener Message Template
