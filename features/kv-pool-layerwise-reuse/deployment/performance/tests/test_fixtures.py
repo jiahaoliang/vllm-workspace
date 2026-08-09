@@ -92,7 +92,8 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     text = output.read_text(encoding="utf-8")
     compile(text, str(output), "exec")
     assert "stream=True" in text
-    assert "retry=0" in text
+    assert "retry=1" in text
+    assert "one total request attempt" in text
     assert "pressure" not in text
     assert "batch_size=8" in text
     assert "request_rate=0" in text
