@@ -1066,6 +1066,7 @@ def _run_variant_canary(
 
 def _stop_engines(command_runner: Runner, environment: RunEnvironment) -> list[str]:
     errors: list[str] = []
+    stopped: list[str] = []
     for role in ("prefill", "decode"):
         try:
             command_runner.run(
@@ -1086,8 +1087,46 @@ def _stop_engines(command_runner: Runner, environment: RunEnvironment) -> list[s
                     description=f"stop-{role}",
                 )
             )
+            stopped.append(role)
         except Exception as error:
             errors.append(f"stop {role}: {error}")
+    hbm_idle = r"""for attempt in $(seq 1 300); do
+  if npu-smi info | python3 -c '
+import re
+import sys
+
+values = [int(value) for value in re.findall(r"(\d+)\s*/\s*32768", sys.stdin.read())]
+sys.exit(0 if values and max(values) <= 4096 else 1)
+'; then
+    exit 0
+  fi
+  sleep 1
+done
+npu-smi info
+exit 1
+"""
+    for role in stopped:
+        try:
+            command_runner.run(
+                Command(
+                    (
+                        "kubectl",
+                        "exec",
+                        "-n",
+                        environment.namespace,
+                        getattr(environment, f"{role}_resource"),
+                        "-c",
+                        f"{role}-engine",
+                        "--",
+                        "sh",
+                        "-c",
+                        hbm_idle,
+                    ),
+                    description=f"wait-{role}-hbm-idle",
+                )
+            )
+        except Exception as error:
+            errors.append(f"wait {role} HBM idle: {error}")
     return errors
 
 

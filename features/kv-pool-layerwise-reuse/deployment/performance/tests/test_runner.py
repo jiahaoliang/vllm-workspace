@@ -683,6 +683,24 @@ def test_attempt_cleanup_removes_keys_without_restarting_master() -> None:
     assert "api/v1/remove_all?force=true" in " ".join(remove_all.argv)
 
 
+def test_stop_engines_waits_for_idle_hbm_before_variant_switch() -> None:
+    fake = FakeCommandRunner()
+
+    assert runner._stop_engines(fake, runner.RunEnvironment()) == []
+
+    assert [call.description for call in fake.calls] == [
+        "stop-prefill",
+        "stop-decode",
+        "wait-prefill-hbm-idle",
+        "wait-decode-hbm-idle",
+    ]
+    for command in fake.calls[2:]:
+        script = command.argv[-1]
+        assert "npu-smi info" in script
+        assert "max(values) <= 4096" in script
+        assert "sleep 1" in script
+
+
 def test_aisbench_manifest_is_cpu_only_on_m1() -> None:
     path = Path(__file__).resolve().parents[1] / "00-aisbench-client.yaml"
     pod = json.loads(path.read_text(encoding="utf-8"))
