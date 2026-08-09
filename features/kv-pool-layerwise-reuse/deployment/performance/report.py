@@ -49,6 +49,18 @@ class ResultRow:
     metrics: dict[str, float]
 
 
+@dataclass(frozen=True)
+class RequestResultRow:
+    point_id: str
+    repetition: int
+    request: int
+    data_id: str
+    uuid: str
+    success: bool
+    input_tokens: int
+    output_tokens: int
+
+
 def _load_json(path: Path) -> dict[str, object]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -345,12 +357,53 @@ def load_results(root: Path) -> tuple[ResultRow, ...]:
     return tuple(rows)
 
 
+def load_request_results(root: Path, results: tuple[ResultRow, ...]) -> tuple[RequestResultRow, ...]:
+    rows: list[RequestResultRow] = []
+    for result in results:
+        summaries = list(
+            (root / "points" / result.point_id / f"formal-{result.repetition}").glob("attempt-*/raw/summary.json")
+        )
+        summary = _load_json(summaries[0])
+        relative_details = summary.get("raw_details")
+        if not isinstance(relative_details, str) or not relative_details:
+            raise ValueError(f"formal summary lacks raw_details: {result.point_id}")
+        details_path = (summaries[0].parent / relative_details).resolve()
+        if not details_path.is_relative_to(root.resolve()) or not details_path.is_file():
+            raise ValueError(f"invalid raw_details artifact: {result.point_id}")
+        point_rows: list[RequestResultRow] = []
+        with details_path.open(encoding="utf-8") as stream:
+            for request, line in enumerate(stream, 1):
+                try:
+                    detail = json.loads(line)
+                except json.JSONDecodeError as error:
+                    raise ValueError(f"malformed raw_details row {request}: {result.point_id}") from error
+                if not isinstance(detail, dict):
+                    raise ValueError(f"raw_details row is not an object: {result.point_id}")
+                point_rows.append(
+                    RequestResultRow(
+                        point_id=result.point_id,
+                        repetition=result.repetition,
+                        request=request,
+                        data_id=str(detail.get("data_id", "")),
+                        uuid=str(detail.get("uuid", "")),
+                        success=detail.get("success") is True,
+                        input_tokens=int(detail.get("input_tokens", 0)),
+                        output_tokens=int(detail.get("output_tokens", 0)),
+                    )
+                )
+        if len(point_rows) != 8:
+            raise ValueError(f"raw_details row count must be 8: {result.point_id}")
+        rows.extend(point_rows)
+    return tuple(rows)
+
+
 def _number(value: float | None) -> str:
     return "" if value is None else f"{value:.6g}"
 
 
 def render_report(root: Path) -> str:
     rows = load_results(root)
+    request_rows = load_request_results(root, rows)
     lines = [
         "# Mooncake Layerwise Performance Raw Characterization",
         "",
@@ -366,6 +419,26 @@ def render_report(root: Path) -> str:
         lines.append(
             f"| {row.topology} | {row.input_tokens} | {row.output_tokens} | "
             f"{row.variant.upper()} | {row.concurrency} | {row.repetition} | {values} |"
+        )
+    lines.extend(
+        (
+            "",
+            "## Per-Request Results",
+            "",
+            (
+                "These rows retain the stable request identity and correctness fields "
+                "from each formal AISBench details artifact."
+            ),
+            "Complete prompt and prediction payloads remain in the immutable raw evidence.",
+            "",
+            "| Point | Repetition | Request | Data ID | UUID | Success | Input Tokens | Output Tokens |",
+            "| --- | ---: | ---: | ---: | --- | --- | ---: | ---: |",
+        )
+    )
+    for row in request_rows:
+        lines.append(
+            f"| {row.point_id} | {row.repetition} | {row.request} | {row.data_id} | {row.uuid} | "
+            f"{str(row.success).lower()} | {row.input_tokens} | {row.output_tokens} |"
         )
     comparisons = (
         ("LAYERWISE / BULK", "layerwise", "bulk"),

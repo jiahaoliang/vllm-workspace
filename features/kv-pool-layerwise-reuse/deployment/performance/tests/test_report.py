@@ -43,6 +43,22 @@ def valid_tree(tmp_path: Path) -> Path:
                 )
             )
         raw = tmp_path / "points" / point / "formal-1" / "attempt-1" / "raw"
+        (raw / "details.jsonl").write_text(
+            "".join(
+                json.dumps(
+                    {
+                        "data_id": request_index,
+                        "uuid": f"{point}-request-{request_index}",
+                        "success": True,
+                        "input_tokens": 16384,
+                        "output_tokens": 128 if "-o128-" in point else 1,
+                    }
+                )
+                + "\n"
+                for request_index in range(8)
+            ),
+            encoding="utf-8",
+        )
         (raw / "summary.json").write_text(
             json.dumps(
                 {
@@ -52,6 +68,7 @@ def valid_tree(tmp_path: Path) -> Path:
                     "stage_request_count": 8,
                     "measurement_stage": "total",
                     "single_wave": True,
+                    "raw_details": "details.jsonl",
                     "metrics": {
                         "Input Token Throughput": 100.0 * index,
                         "Request Throughput": 2.0,
@@ -174,6 +191,16 @@ def test_raw_report_keeps_five_rows_and_output_matched_ratios(valid_tree: Path) 
     assert "p-value" not in text
     assert "confidence interval" not in text
     assert "Performance PASS" not in text
+
+
+def test_raw_report_keeps_all_forty_per_request_rows(valid_tree: Path) -> None:
+    text = report.render_report(valid_tree)
+
+    assert "## Per-Request Results" in text
+    for point in POINTS:
+        assert text.count(f"| {point} | 1 |") == 8
+        for request_index in range(8):
+            assert f"{point}-request-{request_index}" in text
 
 
 def test_aisbench_raw_summary_uses_all_single_wave_requests(tmp_path: Path) -> None:
