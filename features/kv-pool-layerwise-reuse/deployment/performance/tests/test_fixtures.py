@@ -106,7 +106,7 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
     meta = json.loads(dataset.with_name(dataset.name + ".meta.json").read_text(encoding="utf-8"))
-    assert meta == {"request_count": 8, "sampling_mode": "single-wave-total"}
+    assert meta == {"request_count": 8, "sampling_mode": "default"}
     assert "request_count=8" not in text
     assert "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate" in text
     assert "from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever" in text

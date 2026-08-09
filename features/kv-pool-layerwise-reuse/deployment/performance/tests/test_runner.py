@@ -119,6 +119,7 @@ def test_sampler_uses_ten_second_interval() -> None:
     sleep_lines = [line.strip() for line in command.argv[2].splitlines() if line.strip().startswith("sleep ")]
 
     assert sleep_lines == ["sleep 10"] * 4
+    assert "'from urllib.request import urlopen; ''print(urlopen(" in command.argv[2]
 
 
 def test_physical_capacity_ignores_vnpu_and_replaced_engines() -> None:

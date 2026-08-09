@@ -259,7 +259,7 @@ def write_aisbench_config(
         raise FileNotFoundError(dataset_path)
     dataset_path.with_name(dataset_path.name + ".meta.json").write_text(
         json.dumps(
-            {"request_count": request_count, "sampling_mode": "single-wave-total"},
+            {"request_count": request_count, "sampling_mode": "default"},
             indent=2,
             sort_keys=True,
         )

@@ -250,9 +250,9 @@ test "$(git -C "${src}" rev-parse HEAD)" = \
   | tee "${root}/provenance/aisbench-version.txt"
 "${venv}/bin/python" -c \
   'from ais_bench.benchmark.models import VLLMCustomAPI; '\
-  'from ais_bench.benchmark.datasets import CustomDataset; '\
-  'from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer; '\
-  'print("imports: OK")' \
+'from ais_bench.benchmark.datasets import CustomDataset; '\
+'from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer; '\
+'print("imports: OK")' \
   | tee "${root}/provenance/import-smoke.txt"
 "${venv}/bin/python" -m pip freeze \
   >"${root}/provenance/requirements.freeze.txt"
@@ -1504,8 +1504,8 @@ sample_master() {{
       chroot /performance-workspace/rootfs \
       /client-tools/venv/bin/python -c \
       'from urllib.request import urlopen; '\
-      'print(urlopen("http://mooncake-master-service:9003/metrics",'\
-      'timeout=5).read().decode(),end="")' \
+'print(urlopen("http://mooncake-master-service:9003/metrics",'\
+'timeout=5).read().decode(),end="")' \
       || true
     sleep 10
   done
