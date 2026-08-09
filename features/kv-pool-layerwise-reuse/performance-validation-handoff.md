@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 4
-updated_at: 2026-08-09T16:09:01+08:00
+generation: 5
+updated_at: 2026-08-10T01:01:01+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,7 +49,7 @@ updated_at: 2026-08-09T16:09:01+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` performance control parent | `c332a439803001ad85299ae16b4e52dd34e1f0ef` | transition parent pushed as `origin/kv-pool-layerwise-reuse=c332a439803001ad85299ae16b4e52dd34e1f0ef` |
+| control repo | `kv-pool-layerwise-reuse` performance control parent | `7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc` | transition parent pushed as `origin/kv-pool-layerwise-reuse=7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `5355559175f9998f5d70866734fb79569dfc86f9` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -88,7 +88,7 @@ updated_at: 2026-08-09T16:09:01+08:00
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validator.log`; `npu/pure-consumer-canary/validator.log`; `REPORT.md` |
 | Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
 | Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
-| Performance runtime capacity CPU/mock | PASS | PASS | control parent `c332a439803001ad85299ae16b4e52dd34e1f0ef`; `deployment/performance/tests/test_runtime.py`; complete performance harness `61 passed` |
+| Performance runtime capacity CPU/mock | PASS | PASS | control parent `7ffca61a5196024a7f2d554a32fc1d1cb4c55ecc`; `deployment/performance/tests/test_runtime.py`; complete performance harness `68 passed` |
 
 ## Evidence Identity
 
@@ -109,13 +109,23 @@ After this handoff becomes ready, performance validation may use only:
 - Mooncake `LAYERWISE` with `backend=mooncake` and `use_layerwise=true`;
 - Prefill `REUSE3` with `backend=mooncake`, `use_layerwise=true`,
   `layerwise_num_shared_buffers=3`, and `kv_producer`;
-- the no-reuse pure-consumer Decode companion required by DP1/DP2;
+- the no-reuse pure-consumer Decode companion required by DP1;
 - `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` on every Prefill and Decode serving
   rank, identical across BULK, LAYERWISE, and REUSE3;
 - functional validation of `kv_producer` and `kv_both` roles;
 - namespace `liangjiahao`;
-- model, topology, hardware and namespace explicitly frozen by the final
-  validation config snapshot.
+- model `vllm-ascend/DeepSeek-V2-Lite-W8A8`;
+- DP1 only, 16384 input tokens, concurrency 8;
+- exactly five points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1;
+- one 8-request warmup wave and one 8-request formal wave per point;
+- `DefaultPerfMetricCalculator`, `total` stage, one formal repetition, and no
+  automatic retry;
+- three server starts in BULK, LAYERWISE, REUSE3 order;
+- 10-second point telemetry, lightweight point diagnostics, and complete
+  Prefill/Decode logs once per variant;
+- no performance timeout; a valid slow point continues naturally;
+- hardware and namespace explicitly frozen by the final validation config
+  snapshot.
 
 Performance validation must create its own run ID, plan, thresholds, raw evidence
 and checksum manifest. Functional correctness evidence in this handoff is not a
@@ -157,13 +167,14 @@ all unverified fields fail-closed.
 None. The TP2 REUSE3 non-save-owner save-gate defect is preserved in the
 diagnostic performance root `/tmp/layerwise-performance-20260809T010429Z` and
 resolved by vLLM-Ascend
-`5355559175f9998f5d70866734fb79569dfc86f9`. Generation-4 functional evidence
+`5355559175f9998f5d70866734fb79569dfc86f9`. Generation-5 retains the
+generation-4 functional evidence and
 includes both the real-thread TP non-save-owner CPU regression and an exact
 4096-token TP2 REUSE3 producer to pure-consumer Decode NPU canary.
 
 The invalid performance root `/tmp/layerwise-performance-20260809T010429Z`
-must not be resumed. Generation 4 freezes 128 GiB per serving rank and requires
-a new performance run root.
+must not be resumed. Generation 5 freezes the rapid five-point contract and
+128 GiB per serving rank, and requires a new performance run root.
 
 ## Listener Message Template
 
