@@ -2,6 +2,11 @@
 
 ## Status
 
+The performance portion is superseded for the next formal run by
+`../2026-08-09-layerwise-performance-rapid-validation-design.md` and
+`2026-08-10-layerwise-performance-rapid-validation.md`. Functional history in
+this document remains authoritative for the completed functional lane.
+
 Approved by the user on 2026-08-08. Execution is authorized to continue without
 further human intervention, subject to the fail-closed gates in this document.
 

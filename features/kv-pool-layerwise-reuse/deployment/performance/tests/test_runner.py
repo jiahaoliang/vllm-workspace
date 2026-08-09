@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from performance import handoff, runner
+from performance import handoff, image, runner, runtime
 from performance.contract import WorkloadPoint
 
 
@@ -61,15 +61,11 @@ def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
     assert "requirements/api.txt" in bootstrap_text
     assert "TORCH_DEVICE_BACKEND_AUTOLOAD=0" in bootstrap_text
     assert any(call.description == "configure-chroot-dns" for call in fake.calls)
-    devices = next(
-        call for call in fake.calls if call.description == "configure-chroot-devices"
-    )
+    devices = next(call for call in fake.calls if call.description == "configure-chroot-devices")
     devices_text = " ".join(devices.argv)
     assert "dev/null" in devices_text
     assert "dev/urandom" in devices_text
-    tokenizer_link = next(
-        call for call in fake.calls if call.description == "link-tokenizer-model-path"
-    )
+    tokenizer_link = next(call for call in fake.calls if call.description == "link-tokenizer-model-path")
     assert "/client-tools/tokenizer" in " ".join(tokenizer_link.argv)
 
 
@@ -100,6 +96,31 @@ def test_subprocess_runner_resumes_command_numbering(tmp_path: Path) -> None:
     assert command_runner.command_index == 7
 
 
+def test_subprocess_runner_references_owned_stdout_artifact(tmp_path: Path) -> None:
+    command_runner = runner.SubprocessCommandRunner(tmp_path)
+
+    output = command_runner.run(
+        runner.Command(
+            ("sh", "-c", "printf payload"),
+            description="capture",
+            stdout_artifact="artifacts/output.txt",
+        )
+    )
+
+    command_dir = next((tmp_path / "commands").iterdir())
+    result = json.loads((command_dir / "result.json").read_text())
+    assert output == "payload"
+    assert result["stdout_artifact"] == "artifacts/output.txt"
+    assert not (command_dir / "stdout.txt").exists()
+
+
+def test_sampler_uses_ten_second_interval() -> None:
+    command = runner._sampled_aisbench_command(("true",), runner.RunEnvironment())
+    sleep_lines = [line.strip() for line in command.argv[2].splitlines() if line.strip().startswith("sleep ")]
+
+    assert sleep_lines == ["sleep 10"] * 4
+
+
 def test_physical_capacity_ignores_vnpu_and_replaced_engines() -> None:
     nodes = {
         "items": [
@@ -120,13 +141,7 @@ def test_physical_capacity_ignores_vnpu_and_replaced_engines() -> None:
                 "metadata": {"labels": {"app": "prefill"}},
                 "spec": {
                     "nodeName": "n1",
-                    "containers": [
-                        {
-                            "resources": {
-                                "requests": {"huawei.com/Ascend910": "4"}
-                            }
-                        }
-                    ],
+                    "containers": [{"resources": {"requests": {"huawei.com/Ascend910": "4"}}}],
                 },
                 "status": {"phase": "Running"},
             },
@@ -165,9 +180,7 @@ def test_capacity_inventory_covers_all_namespaces(tmp_path: Path) -> None:
 
     runner._capture_pre_run_state(fake, tmp_path)
 
-    inventory = next(
-        call for call in fake.calls if call.description == "capture-pod-inventory"
-    )
+    inventory = next(call for call in fake.calls if call.description == "capture-pod-inventory")
     assert "--all-namespaces" in inventory.argv
     assert "-n" not in inventory.argv
 
@@ -191,9 +204,7 @@ def test_run_rejects_incomplete_ready_handoff_before_any_command(
     assert fake.calls == []
 
 
-def test_run_resumes_incomplete_existing_topology(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_rapid_run_rejects_resume_before_commands(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     state = replace(
         waiting_state(tmp_path),
         digest="ready-digest",
@@ -203,122 +214,143 @@ def test_run_resumes_incomplete_existing_topology(
         placeholders_remaining=False,
         contains_pending=False,
     )
-    (tmp_path / "run-contract.json").write_text(
-        json.dumps(
-            {
-                "topologies": ["dp1"],
-                "image_digest": "sha256:image",
-                "expected_points": ["dp1-4096-bulk-o1-c1"],
-                "formal_repetitions": 3,
-            }
-        ),
-        encoding="utf-8",
-    )
-    (tmp_path / "handoff.json").write_text(
-        json.dumps({"sha256": state.digest}), encoding="utf-8"
-    )
-    runner._write_checksums(tmp_path)
-
     monkeypatch.setattr(runner.handoff, "validate_readiness", lambda selected: [])
-    monkeypatch.setattr(
-        runner.handoff, "validate_handoff", lambda selected, workspace: []
-    )
-    monkeypatch.setattr(runner, "_sync_client_tooling", lambda *args: None)
-    monkeypatch.setattr(runner, "_capture_identity", lambda *args: None)
-
-    def capture_pre_run_state(command_runner: object, output_dir: Path) -> None:
-        del command_runner
-        (output_dir / "cluster").mkdir(exist_ok=True)
-        (output_dir / "cluster" / "nodes.json").write_text(
-            json.dumps(
-                {
-                    "items": [
-                        {
-                            "metadata": {"name": "n1"},
-                            "status": {
-                                "allocatable": {"huawei.com/Ascend910": "8"}
-                            },
-                        }
-                    ]
-                }
-            ),
-            encoding="utf-8",
-        )
-        (output_dir / "cluster" / "pods.json").write_text(
-            json.dumps({"items": []}), encoding="utf-8"
-        )
-
-    monkeypatch.setattr(runner, "_capture_pre_run_state", capture_pre_run_state)
-    monkeypatch.setattr(runner, "build_matrix", lambda topology: ())
-    monkeypatch.setattr(
-        runner.image,
-        "resolve_server_image",
-        lambda *args: runner.image.ImageIdentity(
-            reference="image",
-            digest="sha256:image",
-            platform="linux/arm64",
-            base_reference="base",
-            base_digest="sha256:base",
-            patched_file="/source.py",
-            patched_file_sha256="source",
-            source_labels={},
-            mode="ready-image",
-        ),
-    )
-    monkeypatch.setattr(runner, "_restore_pre_run_state", lambda *args: [])
-
-    runner.run(FakeCommandRunner(), state, tmp_path, topology="dp1", resume=True)
-
-    contract = json.loads((tmp_path / "run-contract.json").read_text(encoding="utf-8"))
-    assert contract["topologies"] == ["dp1"]
-    assert contract["expected_points"] == []
-
-
-def test_run_resume_rejects_checksum_drift_before_commands(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    state = replace(
-        waiting_state(tmp_path),
-        digest="ready-digest",
-        status="READY_FOR_PERFORMANCE_VALIDATION",
-        ready=True,
-        generation=1,
-        placeholders_remaining=False,
-        contains_pending=False,
-    )
-    (tmp_path / "run-contract.json").write_text(
-        json.dumps(
-            {
-                "topologies": ["dp1"],
-                "image_digest": "sha256:image",
-                "expected_points": [],
-                "formal_repetitions": 3,
-            }
-        ),
-        encoding="utf-8",
-    )
-    (tmp_path / "handoff.json").write_text(
-        json.dumps({"sha256": state.digest}), encoding="utf-8"
-    )
-    artifact = tmp_path / "prior-artifact.json"
-    artifact.write_text("{}\n", encoding="utf-8")
-    runner._write_checksums(tmp_path)
-    artifact.write_text('{"changed": true}\n', encoding="utf-8")
-    monkeypatch.setattr(runner.handoff, "validate_readiness", lambda selected: [])
-    monkeypatch.setattr(
-        runner.handoff, "validate_handoff", lambda selected, workspace: []
-    )
+    monkeypatch.setattr(runner.handoff, "validate_handoff", lambda selected, workspace: [])
     fake = FakeCommandRunner()
 
-    with pytest.raises(RuntimeError, match="resume checksum validation failed"):
+    with pytest.raises(ValueError, match="rapid run does not support resume"):
         runner.run(fake, state, tmp_path, topology="dp1", resume=True)
 
     assert fake.calls == []
 
 
+def test_rapid_run_groups_exact_points_into_three_variant_starts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    state = replace(
+        waiting_state(tmp_path),
+        status="READY_FOR_PERFORMANCE_VALIDATION",
+        ready=True,
+        generation=5,
+        placeholders_remaining=False,
+        contains_pending=False,
+    )
+    events: list[str] = []
+    executed: list[str] = []
+    monkeypatch.setattr(runner.handoff, "validate_readiness", lambda selected: [])
+    monkeypatch.setattr(runner.handoff, "validate_handoff", lambda selected, workspace: [])
+    monkeypatch.setattr(
+        runner,
+        "_sync_client_tooling",
+        lambda command_runner, output: events.append("sync"),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_archive_shared_fixtures",
+        lambda command_runner, output: events.append("fixtures"),
+    )
+    monkeypatch.setattr(runner, "_capture_identity", lambda *args: None)
+
+    def capture_pre_run(command_runner: object, output: Path) -> runtime.RuntimeInputs:
+        del command_runner
+        cluster = output / "cluster"
+        cluster.mkdir(parents=True)
+        (cluster / "nodes.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "metadata": {"name": "n1"},
+                            "status": {"allocatable": {"huawei.com/Ascend910": "8"}},
+                        }
+                    ]
+                }
+            )
+        )
+        (cluster / "pods.json").write_text('{"items": []}')
+        return runtime.RuntimeInputs({}, {}, {})
+
+    monkeypatch.setattr(runner, "_capture_pre_run_state", capture_pre_run)
+    monkeypatch.setattr(
+        runner.image,
+        "resolve_server_image",
+        lambda *args: image.ImageIdentity(
+            "image:rapid",
+            "sha256:image",
+            "linux/arm64",
+            "image:base",
+            "sha256:base",
+            "/file.py",
+            "a" * 64,
+            {},
+            "ready-image",
+        ),
+    )
+
+    def write_rendered(
+        inputs: runtime.RuntimeInputs,
+        point: WorkloadPoint,
+        reference: str,
+        output: Path,
+    ) -> tuple[runtime.RenderedResources, tuple[Path, Path, Path]]:
+        del inputs, reference, output
+        resources = runtime.RenderedResources({}, {}, {"metadata": {"name": f"rapid-{point.variant}"}}, 2, 2)
+        return resources, (Path("prefill"), Path("decode"), Path("config"))
+
+    monkeypatch.setattr(runner, "_write_rendered_block", write_rendered)
+    monkeypatch.setattr(runner.runtime, "validate_unique_difference", lambda values: [])
+    monkeypatch.setattr(
+        runner,
+        "_apply_variant_block",
+        lambda command_runner, paths, point, environment, output: events.append(f"start:{point.variant}"),
+    )
+    monkeypatch.setattr(runner, "_run_variant_canary", lambda *args: None)
+    monkeypatch.setattr(
+        runner,
+        "execute_point",
+        lambda command_runner, point, output, environment: executed.append(runner._point_id(point)),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_capture_variant_diagnostics",
+        lambda command_runner, variant, environment, output: events.append(f"logs:{variant}"),
+    )
+    stop_count = 0
+
+    def stop(*args: object) -> list[str]:
+        nonlocal stop_count
+        stop_count += 1
+        return []
+
+    monkeypatch.setattr(runner, "_stop_engines", stop)
+    monkeypatch.setattr(runner, "_restore_pre_run_state", lambda *args: [])
+    monkeypatch.setattr(runner, "_write_checksums", lambda output: None)
+
+    runner.run(FakeCommandRunner(), state, tmp_path / "run", topology="dp1")
+
+    assert events == [
+        "sync",
+        "fixtures",
+        "start:bulk",
+        "logs:bulk",
+        "start:layerwise",
+        "logs:layerwise",
+        "start:reuse3",
+        "logs:reuse3",
+    ]
+    assert executed == [
+        "dp1-16384-bulk-o128-c8",
+        "dp1-16384-bulk-o1-c8",
+        "dp1-16384-layerwise-o128-c8",
+        "dp1-16384-layerwise-o1-c8",
+        "dp1-16384-reuse3-o1-c8",
+    ]
+    assert stop_count == 3
+
+
 def test_point_failure_defers_restore_to_top_level_runner(tmp_path: Path) -> None:
     fake = FakeCommandRunner(fail_step="aisbench")
-    point = WorkloadPoint("dp1", 4096, 1, "bulk", 1)
+    point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
 
     with pytest.raises(RuntimeError, match="failed at aisbench"):
         runner.execute_point(fake, point, tmp_path)
@@ -340,9 +372,7 @@ def test_sync_client_tooling_prepares_chroot_shared_memory(tmp_path: Path) -> No
         def run(self, command: runner.Command) -> str:
             self.calls.append(command)
             if command.description == "verify-client-rootfs-marker":
-                return (
-                    "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b\n"
-                )
+                return "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b\n"
             if command.description == "verify-client-tokenizer-link":
                 return "/client-tools/tokenizer\n"
             return ""
@@ -351,46 +381,51 @@ def test_sync_client_tooling_prepares_chroot_shared_memory(tmp_path: Path) -> No
 
     runner._sync_client_tooling(fake, tmp_path)
 
-    shared_memory = next(
-        call for call in fake.calls if call.description == "prepare-client-shared-memory"
-    )
+    shared_memory = next(call for call in fake.calls if call.description == "prepare-client-shared-memory")
     assert "/performance-workspace/rootfs/dev/shm" in shared_memory.argv
     assert "1777" in shared_memory.argv
-    procfs = next(
-        call for call in fake.calls if call.description == "prepare-client-procfs"
-    )
+    procfs = next(call for call in fake.calls if call.description == "prepare-client-procfs")
     assert "/performance-workspace/rootfs/proc" in procfs.argv
     assert "/proc/meminfo" in procfs.argv
 
 
-def test_three_formal_repetitions_have_distinct_raw_directories(
-    tmp_path: Path,
-) -> None:
+def test_archive_shared_fixtures_copies_only_rapid_slices(tmp_path: Path) -> None:
     fake = FakeCommandRunner()
-    point = WorkloadPoint("dp1", 4096, 1, "bulk", 4)
 
-    runner.execute_point(fake, point, tmp_path)
+    runner._archive_shared_fixtures(fake, tmp_path)
 
-    descriptions = [call.description for call in fake.calls]
-    assert descriptions.count("remove-all-keys") == 4
-    assert "reset-master" not in descriptions
-    assert len(list(tmp_path.glob("points/**/formal-*/attempt-*/raw"))) == 3
+    assert [call.description for call in fake.calls] == [
+        "archive-fixture-manifest",
+        "archive-fixture-warmup",
+        "archive-fixture-formal-1",
+    ]
+    assert [Path(call.argv[-1]).name for call in fake.calls] == [
+        "manifest.json",
+        "warmup.jsonl",
+        "formal-1.jsonl",
+    ]
+    assert all("-n" in call.argv and "liangjiahao" in call.argv for call in fake.calls)
 
 
-def test_execute_point_reuses_valid_prior_phases(tmp_path: Path) -> None:
+def test_execute_point_runs_one_warmup_and_one_formal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeCommandRunner()
-    point = WorkloadPoint("dp1", 4096, 1, "bulk", 1)
-    point_root = tmp_path / "points" / "dp1-4096-bulk-o1-c1"
-    summary = {
-        "valid": True,
-        "image_digest": "sha256:image",
-        "errors": [],
-        "metrics": {"Request Throughput": 1.0, "E2EL P95": 1.0},
-    }
-    for phase in ("warmup", "formal-1", "formal-2", "formal-3"):
-        raw = point_root / phase / "attempt-1" / "raw"
-        raw.mkdir(parents=True)
-        (raw / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+    point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
+
+    def summarize(
+        raw: Path,
+        selected: WorkloadPoint,
+        request_count: int,
+        image_digest: str,
+    ) -> dict[str, object]:
+        del raw, selected, request_count
+        return {
+            "valid": True,
+            "image_digest": image_digest,
+            "errors": [],
+            "metrics": {"Request Throughput": 1.0, "E2EL P95": 1.0},
+        }
+
+    monkeypatch.setattr(runner.report, "summarize_aisbench_attempt", summarize)
 
     summaries = runner.execute_point(
         fake,
@@ -399,32 +434,21 @@ def test_execute_point_reuses_valid_prior_phases(tmp_path: Path) -> None:
         runner.RunEnvironment(image_digest="sha256:image"),
     )
 
-    assert len(summaries) == 3
-    assert fake.calls == []
-    assert not list(point_root.glob("*/attempt-2"))
+    descriptions = [call.description for call in fake.calls]
+    assert len(summaries) == 1
+    assert descriptions.count("remove-all-keys") == 2
+    assert descriptions.count("mooncake-metrics") == 2
+    assert "prefill-log" not in descriptions
+    assert "decode-log" not in descriptions
+    assert "reset-master" not in descriptions
+    assert len(list(tmp_path.glob("points/**/warmup/attempt-1/raw"))) == 1
+    assert len(list(tmp_path.glob("points/**/formal-1/attempt-1/raw"))) == 1
+    assert not list(tmp_path.glob("points/**/formal-2"))
 
 
-def test_execute_point_resumes_after_prior_stable_duration_failures(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_invalid_single_wave_is_not_retried(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeCommandRunner()
-    point = WorkloadPoint("dp1", 4096, 1, "bulk", 4)
-    point_root = tmp_path / "points" / "dp1-4096-bulk-o1-c4"
-    for attempt, request_count in ((1, 8), (2, 16)):
-        raw = point_root / "warmup" / f"attempt-{attempt}" / "raw"
-        raw.mkdir(parents=True)
-        (raw / "summary.json").write_text(
-            json.dumps(
-                {
-                    "valid": False,
-                    "image_digest": "sha256:image",
-                    "request_count": request_count,
-                    "errors": ["stable benchmark duration is insufficient"],
-                    "metrics": {},
-                }
-            ),
-            encoding="utf-8",
-        )
+    point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
     request_counts: list[int] = []
 
     def summarize(
@@ -435,6 +459,53 @@ def test_execute_point_resumes_after_prior_stable_duration_failures(
     ) -> dict[str, object]:
         del raw, selected
         request_counts.append(request_count)
+        if len(request_counts) == 1:
+            return {
+                "valid": True,
+                "image_digest": image_digest,
+                "errors": [],
+                "metrics": {"Request Throughput": 1.0, "E2EL P95": 1.0},
+            }
+        return {
+            "valid": False,
+            "image_digest": image_digest,
+            "errors": ["bad response"],
+            "metrics": {},
+        }
+
+    monkeypatch.setattr(runner.report, "summarize_aisbench_attempt", summarize)
+
+    with pytest.raises(RuntimeError, match="bad response"):
+        runner.execute_point(
+            fake,
+            point,
+            tmp_path,
+            runner.RunEnvironment(image_digest="sha256:image"),
+        )
+
+    assert request_counts == [8, 8]
+    assert not list(tmp_path.glob("points/**/attempt-2"))
+
+
+def test_execute_point_replaces_dataset_copies_with_fixture_references(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class ArchiveRunner(FakeCommandRunner):
+        def run(self, command: runner.Command) -> str:
+            self.calls.append(command)
+            if command.description == "archive-aisbench":
+                raw = Path(command.argv[-1])
+                raw.mkdir(parents=True, exist_ok=True)
+                (raw / "dataset.jsonl").write_text("fixture\n", encoding="utf-8")
+            return ""
+
+    def summarize(
+        raw: Path,
+        selected: WorkloadPoint,
+        request_count: int,
+        image_digest: str,
+    ) -> dict[str, object]:
+        del raw, selected, request_count
         return {
             "valid": True,
             "image_digest": image_digest,
@@ -443,70 +514,30 @@ def test_execute_point_resumes_after_prior_stable_duration_failures(
         }
 
     monkeypatch.setattr(runner.report, "summarize_aisbench_attempt", summarize)
-
     runner.execute_point(
-        fake,
-        point,
+        ArchiveRunner(),
+        WorkloadPoint("dp1", 16384, 1, "bulk", 8),
         tmp_path,
         runner.RunEnvironment(image_digest="sha256:image"),
     )
 
-    assert request_counts == [32, 32, 32, 32]
-    assert (point_root / "warmup" / "attempt-3").is_dir()
-
-
-def test_insufficient_stable_duration_doubles_until_formal_count(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    fake = FakeCommandRunner()
-    point = WorkloadPoint("dp1", 4096, 1, "bulk", 1)
-    request_counts: list[int] = []
-
-    def summarize(
-        raw: Path,
-        selected: WorkloadPoint,
-        request_count: int,
-        image_digest: str,
-    ) -> dict[str, object]:
-        del raw, selected, image_digest
-        request_counts.append(request_count)
-        if len(request_counts) <= 2:
-            return {
-                "valid": False,
-                "errors": ["stable benchmark duration is insufficient"],
-                "metrics": {},
-            }
-        return {
-            "valid": True,
-            "errors": [],
-            "metrics": {"Request Throughput": 1.0, "E2EL P95": 1.0},
-        }
-
-    monkeypatch.setattr(runner.report, "summarize_aisbench_attempt", summarize)
-
-    runner.execute_point(
-        fake,
-        point,
-        tmp_path,
-        runner.RunEnvironment(image_digest="sha256:image"),
-    )
-
-    assert request_counts == [8, 16, 32, 32, 32, 32]
-    assert (
-        tmp_path / "points" / "dp1-4096-bulk-o1-c1" / "warmup" / "attempt-3"
-    ).is_dir()
+    raw_dirs = list(tmp_path.glob("points/**/attempt-1/raw"))
+    assert len(raw_dirs) == 2
+    for raw in raw_dirs:
+        assert not (raw / "dataset.jsonl").exists()
+        reference = json.loads((raw / "fixture-reference.json").read_text())
+        assert reference["path"].startswith("fixtures/tokens-16384-c64/")
+        assert len(reference["sha256"]) == 64
 
 
 def test_point_lifecycle_uses_real_namespaced_aisbench_commands(tmp_path: Path) -> None:
     fake = FakeCommandRunner()
-    point = WorkloadPoint("dp2", 16384, 1, "reuse3", 32)
+    point = WorkloadPoint("dp1", 16384, 1, "reuse3", 8)
 
     runner.execute_point(fake, point, tmp_path)
 
     assert all(
-        call.argv[0] == "kubectl"
-        or (call.argv[0] == "bash" and call.description == "aisbench")
-        for call in fake.calls
+        call.argv[0] == "kubectl" or (call.argv[0] == "bash" and call.description == "aisbench") for call in fake.calls
     )
     assert all("liangjiahao" in " ".join(call.argv) for call in fake.calls)
     assert not any("benchmark" in call.argv for call in fake.calls)
@@ -515,9 +546,7 @@ def test_point_lifecycle_uses_real_namespaced_aisbench_commands(tmp_path: Path) 
     assert "/performance-workspace/rootfs" in aisbench.argv
     assert "prefill-npu-timeseries.log" in aisbench.argv[2]
     assert "mooncake-timeseries.metrics" in aisbench.argv[2]
-    config = next(
-        call for call in fake.calls if call.description == "render-aisbench-config"
-    )
+    config = next(call for call in fake.calls if call.description == "render-aisbench-config")
     assert "performance.fixtures" in config.argv
     assert "--request-count" in config.argv
     assert "-m" in aisbench.argv
@@ -611,6 +640,24 @@ def test_variant_canary_captures_diagnostics_before_restore(tmp_path: Path) -> N
     assert (raw / "mooncake.metrics").is_file()
 
 
+def test_variant_diagnostics_capture_complete_logs_once(tmp_path: Path) -> None:
+    fake = FakeCommandRunner()
+
+    runner._capture_variant_diagnostics(
+        fake,
+        "bulk",
+        runner.RunEnvironment(),
+        tmp_path,
+    )
+
+    descriptions = [call.description for call in fake.calls]
+    assert descriptions.count("prefill-log") == 1
+    assert descriptions.count("decode-log") == 1
+    assert descriptions == ["prefill-log", "decode-log"]
+    assert (tmp_path / "variants" / "bulk" / "raw" / "vllm-prefill.log").is_file()
+    assert (tmp_path / "variants" / "bulk" / "raw" / "vllm-decode.log").is_file()
+
+
 def test_attempt_cleanup_removes_keys_without_restarting_master() -> None:
     point = WorkloadPoint("dp1", 4096, 1, "layerwise", 1)
 
@@ -654,10 +701,7 @@ def test_aisbench_manifest_is_cpu_only_on_m1() -> None:
     assert pod["metadata"]["annotations"]["performance.vllm.ai/config-digest"] == (
         "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
     )
-    assert (
-        pod["metadata"]["annotations"]["performance.vllm.ai/execution-mode"]
-        == "exact-rootfs-chroot"
-    )
+    assert pod["metadata"]["annotations"]["performance.vllm.ai/execution-mode"] == "exact-rootfs-chroot"
     assert resources == {
         "requests": {"cpu": "4", "memory": "16Gi"},
         "limits": {"cpu": "8", "memory": "32Gi"},

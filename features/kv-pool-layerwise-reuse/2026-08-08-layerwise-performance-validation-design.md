@@ -2,6 +2,11 @@
 
 ## Status
 
+Superseded for the next formal run by
+`2026-08-09-layerwise-performance-rapid-validation-design.md` and
+`implementation-plans/2026-08-10-layerwise-performance-rapid-validation.md`.
+This document remains the historical exhaustive-matrix design.
+
 Approved in design review on 2026-08-08. This document defines preparation and
 performance-validation behavior for workspace Issue #1. It does not claim that
 the Mooncake shared-buffer implementation, functional handoff, or performance

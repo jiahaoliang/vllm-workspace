@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Protocol
@@ -38,15 +38,9 @@ LABEL_FIELDS = {
 
 
 def _inspect(reference: str, runner: CommandRunner) -> dict[str, object]:
-    raw = runner.run(
-        ("nerdctl", "--namespace", "k8s.io", "image", "inspect", reference)
-    )
+    raw = runner.run(("nerdctl", "--namespace", "k8s.io", "image", "inspect", reference))
     parsed = json.loads(raw)
-    if (
-        not isinstance(parsed, list)
-        or len(parsed) != 1
-        or not isinstance(parsed[0], dict)
-    ):
+    if not isinstance(parsed, list) or len(parsed) != 1 or not isinstance(parsed[0], dict):
         raise ImageContractError("nerdctl image inspect did not return one image")
     return parsed[0]
 
@@ -57,11 +51,28 @@ def verify_import(
     expected_sha256: str,
     runner: CommandRunner,
 ) -> dict[str, str]:
-    script = (
-        "import hashlib,json; from pathlib import Path; "
-        f"p=Path({patched_file!r}).resolve(); "
-        "print(json.dumps({'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}))"
-    )
+    paths = tuple(value.strip() for value in patched_file.split(","))
+    if not paths or any(not value for value in paths):
+        raise ImageContractError("patched file path list is malformed")
+    expected_path = ",".join(paths)
+    script = f"""import hashlib
+import json
+from pathlib import Path
+
+paths = tuple(Path(value).resolve() for value in {paths!r})
+if len(paths) == 1:
+    digest = hashlib.sha256(paths[0].read_bytes()).hexdigest()
+else:
+    rows = []
+    for path in paths:
+        file_digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        parts = path.parts
+        package_index = parts.index("vllm_ascend")
+        relative = Path(*parts[package_index:]).as_posix()
+        rows.append(f"{{file_digest}}  {{relative}}\\n")
+    digest = hashlib.sha256("".join(rows).encode()).hexdigest()
+print(json.dumps({{"path": ",".join(str(path) for path in paths), "sha256": digest}}))
+"""
     raw = runner.run(
         (
             "nerdctl",
@@ -79,7 +90,7 @@ def verify_import(
         )
     )
     result = json.loads(raw)
-    if result.get("path") != patched_file or result.get("sha256") != expected_sha256:
+    if result.get("path") != expected_path or result.get("sha256") != expected_sha256:
         raise ImageContractError("patched import path or SHA256 does not match handoff")
     return {"path": result["path"], "sha256": result["sha256"]}
 
@@ -157,25 +168,19 @@ def resolve_server_image(
     reference = fields.get("Derived image reference", "")
     digest = fields.get("Derived manifest digest", "")
     if not reference or not digest:
-        raise ImageContractError(
-            "ready-image mode requires derived reference and digest"
-        )
+        raise ImageContractError("ready-image mode requires derived reference and digest")
     inspected = _inspect(reference, runner)
     platform = f"{inspected.get('Os', '')}/{inspected.get('Architecture', '')}"
     if platform != fields.get("Platform") or platform != "linux/arm64":
         raise ImageContractError(f"server image platform mismatch: {platform}")
     repo_digests = inspected.get("RepoDigests", [])
-    if not isinstance(repo_digests, list) or not any(
-        str(value).endswith(f"@{digest}") for value in repo_digests
-    ):
+    if not isinstance(repo_digests, list) or not any(str(value).endswith(f"@{digest}") for value in repo_digests):
         raise ImageContractError("derived manifest digest does not match image inspect")
     config = inspected.get("Config", {})
     labels = config.get("Labels", {}) if isinstance(config, dict) else {}
     if not isinstance(labels, dict):
         raise ImageContractError("image source labels are unavailable")
-    expected_labels = {
-        key: fields.get(field, "") for key, field in LABEL_FIELDS.items()
-    }
+    expected_labels = {key: fields.get(field, "") for key, field in LABEL_FIELDS.items()}
     if any(labels.get(key) != value for key, value in expected_labels.items()):
         raise ImageContractError("image source labels do not match handoff")
     patched_file = fields.get("Patched file path", "")

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
 import json
-from pathlib import Path
 import subprocess
 import sys
+from copy import deepcopy
+from pathlib import Path
 
 from performance import runtime
 from performance.contract import WorkloadPoint
@@ -59,33 +59,26 @@ def base_inputs() -> runtime.RuntimeInputs:
 def test_topology_allocations_and_image_identity() -> None:
     inputs = base_inputs()
     original = deepcopy(inputs)
-    dp1 = runtime.render_resources(
-        inputs, WorkloadPoint("dp1", 4096, 1, "bulk", 1), "image@sha256:x"
-    )
-    dp2 = runtime.render_resources(
-        inputs, WorkloadPoint("dp2", 4096, 1, "bulk", 2), "image@sha256:x"
-    )
+    dp1 = runtime.render_resources(inputs, WorkloadPoint("dp1", 16384, 1, "bulk", 8), "image@sha256:x")
 
     assert (dp1.prefill_npus, dp1.decode_npus) == (2, 2)
-    assert (dp2.prefill_npus, dp2.decode_npus) == (4, 2)
     assert dp1.images == ("image@sha256:x", "image@sha256:x")
     assert inputs == original
 
 
-def test_runtime_sizes_mooncake_pool_for_the_largest_formal_phase() -> None:
-    for topology, concurrency in (("dp1", 32), ("dp2", 64)):
-        for variant in ("bulk", "layerwise", "reuse3"):
-            rendered = runtime.render_resources(
-                base_inputs(),
-                WorkloadPoint(topology, 32768, 1, variant, concurrency),
-                "image@sha256:x",
-            )
-            data = rendered.runtime_configmap["data"]
-            identity = json.loads(data["runtime-identity.json"])
+def test_runtime_keeps_frozen_mooncake_pool_size() -> None:
+    for variant in ("bulk", "layerwise", "reuse3"):
+        rendered = runtime.render_resources(
+            base_inputs(),
+            WorkloadPoint("dp1", 16384, 1, variant, 8),
+            "image@sha256:x",
+        )
+        data = rendered.runtime_configmap["data"]
+        identity = json.loads(data["runtime-identity.json"])
 
-            assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-prefill.sh"]
-            assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-decode.sh"]
-            assert identity["mooncake_global_segment_size"] == "128GB"
+        assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-prefill.sh"]
+        assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-decode.sh"]
+        assert identity["mooncake_global_segment_size"] == "128GB"
 
 
 def _kv_config(argv: tuple[str, ...]) -> dict[str, object]:
@@ -94,8 +87,8 @@ def _kv_config(argv: tuple[str, ...]) -> dict[str, object]:
 
 
 def test_reuse3_changes_only_prefill_compute_buffers() -> None:
-    layerwise = WorkloadPoint("dp2", 16384, 1, "layerwise", 4)
-    reuse3 = WorkloadPoint("dp2", 16384, 1, "reuse3", 4)
+    layerwise = WorkloadPoint("dp1", 16384, 1, "layerwise", 8)
+    reuse3 = WorkloadPoint("dp1", 16384, 1, "reuse3", 8)
     layerwise_prefill = _kv_config(runtime.server_argv("prefill", layerwise))
     reuse_prefill = _kv_config(runtime.server_argv("prefill", reuse3))
     reuse_decode = _kv_config(runtime.server_argv("decode", reuse3))
@@ -118,32 +111,27 @@ def test_unique_difference_rejects_hidden_runtime_drift() -> None:
     inputs = base_inputs()
     layerwise = runtime.render_resources(
         inputs,
-        WorkloadPoint("dp1", 32768, 1, "layerwise", 1),
+        WorkloadPoint("dp1", 16384, 1, "layerwise", 8),
         "image@sha256:x",
     )
     reuse3 = runtime.render_resources(
         inputs,
-        WorkloadPoint("dp1", 32768, 1, "reuse3", 1),
+        WorkloadPoint("dp1", 16384, 1, "reuse3", 8),
         "image@sha256:x",
     )
 
-    assert (
-        runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3})
-        == []
-    )
+    assert runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3}) == []
     reuse3.decode_deployment["spec"]["template"]["spec"]["nodeName"] = "m2"
     assert any(
         "non-experimental runtime drift" in error
-        for error in runtime.validate_unique_difference(
-            {"layerwise": layerwise, "reuse3": reuse3}
-        )
+        for error in runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3})
     )
 
 
 def test_reuse3_runtime_identity_freezes_slots_and_memory_factor() -> None:
     rendered = runtime.render_resources(
         base_inputs(),
-        WorkloadPoint("dp1", 4096, 1, "reuse3", 1),
+        WorkloadPoint("dp1", 16384, 1, "reuse3", 8),
         "image@sha256:x",
     )
     data = rendered.runtime_configmap["data"]
@@ -160,7 +148,7 @@ def test_runtime_check_avoids_loading_a_second_npu_runtime(tmp_path: Path) -> No
     for variant in ("bulk", "layerwise", "reuse3"):
         rendered = runtime.render_resources(
             base_inputs(),
-            WorkloadPoint("dp1", 4096, 1, variant, 1),
+            WorkloadPoint("dp1", 16384, 1, variant, 8),
             "image@sha256:x",
         )
         data = rendered.runtime_configmap["data"]
@@ -184,7 +172,4 @@ def test_runtime_check_avoids_loading_a_second_npu_runtime(tmp_path: Path) -> No
                 text=True,
             )
             checked = json.loads(result.stdout)
-            assert (
-                checked["physical_slots"]
-                == json.loads(data["runtime-identity.json"])[f"{role}_physical_slots"]
-            )
+            assert checked["physical_slots"] == json.loads(data["runtime-identity.json"])[f"{role}_physical_slots"]

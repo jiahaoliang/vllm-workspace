@@ -9,6 +9,12 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
+The next formal performance import follows the five-point rapid-validation
+design in
+[`2026-08-09-layerwise-performance-rapid-validation-design.md`](../2026-08-09-layerwise-performance-rapid-validation-design.md).
+No older diagnostic performance root is indexed as accepted performance
+evidence.
+
 ## Native Revoke Ownership Full Validation 20260807T100722Z
 
 - Plan:

@@ -1,5 +1,10 @@
 # Mooncake Layerwise Performance Validation Implementation Plan
 
+> Superseded for the next formal run by
+> `2026-08-09-layerwise-performance-rapid-validation-design.md` and
+> `implementation-plans/2026-08-10-layerwise-performance-rapid-validation.md`.
+> Retained as the historical exhaustive DP1/DP2 checklist.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (- [ ]) syntax for tracking.
 
 **Goal:** Prepare, gate, execute, verify, and publish the complete DP1/DP2 AISBench characterization defined by 2026-08-08-layerwise-performance-validation-design.md without human intervention.

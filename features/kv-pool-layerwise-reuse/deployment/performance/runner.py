@@ -6,22 +6,21 @@ import json
 import os
 import subprocess
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Protocol
 
 from performance import handoff, image, report, runtime
 from performance.contract import (
-    INPUT_TOKENS,
-    PointResult,
     TOPOLOGIES,
+    VARIANT_ORDER,
     WorkloadPoint,
-    adaptive_stop,
     build_matrix,
+    build_run_contract,
+    point_id,
     sample_counts,
 )
-
 
 WORKSPACE_ROOT = Path(os.environ.get("VLLM_WORKSPACE_ROOT", Path.cwd())).resolve()
 
@@ -32,6 +31,7 @@ class Command:
     mutates_server: bool = False
     sends_inference: bool = False
     description: str = ""
+    stdout_artifact: str | None = None
 
 
 @dataclass(frozen=True)
@@ -65,19 +65,29 @@ class SubprocessCommandRunner:
         command_id = f"{self.command_index:04d}-{command.description or 'command'}"
         command_root = self.evidence_root / "commands" / command_id
         command_root.mkdir(parents=True, exist_ok=False)
-        (command_root / "argv.json").write_text(
-            json.dumps(command.argv, indent=2) + "\n", encoding="utf-8"
-        )
+        (command_root / "argv.json").write_text(json.dumps(command.argv, indent=2) + "\n", encoding="utf-8")
         result = subprocess.run(command.argv, check=False, capture_output=True, text=True)
-        (command_root / "stdout.txt").write_text(result.stdout, encoding="utf-8")
+        result_data: dict[str, object] = {
+            "returncode": result.returncode,
+            "mutates_server": command.mutates_server,
+            "sends_inference": command.sends_inference,
+        }
+        if command.stdout_artifact is None:
+            (command_root / "stdout.txt").write_text(result.stdout, encoding="utf-8")
+        else:
+            artifact = Path(command.stdout_artifact)
+            if not artifact.is_absolute():
+                artifact = self.evidence_root / artifact
+            artifact = artifact.resolve()
+            try:
+                artifact_name = artifact.relative_to(self.evidence_root.resolve())
+            except ValueError as error:
+                raise ValueError("stdout artifact escapes evidence root") from error
+            result_data["stdout_artifact"] = str(artifact_name)
         (command_root / "stderr.txt").write_text(result.stderr, encoding="utf-8")
         (command_root / "result.json").write_text(
             json.dumps(
-                {
-                    "returncode": result.returncode,
-                    "mutates_server": command.mutates_server,
-                    "sends_inference": command.sends_inference,
-                },
+                result_data,
                 indent=2,
                 sort_keys=True,
             )
@@ -85,9 +95,7 @@ class SubprocessCommandRunner:
             encoding="utf-8",
         )
         if result.returncode:
-            raise RuntimeError(
-                f"command failed ({result.returncode}): {' '.join(command.argv)}"
-            )
+            raise RuntimeError(f"command failed ({result.returncode}): {' '.join(command.argv)}")
         return result.stdout
 
 
@@ -99,23 +107,16 @@ def _append(path: Path, event: dict[str, object]) -> None:
 
 
 def _write_checksums(root: Path) -> None:
-    paths = sorted(
-        path for path in root.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
-    )
+    paths = sorted(path for path in root.rglob("*") if path.is_file() and path.name != "SHA256SUMS")
     (root / "SHA256SUMS").write_text(
-        "".join(
-            f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(root)}\n"
-            for path in paths
-        ),
+        "".join(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(root)}\n" for path in paths),
         encoding="utf-8",
     )
 
 
 def _write_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def _clean_kubernetes_resource(value: dict[str, object]) -> dict[str, object]:
@@ -151,9 +152,7 @@ def _available_test_npus(nodes: dict[str, object], pods: dict[str, object]) -> i
     matching = [
         node
         for node in node_items
-        if isinstance(node, dict)
-        and isinstance(node.get("metadata"), dict)
-        and node["metadata"].get("name") == "n1"
+        if isinstance(node, dict) and isinstance(node.get("metadata"), dict) and node["metadata"].get("name") == "n1"
     ]
     if len(matching) != 1:
         raise ValueError(f"expected exactly one n1 node, got {len(matching)}")
@@ -209,7 +208,7 @@ def prepare(command_runner: Runner, output_dir: Path) -> None:
         {"phase": "prepare", "status": "started", "server_authorized": False},
     )
     manifest = Path(__file__).with_name("00-aisbench-client.yaml")
-    bootstrap = r'''
+    bootstrap = r"""
 set -euo pipefail
 root=/client-tools
 src=${root}/src/benchmark
@@ -250,20 +249,18 @@ test "$(git -C "${src}" rev-parse HEAD)" = \
   'import ais_bench.benchmark as b; print(b.__version__)' \
   | tee "${root}/provenance/aisbench-version.txt"
 "${venv}/bin/python" -c \
-  'from ais_bench.benchmark.models import VLLMCustomAPI; from ais_bench.benchmark.datasets import CustomDataset; from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer; print("imports: OK")' \
+  'from ais_bench.benchmark.models import VLLMCustomAPI; '\
+  'from ais_bench.benchmark.datasets import CustomDataset; '\
+  'from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer; '\
+  'print("imports: OK")' \
   | tee "${root}/provenance/import-smoke.txt"
 "${venv}/bin/python" -m pip freeze \
   >"${root}/provenance/requirements.freeze.txt"
 git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
-'''.strip()
-    exact_image = (
-        "docker.io/library/vllm-ascend:"
-        "kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
-    )
-    exact_config_digest = (
-        "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
-    )
-    rootfs_sync = f'''
+""".strip()
+    exact_image = "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
+    exact_config_digest = "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+    rootfs_sync = f"""
 set -euo pipefail
 marker=/performance-workspace/rootfs/.performance-image-config-digest
 if kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
@@ -290,8 +287,8 @@ tar --numeric-owner -C "${{mount_dir}}" -cf - . | \
 kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
   sh -c 'printf "%s\\n" "$1" >"$2"' sh \
   {exact_config_digest!r} "${{marker}}"
-'''.strip()
-    tokenizer_copy = r'''
+""".strip()
+    tokenizer_copy = r"""
 set -euo pipefail
 kubectl exec -n liangjiahao deployment/prefill-engine-deployment \
   -c prefill-engine -- tar \
@@ -300,7 +297,7 @@ kubectl exec -n liangjiahao deployment/prefill-engine-deployment \
   tokenization_deepseek_fast.py tokenizer.json tokenizer_config.json | \
 kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
   -c aisbench -- tar -C /performance-workspace/rootfs/client-tools/tokenizer -xf -
-'''.strip()
+""".strip()
     tooling_sync = (
         "set -euo pipefail; "
         f"tar --exclude='*/__pycache__' --exclude='*.pyc' "
@@ -413,10 +410,10 @@ kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
                 "-c",
                 "set -eu; root=/performance-workspace/rootfs; "
                 "target=$root/root/.cache/modelscope/vllm-ascend/"
-                "DeepSeek-V2-Lite-W8A8; mkdir -p \"$(dirname \"$target\")\"; "
-                "if test -L \"$target\"; then "
-                "test \"$(readlink \"$target\")\" = /client-tools/tokenizer; "
-                "else test ! -e \"$target\"; ln -s /client-tools/tokenizer \"$target\"; fi",
+                'DeepSeek-V2-Lite-W8A8; mkdir -p "$(dirname "$target")"; '
+                'if test -L "$target"; then '
+                'test "$(readlink "$target")" = /client-tools/tokenizer; '
+                'else test ! -e "$target"; ln -s /client-tools/tokenizer "$target"; fi',
             ),
             description="link-tokenizer-model-path",
         ),
@@ -541,9 +538,7 @@ kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
     _write_checksums(output_dir)
 
 
-def _run_and_save(
-    command_runner: Runner, command: Command, destination: Path
-) -> str:
+def _run_and_save(command_runner: Runner, command: Command, destination: Path) -> str:
     output = command_runner.run(command)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(output, encoding="utf-8")
@@ -555,18 +550,11 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
     files = sorted(
         path
         for path in package.rglob("*")
-        if path.is_file()
-        and "__pycache__" not in path.parts
-        and path.suffix != ".pyc"
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
     )
     _write_json(
         output_dir / "tooling-identity.json",
-        {
-            "files": {
-                str(path.relative_to(package)): hashlib.sha256(path.read_bytes()).hexdigest()
-                for path in files
-            }
-        },
+        {"files": {str(path.relative_to(package)): hashlib.sha256(path.read_bytes()).hexdigest() for path in files}},
     )
     deployment_root = package.parent
     script = (
@@ -577,9 +565,7 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
         "-c aisbench -- tar -C "
         "/performance-workspace/rootfs/client-tools/tooling -xf -"
     )
-    command_runner.run(
-        Command(("bash", "-c", script), description="sync-formal-tooling")
-    )
+    command_runner.run(Command(("bash", "-c", script), description="sync-formal-tooling"))
     command_runner.run(
         Command(
             (
@@ -593,8 +579,7 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
                 "--",
                 "sh",
                 "-c",
-                'set -eu; mkdir -p "$1"; chmod "$2" "$1"; '
-                'test "$(stat -c %a "$1")" = "$2"',
+                'set -eu; mkdir -p "$1"; chmod "$2" "$1"; test "$(stat -c %a "$1")" = "$2"',
                 "sh",
                 "/performance-workspace/rootfs/dev/shm",
                 "1777",
@@ -615,8 +600,7 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
                 "--",
                 "sh",
                 "-c",
-                'set -eu; mkdir -p "$1"; cp "$2" "$1/meminfo"; '
-                'test -s "$1/meminfo"',
+                'set -eu; mkdir -p "$1"; cp "$2" "$1/meminfo"; test -s "$1/meminfo"',
                 "sh",
                 "/performance-workspace/rootfs/proc",
                 "/proc/meminfo",
@@ -656,8 +640,7 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
                 "aisbench",
                 "--",
                 "readlink",
-                "/performance-workspace/rootfs/root/.cache/modelscope/"
-                "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+                "/performance-workspace/rootfs/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
             ),
             description="verify-client-tokenizer-link",
         )
@@ -666,9 +649,29 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
         raise RuntimeError(f"client tokenizer link mismatch: {link}")
 
 
-def _capture_pre_run_state(
-    command_runner: Runner, output_dir: Path
-) -> runtime.RuntimeInputs:
+def _archive_shared_fixtures(command_runner: Runner, output_dir: Path) -> None:
+    destination = output_dir / "fixtures" / "tokens-16384-c64"
+    destination.mkdir(parents=True, exist_ok=False)
+    source = "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c64"
+    for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
+        command_runner.run(
+            Command(
+                (
+                    "kubectl",
+                    "cp",
+                    "-n",
+                    "liangjiahao",
+                    "-c",
+                    "aisbench",
+                    f"{source}/{filename}",
+                    str(destination / filename),
+                ),
+                description=f"archive-fixture-{Path(filename).stem}",
+            )
+        )
+
+
+def _capture_pre_run_state(command_runner: Runner, output_dir: Path) -> runtime.RuntimeInputs:
     pre_run = output_dir / "pre-run-state"
     resources = {
         "prefill-deployment": (
@@ -976,14 +979,12 @@ def _apply_variant_block(
                 ),
                 description=f"check-runtime-{role}",
             ),
-            output_dir
-            / "runtime-checks"
-            / f"{point.topology}-{point.input_tokens}-{point.variant}-{role}.json",
+            output_dir / "runtime-checks" / f"{point.topology}-{point.input_tokens}-{point.variant}-{role}.json",
         )
 
 
 def _canary_command(point: WorkloadPoint, environment: RunEnvironment) -> Command:
-    script = '''import json, sys
+    script = """import json, sys
 from pathlib import Path
 from urllib.request import Request, urlopen
 input_tokens, output_tokens = map(int, sys.argv[1:])
@@ -1010,7 +1011,7 @@ assert usage["prompt_tokens"] == input_tokens, usage
 assert usage["completion_tokens"] == output_tokens, usage
 assert len(body["choices"]) == 1, body
 print(json.dumps(body, sort_keys=True))
-'''
+"""
     base = _client_python(environment, script)
     return Command(
         (*base.argv, str(point.input_tokens), str(point.output_tokens)),
@@ -1031,9 +1032,7 @@ def _run_variant_canary(
         _run_and_save(
             command_runner,
             _canary_command(point, environment),
-            output_dir
-            / "canaries"
-            / f"{point.topology}-{point.input_tokens}-{point.variant}.json",
+            output_dir / "canaries" / f"{point.topology}-{point.input_tokens}-{point.variant}.json",
         )
     except BaseException as error:
         point_name = f"{point.topology}-{point.input_tokens}-{point.variant}"
@@ -1199,37 +1198,13 @@ def run(
     errors = handoff.validate_handoff(state, WORKSPACE_ROOT)
     if errors:
         raise handoff.HandoffError("handoff validation failed: " + "; ".join(errors))
-    if output_dir.exists() and any(output_dir.iterdir()) and not resume:
+    if resume:
+        raise ValueError("rapid run does not support resume")
+    if output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(f"run output is not empty: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=True)
-    existing_contract: dict[str, object] = {}
-    prior_topologies: list[str] = []
-    if resume:
-        contract_path = output_dir / "run-contract.json"
-        handoff_path = output_dir / "handoff.json"
-        if not contract_path.is_file() or not handoff_path.is_file():
-            raise FileNotFoundError("resume requires run-contract.json and handoff.json")
-        existing_contract = json.loads(contract_path.read_text(encoding="utf-8"))
-        archived_handoff = json.loads(handoff_path.read_text(encoding="utf-8"))
-        if archived_handoff.get("sha256") != state.digest:
-            raise handoff.HandoffError("handoff changed since the original topology run")
-        checksum_errors = report.validate_checksums(output_dir)
-        if checksum_errors:
-            raise RuntimeError(
-                "resume checksum validation failed: " + "; ".join(checksum_errors)
-            )
-        topologies = existing_contract.get("topologies", [])
-        if (
-            not isinstance(topologies, list)
-            or any(not isinstance(value, str) for value in topologies)
-            or len(set(topologies)) != len(topologies)
-            or (topology in topologies and topologies[-1] != topology)
-        ):
-            raise ValueError(f"topology is already present or malformed: {topology}")
-        prior_topologies = list(topologies)
-        if prior_topologies and prior_topologies[-1] == topology:
-            prior_topologies.pop()
     _sync_client_tooling(command_runner, output_dir)
+    _archive_shared_fixtures(command_runner, output_dir)
     _capture_identity(command_runner, state, output_dir)
     inputs = _capture_pre_run_state(command_runner, output_dir)
     nodes = json.loads((output_dir / "cluster" / "nodes.json").read_text())
@@ -1247,172 +1222,73 @@ def run(
         },
     )
     if available_npus < required_npus:
-        raise RuntimeError(
-            f"insufficient physical Ascend910 capacity: {available_npus} < {required_npus}"
-        )
-    image_identity = image.resolve_server_image(
-        state, _ImageRunner(command_runner), output_dir / "image"
-    )
-    if existing_contract and existing_contract.get("image_digest") != image_identity.digest:
-        raise image.ImageContractError("server image changed since the original topology run")
+        raise RuntimeError(f"insufficient physical Ascend910 capacity: {available_npus} < {required_npus}")
+    image_identity = image.resolve_server_image(state, _ImageRunner(command_runner), output_dir / "image")
     points = build_matrix(topology)
-    prior_points = existing_contract.get("expected_points", [])
-    if not isinstance(prior_points, list) or any(
-        not isinstance(value, str) for value in prior_points
-    ):
-        raise ValueError("existing run contract points are malformed")
-    retained_prior_points = [
-        value for value in prior_points if not value.startswith(f"{topology}-")
-    ]
-    existing_stops = existing_contract.get("adaptive_stops", [])
-    if not isinstance(existing_stops, list) or any(
-        not isinstance(value, dict) for value in existing_stops
-    ):
-        raise ValueError("existing run contract adaptive stops are malformed")
-    retained_prior_stops = [
-        value for value in existing_stops if value.get("topology") != topology
-    ]
-    provisional_points = list(retained_prior_points)
-    provisional_points.extend(_point_id(point) for point in points)
-    _write_json(
-        output_dir / "run-contract.json",
-        {
-            "topologies": [*prior_topologies, topology],
-            "image_digest": image_identity.digest,
-            "expected_points": provisional_points,
-            "formal_repetitions": 3,
-            "raw_characterization_only": True,
-            "adaptive_stops": retained_prior_stops,
-        },
-    )
+    run_contract = build_run_contract(image_identity.digest)
+    _write_json(output_dir / "run-contract.json", run_contract)
     environment = RunEnvironment(
         restore_manifest=output_dir / "pre-run-state",
         image_digest=image_identity.digest,
     )
     performance_configmaps: set[str] = set()
-    executed_points = list(retained_prior_points)
-    stop_decisions: list[dict[str, object]] = list(retained_prior_stops)
     run_error: BaseException | None = None
     try:
-        for input_tokens in INPUT_TOKENS:
-            ordered_variants = tuple(
-                dict.fromkeys(
-                    point.variant
-                    for point in points
-                    if point.input_tokens == input_tokens
-                )
+        rendered_variants: dict[str, runtime.RenderedResources] = {}
+        rendered_paths: dict[str, tuple[Path, Path, Path]] = {}
+        for variant in VARIANT_ORDER:
+            representative = next(point for point in points if point.variant == variant)
+            rendered, paths = _write_rendered_block(
+                inputs,
+                representative,
+                image_identity.reference,
+                output_dir,
             )
-            rendered_variants: dict[str, runtime.RenderedResources] = {}
-            rendered_paths: dict[str, tuple[Path, Path, Path]] = {}
-            for variant in ordered_variants:
-                representative = next(
-                    point
-                    for point in points
-                    if point.input_tokens == input_tokens and point.variant == variant
+            rendered_variants[variant] = rendered
+            rendered_paths[variant] = paths
+            performance_configmaps.add(str(rendered.runtime_configmap["metadata"]["name"]))
+        drift = runtime.validate_unique_difference(rendered_variants)
+        if drift:
+            raise RuntimeError("runtime variant drift: " + "; ".join(drift))
+        for variant in VARIANT_ORDER:
+            block_points = tuple(point for point in points if point.variant == variant)
+            representative = block_points[0]
+            _apply_variant_block(
+                command_runner,
+                rendered_paths[variant],
+                representative,
+                environment,
+                output_dir,
+            )
+            _run_variant_canary(
+                command_runner,
+                representative,
+                environment,
+                output_dir,
+            )
+            for point in block_points:
+                point_root = output_dir / "points" / _point_id(point)
+                _write_json(
+                    point_root / "identity.json",
+                    {
+                        "image_digest": image_identity.digest,
+                        "variant": point.variant,
+                        "topology": point.topology,
+                        "input_tokens": point.input_tokens,
+                        "output_tokens": point.output_tokens,
+                        "concurrency": point.concurrency,
+                    },
                 )
-                rendered, paths = _write_rendered_block(
-                    inputs,
-                    representative,
-                    image_identity.reference,
-                    output_dir,
-                )
-                rendered_variants[variant] = rendered
-                rendered_paths[variant] = paths
-                performance_configmaps.add(
-                    str(rendered.runtime_configmap["metadata"]["name"])
-                )
-            drift = runtime.validate_unique_difference(rendered_variants)
-            if drift:
-                raise RuntimeError("runtime variant drift: " + "; ".join(drift))
-            for variant in ordered_variants:
-                block_points = tuple(
-                    point
-                    for point in points
-                    if point.input_tokens == input_tokens
-                    and point.variant == variant
-                )
-                representative = block_points[0]
-                _apply_variant_block(
-                    command_runner,
-                    rendered_paths[variant],
-                    representative,
-                    environment,
-                    output_dir,
-                )
-                _run_variant_canary(
-                    command_runner,
-                    representative,
-                    environment,
-                    output_dir,
-                )
-                for output_tokens in dict.fromkeys(
-                    point.output_tokens for point in block_points
-                ):
-                    history: list[PointResult] = []
-                    for point in (
-                        selected
-                        for selected in block_points
-                        if selected.output_tokens == output_tokens
-                    ):
-                        point_root = output_dir / "points" / _point_id(point)
-                        _write_json(
-                            point_root / "identity.json",
-                            {
-                                "image_digest": image_identity.digest,
-                                "variant": point.variant,
-                                "topology": point.topology,
-                                "input_tokens": point.input_tokens,
-                                "output_tokens": point.output_tokens,
-                                "concurrency": point.concurrency,
-                            },
-                        )
-                        summaries = execute_point(
-                            command_runner, point, output_dir, environment
-                        )
-                        executed_points.append(_point_id(point))
-                        last = summaries[-1]
-                        raw_metrics = last.get("metrics", {})
-                        if not isinstance(raw_metrics, dict):
-                            raise RuntimeError("formal summary metrics are malformed")
-                        history.append(
-                            PointResult(
-                                float(raw_metrics["Request Throughput"]),
-                                float(raw_metrics["E2EL P95"]),
-                            )
-                        )
-                        decision = adaptive_stop(tuple(history), hard_failure=False)
-                        if decision.stop:
-                            stop_decisions.append(
-                                {
-                                    "topology": topology,
-                                    "input_tokens": input_tokens,
-                                    "output_tokens": output_tokens,
-                                    "variant": variant,
-                                    "after_concurrency": point.concurrency,
-                                    "reason": decision.reason,
-                                }
-                            )
-                            break
-                stop_errors = _stop_engines(command_runner, environment)
-                if stop_errors:
-                    raise RuntimeError("; ".join(stop_errors))
+                execute_point(command_runner, point, output_dir, environment)
+            _capture_variant_diagnostics(command_runner, variant, environment, output_dir)
+            stop_errors = _stop_engines(command_runner, environment)
+            if stop_errors:
+                raise RuntimeError("; ".join(stop_errors))
     except BaseException as error:
         run_error = error
-    restoration_errors = _restore_pre_run_state(
-        command_runner, output_dir, environment, performance_configmaps
-    )
+    restoration_errors = _restore_pre_run_state(command_runner, output_dir, environment, performance_configmaps)
     if run_error is None:
-        _write_json(
-            output_dir / "run-contract.json",
-            {
-                "topologies": [*prior_topologies, topology],
-                "image_digest": image_identity.digest,
-                "expected_points": executed_points,
-                "formal_repetitions": 3,
-                "raw_characterization_only": True,
-                "adaptive_stops": stop_decisions,
-            },
-        )
+        _write_json(output_dir / "run-contract.json", run_contract)
     _write_checksums(output_dir)
     if run_error is not None:
         raise run_error
@@ -1421,10 +1297,7 @@ def run(
 
 
 def _point_id(point: WorkloadPoint) -> str:
-    return (
-        f"{point.topology}-{point.input_tokens}-{point.variant}"
-        f"-o{point.output_tokens}-c{point.concurrency}"
-    )
+    return point_id(point)
 
 
 def _new_attempt(root: Path, phase: str) -> Path:
@@ -1438,46 +1311,6 @@ def _new_attempt(root: Path, phase: str) -> Path:
     attempt = phase_root / f"attempt-{max(existing, default=0) + 1}"
     (attempt / "raw").mkdir(parents=True, exist_ok=False)
     return attempt
-
-
-def _prior_phase_state(
-    point_root: Path, phase: str, image_digest: str, formal_count: int
-) -> tuple[dict[str, object] | None, int | None]:
-    summaries: list[tuple[int, Path, dict[str, object]]] = []
-    valid: list[dict[str, object]] = []
-    for path in (point_root / phase).glob("attempt-*/raw/summary.json"):
-        try:
-            summary = json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as error:
-            raise RuntimeError(f"malformed prior summary: {path}") from error
-        if not isinstance(summary, dict):
-            raise RuntimeError(f"prior summary is not an object: {path}")
-        if summary.get("image_digest") != image_digest:
-            raise RuntimeError(f"prior summary image digest drift: {path}")
-        attempt_name = path.parent.parent.name
-        attempt_text = attempt_name.removeprefix("attempt-")
-        if not attempt_text.isdigit():
-            raise RuntimeError(f"malformed prior attempt name: {attempt_name}")
-        summaries.append((int(attempt_text), path, summary))
-        if summary.get("valid") is True:
-            valid.append(summary)
-    if len(valid) > 1:
-        raise RuntimeError(f"multiple valid prior summaries for phase: {phase}")
-    if valid:
-        return valid[0], None
-    if not summaries:
-        return None, None
-    _, path, latest = max(summaries, key=lambda item: item[0])
-    errors = [str(error) for error in latest.get("errors", [])]
-    request_count = latest.get("request_count")
-    if (
-        errors == ["stable benchmark duration is insufficient"]
-        and isinstance(request_count, int)
-        and not isinstance(request_count, bool)
-        and 0 < request_count < formal_count
-    ):
-        return None, min(request_count * 2, formal_count)
-    raise RuntimeError(f"prior attempt is not resumable: {path}")
 
 
 def _invoke(command_runner: Runner, command: Command, attempt: Path) -> str:
@@ -1497,16 +1330,19 @@ def _invoke(command_runner: Runner, command: Command, attempt: Path) -> str:
     return output
 
 
-def _capture(
-    command_runner: Runner, command: Command, attempt: Path, filename: str
-) -> str:
-    output = _invoke(command_runner, command, attempt)
-    (attempt / "raw" / filename).write_text(output, encoding="utf-8")
+def _capture(command_runner: Runner, command: Command, attempt: Path, filename: str) -> str:
+    destination = attempt / "raw" / filename
+    output = _invoke(
+        command_runner,
+        replace(command, stdout_artifact=str(destination)),
+        attempt,
+    )
+    destination.write_text(output, encoding="utf-8")
     return output
 
 
 def _master_empty_script() -> str:
-    return '''import time
+    return """import time
 from urllib.error import URLError
 from urllib.request import urlopen
 for attempt in range(60):
@@ -1530,11 +1366,11 @@ for line in text.splitlines():
 assert values.get("master_key_count") == 0, values
 assert values.get("master_allocated_bytes") == 0, values
 print(text, end="")
-'''
+"""
 
 
 def _http_ok_script() -> str:
-    return '''from urllib.request import urlopen
+    return """from urllib.request import urlopen
 for url in (
     "http://vllm-proxy-service:8000/health",
     "http://vllm-proxy-service:8000/listEndPoints",
@@ -1542,11 +1378,11 @@ for url in (
     with urlopen(url, timeout=30) as response:
         assert response.status == 200, (url, response.status)
         print(url, response.read().decode())
-'''
+"""
 
 
 def _master_remove_all_script() -> str:
-    return '''import json
+    return """import json
 from urllib.request import Request, urlopen
 request = Request(
     "http://mooncake-master-service:9003/api/v1/remove_all?force=true",
@@ -1560,7 +1396,7 @@ assert body.get("success") is True, body
 removed_count = body.get("removed_count")
 assert isinstance(removed_count, int) and removed_count >= 0, body
 print(json.dumps(body, sort_keys=True))
-'''
+"""
 
 
 def _client_python(environment: RunEnvironment, script: str) -> Command:
@@ -1639,11 +1475,9 @@ def _master_cleanup_commands(environment: RunEnvironment) -> tuple[Command, ...]
     )
 
 
-def _sampled_aisbench_command(
-    aisbench_argv: tuple[str, ...], environment: RunEnvironment
-) -> Command:
+def _sampled_aisbench_command(aisbench_argv: tuple[str, ...], environment: RunEnvironment) -> Command:
     namespace = environment.namespace
-    script = f'''set -euo pipefail
+    script = f"""set -euo pipefail
 raw=$1
 shift
 mkdir -p "${{raw}}"
@@ -1652,7 +1486,7 @@ sample_prefill() {{
     date -u +%Y-%m-%dT%H:%M:%S.%NZ
     kubectl exec -n {namespace} {environment.prefill_resource} \
       -c prefill-engine -- npu-smi info || true
-    sleep 1
+    sleep 10
   done
 }}
 sample_decode() {{
@@ -1660,7 +1494,7 @@ sample_decode() {{
     date -u +%Y-%m-%dT%H:%M:%S.%NZ
     kubectl exec -n {namespace} {environment.decode_resource} \
       -c decode-engine -- npu-smi info || true
-    sleep 1
+    sleep 10
   done
 }}
 sample_master() {{
@@ -1669,9 +1503,11 @@ sample_master() {{
     kubectl exec -n {namespace} {environment.client_pod} -c aisbench -- \
       chroot /performance-workspace/rootfs \
       /client-tools/venv/bin/python -c \
-      'from urllib.request import urlopen; print(urlopen("http://mooncake-master-service:9003/metrics",timeout=5).read().decode(),end="")' \
+      'from urllib.request import urlopen; '\
+      'print(urlopen("http://mooncake-master-service:9003/metrics",'\
+      'timeout=5).read().decode(),end="")' \
       || true
-    sleep 1
+    sleep 10
   done
 }}
 sample_client() {{
@@ -1680,7 +1516,7 @@ sample_client() {{
     kubectl top pod -n {namespace} {environment.client_pod} || true
     kubectl exec -n {namespace} {environment.client_pod} -c aisbench -- \
       sh -c 'cat /proc/net/dev; ss -s 2>/dev/null || true' || true
-    sleep 1
+    sleep 10
   done
 }}
 sample_prefill >"${{raw}}/prefill-npu-timeseries.log" 2>&1 & p1=$!
@@ -1693,7 +1529,7 @@ cleanup() {{
 }}
 trap cleanup EXIT INT TERM
 "$@"
-'''
+"""
     return Command(
         ("bash", "-c", script, "bash", "__LOCAL_RAW__", *aisbench_argv),
         sends_inference=True,
@@ -1712,14 +1548,8 @@ def _attempt_commands(
     rootfs = "/performance-workspace/rootfs"
     chroot_attempt = f"/client-tools/runs/{remote_attempt}"
     host_attempt = f"{rootfs}{chroot_attempt}"
-    fixture = (
-        f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c64/"
-        f"{phase}.jsonl"
-    )
-    prepare_script = (
-        "set -eu; test ! -e \"$1\"; mkdir -p \"$1\"; "
-        "cp \"$2\" \"$1/dataset.jsonl\""
-    )
+    fixture = f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c64/{phase}.jsonl"
+    prepare_script = 'set -eu; test ! -e "$1"; mkdir -p "$1"; cp "$2" "$1/dataset.jsonl"'
     config_argv = (
         "kubectl",
         "exec",
@@ -1820,7 +1650,7 @@ def _diagnostic_commands(environment: RunEnvironment) -> tuple[tuple[Command, st
     namespace = environment.namespace
     metrics = _client_python(
         environment,
-        'from urllib.request import urlopen; print(urlopen('
+        "from urllib.request import urlopen; print(urlopen("
         '"http://mooncake-master-service:9003/metrics", timeout=10).read().decode(), end="")',
     )
     return (
@@ -1917,86 +1747,85 @@ def _diagnostic_commands(environment: RunEnvironment) -> tuple[tuple[Command, st
     )
 
 
+def _point_diagnostic_commands(
+    environment: RunEnvironment,
+) -> tuple[tuple[Command, str], ...]:
+    return tuple(
+        (command, filename)
+        for command, filename in _diagnostic_commands(environment)
+        if command.description not in {"prefill-log", "decode-log"}
+    )
+
+
+def _capture_variant_diagnostics(
+    command_runner: Runner,
+    variant: str,
+    environment: RunEnvironment,
+    output_dir: Path,
+) -> None:
+    destination = output_dir / "variants" / variant
+    (destination / "raw").mkdir(parents=True, exist_ok=False)
+    for command, filename in _diagnostic_commands(environment):
+        if command.description in {"prefill-log", "decode-log"}:
+            _capture(command_runner, command, destination, filename)
+
+
+def _replace_attempt_fixture(raw: Path, input_tokens: int, phase: str) -> None:
+    dataset = raw / "dataset.jsonl"
+    if not dataset.is_file():
+        return
+    _write_json(
+        raw / "fixture-reference.json",
+        {
+            "path": f"fixtures/tokens-{input_tokens}-c64/{phase}.jsonl",
+            "sha256": hashlib.sha256(dataset.read_bytes()).hexdigest(),
+        },
+    )
+    dataset.unlink()
+
+
 def execute_point(
     command_runner: Runner,
     point: WorkloadPoint,
     output_dir: Path,
-    environment: RunEnvironment = RunEnvironment(),
+    environment: RunEnvironment | None = None,
 ) -> tuple[dict[str, object], ...]:
+    environment = environment or RunEnvironment()
     point_root = output_dir / "points" / _point_id(point)
     warmup_count, formal_count, repetitions = sample_counts(point.concurrency)
-    phases = [("warmup", warmup_count)] + [
-        (f"formal-{index}", formal_count) for index in range(1, repetitions + 1)
-    ]
+    assert repetitions == 1
+    phases = (("warmup", warmup_count), ("formal-1", formal_count))
     current_attempt = point_root
     formal_summaries: list[dict[str, object]] = []
     try:
-        for phase, initial_request_count in phases:
-            prior_summary, resumed_request_count = (
-                _prior_phase_state(
-                    point_root,
-                    phase,
-                    environment.image_digest,
-                    formal_count,
-                )
-                if environment.image_digest
-                else (None, None)
-            )
-            if prior_summary is not None:
-                if phase.startswith("formal-"):
-                    formal_summaries.append(prior_summary)
-                continue
-            request_count = resumed_request_count or initial_request_count
-            while True:
-                current_attempt = _new_attempt(point_root, phase)
-                attempt_token = hashlib.sha256(
-                    str(current_attempt.resolve()).encode("utf-8")
-                ).hexdigest()[:16]
-                remote_attempt = f"{_point_id(point)}/{phase}/{attempt_token}"
-                for command in _attempt_commands(
-                    point, phase, request_count, remote_attempt, environment
-                ):
-                    if command.description in {"aisbench", "archive-aisbench"}:
-                        argv = tuple(
-                            str(current_attempt / "raw")
-                            if value == "__LOCAL_RAW__"
-                            else value
-                            for value in command.argv
-                        )
-                        command = Command(argv, description=command.description)
-                    _invoke(command_runner, command, current_attempt)
-                for command, filename in _diagnostic_commands(environment):
-                    _capture(command_runner, command, current_attempt, filename)
-                if not environment.image_digest:
-                    break
-                summary = report.summarize_aisbench_attempt(
-                    current_attempt / "raw",
-                    point,
-                    request_count,
-                    environment.image_digest,
-                )
-                _write_json(current_attempt / "raw" / "summary.json", summary)
-                if summary.get("valid") is True:
-                    if phase.startswith("formal-"):
-                        formal_summaries.append(summary)
-                    break
-                errors = [str(error) for error in summary.get("errors", [])]
-                if (
-                    errors == ["stable benchmark duration is insufficient"]
-                    and request_count < formal_count
-                ):
-                    next_request_count = min(request_count * 2, formal_count)
-                    _append(
-                        current_attempt / "state.jsonl",
-                        {
-                            "status": "insufficient_stable_duration",
-                            "request_count": request_count,
-                            "next_request_count": next_request_count,
-                        },
+        for phase, request_count in phases:
+            current_attempt = _new_attempt(point_root, phase)
+            attempt_token = hashlib.sha256(str(current_attempt.resolve()).encode("utf-8")).hexdigest()[:16]
+            remote_attempt = f"{_point_id(point)}/{phase}/{attempt_token}"
+            for command in _attempt_commands(point, phase, request_count, remote_attempt, environment):
+                if command.description in {"aisbench", "archive-aisbench"}:
+                    argv = tuple(
+                        str(current_attempt / "raw") if value == "__LOCAL_RAW__" else value for value in command.argv
                     )
-                    request_count = next_request_count
-                    continue
+                    command = replace(command, argv=argv)
+                _invoke(command_runner, command, current_attempt)
+            _replace_attempt_fixture(current_attempt / "raw", point.input_tokens, phase)
+            for command, filename in _point_diagnostic_commands(environment):
+                _capture(command_runner, command, current_attempt, filename)
+            if not environment.image_digest:
+                continue
+            summary = report.summarize_aisbench_attempt(
+                current_attempt / "raw",
+                point,
+                request_count,
+                environment.image_digest,
+            )
+            _write_json(current_attempt / "raw" / "summary.json", summary)
+            if summary.get("valid") is not True:
+                errors = [str(error) for error in summary.get("errors", [])]
                 raise RuntimeError("invalid AISBench attempt: " + "; ".join(errors))
+            if phase == "formal-1":
+                formal_summaries.append(summary)
     except Exception as error:
         _append(
             current_attempt / "state.jsonl",
@@ -2031,16 +1860,12 @@ def _parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--output", type=Path, required=True)
     run_parser.add_argument("--topology", choices=("dp1", "dp2"), required=True)
-    run_parser.add_argument("--resume", action="store_true")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    handoff_path = (
-        WORKSPACE_ROOT
-        / "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
-    )
+    handoff_path = WORKSPACE_ROOT / "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
     if args.command == "wait":
         handoff.wait_for_ready(
             handoff_path,
@@ -2059,7 +1884,7 @@ def main(argv: list[str] | None = None) -> int:
         state,
         args.output,
         topology=args.topology,
-        resume=args.resume,
+        resume=False,
     )
     return 0
 

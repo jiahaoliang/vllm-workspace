@@ -27,16 +27,10 @@ class MergingTokenizer:
     name_or_path = "merging-tokenizer"
 
     def decode(self, token_ids: list[int], **_: object) -> str:
-        return "".join(
-            chr(65 + token_id) if token_id < 16 else chr(0x400 + token_id)
-            for token_id in token_ids
-        )
+        return "".join(chr(65 + token_id) if token_id < 16 else chr(0x400 + token_id) for token_id in token_ids)
 
     def encode(self, text: str, **_: object) -> list[int]:
-        values = [
-            ord(character) - 65 if ord(character) < 128 else ord(character) - 0x400
-            for character in text
-        ]
+        values = [ord(character) - 65 if ord(character) < 128 else ord(character) - 0x400 for character in text]
         if len(values) > 1 and all(value < 16 for value in values[:2]):
             return [47, *values[2:]]
         return values
@@ -44,10 +38,7 @@ class MergingTokenizer:
 
 def test_exact_roundtrip_and_unique_first_block() -> None:
     tokenizer = FakeTokenizer()
-    records = [
-        fixtures.build_prompt(tokenizer, 4096, request_index, 20260808)
-        for request_index in range(4)
-    ]
+    records = [fixtures.build_prompt(tokenizer, 4096, request_index, 20260808) for request_index in range(4)]
 
     assert all(len(record.token_ids) == 4096 for record in records)
     assert all(tokenizer.encode(record.text) == list(record.token_ids) for record in records)
@@ -61,9 +52,7 @@ def test_generator_avoids_single_token_values_that_merge_in_sequences() -> None:
     assert MergingTokenizer().encode(record.text) == list(record.token_ids)
 
 
-def test_fixture_scans_tokenizer_alphabet_once(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_fixture_scans_tokenizer_alphabet_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     calls = 0
     original = fixtures.find_roundtrip_tokens
 
@@ -73,24 +62,19 @@ def test_fixture_scans_tokenizer_alphabet_once(
         return original(tokenizer, minimum)
 
     monkeypatch.setattr(fixtures, "find_roundtrip_tokens", counted)
-    fixtures.write_fixture(FakeTokenizer(), 128, 4, 20260808, tmp_path)
+    fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
 
     assert calls == 1
 
 
 def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None:
-    manifest = fixtures.write_fixture(
-        FakeTokenizer(), 128, 1, 20260808, tmp_path
-    )
+    manifest = fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
 
     assert len(manifest.warmup_ids) == 8
-    assert all(len(ids) == 32 for ids in manifest.formal_ids)
+    assert len(manifest.formal_ids) == 1
+    assert all(len(ids) == 8 for ids in manifest.formal_ids)
     partitions = (set(manifest.warmup_ids), *(set(ids) for ids in manifest.formal_ids))
-    assert all(
-        left.isdisjoint(right)
-        for index, left in enumerate(partitions)
-        for right in partitions[index + 1 :]
-    )
+    assert all(left.isdisjoint(right) for index, left in enumerate(partitions) for right in partitions[index + 1 :])
     row = json.loads(manifest.partition_files["warmup"].read_text().splitlines()[0])
     assert set(row) == {"question", "answer", "request_id"}
     assert row["answer"] == ""
@@ -100,41 +84,33 @@ def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None
 def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     dataset = tmp_path / "formal-1.jsonl"
     dataset.write_text('{"question":"x","answer":"","request_id":"r"}\n')
-    point = WorkloadPoint("dp1", 4096, 128, "bulk", 4)
+    point = WorkloadPoint("dp1", 16384, 128, "bulk", 8)
     output = tmp_path / "point.py"
 
-    fixtures.write_aisbench_config(point, dataset, output, request_count=32)
+    fixtures.write_aisbench_config(point, dataset, output, request_count=8)
 
     text = output.read_text(encoding="utf-8")
     compile(text, str(output), "exec")
     assert "stream=True" in text
-    assert "retry=1" in text
+    assert "retry=0" in text
     assert "pressure" not in text
-    assert "batch_size=4" in text
+    assert "batch_size=8" in text
     assert "request_rate=0" in text
     assert "max_out_len=128" in text
     assert text.count("abbr='bulk'") == 2
     assert 'attr="performance"' in text
     assert "type=DefaultPerfSummarizer" in text
-    assert "type=StablePerfMetricCalculator" in text
+    assert "type=DefaultPerfMetricCalculator" in text
+    assert "StablePerfMetricCalculator" not in text
     assert "temperature=0" in text
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
-    meta = json.loads(
-        dataset.with_name(dataset.name + ".meta.json").read_text(encoding="utf-8")
-    )
-    assert meta == {"request_count": 32, "sampling_mode": "default"}
-    assert "request_count=32" not in text
-    assert (
-        "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate"
-        in text
-    )
-    assert (
-        "from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever" in text
-    )
-    assert (
-        "from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer" in text
-    )
+    meta = json.loads(dataset.with_name(dataset.name + ".meta.json").read_text(encoding="utf-8"))
+    assert meta == {"request_count": 8, "sampling_mode": "single-wave-total"}
+    assert "request_count=8" not in text
+    assert "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate" in text
+    assert "from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever" in text
+    assert "from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer" in text
     assert "type=NaivePartitioner" in text
     assert "from ais_bench.benchmark.runners import LocalRunner" in text
     assert "from ais_bench.benchmark.tasks import OpenICLApiInferTask" in text
@@ -143,12 +119,10 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
 
 
 def test_fixture_corruption_breaks_checksum_replay(tmp_path: Path) -> None:
-    manifest = fixtures.write_fixture(FakeTokenizer(), 128, 1, 20260808, tmp_path)
-    manifest.partition_files["formal-2"].write_text("changed\n", encoding="utf-8")
+    manifest = fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
+    manifest.partition_files["formal-1"].write_text("changed\n", encoding="utf-8")
 
-    assert fixtures.replay_fixture(manifest) == [
-        "fixture checksum mismatch: formal-2.jsonl"
-    ]
+    assert fixtures.replay_fixture(manifest) == ["fixture checksum mismatch: formal-1.jsonl"]
 
 
 def test_config_cli_writes_attempt_local_metadata(tmp_path: Path) -> None:
@@ -178,7 +152,5 @@ def test_config_cli_writes_attempt_local_metadata(tmp_path: Path) -> None:
     )
 
     assert result == 0
-    assert json.loads((tmp_path / "dataset.jsonl.meta.json").read_text())[
-        "request_count"
-    ] == 256
+    assert json.loads((tmp_path / "dataset.jsonl.meta.json").read_text())["request_count"] == 256
     assert "batch_size=32" in (tmp_path / "config.py").read_text()

@@ -1,8 +1,8 @@
 # Mooncake Layerwise Performance Validation
 
 This directory implements the preparation, handoff gate, execution, and raw
-reporting contract in
-[`2026-08-08-layerwise-performance-validation-design.md`](../../2026-08-08-layerwise-performance-validation-design.md).
+reporting contract in the approved
+[`2026-08-09-layerwise-performance-rapid-validation-design.md`](../../2026-08-09-layerwise-performance-rapid-validation-design.md).
 
 ## Safety Boundary
 
@@ -16,9 +16,13 @@ reporting contract in
   patch with `nerdctl commit`. Dockerfile, BuildKit, and image build commands
   are outside this workflow.
 - Generated Prefill and Decode start scripts freeze
-  `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` per serving rank. This provides enough
-  pool capacity for the 512-request, 32768-token DP2 formal phase and remains
-  identical across all variants.
+  `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` per serving rank, identically across all
+  variants.
+- The formal matrix is exactly DP1, 16384 input tokens, concurrency 8, and five
+  points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1.
+- Each point has one 8-request warmup wave and one 8-request formal wave. The
+  runner starts the server once per variant, does not retry a point, and defines
+  no performance timeout. A valid slow point continues naturally.
 
 ## Commands
 
@@ -64,27 +68,19 @@ features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh 
   wait --output "/tmp/layerwise-performance-wait-${wait_id}" --poll-seconds 10
 ```
 
-After the listener accepts the handoff, execute DP1 then DP2 in the same run
-root. A retry uses a new attempt directory; `--resume` never overwrites an
-earlier attempt.
-
-Do not resume a root created under a different runtime contract or handoff
-generation. In particular, a root that used Mooncake's default 1 GiB segment
-size is invalid capacity-diagnostic evidence and must not be reused after the
-128 GiB sizing fix.
+After the listener accepts the generation-5 handoff, execute the rapid DP1 run
+in a new root. A failed root is retained as diagnostics and is never resumed.
 
 ```bash
 run_id=$(date -u +%Y%m%dT%H%M%SZ)
-run_root="/tmp/layerwise-performance-${run_id}"
+run_root="/tmp/layerwise-performance-rapid-${run_id}"
 features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh \
   run --topology dp1 --output "${run_root}"
-python3 -m performance.report check --root "${run_root}" --scope dp1
-features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh \
-  run --topology dp2 --output "${run_root}" --resume
-python3 -m performance.report check --root "${run_root}" --scope all
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+  python3 -m performance.report check --root "${run_root}" --scope all
 ```
 
-Render raw per-repetition rows and direct ratios:
+Render the five raw rows and output-matched direct ratios:
 
 ```bash
 PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
@@ -93,5 +89,7 @@ python3 -m performance.report render \
   --output features/kv-pool-layerwise-reuse/layerwise-performance-validation-2026-08-08.md
 ```
 
-The report does not remove outliers, calculate statistical significance, or
-assign a performance pass/fail result.
+This is single-wave raw characterization, not a steady-state or statistically
+significant result. The report does not remove outliers or assign a performance
+pass/fail result. Point evidence keeps 10-second telemetry and lightweight
+diagnostics; complete Prefill and Decode logs are captured once per variant.

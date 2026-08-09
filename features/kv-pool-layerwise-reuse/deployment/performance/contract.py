@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -30,18 +31,6 @@ class WorkloadPoint:
     output_tokens: int
     variant: str
     concurrency: int
-
-
-@dataclass(frozen=True)
-class PointResult:
-    throughput: float
-    p95_latency: float
-
-
-@dataclass(frozen=True)
-class StopDecision:
-    stop: bool
-    reason: str | None = None
 
 
 def _settings(**values: Any) -> Mapping[str, Any]:
@@ -75,13 +64,11 @@ VARIANTS = MappingProxyType(
     }
 )
 
-TOPOLOGIES = MappingProxyType(
-    {
-        "dp1": Topology("dp1", 1, 2, 1, 2, (1, 2, 4, 8, 16, 32)),
-        "dp2": Topology("dp2", 2, 4, 1, 2, (2, 4, 8, 16, 32, 64)),
-    }
-)
-INPUT_TOKENS = (4096, 16384, 32768)
+TOPOLOGIES = MappingProxyType({"dp1": Topology("dp1", 1, 2, 1, 2, (8,))})
+INPUT_TOKENS = (16384,)
+VARIANT_ORDER = ("bulk", "layerwise", "reuse3")
+REQUEST_COUNT = 8
+FORMAL_REPETITIONS = 1
 RUNTIME_CONSTANTS = MappingProxyType(
     {
         "block_size": 128,
@@ -97,16 +84,6 @@ RUNTIME_CONSTANTS = MappingProxyType(
         "layerwise_prefetch_layers": 3,
     }
 )
-DP1_ROTATION = MappingProxyType(
-    {
-        4096: ("bulk", "layerwise", "reuse3"),
-        16384: ("layerwise", "reuse3", "bulk"),
-        32768: ("reuse3", "bulk", "layerwise"),
-    }
-)
-DP2_ROTATION = MappingProxyType(
-    {length: tuple(reversed(order)) for length, order in DP1_ROTATION.items()}
-)
 
 
 def outputs_for(variant: str) -> tuple[int, ...]:
@@ -114,52 +91,35 @@ def outputs_for(variant: str) -> tuple[int, ...]:
 
 
 def build_matrix(topology: str | None = None) -> tuple[WorkloadPoint, ...]:
-    topology_names = (topology,) if topology is not None else tuple(TOPOLOGIES)
-    points: list[WorkloadPoint] = []
-    for topology_name in topology_names:
-        selected = TOPOLOGIES[topology_name]
-        rotation = DP1_ROTATION if topology_name == "dp1" else DP2_ROTATION
-        for input_tokens in INPUT_TOKENS:
-            for variant in rotation[input_tokens]:
-                for output_tokens in outputs_for(variant):
-                    for concurrency in selected.concurrency:
-                        points.append(
-                            WorkloadPoint(
-                                topology_name,
-                                input_tokens,
-                                output_tokens,
-                                variant,
-                                concurrency,
-                            )
-                        )
-    return tuple(points)
+    if topology not in (None, "dp1"):
+        raise ValueError(f"unsupported topology: {topology}")
+    return (
+        WorkloadPoint("dp1", 16384, 128, "bulk", 8),
+        WorkloadPoint("dp1", 16384, 1, "bulk", 8),
+        WorkloadPoint("dp1", 16384, 128, "layerwise", 8),
+        WorkloadPoint("dp1", 16384, 1, "layerwise", 8),
+        WorkloadPoint("dp1", 16384, 1, "reuse3", 8),
+    )
+
+
+def point_id(point: WorkloadPoint) -> str:
+    return f"{point.topology}-{point.input_tokens}-{point.variant}-o{point.output_tokens}-c{point.concurrency}"
+
+
+def build_run_contract(image_digest: str) -> dict[str, object]:
+    return {
+        "topologies": ["dp1"],
+        "image_digest": image_digest,
+        "expected_points": [point_id(point) for point in build_matrix()],
+        "formal_repetitions": FORMAL_REPETITIONS,
+        "request_count": REQUEST_COUNT,
+        "calculator": "total",
+        "single_wave": True,
+        "raw_characterization_only": True,
+    }
 
 
 def sample_counts(concurrency: int) -> tuple[int, int, int]:
-    if concurrency <= 0:
-        raise ValueError("concurrency must be positive")
-    return max(8, 2 * concurrency), max(32, 8 * concurrency), 3
-
-
-def stable_measurement_valid(max_e2el_ms: float, duration_ms: float) -> bool:
-    return max_e2el_ms >= 0 and max_e2el_ms * 3 < duration_ms
-
-
-def adaptive_stop(
-    history: tuple[PointResult, ...], hard_failure: bool
-) -> StopDecision:
-    if hard_failure:
-        return StopDecision(True, "hard failure")
-    if len(history) < 3:
-        return StopDecision(False)
-    transitions: list[bool] = []
-    for previous, current in zip(history[-3:-1], history[-2:]):
-        if previous.throughput <= 0 or previous.p95_latency <= 0:
-            transitions.append(False)
-            continue
-        throughput_gain = current.throughput / previous.throughput - 1
-        latency_growth = current.p95_latency / previous.p95_latency - 1
-        transitions.append(throughput_gain < 0.05 and latency_growth > 0.50)
-    if all(transitions):
-        return StopDecision(True, "two consecutive soft-saturation transitions")
-    return StopDecision(False)
+    if concurrency != 8:
+        raise ValueError("concurrency must be 8")
+    return REQUEST_COUNT, REQUEST_COUNT, FORMAL_REPETITIONS

@@ -10,7 +10,6 @@ from typing import Any
 
 from performance.contract import INPUT_TOKENS, WorkloadPoint, sample_counts
 
-
 BLOCK_SIZE = 128
 
 
@@ -72,10 +71,8 @@ def find_roundtrip_tokens(tokenizer: Any, minimum: int = 16) -> tuple[int, ...]:
     stable: list[int] = []
     for token_id in candidates:
         if all(
-            _encode(tokenizer, _decode(tokenizer, [other, token_id]))
-            == [other, token_id]
-            and _encode(tokenizer, _decode(tokenizer, [token_id, other]))
-            == [token_id, other]
+            _encode(tokenizer, _decode(tokenizer, [other, token_id])) == [other, token_id]
+            and _encode(tokenizer, _decode(tokenizer, [token_id, other])) == [token_id, other]
             for other in stable
         ):
             stable.append(token_id)
@@ -110,10 +107,7 @@ def build_prompt(
     stable = stable_tokens or find_roundtrip_tokens(tokenizer)
     token_ids = _index_prefix(request_index, stable)
     randomizer = random.Random(f"{seed}:{input_tokens}:{request_index}")
-    token_ids.extend(
-        stable[randomizer.randrange(len(stable))]
-        for _ in range(input_tokens - len(token_ids))
-    )
+    token_ids.extend(stable[randomizer.randrange(len(stable))] for _ in range(input_tokens - len(token_ids)))
     text = _decode(tokenizer, token_ids)
     replay = _encode(tokenizer, text)
     if replay != token_ids:
@@ -211,14 +205,9 @@ def write_fixture(
                 "input_tokens": input_tokens,
                 "concurrency": concurrency,
                 "seed": seed,
-                "tokenizer_identity": str(
-                    getattr(tokenizer, "name_or_path", type(tokenizer).__name__)
-                ),
+                "tokenizer_identity": str(getattr(tokenizer, "name_or_path", type(tokenizer).__name__)),
                 "warmup_ids": partition_ids["warmup"],
-                "formal_ids": [
-                    partition_ids[f"formal-{index}"]
-                    for index in range(1, repetitions + 1)
-                ],
+                "formal_ids": [partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)],
                 "artifact_checksums": checksums,
             },
             indent=2,
@@ -239,9 +228,7 @@ def write_fixture(
         concurrency=concurrency,
         seed=seed,
         warmup_ids=partition_ids["warmup"],
-        formal_ids=tuple(
-            partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)
-        ),
+        formal_ids=tuple(partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)),
         partition_files=partition_files,
         metadata_file=metadata_file,
         manifest_file=manifest_file,
@@ -272,14 +259,14 @@ def write_aisbench_config(
         raise FileNotFoundError(dataset_path)
     dataset_path.with_name(dataset_path.name + ".meta.json").write_text(
         json.dumps(
-            {"request_count": request_count, "sampling_mode": "default"},
+            {"request_count": request_count, "sampling_mode": "single-wave-total"},
             indent=2,
             sort_keys=True,
         )
         + "\n",
         encoding="utf-8",
     )
-    text = f'''from ais_bench.benchmark.calculators import StablePerfMetricCalculator
+    text = f"""from ais_bench.benchmark.calculators import DefaultPerfMetricCalculator
 from ais_bench.benchmark.datasets import CustomDataset
 from ais_bench.benchmark.models import VLLMCustomAPI
 from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer
@@ -295,7 +282,7 @@ summarizer = dict(
     attr="performance",
     type=DefaultPerfSummarizer,
     calculator=dict(
-        type=StablePerfMetricCalculator,
+        type=DefaultPerfMetricCalculator,
         stats_list=["Average", "Min", "Max", "Median", "P75", "P90", "P95", "P99"],
     ),
 )
@@ -305,7 +292,7 @@ models = [dict(
     attr="service",
     type=VLLMCustomAPI,
     stream=True,
-    retry=1,
+    retry=0,
     url={endpoint!r},
     model="vllm-ascend/DeepSeek-V2-Lite-W8A8",
     path="/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8",
@@ -336,7 +323,7 @@ infer = dict(
     ),
 )
 work_dir={str((output_path.parent / "aisbench-output").resolve())!r}
-'''
+"""
     compile(text, str(output_path), "exec")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(text, encoding="utf-8")
@@ -394,10 +381,7 @@ def main(argv: list[str] | None = None) -> int:
                 "class": type(tokenizer).__name__,
                 "vocab_size": tokenizer.vocab_size,
                 "model_max_length_for_validation": tokenizer.model_max_length,
-                "files": {
-                    path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-                    for path in tokenizer_files
-                },
+                "files": {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in tokenizer_files},
             },
             indent=2,
             sort_keys=True,

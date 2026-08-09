@@ -8,8 +8,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from performance.contract import WorkloadPoint, stable_measurement_valid
-
+from performance.contract import WorkloadPoint, build_matrix, point_id
 
 REQUIRED_ROOT_FILES = (
     "handoff.json",
@@ -25,7 +24,11 @@ POINT_PATTERN = re.compile(
 METRICS = (
     "Input Token Throughput",
     "Request Throughput",
+    "TTFT Median",
+    "TTFT Max",
     "TTFT P95",
+    "E2EL Median",
+    "E2EL Max",
     "E2EL P95",
     "Achieved Concurrency",
     "Output Token Throughput",
@@ -65,11 +68,11 @@ def _metric_number(value: object) -> float:
     return float(match.group(1))
 
 
-def _stable_value(common: dict[str, object], name: str) -> float:
+def _stage_value(common: dict[str, object], name: str, stage: str = "total") -> float:
     stages = common.get(name)
-    if not isinstance(stages, dict) or "stable" not in stages:
-        raise ValueError(f"AISBench common metric lacks stable stage: {name}")
-    return _metric_number(stages["stable"])
+    if not isinstance(stages, dict) or stage not in stages:
+        raise ValueError(f"AISBench common metric lacks {stage} stage: {name}")
+    return _metric_number(stages[stage])
 
 
 def summarize_aisbench_attempt(
@@ -78,16 +81,8 @@ def summarize_aisbench_attempt(
     request_count: int,
     image_digest: str,
 ) -> dict[str, object]:
-    common_paths = [
-        path
-        for path in raw.rglob(f"{point.variant}.json")
-        if "performances" in path.parts
-    ]
-    csv_paths = [
-        path
-        for path in raw.rglob(f"{point.variant}.csv")
-        if "performances" in path.parts
-    ]
+    common_paths = [path for path in raw.rglob(f"{point.variant}.json") if "performances" in path.parts]
+    csv_paths = [path for path in raw.rglob(f"{point.variant}.csv") if "performances" in path.parts]
     detail_paths = list(raw.rglob(f"{point.variant}_details.jsonl"))
     errors: list[str] = []
     if len(common_paths) != 1:
@@ -112,14 +107,14 @@ def summarize_aisbench_attempt(
         ("Output Token Throughput", "Output Token Throughput"),
     ):
         try:
-            metrics[target] = _stable_value(common, source)
+            metrics[target] = _stage_value(common, source)
         except ValueError as error:
             errors.append(str(error))
     try:
-        duration_ms = _stable_value(common, "Benchmark Duration")
-        total_requests = _stable_value(common, "Total Requests")
-        failed_requests = _stable_value(common, "Failed Requests")
-        success_requests = _stable_value(common, "Success Requests")
+        duration_ms = _stage_value(common, "Benchmark Duration")
+        total_requests = _stage_value(common, "Total Requests")
+        failed_requests = _stage_value(common, "Failed Requests")
+        success_requests = _stage_value(common, "Success Requests")
     except ValueError as error:
         errors.append(str(error))
         duration_ms = 0.0
@@ -129,17 +124,16 @@ def summarize_aisbench_attempt(
     request_metrics: dict[str, dict[str, str]] = {}
     with csv_paths[0].open(newline="", encoding="utf-8") as stream:
         for row in csv.DictReader(stream):
-            if row.get("Stage") == "stable":
+            if row.get("Stage") == "total":
                 request_metrics[row.get("Performance Parameters", "")] = row
-    for source, target in (
-        ("TTFT", "TTFT P95"),
-        ("E2EL", "E2EL P95"),
-        ("TPOT", "TPOT P95"),
-        ("ITL", "ITL P95"),
-    ):
+    for source in ("TTFT", "E2EL", "TPOT", "ITL"):
         row = request_metrics.get(source)
-        if row is not None and row.get("P95") not in (None, ""):
-            metrics[target] = _metric_number(row["P95"])
+        if row is None:
+            continue
+        for statistic in ("Median", "Max", "P95"):
+            value = row.get(statistic)
+            if value not in (None, ""):
+                metrics[f"{source} {statistic}"] = _metric_number(value)
     e2el = request_metrics.get("E2EL", {})
     max_e2el_ms = _metric_number(e2el.get("Max", 0))
     detail_count = 0
@@ -159,36 +153,30 @@ def summarize_aisbench_attempt(
             if detail.get("output_tokens") != point.output_tokens:
                 errors.append(f"output token mismatch in detail line {line_number}")
     if detail_count != request_count:
-        errors.append(
-            f"AISBench detail count mismatch: expected {request_count}, got {detail_count}"
-        )
+        errors.append(f"AISBench detail count mismatch: expected {request_count}, got {detail_count}")
     if success_count != request_count:
-        errors.append(
-            f"AISBench success count mismatch: expected {request_count}, got {success_count}"
-        )
+        errors.append(f"AISBench success count mismatch: expected {request_count}, got {success_count}")
     common_counts = (total_requests, failed_requests, success_requests)
     if (
         any(value != int(value) for value in common_counts)
         or failed_requests != 0
-        or success_requests != total_requests
-        or not 0 < total_requests <= request_count
+        or total_requests != request_count
+        or success_requests != request_count
     ):
         errors.append("AISBench common request counts do not match the attempt contract")
-    stable_valid = stable_measurement_valid(max_e2el_ms, duration_ms)
-    if not stable_valid:
-        errors.append("stable benchmark duration is insufficient")
     return {
         "valid": not errors,
         "image_digest": image_digest,
         "errors": errors,
         "metrics": metrics,
         "request_count": request_count,
-        "stable_request_count": int(total_requests),
+        "measurement_stage": "total",
+        "single_wave": True,
+        "stage_request_count": int(total_requests),
         "detail_count": detail_count,
         "success_count": success_count,
         "benchmark_duration_ms": duration_ms,
         "max_e2el_ms": max_e2el_ms,
-        "stable_duration_valid": stable_valid,
         "raw_common": str(common_paths[0].relative_to(raw)),
         "raw_request_metrics": str(csv_paths[0].relative_to(raw)),
         "raw_details": str(detail_paths[0].relative_to(raw)),
@@ -200,9 +188,7 @@ def validate_checksums(root: Path) -> list[str]:
     if not manifest.is_file():
         return ["missing root evidence: SHA256SUMS"]
     errors: list[str] = []
-    for line_number, line in enumerate(
-        manifest.read_text(encoding="utf-8").splitlines(), 1
-    ):
+    for line_number, line in enumerate(manifest.read_text(encoding="utf-8").splitlines(), 1):
         digest, separator, name = line.partition("  ")
         if not separator or len(digest) != 64 or not name:
             errors.append(f"malformed SHA256SUMS line {line_number}")
@@ -235,6 +221,28 @@ def validate_evidence(root: Path) -> list[str]:
     if not isinstance(expected_points, list):
         errors.append("run contract expected_points is not a list")
         return errors
+    rapid_points = [point_id(point) for point in build_matrix("dp1")]
+    if expected_points != rapid_points:
+        errors.append("run contract does not match the exact rapid point matrix")
+    if repetitions != 1:
+        errors.append("run contract formal_repetitions must be 1")
+    if contract.get("request_count") != 8:
+        errors.append("run contract request_count must be 8")
+    if contract.get("calculator") != "total":
+        errors.append("run contract calculator must be total")
+    if contract.get("single_wave") is not True:
+        errors.append("run contract single_wave must be true")
+    actual_points = sorted(path.name for path in (root / "points").glob("*") if path.is_dir())
+    for point in sorted(set(actual_points) - set(rapid_points)):
+        errors.append(f"unexpected point directory: {point}")
+    fixture_root = root / "fixtures" / "tokens-16384-c64"
+    for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
+        if not (fixture_root / filename).is_file():
+            errors.append(f"missing shared fixture: {filename}")
+    for variant in ("bulk", "layerwise", "reuse3"):
+        for filename in ("vllm-prefill.log", "vllm-decode.log"):
+            if not (root / "variants" / variant / "raw" / filename).is_file():
+                errors.append(f"missing variant evidence: {variant}/{filename}")
     for point in expected_points:
         point_root = root / "points" / str(point)
         identity_path = point_root / "identity.json"
@@ -249,6 +257,31 @@ def validate_evidence(root: Path) -> list[str]:
                 errors.append(str(error))
         if not (point_root / "warmup").is_dir():
             errors.append(f"missing warmup: {point}")
+        formal_phases = sorted(path.name for path in point_root.glob("formal-*") if path.is_dir())
+        for phase_name in formal_phases:
+            if phase_name != "formal-1":
+                errors.append(f"unexpected formal phase {phase_name}: {point}")
+        for phase_name in ("warmup", "formal-1"):
+            attempts = list((point_root / phase_name).glob("attempt-*"))
+            if len(attempts) != 1:
+                errors.append(f"missing or ambiguous {phase_name} attempt: {point}")
+                continue
+            reference_path = attempts[0] / "raw" / "fixture-reference.json"
+            if not reference_path.is_file():
+                errors.append(f"missing fixture reference for {phase_name}: {point}")
+                continue
+            try:
+                reference = _load_json(reference_path)
+                relative = reference.get("path")
+                expected_relative = f"fixtures/tokens-16384-c64/{phase_name}.jsonl"
+                if relative != expected_relative:
+                    errors.append(f"fixture reference path drift for {phase_name}: {point}")
+                shared = root / expected_relative
+                digest = hashlib.sha256(shared.read_bytes()).hexdigest() if shared.is_file() else ""
+                if reference.get("sha256") != digest:
+                    errors.append(f"fixture reference digest drift for {phase_name}: {point}")
+            except ValueError as error:
+                errors.append(str(error))
         for repetition in range(1, repetitions + 1):
             phase = point_root / f"formal-{repetition}"
             summaries = list(phase.glob("attempt-*/raw/summary.json"))
@@ -258,11 +291,16 @@ def validate_evidence(root: Path) -> list[str]:
             try:
                 summary = _load_json(summaries[0])
                 if summary.get("image_digest") != contract.get("image_digest"):
-                    errors.append(
-                        f"image digest drift in formal repetition {repetition}: {point}"
-                    )
+                    errors.append(f"image digest drift in formal repetition {repetition}: {point}")
                 if summary.get("valid") is not True:
                     errors.append(f"invalid formal repetition {repetition}: {point}")
+                if (
+                    summary.get("request_count") != 8
+                    or summary.get("stage_request_count") != 8
+                    or summary.get("measurement_stage") != "total"
+                    or summary.get("single_wave") is not True
+                ):
+                    errors.append(f"formal summary contract drift: {point}")
             except ValueError as error:
                 errors.append(str(error))
     return errors
@@ -274,21 +312,19 @@ def load_results(root: Path) -> tuple[ResultRow, ...]:
         raise ValueError("invalid evidence: " + "; ".join(errors))
     contract = _load_json(root / "run-contract.json")
     rows: list[ResultRow] = []
-    for point_id in contract["expected_points"]:  # type: ignore[index]
-        match = POINT_PATTERN.fullmatch(str(point_id))
+    for selected_point_id in contract["expected_points"]:  # type: ignore[index]
+        match = POINT_PATTERN.fullmatch(str(selected_point_id))
         if match is None:
-            raise ValueError(f"malformed point ID: {point_id}")
+            raise ValueError(f"malformed point ID: {selected_point_id}")
         repetitions = int(contract["formal_repetitions"])
         for repetition in range(1, repetitions + 1):
             summaries = list(
-                (root / "points" / str(point_id) / f"formal-{repetition}").glob(
-                    "attempt-*/raw/summary.json"
-                )
+                (root / "points" / str(selected_point_id) / f"formal-{repetition}").glob("attempt-*/raw/summary.json")
             )
             summary = _load_json(summaries[0])
             raw_metrics = summary.get("metrics", {})
             if not isinstance(raw_metrics, dict):
-                raise ValueError(f"metrics are not an object: {point_id} repetition {repetition}")
+                raise ValueError(f"metrics are not an object: {selected_point_id} repetition {repetition}")
             metrics = {
                 name: float(value)
                 for name, value in raw_metrics.items()
@@ -296,7 +332,7 @@ def load_results(root: Path) -> tuple[ResultRow, ...]:
             }
             rows.append(
                 ResultRow(
-                    point_id=str(point_id),
+                    point_id=str(selected_point_id),
                     topology=match.group("topology"),
                     input_tokens=int(match.group("input")),
                     output_tokens=int(match.group("output")),
@@ -318,16 +354,12 @@ def render_report(root: Path) -> str:
     lines = [
         "# Mooncake Layerwise Performance Raw Characterization",
         "",
-        "This report retains every formal repetition and presents direct raw comparisons only.",
+        "Single-wave raw characterization; not a steady-state or statistically significant result.",
         "",
         "## Raw Results",
         "",
-        "| Topology | Input | Output | Variant | Concurrency | Repetition | "
-        + " | ".join(METRICS)
-        + " |",
-        "| --- | ---: | ---: | --- | ---: | ---: | "
-        + " | ".join("---:" for _ in METRICS)
-        + " |",
+        "| Topology | Input | Output | Variant | Concurrency | Repetition | " + " | ".join(METRICS) + " |",
+        "| --- | ---: | ---: | --- | ---: | ---: | " + " | ".join("---:" for _ in METRICS) + " |",
     ]
     for row in rows:
         values = " | ".join(_number(row.metrics.get(metric)) for metric in METRICS)

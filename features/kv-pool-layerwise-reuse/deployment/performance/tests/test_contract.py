@@ -15,38 +15,46 @@ def test_variant_contract() -> None:
     assert contract.outputs_for("reuse3") == (1,)
 
 
-def test_topology_matrix_and_rotation() -> None:
-    assert contract.TOPOLOGIES["dp1"].concurrency == (1, 2, 4, 8, 16, 32)
-    assert contract.TOPOLOGIES["dp2"].concurrency == (2, 4, 8, 16, 32, 64)
-    assert contract.DP1_ROTATION[4096] == ("bulk", "layerwise", "reuse3")
-    assert contract.DP2_ROTATION[4096] == ("reuse3", "layerwise", "bulk")
-    matrix = contract.build_matrix()
-    assert len(matrix) == 180
-    assert {point.input_tokens for point in matrix} == {4096, 16384, 32768}
-    assert not any(
-        point.variant == "reuse3" and point.output_tokens == 128 for point in matrix
+def test_rapid_matrix_is_exactly_five_points() -> None:
+    assert tuple(contract.TOPOLOGIES) == ("dp1",)
+    assert contract.TOPOLOGIES["dp1"].concurrency == (8,)
+    assert contract.INPUT_TOKENS == (16384,)
+    assert contract.VARIANT_ORDER == ("bulk", "layerwise", "reuse3")
+    assert contract.build_matrix() == (
+        contract.WorkloadPoint("dp1", 16384, 128, "bulk", 8),
+        contract.WorkloadPoint("dp1", 16384, 1, "bulk", 8),
+        contract.WorkloadPoint("dp1", 16384, 128, "layerwise", 8),
+        contract.WorkloadPoint("dp1", 16384, 1, "layerwise", 8),
+        contract.WorkloadPoint("dp1", 16384, 1, "reuse3", 8),
     )
+    assert contract.build_matrix("dp1") == contract.build_matrix()
+    with pytest.raises(ValueError, match="unsupported topology"):
+        contract.build_matrix("dp2")
 
 
-@pytest.mark.parametrize(
-    ("concurrency", "warmup", "formal"),
-    [(1, 8, 32), (4, 8, 32), (16, 32, 128), (64, 128, 512)],
-)
-def test_sample_counts(concurrency: int, warmup: int, formal: int) -> None:
-    assert contract.sample_counts(concurrency) == (warmup, formal, 3)
+def test_single_wave_counts_are_frozen() -> None:
+    assert contract.sample_counts(8) == (8, 8, 1)
+    with pytest.raises(ValueError, match="concurrency must be 8"):
+        contract.sample_counts(1)
 
 
-def test_adaptive_stop_and_stable_duration() -> None:
-    history = (
-        contract.PointResult(100.0, 100.0),
-        contract.PointResult(104.0, 160.0),
-        contract.PointResult(107.0, 250.0),
-    )
-    assert contract.adaptive_stop(history, hard_failure=False).stop is True
-    assert contract.adaptive_stop(history[:2], hard_failure=False).stop is False
-    assert contract.adaptive_stop((), hard_failure=True).stop is True
-    assert contract.stable_measurement_valid(900.0, 3001.0)
-    assert not contract.stable_measurement_valid(1001.0, 3000.0)
+def test_rapid_run_contract_is_self_describing() -> None:
+    assert contract.build_run_contract("sha256:image") == {
+        "topologies": ["dp1"],
+        "image_digest": "sha256:image",
+        "expected_points": [
+            "dp1-16384-bulk-o128-c8",
+            "dp1-16384-bulk-o1-c8",
+            "dp1-16384-layerwise-o128-c8",
+            "dp1-16384-layerwise-o1-c8",
+            "dp1-16384-reuse3-o1-c8",
+        ],
+        "formal_repetitions": 1,
+        "request_count": 8,
+        "calculator": "total",
+        "single_wave": True,
+        "raw_characterization_only": True,
+    }
 
 
 def test_runtime_constants_are_frozen() -> None:
