@@ -10,6 +10,9 @@
   },
   "raw_manifest_digest": "fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c",
   "report_path": "features/kv-pool-layerwise-reuse/layerwise-performance-rapid-validation-2026-08-10.md",
+  "report_renderer_commit": "0f88b7a3d95f9748b86c2ddb49b53dbc00428b61",
+  "report_rendered_at": "2026-08-10T03:42:34+08:00",
+  "report_sha256": "56443723eec12deba773a4d2de76e510e0c020c78c6c231842d1c6d30cb6bc65",
   "run_id": "20260809T184011Z",
   "source_path": "/tmp/layerwise-performance-rapid-20260809T184011Z"
 }

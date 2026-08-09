@@ -25,6 +25,10 @@ evidence.
   checker with `8/8` successful requests. Raw request throughput was `0.2063`
   (BULK o128), `0.3743` (BULK o1), `0.1552` (LAYERWISE o128), `0.2320`
   (LAYERWISE o1), and `0.2567` req/s (REUSE3 o1).
+- Report coverage: five aggregate point rows, all 40 formal per-request rows,
+  and all output-matched direct ratios. Report SHA256 is
+  `56443723eec12deba773a4d2de76e510e0c020c78c6c231842d1c6d30cb6bc65`;
+  renderer commit is `0f88b7a3d95f9748b86c2ddb49b53dbc00428b61`.
 - Direct observation: REUSE3 improved o1 request throughput by `1.10647x`
   over LAYERWISE and reduced median TTFT to `0.933059x`. LAYERWISE did not
   outperform BULK in this single wave; no statistical significance or
@@ -35,7 +39,7 @@ evidence.
 - Raw `SHA256SUMS` digest:
   `fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c`.
 - Repository import `SHA256SUMS` digest (1128 entries):
-  `c1dd24cc79c5af6bef5b3f0e3f8b3b09b7fdac5904564c9a1f726135cf6440cf`.
+  `01ff2689580656b70cc381af7a382b53f711f9163a60cf0174a3d8d5b995cff4`.
 - Reusable `linux/arm64` image:
   `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`,
   manifest

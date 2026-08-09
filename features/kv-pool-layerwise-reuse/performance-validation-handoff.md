@@ -4,7 +4,7 @@ status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
 generation: 8
-updated_at: 2026-08-10T03:22:04+08:00
+updated_at: 2026-08-10T03:42:34+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -205,9 +205,9 @@ scope.
 | Formal requests | PASS | every point is `valid: true` with `8/8` successful requests |
 | Full report checker | PASS | `performance.report check --scope all` returned `{"scope":"all","valid":true,"errors":[]}` |
 | Raw checksum replay | PASS | `evidence/layerwise-performance-20260809T184011Z/raw/SHA256SUMS` digest `fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c` |
-| Repository import checksum replay | PASS | `evidence/layerwise-performance-20260809T184011Z/SHA256SUMS` digest `c1dd24cc79c5af6bef5b3f0e3f8b3b09b7fdac5904564c9a1f726135cf6440cf` |
+| Repository import checksum replay | PASS | `evidence/layerwise-performance-20260809T184011Z/SHA256SUMS` digest `01ff2689580656b70cc381af7a382b53f711f9163a60cf0174a3d8d5b995cff4` |
 | Runtime cleanup/restoration | PASS | `raw/restoration.json`: completed, engines stopped, no errors, Mooncake empty; `raw/final-mooncake-empty.metrics`: zero keys and allocated bytes |
-| Raw report | PASS | `layerwise-performance-rapid-validation-2026-08-10.md` |
+| Raw report | PASS | `layerwise-performance-rapid-validation-2026-08-10.md`: five aggregate rows, all 40 formal per-request rows, and approved ratios; SHA256 `56443723eec12deba773a4d2de76e510e0c020c78c6c231842d1c6d30cb6bc65`; renderer `0f88b7a3d95f9748b86c2ddb49b53dbc00428b61` |
 
 Observed request throughput was `0.2063` (BULK o128), `0.3743` (BULK o1),
 `0.1552` (LAYERWISE o128), `0.2320` (LAYERWISE o1), and `0.2567` req/s
