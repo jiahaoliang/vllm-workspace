@@ -220,6 +220,15 @@ freeze the same:
 the scheduler and available KV capacity, rather than a lower static sequence
 limit, determine saturation.
 
+Every serving rank starts with
+`MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB`. The largest formal phase is DP2,
+32768 input tokens, concurrency 64, and 512 requests. A measured 4096-token
+entry occupies 127,401,984 bytes, so that phase requires at most
+521,838,526,464 bytes before allocator overhead. Six 128 GiB serving segments
+provide 824,633,720,832 bytes. The runner records the override in runtime
+identity, and startup logs must show the corresponding mounted segment size.
+This sizing is identical across BULK, LAYERWISE, and REUSE3.
+
 ## Topologies
 
 ### Mechanism Topology
@@ -359,6 +368,7 @@ The runtime identity must additionally prove:
   expected logical KV-memory factor, and uses ranged transfer;
 - `REUSE3` Decode remains a no-reuse pure consumer;
 - no non-experimental flag differs across A/B/C.
+- every Prefill and Decode rank mounts the frozen 128 GiB Mooncake segment.
 
 If any identity or correctness gate fails, do not collect or publish a formal
 performance comparison for that variant.

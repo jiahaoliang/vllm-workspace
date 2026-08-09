@@ -72,6 +72,22 @@ def test_topology_allocations_and_image_identity() -> None:
     assert inputs == original
 
 
+def test_runtime_sizes_mooncake_pool_for_the_largest_formal_phase() -> None:
+    for topology, concurrency in (("dp1", 32), ("dp2", 64)):
+        for variant in ("bulk", "layerwise", "reuse3"):
+            rendered = runtime.render_resources(
+                base_inputs(),
+                WorkloadPoint(topology, 32768, 1, variant, concurrency),
+                "image@sha256:x",
+            )
+            data = rendered.runtime_configmap["data"]
+            identity = json.loads(data["runtime-identity.json"])
+
+            assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-prefill.sh"]
+            assert "MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB" in data["start-decode.sh"]
+            assert identity["mooncake_global_segment_size"] == "128GB"
+
+
 def _kv_config(argv: tuple[str, ...]) -> dict[str, object]:
     index = argv.index("--kv-transfer-config")
     return json.loads(argv[index + 1])

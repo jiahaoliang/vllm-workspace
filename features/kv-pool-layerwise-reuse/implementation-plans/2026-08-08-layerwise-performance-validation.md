@@ -375,11 +375,11 @@ def test_reuse3_only_adds_prefill_shared_buffers(base_inputs):
 
 - [ ] **Step 2: Prove red, then implement JSON rendering**
 
-Deep-copy live objects and change only derived image, performance ConfigMap volume, physical NPU requests/limits, generated start scripts, Prefill DP arguments, and variant KV JSON. Preserve all mounts, probes, commands, services, nodes, and non-experimental environment. Emit canonical JSON, not YAML substitution.
+Deep-copy live objects and change only derived image, performance ConfigMap volume, physical NPU requests/limits, generated start scripts, Prefill DP arguments, and variant KV JSON. Generated Prefill and Decode start scripts must set the same `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB`: the largest DP2 formal phase needs 521,838,526,464 payload bytes, while six 128 GiB segments provide 824,633,720,832 bytes. Preserve all mounts, probes, commands, services, nodes, and other non-experimental environment. Emit canonical JSON, not YAML substitution.
 
 - [ ] **Step 3: Implement runtime identity**
 
-Generated check-runtime.py emits variant, topology, image digest, role, DP/TP, model, prefetch depth, shared buffers, max sequences, max batched tokens, and imported source path. Require REUSE3 Prefill to report 27 layers, five physical slots, and the memory factor; Decode reports no reuse. Require whole-key-only BULK and ranged/no-whole-key LAYERWISE/REUSE3.
+Generated check-runtime.py emits variant, topology, image digest, role, DP/TP, model, prefetch depth, shared buffers, max sequences, max batched tokens, Mooncake global segment size, and imported source path. Require REUSE3 Prefill to report 27 layers, five physical slots, and the memory factor; Decode reports no reuse. Require whole-key-only BULK and ranged/no-whole-key LAYERWISE/REUSE3.
 
 - [ ] **Step 4: Run tests and commit**
 
@@ -698,6 +698,11 @@ PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
 ~~~
 
 Do not continue on identity/correctness/evidence invalidity. Complete capacity boundaries remain observations.
+
+If a formal run used the Mooncake default 1 GiB per rank and exhausted the
+pool, preserve it as invalid diagnostic evidence. Repair the performance
+runtime sizing, increment the committed handoff generation, and restart from a
+new run root; do not resume across the changed runtime contract.
 
 ### Task 12: Run And Check DP2
 

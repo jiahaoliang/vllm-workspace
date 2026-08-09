@@ -15,6 +15,10 @@ reporting contract in
 - Server images are consumed directly or materialized from an exact Python
   patch with `nerdctl commit`. Dockerfile, BuildKit, and image build commands
   are outside this workflow.
+- Generated Prefill and Decode start scripts freeze
+  `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` per serving rank. This provides enough
+  pool capacity for the 512-request, 32768-token DP2 formal phase and remains
+  identical across all variants.
 
 ## Commands
 
@@ -63,6 +67,11 @@ features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh 
 After the listener accepts the handoff, execute DP1 then DP2 in the same run
 root. A retry uses a new attempt directory; `--resume` never overwrites an
 earlier attempt.
+
+Do not resume a root created under a different runtime contract or handoff
+generation. In particular, a root that used Mooncake's default 1 GiB segment
+size is invalid capacity-diagnostic evidence and must not be reused after the
+128 GiB sizing fix.
 
 ```bash
 run_id=$(date -u +%Y%m%dT%H%M%SZ)

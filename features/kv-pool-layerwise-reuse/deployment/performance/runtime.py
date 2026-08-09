@@ -9,6 +9,9 @@ from typing import Any
 from performance.contract import RUNTIME_CONSTANTS, TOPOLOGIES, VARIANTS, WorkloadPoint
 
 
+MOONCAKE_GLOBAL_SEGMENT_SIZE = "128GB"
+
+
 @dataclass(frozen=True)
 class RuntimeInputs:
     prefill_deployment: dict[str, Any]
@@ -148,6 +151,7 @@ if [[ -e ${{pid_file}} ]] && kill -0 "$(<"${{pid_file}}")" 2>/dev/null; then
 fi
 : >"${{log_file}}"
 nohup env VLLM_USE_V1=1 PYTHONHASHSEED=0 PYTHONUNBUFFERED=1 \\
+  MOONCAKE_GLOBAL_SEGMENT_SIZE={MOONCAKE_GLOBAL_SEGMENT_SIZE} \\
   {command} >"${{log_file}}" 2>&1 </dev/null &
 echo "$!" >"${{pid_file}}"
 """
@@ -170,6 +174,7 @@ def _runtime_identity(point: WorkloadPoint, image: str) -> dict[str, Any]:
         "prefill_logical_memory_factor": 27 / prefill_slots,
         "decode_physical_slots": 27,
         "decode_logical_memory_factor": 1.0,
+        "mooncake_global_segment_size": MOONCAKE_GLOBAL_SEGMENT_SIZE,
         "prefill_kv": _kv_transfer_config("prefill", point),
         "decode_kv": _kv_transfer_config("decode", point),
     }
