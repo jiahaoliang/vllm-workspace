@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 2
-updated_at: 2026-08-09T05:36:35+08:00
+generation: 3
+updated_at: 2026-08-09T08:29:43+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,7 +49,7 @@ updated_at: 2026-08-09T05:36:35+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` functional control parent | `a468b71d1c808e636ca07d85b2990b6e6d682854` | transition parent pushed as `origin/kv-pool-layerwise-reuse=a468b71d1c808e636ca07d85b2990b6e6d682854` |
+| control repo | `kv-pool-layerwise-reuse` performance control parent | `ad10a914857fb823054e90afa54d86461ae4124d` | transition parent pushed as `origin/kv-pool-layerwise-reuse=ad10a914857fb823054e90afa54d86461ae4124d` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `d74269a08e48e3b5b097f9a34f5c421696ddda40` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=d74269a08e48e3b5b097f9a34f5c421696ddda40` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -88,6 +88,7 @@ updated_at: 2026-08-09T05:36:35+08:00
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/validator.log`; `REPORT.md` |
 | Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
 | Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T203742Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
+| Performance runtime capacity CPU/mock | PASS | PASS | control commit `ad10a914857fb823054e90afa54d86461ae4124d`; `deployment/performance/tests/test_runtime.py`; complete performance harness `61 passed` |
 
 ## Evidence Identity
 
@@ -109,6 +110,8 @@ After this handoff becomes ready, performance validation may use only:
 - Prefill `REUSE3` with `backend=mooncake`, `use_layerwise=true`,
   `layerwise_num_shared_buffers=3`, and `kv_producer`;
 - the no-reuse pure-consumer Decode companion required by DP1/DP2;
+- `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` on every Prefill and Decode serving
+  rank, identical across BULK, LAYERWISE, and REUSE3;
 - functional validation of `kv_producer` and `kv_both` roles;
 - namespace `liangjiahao`;
 - model, topology, hardware and namespace explicitly frozen by the final
@@ -155,6 +158,13 @@ None. The initial partial-load correctness defect is preserved in historical
 performance diagnostics and resolved by vLLM-Ascend
 `d74269a08e48e3b5b097f9a34f5c421696ddda40`; generation-2 functional evidence
 includes an exact 4096-token pure-consumer Decode regression canary.
+
+The invalid generation-2 performance root
+`/tmp/layerwise-performance-20260808T213937Z` exhausted the former default
+1 GiB-per-rank Mooncake pool after 30 unique 4096-token LAYERWISE requests. It
+is capacity-diagnostic evidence, not a performance result, and must not be
+resumed. Generation 3 freezes 128 GiB per serving rank and requires a new run
+root.
 
 ## Listener Message Template
 
