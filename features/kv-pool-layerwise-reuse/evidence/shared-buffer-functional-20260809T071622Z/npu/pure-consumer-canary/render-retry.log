@@ -1,0 +1,1 @@
+{"decode_npus": 2, "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z", "point": {"concurrency": 1, "input_tokens": 4096, "output_tokens": 1, "topology": "dp1", "variant": "reuse3"}, "prefill_npus": 2, "runtime_configmap": "layerwise-performance-dp1-4096-reuse3"}

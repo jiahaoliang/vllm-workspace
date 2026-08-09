@@ -1,0 +1,45 @@
+[2026-08-09T07:49:39Z] START focused TP2 non-save-owner gate regression
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/ut/distributed/ascend_store/test_pool_worker.py::TestKVPoolWorkerEarlyDispatch::test_mooncake_non_owner_publishes_reuse_save_gate_across_chunks
+[2026-08-09T07:50:04Z] END focused TP2 non-save-owner gate regression exit=0 artifact=pytest-non-save-owner.log
+[2026-08-09T07:50:32Z] START complete AscendStore CPU mock suite
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/ut/distributed/ascend_store
+[2026-08-09T07:51:04Z] END complete AscendStore CPU mock suite exit=0 artifact=pytest-ascend-store.log
+[2026-08-09T07:52:09Z] START MLA decode scoped layer wait regression
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/ut/attention/a2/test_mla_v1.py::TestAscendMLAImpl::test_mla_preprocess_decode_requests_scoped_layer_wait
+[2026-08-09T07:52:33Z] END MLA decode scoped layer wait regression exit=0 artifact=pytest-mla-decode-load.log
+[2026-08-09T07:52:38Z] START model runner layer reuse layout
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider -k layer_reuse tests/ut/worker/a2/test_model_runner_v1.py
+[2026-08-09T07:53:03Z] END model runner layer reuse layout exit=0 artifact=pytest-model-runner-layer-reuse.log
+[2026-08-09T07:53:44Z] START all role and default layerwise config
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/ut/distributed/ascend_store/test_layerwise_config.py
+[2026-08-09T07:54:08Z] END all role and default layerwise config exit=0 artifact=pytest-layerwise-roles.log
+[2026-08-09T07:55:56Z] START create isolated control UT directory
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- mkdir /workspace/control-functional-20260809T071622Z
+[2026-08-09T07:55:56Z] END create isolated control UT directory exit=0 artifact=control-ut-mkdir.log
+[2026-08-09T07:56:02Z] START tar sync control checkout to CPU UT Pod
+COMMAND bash -o pipefail -c tar\ --exclude=./.git\ --exclude=./repos\ --exclude=./deployment_yaml\ --exclude=./dockerfile.vllm23\ --exclude=./features/kv-pool-layerwise-reuse/evidence\ --exclude=\*/__pycache__\ --exclude=\*.pyc\ --exclude=./.pytest_cache\ --exclude=./.ruff_cache\ -C\ \"\$1\"\ -cf\ -\ .\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ vllm-ascend-ut\ -c\ ut\ --\ tar\ -C\ \"\$2\"\ -xf\ - bash /root/ljh/vllm-workspace /workspace/control-functional-20260809T071622Z
+[2026-08-09T07:56:02Z] END tar sync control checkout to CPU UT Pod exit=0 artifact=control-ut-sync.log
+[2026-08-09T07:56:31Z] START deployment and performance CPU mock suites
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/control-functional-20260809T071622Z/features/kv-pool-layerwise-reuse/deployment python3 -m pytest -q -p no:cacheprovider /workspace/control-functional-20260809T071622Z/features/kv-pool-layerwise-reuse/deployment/tests /workspace/control-functional-20260809T071622Z/features/kv-pool-layerwise-reuse/deployment/performance/tests
+[2026-08-09T07:56:34Z] END deployment and performance CPU mock suites exit=0 artifact=pytest-deployment-performance.log
+[2026-08-09T07:57:03Z] START complete performance harness CPU mock suite
+COMMAND kubectl exec -n liangjiahao vllm-ascend-ut -c ut -- env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/control-functional-20260809T071622Z/features/kv-pool-layerwise-reuse/deployment python3 -m pytest -q -p no:cacheprovider /workspace/control-functional-20260809T071622Z/features/kv-pool-layerwise-reuse/deployment/performance/tests
+[2026-08-09T07:57:06Z] END complete performance harness CPU mock suite exit=0 artifact=pytest-performance-harness.log
+[2026-08-09T07:57:51Z] START Ruff check changed production and regression files
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 /workspace/tools/ruff check vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py tests/ut/distributed/ascend_store/test_pool_worker.py
+[2026-08-09T07:57:53Z] END Ruff check changed production and regression files exit=0 artifact=ruff-check.log
+[2026-08-09T07:57:58Z] START Ruff format check changed production and regression files
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 /workspace/tools/ruff format --check vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py tests/ut/distributed/ascend_store/test_pool_worker.py
+[2026-08-09T07:58:01Z] END Ruff format check changed production and regression files exit=0 artifact=ruff-format.log
+[2026-08-09T07:58:08Z] START compile changed production and regression files
+COMMAND features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh -- env PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py tests/ut/distributed/ascend_store/test_pool_worker.py
+[2026-08-09T07:58:11Z] END compile changed production and regression files exit=0 artifact=python-compile.log
+[2026-08-09T07:58:42Z] START vLLM Ascend committed patch diff check
+COMMAND git -C repos/vllm-ascend diff --check 45b2e785b10ca4604cd6314819ed15f3ff674781..5355559175f9998f5d70866734fb79569dfc86f9
+[2026-08-09T07:58:42Z] END vLLM Ascend committed patch diff check exit=0 artifact=source-diff-check.log
+[2026-08-09T07:58:42Z] START control working tree diff check
+COMMAND git diff --check
+[2026-08-09T07:58:42Z] END control working tree diff check exit=0 artifact=control-diff-check.log
+[2026-08-09T07:58:43Z] START functional shell syntax check
+COMMAND bash -n features/kv-pool-layerwise-reuse/deployment/run-vllm-ascend-ut.sh features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/run-functional.sh features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/image/correct-oci-labels.sh
+[2026-08-09T07:58:43Z] END functional shell syntax check exit=0 artifact=shell-syntax.log

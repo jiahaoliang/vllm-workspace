@@ -890,6 +890,29 @@
 
 ## 2026-08-09
 
+- Fixed the TP2 Mooncake REUSE3 non-save-owner gate stall in vLLM-Ascend
+  `5355559175f9998f5d70866734fb79569dfc86f9`. The production delta from the
+  preceding source is three lines in `pool_worker.py`; memcache, Backend APIs,
+  and the public slot-release lifecycle are unchanged. The real-thread CPU
+  regression covers `tp_rank=1`, `put_step=2`, two chunked starts, and shared
+  source layer 1 to target layer 4.
+- Created native `linux/arm64` image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
+  from the frozen `45b2e785` base by patching all eight cumulative Python files
+  and running `nerdctl commit`. Manifest is
+  `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`;
+  config is
+  `sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c`.
+- Functional run `20260809T071622Z` passed the exact TP2 4096-token REUSE3
+  producer to pure-consumer canary, followed by no-reuse baseline,
+  `kv_producer`, and `kv_both` cold/warm real-NPU validation. CPU/mock gates
+  passed `515` AscendStore and `146` deployment/performance tests; all final
+  NPU/Mooncake cleanup gates passed. The 158-file root checksum manifest digest
+  is `e8cf5ce3fbf332dada8c9bfeb6fd1d3ececc6f02b96fe4a0a5b28b6e1b556876`.
+- The invalid performance root `/tmp/layerwise-performance-20260809T010429Z`
+  remains diagnostic and must not be resumed. Performance requires a fresh root
+  after generation 4 replaces the stale generation-3 handoff.
+
 - Preserved the isolated generation-1 performance failure showing that a pure
   Decode consumer requested the process-local key
   `model@decode-request_lastblock_31@0` while the Prefill-produced partial block

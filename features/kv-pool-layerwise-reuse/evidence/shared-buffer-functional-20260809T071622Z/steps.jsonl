@@ -1,0 +1,1 @@
+{"name":"validate complete functional evidence","started_at":"2026-08-09T08:03:59Z","ended_at":"2026-08-09T08:04:00Z","command":"python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/validate-functional-evidence.py","artifact":"functional-validator.log","exit_code":0}

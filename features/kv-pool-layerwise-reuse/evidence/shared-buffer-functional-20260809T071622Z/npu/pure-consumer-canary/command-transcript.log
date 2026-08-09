@@ -1,0 +1,114 @@
+[2026-08-09T07:17:36Z] START capture source Prefill Deployment
+COMMAND kubectl get deployment -n liangjiahao prefill-engine-deployment -o json
+[2026-08-09T07:17:36Z] END capture source Prefill Deployment exit=0 artifact=source-prefill.json
+[2026-08-09T07:17:40Z] START capture source Decode Deployment
+COMMAND kubectl get deployment -n liangjiahao decode-engine-deployment -o json
+[2026-08-09T07:17:40Z] END capture source Decode Deployment exit=0 artifact=source-decode.json
+[2026-08-09T07:17:45Z] START capture source runtime ConfigMap
+COMMAND kubectl get configmap -n liangjiahao layerwise-runtime-config -o json
+[2026-08-09T07:17:45Z] END capture source runtime ConfigMap exit=0 artifact=source-runtime-configmap.json
+[2026-08-09T07:17:49Z] START capture source Pods
+COMMAND kubectl get pods -n liangjiahao -o json
+[2026-08-09T07:17:49Z] END capture source Pods exit=0 artifact=source-pods.json
+[2026-08-09T07:18:03Z] START render TP2 4096 REUSE3 canary
+COMMAND python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/render-canary.py
+[2026-08-09T07:18:03Z] END render TP2 4096 REUSE3 canary exit=1 artifact=render.log
+[2026-08-09T07:18:35Z] START render TP2 4096 REUSE3 canary retry
+COMMAND python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/render-canary.py
+[2026-08-09T07:18:35Z] END render TP2 4096 REUSE3 canary retry exit=0 artifact=render-retry.log
+[2026-08-09T07:19:08Z] START apply REUSE3 runtime ConfigMap
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/rendered/runtime-configmap.json
+[2026-08-09T07:19:08Z] END apply REUSE3 runtime ConfigMap exit=0 artifact=apply-runtime-configmap.log
+[2026-08-09T07:19:14Z] START apply REUSE3 Prefill Deployment
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/rendered/prefill-deployment.json
+[2026-08-09T07:19:15Z] END apply REUSE3 Prefill Deployment exit=0 artifact=apply-prefill.log
+[2026-08-09T07:19:19Z] START apply no-reuse Decode Deployment
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/rendered/decode-deployment.json
+[2026-08-09T07:19:19Z] END apply no-reuse Decode Deployment exit=0 artifact=apply-decode.log
+[2026-08-09T07:21:51Z] START capture REUSE3 Prefill Pods
+COMMAND kubectl get pods -n liangjiahao -l app=prefill -o json
+[2026-08-09T07:21:51Z] END capture REUSE3 Prefill Pods exit=0 artifact=prefill-pods.json
+[2026-08-09T07:21:55Z] START capture no-reuse Decode Pods
+COMMAND kubectl get pods -n liangjiahao -l app=decode -o json
+[2026-08-09T07:21:55Z] END capture no-reuse Decode Pods exit=0 artifact=decode-pods.json
+[2026-08-09T07:22:03Z] START check REUSE3 Prefill runtime
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 /opt/vllm-layerwise/check-runtime.py --role prefill
+[2026-08-09T07:22:04Z] END check REUSE3 Prefill runtime exit=0 artifact=prefill-runtime.json
+[2026-08-09T07:22:10Z] START check no-reuse Decode runtime
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- python3 /opt/vllm-layerwise/check-runtime.py --role decode
+[2026-08-09T07:22:10Z] END check no-reuse Decode runtime exit=0 artifact=decode-runtime.json
+[2026-08-09T07:22:15Z] START capture pre-start Prefill NPU
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- npu-smi info
+[2026-08-09T07:22:16Z] END capture pre-start Prefill NPU exit=0 artifact=prefill-pre-start-npu.txt
+[2026-08-09T07:22:20Z] START capture pre-start Decode NPU
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- npu-smi info
+[2026-08-09T07:22:21Z] END capture pre-start Decode NPU exit=0 artifact=decode-pre-start-npu.txt
+[2026-08-09T07:22:28Z] START capture pre-start Master metrics
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\'http://mooncake-master-service:9003/metrics\'\,timeout=10\).read\(\).decode\(\)\,end=\'\'\)
+[2026-08-09T07:22:28Z] END capture pre-start Master metrics exit=0 artifact=pre-start.metrics
+[2026-08-09T07:23:04Z] START start REUSE3 Prefill TP2
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- /opt/vllm-layerwise/start-prefill.sh
+[2026-08-09T07:23:05Z] END start REUSE3 Prefill TP2 exit=0 artifact=start-prefill.log
+[2026-08-09T07:23:11Z] START wait REUSE3 Prefill ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod -l app=prefill --timeout=1800s
+[2026-08-09T07:25:47Z] END wait REUSE3 Prefill ready exit=0 artifact=wait-prefill-ready.log
+[2026-08-09T07:26:09Z] START start no-reuse Decode TP2
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- /opt/vllm-layerwise/start-decode.sh
+[2026-08-09T07:26:09Z] END start no-reuse Decode TP2 exit=0 artifact=start-decode.log
+[2026-08-09T07:26:16Z] START wait no-reuse Decode ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod -l app=decode --timeout=1800s
+[2026-08-09T07:28:44Z] END wait no-reuse Decode ready exit=0 artifact=wait-decode-ready.log
+[2026-08-09T07:30:07Z] START sync exact-fixture canary client
+COMMAND kubectl cp -n liangjiahao features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/send-canary.py layerwise-performance-aisbench:/tmp/send-canary-20260809T071622Z.py
+[2026-08-09T07:30:08Z] END sync exact-fixture canary client exit=0 artifact=client-sync.log
+[2026-08-09T07:30:12Z] START capture active Master metrics
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\'http://mooncake-master-service:9003/metrics\'\,timeout=10\).read\(\).decode\(\)\,end=\'\'\)
+[2026-08-09T07:30:12Z] END capture active Master metrics exit=0 artifact=active.metrics
+[2026-08-09T07:30:21Z] START send exact 4096-token REUSE3 canary
+COMMAND kubectl exec -n liangjiahao layerwise-performance-aisbench -- env PYTHONDONTWRITEBYTECODE=1 python3 /tmp/send-canary-20260809T071622Z.py 4096 1
+[2026-08-09T07:30:22Z] END send exact 4096-token REUSE3 canary exit=1 artifact=response.json
+[2026-08-09T07:32:36Z] START sync canary client into exact rootfs
+COMMAND kubectl cp -n liangjiahao features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/send-canary.py layerwise-performance-aisbench:/performance-workspace/rootfs/tmp/send-canary-20260809T071622Z.py
+[2026-08-09T07:32:37Z] END sync canary client into exact rootfs exit=0 artifact=client-chroot-sync.log
+[2026-08-09T07:32:43Z] START retry exact 4096-token REUSE3 canary in chroot
+COMMAND kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- chroot /performance-workspace/rootfs env TORCH_DEVICE_BACKEND_AUTOLOAD=0 PYTHONDONTWRITEBYTECODE=1 /client-tools/venv/bin/python /tmp/send-canary-20260809T071622Z.py 4096 1
+[2026-08-09T07:33:29Z] END retry exact 4096-token REUSE3 canary in chroot exit=0 artifact=response-retry.json
+[2026-08-09T07:33:59Z] START capture post-request Master metrics
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\'http://mooncake-master-service:9003/metrics\'\,timeout=10\).read\(\).decode\(\)\,end=\'\'\)
+[2026-08-09T07:33:59Z] END capture post-request Master metrics exit=0 artifact=post-request.metrics
+[2026-08-09T07:34:05Z] START capture REUSE3 Prefill log
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- cat /tmp/vllm-prefill.log
+[2026-08-09T07:34:05Z] END capture REUSE3 Prefill log exit=0 artifact=vllm-prefill.log
+[2026-08-09T07:34:10Z] START capture no-reuse Decode log
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- cat /tmp/vllm-decode.log
+[2026-08-09T07:34:10Z] END capture no-reuse Decode log exit=0 artifact=vllm-decode.log
+[2026-08-09T07:34:30Z] START stop targeted prefill TP2
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-09T07:34:54Z] END stop targeted prefill TP2 exit=0 artifact=stop-prefill.log
+[2026-08-09T07:34:59Z] START stop targeted decode TP2
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- /opt/vllm-layerwise/stop-engine.sh decode
+[2026-08-09T07:35:22Z] END stop targeted decode TP2 exit=0 artifact=stop-decode.log
+[2026-08-09T07:35:40Z] START capture prefill NPU release
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- npu-smi info
+[2026-08-09T07:35:41Z] END capture prefill NPU release exit=0 artifact=prefill-npu-released.txt
+[2026-08-09T07:35:46Z] START capture decode NPU release
+COMMAND kubectl exec -n liangjiahao deployment/decode-engine-deployment -c decode-engine -- npu-smi info
+[2026-08-09T07:35:46Z] END capture decode NPU release exit=0 artifact=decode-npu-released.txt
+[2026-08-09T07:35:51Z] START restart Mooncake Master after targeted canary
+COMMAND kubectl rollout restart -n liangjiahao deployment/mooncake-master-deployment
+[2026-08-09T07:35:52Z] END restart Mooncake Master after targeted canary exit=0 artifact=restart-master.log
+[2026-08-09T07:35:57Z] START wait Mooncake Master reset
+COMMAND kubectl rollout status -n liangjiahao deployment/mooncake-master-deployment --timeout=300s
+[2026-08-09T07:35:57Z] END wait Mooncake Master reset exit=0 artifact=wait-master.log
+[2026-08-09T07:36:11Z] START capture final Master metrics
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\'http://mooncake-master-service:9003/metrics\'\,timeout=30\).read\(\).decode\(\)\,end=\'\'\)
+[2026-08-09T07:36:12Z] END capture final Master metrics exit=0 artifact=final.metrics
+[2026-08-09T07:36:12Z] START validate targeted REUSE3 canary
+COMMAND python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/validate-canary.py
+[2026-08-09T07:36:12Z] END validate targeted REUSE3 canary exit=0 artifact=validator.log
+[2026-08-09T08:01:39Z] START remove exact canary client temp 1
+COMMAND kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- rm -f -- /tmp/send-canary-20260809T071622Z.py
+[2026-08-09T08:01:39Z] END remove exact canary client temp 1 exit=0 artifact=client-temp-cleanup-1.log
+[2026-08-09T08:01:45Z] START remove exact canary client temp 2
+COMMAND kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- rm -f -- /performance-workspace/rootfs/tmp/send-canary-20260809T071622Z.py
+[2026-08-09T08:01:46Z] END remove exact canary client temp 2 exit=0 artifact=client-temp-cleanup-2.log

@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-09T14:55:41+08:00
+Captured At: 2026-08-09T16:05:01+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
@@ -22,20 +22,25 @@ mocks passed `146`. Ruff, `py_compile`, and `git diff --check` passed. Source
 commit `535555917` is clean, DCO-signed, pushed, and has local/origin left-right
 `0 0`.
 
-Historical generation-3 source `d74269a08` used native `linux/arm64` image
-`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-d74269a0-df3f74ed-20260808T203742Z`
-with manifest `sha256:3c02653463562e8bfff717e6ade962ab1a2c661de59ae9f310bc050528fa81bd`.
-All eight cumulative production files match the checkout. CPU/mock gates passed
-`514` AscendStore, `20` role/default, `3` model-runner, `145`
-deployment/performance, and `60` performance harness tests. Real-NPU baseline,
-`kv_producer`, and `kv_both` cold/warm all passed. The exact DP1 4096-token
-Prefill to pure-consumer Decode canary passed with 32/32 block hits, 4095 remote
-load tokens, `vllm_cached=0`, and no KV load failure. All NPU processes exited,
-final Master metrics are `0/0/0`, and the 115-file evidence manifest replayed
-with digest `121a11b331cffeb4d031dac21637d70c0395d83ee971b07a138e4d4f4e03f449`.
-Formal performance root `/tmp/layerwise-performance-20260809T010429Z` later
-failed at the first REUSE3 canary because TP1 never published layer 1's gate;
-that root is diagnostic only and must not be resumed. The image and generation-3
-handoff remain bound to `d74269a08` and are not valid for current source
-`535555917`. A new patched image, NPU functional run, and incremented handoff are
-required before restarting performance from a new root.
+Current source uses native `linux/arm64` image
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
+with manifest `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`
+and config `sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c`.
+It is an eight-file cumulative patch of the frozen `45b2e785` base using
+`nerdctl commit`; all filesystem layers are unchanged by the subsequent OCI
+metadata correction and every in-image file hash matches the checkout.
+
+Functional run `20260809T071622Z` passed the targeted TP2 4096-token REUSE3
+canary with 32/32 block hits, 4095 remote load tokens, `vllm_cached=0`, all-zero
+commit results, no gate timeout, and final NPU/Master cleanup. The formal
+1-NPU baseline, `kv_producer`, and `kv_both` cold/warm matrix also passed with
+exact response equality and 61/61 runtime steps. CPU/mock gates passed `515`
+AscendStore, `20` role/default, `1` TP non-save-owner regression, `1` MLA,
+`3` model-runner, `146` deployment/performance, and `61` performance harness
+tests. The 158-file evidence manifest replayed with digest
+`e8cf5ce3fbf332dada8c9bfeb6fd1d3ececc6f02b96fe4a0a5b28b6e1b556876`.
+
+Formal performance root `/tmp/layerwise-performance-20260809T010429Z` remains
+diagnostic only and must not be resumed. The committed generation-3 handoff is
+still bound to `d74269a08`; it must be replaced by a generation-4 handoff-only
+child commit before performance restarts from a new root.

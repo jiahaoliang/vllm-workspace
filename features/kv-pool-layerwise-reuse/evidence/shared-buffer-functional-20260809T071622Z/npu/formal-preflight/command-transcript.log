@@ -1,0 +1,15 @@
+[2026-08-09T07:37:30Z] START apply functional runtime ConfigMap
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/10-runtime-config.yaml
+[2026-08-09T07:37:30Z] END apply functional runtime ConfigMap exit=0 artifact=apply-runtime-config.log
+[2026-08-09T07:37:35Z] START apply final 1-NPU Prefill Deployment
+COMMAND kubectl apply -n liangjiahao -f features/kv-pool-layerwise-reuse/deployment/40-prefill-engine.yaml
+[2026-08-09T07:37:35Z] END apply final 1-NPU Prefill Deployment exit=0 artifact=apply-prefill.log
+[2026-08-09T07:40:10Z] START capture formal Prefill Pod
+COMMAND kubectl get pod -n liangjiahao -l app=prefill -o json
+[2026-08-09T07:40:10Z] END capture formal Prefill Pod exit=0 artifact=prefill-pod.json
+[2026-08-09T07:40:15Z] START capture formal Prefill NPU idle
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- npu-smi info
+[2026-08-09T07:40:15Z] END capture formal Prefill NPU idle exit=0 artifact=prefill-npu-idle.txt
+[2026-08-09T07:40:24Z] START capture formal Master empty
+COMMAND kubectl exec -n liangjiahao deployment/prefill-engine-deployment -c prefill-engine -- python3 -c from\ urllib.request\ import\ urlopen\;\ print\(urlopen\(\'http://mooncake-master-service:9003/metrics\'\,timeout=10\).read\(\).decode\(\)\,end=\'\'\)
+[2026-08-09T07:40:25Z] END capture formal Master empty exit=0 artifact=master-empty.metrics

@@ -1,0 +1,21 @@
+[2026-08-09T07:59:01Z] START capture native base inspect
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z --mode=native
+[2026-08-09T07:59:01Z] END capture native base inspect exit=0 artifact=native-base-native-inspect.json
+[2026-08-09T07:59:06Z] START capture pre-metadata inspect
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-pre-metadata-535555917-20260809T070557Z --mode=native
+[2026-08-09T07:59:06Z] END capture pre-metadata inspect exit=0 artifact=pre-metadata-native-inspect.json
+[2026-08-09T07:59:12Z] START capture final native inspect
+COMMAND nerdctl -n k8s.io image inspect docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z --mode=native
+[2026-08-09T07:59:12Z] END capture final native inspect exit=0 artifact=final-native-inspect.json
+[2026-08-09T07:59:31Z] START hash clean checkout production files
+COMMAND sha256sum repos/vllm-ascend/vllm_ascend/attention/mla_v1.py repos/vllm-ascend/vllm_ascend/attention/utils.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py repos/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+[2026-08-09T07:59:31Z] END hash clean checkout production files exit=0 artifact=checkout-production-sha256.txt
+[2026-08-09T07:59:39Z] START hash final in-image production files
+COMMAND nerdctl -n k8s.io run --rm --pull=never --net=none --entrypoint sha256sum docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z /vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py /vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py /vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+[2026-08-09T07:59:40Z] END hash final in-image production files exit=0 artifact=image-production-sha256.txt
+[2026-08-09T08:00:04Z] START rehash clean checkout with source-relative paths
+COMMAND sha256sum vllm_ascend/attention/mla_v1.py vllm_ascend/attention/utils.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+[2026-08-09T08:00:04Z] END rehash clean checkout with source-relative paths exit=0 artifact=checkout-production-sha256-retry.txt
+[2026-08-09T08:01:13Z] START validate derived image identity and files
+COMMAND python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/image/validate-image.py
+[2026-08-09T08:01:13Z] END validate derived image identity and files exit=0 artifact=validator.log

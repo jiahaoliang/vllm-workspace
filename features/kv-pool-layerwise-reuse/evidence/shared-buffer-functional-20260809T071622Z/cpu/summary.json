@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "source_head": "5355559175f9998f5d70866734fb79569dfc86f9",
+  "source_dirty": false,
+  "focused_non_save_owner_tests": 1,
+  "ascend_store_tests": 515,
+  "mla_decode_load_tests": 1,
+  "model_runner_layer_reuse_tests": 3,
+  "layerwise_role_and_default_tests": 20,
+  "deployment_and_performance_tests": 146,
+  "performance_harness_tests": 61,
+  "role_coverage": [
+    "kv_producer",
+    "kv_both",
+    "kv_consumer+consumer_is_to_put=true",
+    "pure kv_consumer startup rejection with shared buffers",
+    "absent/null default behavior"
+  ],
+  "ruff_check": "passed",
+  "ruff_format_check": "passed",
+  "python_compile": "passed",
+  "source_diff_check": "passed",
+  "control_diff_check": "passed",
+  "shell_syntax": "passed",
+  "errors": []
+}

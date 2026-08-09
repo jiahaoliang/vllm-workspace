@@ -11,7 +11,7 @@ FEATURE_DIR = Path(__file__).resolve().parents[2]
 DEPLOYMENT_DIR = FEATURE_DIR / "deployment"
 ROOT = FEATURE_DIR.parents[1]
 IDENTITY = json.loads((DEPLOYMENT_DIR / "validation-identity.json").read_text())
-FINAL_SOURCE_COMMIT = "d74269a08e48e3b5b097f9a34f5c421696ddda40"
+FINAL_SOURCE_COMMIT = "5355559175f9998f5d70866734fb79569dfc86f9"
 BASE_SOURCE_COMMIT = "45b2e785b10ca4604cd6314819ed15f3ff674781"
 PATCHED_FILES = {
     "/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py",

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/render-canary.py", line 92, in <module>
+    raise SystemExit(main())
+  File "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/render-canary.py", line 73, in main
+    write("runtime-configmap.json", rendered.runtime_configmap)
+  File "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/render-canary.py", line 48, in write
+    path.write_text(
+  File "/usr/lib64/python3.9/pathlib.py", line 1285, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors) as f:
+  File "/usr/lib64/python3.9/pathlib.py", line 1252, in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+  File "/usr/lib64/python3.9/pathlib.py", line 1120, in _opener
+    return self._accessor.open(self, flags, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/rendered/runtime-configmap.json'

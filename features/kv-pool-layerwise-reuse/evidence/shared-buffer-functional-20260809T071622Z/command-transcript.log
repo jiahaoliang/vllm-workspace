@@ -1,0 +1,3 @@
+[2026-08-09T08:03:59Z] START validate complete functional evidence
+COMMAND python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/validate-functional-evidence.py
+[2026-08-09T08:04:00Z] END validate complete functional evidence exit=0 artifact=functional-validator.log

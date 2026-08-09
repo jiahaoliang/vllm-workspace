@@ -1,0 +1,186 @@
+[2026-08-09T07:40:50Z] START capture Prefill identity
+COMMAND kubectl get pod -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -o json
+[2026-08-09T07:40:50Z] END capture Prefill identity exit=0 artifact=prefill-pod.json
+[2026-08-09T07:40:50Z] START assert Prefill identity
+COMMAND jq -e --arg image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z --arg config sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c $'\n    .metadata.namespace == "liangjiahao" and\n    .metadata.deletionTimestamp == null and\n    .status.phase == "Running" and .spec.nodeName == "n1" and\n    .spec.containers[0].image == $image and\n    .status.containerStatuses[0].imageID == $config and\n    .status.containerStatuses[0].restartCount == 0 and\n    .spec.containers[0].resources.requests["huawei.com/Ascend910"] == "1" and\n    .spec.containers[0].resources.limits["huawei.com/Ascend910"] == "1"\n  ' /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/prefill-pod.json
+[2026-08-09T07:40:50Z] END assert Prefill identity exit=0 artifact=prefill-identity-assert.log
+[2026-08-09T07:40:50Z] START create remote directory
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- mkdir -p /tmp/shared-buffer-functional-20260809T071622Z
+[2026-08-09T07:40:51Z] END create remote directory exit=0 artifact=remote-mkdir.log
+[2026-08-09T07:40:51Z] START sync request
+COMMAND bash -o pipefail -c tar\ -C\ \"\$1\"\ -cf\ -\ request.json\ \|\ kubectl\ exec\ -i\ -n\ liangjiahao\ \"\$2\"\ -c\ prefill-engine\ --\ tar\ -C\ \"\$3\"\ -xf\ - bash /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu prefill-engine-deployment-764d67cf9b-l8dv6 /tmp/shared-buffer-functional-20260809T071622Z
+[2026-08-09T07:40:51Z] END sync request exit=0 artifact=request-sync.log
+[2026-08-09T07:40:51Z] START baseline: restart Master
+COMMAND restart_master
+[2026-08-09T07:40:56Z] END baseline: restart Master exit=0 artifact=master-restart.log
+[2026-08-09T07:40:56Z] START baseline: pre-start metrics
+COMMAND capture_metrics
+[2026-08-09T07:40:56Z] END baseline: pre-start metrics exit=0 artifact=pre-start.metrics
+[2026-08-09T07:40:56Z] START baseline: assert empty before start
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/baseline/pre-start.metrics
+[2026-08-09T07:40:56Z] END baseline: assert empty before start exit=0 artifact=pre-start-assert.log
+[2026-08-09T07:40:56Z] START baseline: start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- env VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 PYTHONDONTWRITEBYTECODE=1 /opt/vllm-layerwise/start-prefill.sh
+[2026-08-09T07:41:00Z] END baseline: start Prefill exit=0 artifact=start-prefill.log
+[2026-08-09T07:41:00Z] START baseline: wait HTTP
+COMMAND wait_http
+[2026-08-09T07:42:48Z] END baseline: wait HTTP exit=0 artifact=wait-http.log
+[2026-08-09T07:42:48Z] START baseline: wait Pod Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-764d67cf9b-l8dv6 --timeout=1800s
+[2026-08-09T07:42:48Z] END baseline: wait Pod Ready exit=0 artifact=wait-ready.log
+[2026-08-09T07:42:48Z] START baseline: capture command line
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- bash -c pid=\$\(cat\ /tmp/vllm-prefill.pid\)\;\ tr\ \"\\0\"\ \"\\n\"\ \<\"/proc/\$\{pid\}/cmdline\"
+[2026-08-09T07:42:49Z] END baseline: capture command line exit=0 artifact=cmdline.txt
+[2026-08-09T07:42:49Z] START baseline: active metrics
+COMMAND capture_metrics
+[2026-08-09T07:42:49Z] END baseline: active metrics exit=0 artifact=active.metrics
+[2026-08-09T07:42:49Z] START baseline: request 1
+COMMAND send_request /tmp/shared-buffer-functional-20260809T071622Z/baseline-response-1.json
+[2026-08-09T07:43:14Z] END baseline: request 1 exit=0 artifact=request-1.log
+[2026-08-09T07:43:14Z] START baseline: capture response 1
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/shared-buffer-functional-20260809T071622Z/baseline-response-1.json
+[2026-08-09T07:43:14Z] END baseline: capture response 1 exit=0 artifact=response-1.json
+[2026-08-09T07:43:14Z] START baseline: wait 4 keys 1
+COMMAND wait_master_keys 4
+[2026-08-09T07:43:15Z] END baseline: wait 4 keys 1 exit=0 artifact=keys-1.metrics
+[2026-08-09T07:43:15Z] START baseline: post-request metrics
+COMMAND capture_metrics
+[2026-08-09T07:43:15Z] END baseline: post-request metrics exit=0 artifact=post-request.metrics
+[2026-08-09T07:43:15Z] START baseline: capture engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/vllm-prefill.log
+[2026-08-09T07:43:15Z] END baseline: capture engine log exit=0 artifact=vllm-prefill.log
+[2026-08-09T07:43:15Z] START baseline: stop Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-09T07:43:18Z] END baseline: stop Prefill exit=0 artifact=stop-prefill.log
+[2026-08-09T07:43:18Z] START baseline: wait NPU release
+COMMAND wait_npu_release
+[2026-08-09T07:43:18Z] END baseline: wait NPU release exit=0 artifact=npu-released.txt
+[2026-08-09T07:43:18Z] START baseline: cleanup Master
+COMMAND restart_master
+[2026-08-09T07:43:24Z] END baseline: cleanup Master exit=0 artifact=cleanup-master.log
+[2026-08-09T07:43:24Z] START baseline: final metrics
+COMMAND capture_metrics
+[2026-08-09T07:43:24Z] END baseline: final metrics exit=0 artifact=final.metrics
+[2026-08-09T07:43:24Z] START baseline: assert final empty
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/baseline/final.metrics
+[2026-08-09T07:43:24Z] END baseline: assert final empty exit=0 artifact=final-assert.log
+[2026-08-09T07:43:24Z] START producer-reuse: restart Master
+COMMAND restart_master
+[2026-08-09T07:43:27Z] END producer-reuse: restart Master exit=0 artifact=master-restart.log
+[2026-08-09T07:43:27Z] START producer-reuse: pre-start metrics
+COMMAND capture_metrics
+[2026-08-09T07:43:27Z] END producer-reuse: pre-start metrics exit=0 artifact=pre-start.metrics
+[2026-08-09T07:43:27Z] START producer-reuse: assert empty before start
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/producer-reuse/pre-start.metrics
+[2026-08-09T07:43:27Z] END producer-reuse: assert empty before start exit=0 artifact=pre-start-assert.log
+[2026-08-09T07:43:27Z] START producer-reuse: start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- env VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 PYTHONDONTWRITEBYTECODE=1 PREFILL_KV_TRANSFER_CONFIG=\{\"kv_connector\":\"AscendStoreConnector\"\,\"kv_role\":\"kv_producer\"\,\"kv_load_failure_policy\":\"fail\"\,\"kv_connector_extra_config\":\{\"backend\":\"mooncake\"\,\"use_layerwise\":true\,\"layerwise_num_shared_buffers\":3\,\"layerwise_prefetch_layers\":1\,\"lookup_rpc_port\":0\}\} /opt/vllm-layerwise/start-prefill.sh
+[2026-08-09T07:43:30Z] END producer-reuse: start Prefill exit=0 artifact=start-prefill.log
+[2026-08-09T07:43:30Z] START producer-reuse: wait HTTP
+COMMAND wait_http
+[2026-08-09T07:45:19Z] END producer-reuse: wait HTTP exit=0 artifact=wait-http.log
+[2026-08-09T07:45:19Z] START producer-reuse: wait Pod Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-764d67cf9b-l8dv6 --timeout=1800s
+[2026-08-09T07:45:19Z] END producer-reuse: wait Pod Ready exit=0 artifact=wait-ready.log
+[2026-08-09T07:45:19Z] START producer-reuse: capture command line
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- bash -c pid=\$\(cat\ /tmp/vllm-prefill.pid\)\;\ tr\ \"\\0\"\ \"\\n\"\ \<\"/proc/\$\{pid\}/cmdline\"
+[2026-08-09T07:45:19Z] END producer-reuse: capture command line exit=0 artifact=cmdline.txt
+[2026-08-09T07:45:19Z] START producer-reuse: active metrics
+COMMAND capture_metrics
+[2026-08-09T07:45:19Z] END producer-reuse: active metrics exit=0 artifact=active.metrics
+[2026-08-09T07:45:19Z] START producer-reuse: request 1
+COMMAND send_request /tmp/shared-buffer-functional-20260809T071622Z/producer-reuse-response-1.json
+[2026-08-09T07:45:23Z] END producer-reuse: request 1 exit=0 artifact=request-1.log
+[2026-08-09T07:45:23Z] START producer-reuse: capture response 1
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/shared-buffer-functional-20260809T071622Z/producer-reuse-response-1.json
+[2026-08-09T07:45:23Z] END producer-reuse: capture response 1 exit=0 artifact=response-1.json
+[2026-08-09T07:45:23Z] START producer-reuse: wait 20 keys 1
+COMMAND wait_master_keys 20
+[2026-08-09T07:45:23Z] END producer-reuse: wait 20 keys 1 exit=0 artifact=keys-1.metrics
+[2026-08-09T07:45:23Z] START producer-reuse: post-request metrics
+COMMAND capture_metrics
+[2026-08-09T07:45:23Z] END producer-reuse: post-request metrics exit=0 artifact=post-request.metrics
+[2026-08-09T07:45:23Z] START producer-reuse: capture engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/vllm-prefill.log
+[2026-08-09T07:45:24Z] END producer-reuse: capture engine log exit=0 artifact=vllm-prefill.log
+[2026-08-09T07:45:24Z] START producer-reuse: stop Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-09T07:45:26Z] END producer-reuse: stop Prefill exit=0 artifact=stop-prefill.log
+[2026-08-09T07:45:26Z] START producer-reuse: wait NPU release
+COMMAND wait_npu_release
+[2026-08-09T07:45:27Z] END producer-reuse: wait NPU release exit=0 artifact=npu-released.txt
+[2026-08-09T07:45:27Z] START producer-reuse: cleanup Master
+COMMAND restart_master
+[2026-08-09T07:45:32Z] END producer-reuse: cleanup Master exit=0 artifact=cleanup-master.log
+[2026-08-09T07:45:32Z] START producer-reuse: final metrics
+COMMAND capture_metrics
+[2026-08-09T07:45:32Z] END producer-reuse: final metrics exit=0 artifact=final.metrics
+[2026-08-09T07:45:32Z] START producer-reuse: assert final empty
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/producer-reuse/final.metrics
+[2026-08-09T07:45:32Z] END producer-reuse: assert final empty exit=0 artifact=final-assert.log
+[2026-08-09T07:45:32Z] START both-reuse: restart Master
+COMMAND restart_master
+[2026-08-09T07:45:35Z] END both-reuse: restart Master exit=0 artifact=master-restart.log
+[2026-08-09T07:45:35Z] START both-reuse: pre-start metrics
+COMMAND capture_metrics
+[2026-08-09T07:45:35Z] END both-reuse: pre-start metrics exit=0 artifact=pre-start.metrics
+[2026-08-09T07:45:35Z] START both-reuse: assert empty before start
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/both-reuse/pre-start.metrics
+[2026-08-09T07:45:35Z] END both-reuse: assert empty before start exit=0 artifact=pre-start-assert.log
+[2026-08-09T07:45:35Z] START both-reuse: start Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- env VLLM_ASCEND_KVPOOL_RANGE_DEBUG=1 PYTHONDONTWRITEBYTECODE=1 PREFILL_KV_TRANSFER_CONFIG=\{\"kv_connector\":\"AscendStoreConnector\"\,\"kv_role\":\"kv_both\"\,\"kv_load_failure_policy\":\"fail\"\,\"kv_connector_extra_config\":\{\"backend\":\"mooncake\"\,\"use_layerwise\":true\,\"layerwise_num_shared_buffers\":3\,\"layerwise_prefetch_layers\":1\,\"lookup_rpc_port\":0\}\} /opt/vllm-layerwise/start-prefill.sh
+[2026-08-09T07:45:39Z] END both-reuse: start Prefill exit=0 artifact=start-prefill.log
+[2026-08-09T07:45:39Z] START both-reuse: wait HTTP
+COMMAND wait_http
+[2026-08-09T07:47:27Z] END both-reuse: wait HTTP exit=0 artifact=wait-http.log
+[2026-08-09T07:47:27Z] START both-reuse: wait Pod Ready
+COMMAND kubectl wait -n liangjiahao --for=condition=Ready pod/prefill-engine-deployment-764d67cf9b-l8dv6 --timeout=1800s
+[2026-08-09T07:47:27Z] END both-reuse: wait Pod Ready exit=0 artifact=wait-ready.log
+[2026-08-09T07:47:27Z] START both-reuse: capture command line
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- bash -c pid=\$\(cat\ /tmp/vllm-prefill.pid\)\;\ tr\ \"\\0\"\ \"\\n\"\ \<\"/proc/\$\{pid\}/cmdline\"
+[2026-08-09T07:47:27Z] END both-reuse: capture command line exit=0 artifact=cmdline.txt
+[2026-08-09T07:47:27Z] START both-reuse: active metrics
+COMMAND capture_metrics
+[2026-08-09T07:47:28Z] END both-reuse: active metrics exit=0 artifact=active.metrics
+[2026-08-09T07:47:28Z] START both-reuse: request 1
+COMMAND send_request /tmp/shared-buffer-functional-20260809T071622Z/both-reuse-response-1.json
+[2026-08-09T07:47:31Z] END both-reuse: request 1 exit=0 artifact=request-1.log
+[2026-08-09T07:47:31Z] START both-reuse: capture response 1
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/shared-buffer-functional-20260809T071622Z/both-reuse-response-1.json
+[2026-08-09T07:47:31Z] END both-reuse: capture response 1 exit=0 artifact=response-1.json
+[2026-08-09T07:47:31Z] START both-reuse: wait 20 keys 1
+COMMAND wait_master_keys 20
+[2026-08-09T07:47:32Z] END both-reuse: wait 20 keys 1 exit=0 artifact=keys-1.metrics
+[2026-08-09T07:47:32Z] START both-reuse: request 2
+COMMAND send_request /tmp/shared-buffer-functional-20260809T071622Z/both-reuse-response-2.json
+[2026-08-09T07:47:34Z] END both-reuse: request 2 exit=0 artifact=request-2.log
+[2026-08-09T07:47:34Z] START both-reuse: capture response 2
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/shared-buffer-functional-20260809T071622Z/both-reuse-response-2.json
+[2026-08-09T07:47:35Z] END both-reuse: capture response 2 exit=0 artifact=response-2.json
+[2026-08-09T07:47:35Z] START both-reuse: wait 36 keys 2
+COMMAND wait_master_keys 36
+[2026-08-09T07:47:35Z] END both-reuse: wait 36 keys 2 exit=0 artifact=keys-2.metrics
+[2026-08-09T07:47:35Z] START both-reuse: post-request metrics
+COMMAND capture_metrics
+[2026-08-09T07:47:35Z] END both-reuse: post-request metrics exit=0 artifact=post-request.metrics
+[2026-08-09T07:47:35Z] START both-reuse: capture engine log
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- cat /tmp/vllm-prefill.log
+[2026-08-09T07:47:36Z] END both-reuse: capture engine log exit=0 artifact=vllm-prefill.log
+[2026-08-09T07:47:36Z] START both-reuse: stop Prefill
+COMMAND kubectl exec -n liangjiahao prefill-engine-deployment-764d67cf9b-l8dv6 -c prefill-engine -- /opt/vllm-layerwise/stop-engine.sh prefill
+[2026-08-09T07:47:38Z] END both-reuse: stop Prefill exit=0 artifact=stop-prefill.log
+[2026-08-09T07:47:38Z] START both-reuse: wait NPU release
+COMMAND wait_npu_release
+[2026-08-09T07:47:38Z] END both-reuse: wait NPU release exit=0 artifact=npu-released.txt
+[2026-08-09T07:47:38Z] START both-reuse: cleanup Master
+COMMAND restart_master
+[2026-08-09T07:47:41Z] END both-reuse: cleanup Master exit=0 artifact=cleanup-master.log
+[2026-08-09T07:47:41Z] START both-reuse: final metrics
+COMMAND capture_metrics
+[2026-08-09T07:47:42Z] END both-reuse: final metrics exit=0 artifact=final.metrics
+[2026-08-09T07:47:42Z] START both-reuse: assert final empty
+COMMAND assert_empty /root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/both-reuse/final.metrics
+[2026-08-09T07:47:42Z] END both-reuse: assert final empty exit=0 artifact=final-assert.log
+[2026-08-09T07:47:53Z] START validate formal functional matrix
+COMMAND env FUNCTIONAL_RUN_ID=20260809T071622Z FUNCTIONAL_ROOT=features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu python3 features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validate-functional.py
+[2026-08-09T07:47:53Z] END validate formal functional matrix exit=0 artifact=validator.log

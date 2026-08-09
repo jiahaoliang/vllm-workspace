@@ -1,0 +1,19 @@
+{
+  "cpu_tests": 515,
+  "errors": [],
+  "final_master_empty": true,
+  "image_manifest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "intentional_tooling_diagnostics": [
+    "render TP2 4096 REUSE3 canary",
+    "send exact 4096-token REUSE3 canary"
+  ],
+  "runtime_roles": [
+    "kv_producer",
+    "kv_both"
+  ],
+  "schema_version": 1,
+  "source_head": "5355559175f9998f5d70866734fb79569dfc86f9",
+  "status": "passed",
+  "targeted_canary": "passed",
+  "validated": true
+}
