@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "apply",
+  "-n",
+  "liangjiahao",
+  "-f",
+  "/tmp/layerwise-performance-rapid-20260809T184011Z/pre-run-state/runtime-configmap.json"
+]

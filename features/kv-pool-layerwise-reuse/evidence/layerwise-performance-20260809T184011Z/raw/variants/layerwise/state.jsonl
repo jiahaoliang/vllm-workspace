@@ -1,0 +1,4 @@
+{"argv": ["kubectl", "exec", "-n", "liangjiahao", "deployment/prefill-engine-deployment", "-c", "prefill-engine", "--", "cat", "/tmp/vllm-prefill.log"], "description": "prefill-log", "status": "running", "timestamp": "2026-08-09T19:08:31.632676+00:00"}
+{"description": "prefill-log", "status": "completed", "timestamp": "2026-08-09T19:08:31.818290+00:00"}
+{"argv": ["kubectl", "exec", "-n", "liangjiahao", "deployment/decode-engine-deployment", "-c", "decode-engine", "--", "cat", "/tmp/vllm-decode.log"], "description": "decode-log", "status": "running", "timestamp": "2026-08-09T19:08:31.819187+00:00"}
+{"description": "decode-log", "status": "completed", "timestamp": "2026-08-09T19:08:32.029515+00:00"}

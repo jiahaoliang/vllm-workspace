@@ -1,0 +1,10 @@
+[
+  "kubectl",
+  "cp",
+  "-n",
+  "liangjiahao",
+  "-c",
+  "aisbench",
+  "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/runs/dp1-16384-bulk-o1-c8/formal-1/c079ae0b069d19a7/.",
+  "/tmp/layerwise-performance-rapid-20260809T184011Z/points/dp1-16384-bulk-o1-c8/formal-1/attempt-1/raw"
+]

@@ -1,0 +1,10 @@
+[
+  "kubectl",
+  "get",
+  "-n",
+  "liangjiahao",
+  "deployment",
+  "prefill-engine-deployment",
+  "-o",
+  "json"
+]

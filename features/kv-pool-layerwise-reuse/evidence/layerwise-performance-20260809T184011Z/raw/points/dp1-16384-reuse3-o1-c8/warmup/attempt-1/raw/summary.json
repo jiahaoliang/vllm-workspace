@@ -1,0 +1,31 @@
+{
+  "benchmark_duration_ms": 32540.4654,
+  "detail_count": 8,
+  "errors": [],
+  "image_digest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "max_e2el_ms": 32501.2,
+  "measurement_stage": "total",
+  "metrics": {
+    "Achieved Concurrency": 4.5812,
+    "E2EL Max": 32501.2,
+    "E2EL Median": 18669.4,
+    "E2EL P95": 31120.1,
+    "ITL Max": 0.2,
+    "ITL Median": 0.1,
+    "ITL P95": 0.2,
+    "Input Token Throughput": 4027.9694,
+    "Output Token Throughput": 0.2458,
+    "Request Throughput": 0.2458,
+    "TTFT Max": 32501.1,
+    "TTFT Median": 18669.3,
+    "TTFT P95": 31120.0
+  },
+  "raw_common": "aisbench-output/20260809_191735/performances/reuse3/reuse3.json",
+  "raw_details": "aisbench-output/20260809_191735/performances/reuse3/reuse3_details.jsonl",
+  "raw_request_metrics": "aisbench-output/20260809_191735/performances/reuse3/reuse3.csv",
+  "request_count": 8,
+  "single_wave": true,
+  "stage_request_count": 8,
+  "success_count": 8,
+  "valid": true
+}

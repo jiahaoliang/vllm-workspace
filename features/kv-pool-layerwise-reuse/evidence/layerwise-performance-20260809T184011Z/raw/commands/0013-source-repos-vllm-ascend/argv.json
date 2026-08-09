@@ -1,0 +1,7 @@
+[
+  "git",
+  "-C",
+  "/root/ljh/vllm-workspace/repos/vllm-ascend",
+  "rev-parse",
+  "HEAD"
+]

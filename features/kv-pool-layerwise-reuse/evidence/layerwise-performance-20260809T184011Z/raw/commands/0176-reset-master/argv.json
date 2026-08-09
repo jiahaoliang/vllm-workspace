@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "rollout",
+  "restart",
+  "-n",
+  "liangjiahao",
+  "deployment/mooncake-master-deployment"
+]

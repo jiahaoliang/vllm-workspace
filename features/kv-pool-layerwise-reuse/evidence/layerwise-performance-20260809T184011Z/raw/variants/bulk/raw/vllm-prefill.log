@@ -1,0 +1,1064 @@
+INFO 08-09 18:42:51 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:42:51 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:42:51 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:42:51 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:42:51 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-09 18:43:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-09 18:43:07 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345] 
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345]        █     █     █▄   ▄█
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.1.dev1+g54503ecec
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345]   █▄█▀ █     █     █     █  model   /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:345] 
+(APIServer pid=89) INFO 08-09 18:43:07 [api_utils.py:273] non-default args: {'host': '0.0.0.0', 'port': 8100, 'model': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'trust_remote_code': True, 'max_model_len': 65536, 'quantization': 'ascend', 'enforce_eager': True, 'served_model_name': ['vllm-ascend/DeepSeek-V2-Lite-W8A8'], 'distributed_executor_backend': 'mp', 'tensor_parallel_size': 2, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'enable_prefix_caching': False, 'enable_logging_iteration_details': True, 'max_num_batched_tokens': 1024, 'max_num_seqs': 64, 'enable_chunked_prefill': True, 'kv_transfer_config': KVTransferConfig(kv_connector='AscendStoreConnector', engine_id='a16a0b26-8f71-4222-bd7d-2d71b7a05b38', kv_buffer_device='npu', kv_buffer_size=1000000000.0, kv_role='kv_producer', kv_rank=None, kv_parallel_size=1, kv_ip='127.0.0.1', kv_port=14579, kv_connector_extra_config={'backend': 'mooncake', 'layerwise_prefetch_layers': 3, 'lookup_rpc_port': 0, 'use_layerwise': False}, kv_connector_module_path=None, enable_permute_local_kv=False, kv_load_failure_policy='fail')}
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_HOST
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PORT
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PROTO
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_ADDR
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT_HTTP_API
+(APIServer pid=89) WARNING 08-09 18:43:07 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_USE_V1
+(APIServer pid=89) INFO 08-09 18:43:07 [model.py:619] Resolved architecture: DeepseekV2ForCausalLM
+(APIServer pid=89) INFO 08-09 18:43:07 [model.py:1776] Using max model len 65536
+(APIServer pid=89) INFO 08-09 18:43:07 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=1024.
+(APIServer pid=89) INFO 08-09 18:43:08 [vllm.py:1090] Asynchronous scheduling is enabled.
+(APIServer pid=89) WARNING 08-09 18:43:08 [vllm.py:1144] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=89) WARNING 08-09 18:43:08 [vllm.py:1192] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=89) INFO 08-09 18:43:08 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=89) INFO 08-09 18:43:08 [vllm.py:1371] Cudagraph is disabled under eager mode
+(APIServer pid=89) WARNING 08-09 18:43:08 [platform.py:1045] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=89) INFO 08-09 18:43:08 [ascend_config.py:843] Dynamic EPLB is False
+(APIServer pid=89) INFO 08-09 18:43:08 [ascend_config.py:844] The number of redundant experts is 0
+(APIServer pid=89) INFO 08-09 18:43:08 [platform.py:486] Compilation disabled, using eager mode by default
+(APIServer pid=89) INFO 08-09 18:43:08 [platform.py:772] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=89) INFO 08-09 18:43:08 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+INFO 08-09 18:43:19 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:43:19 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:43:19 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:43:19 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:43:19 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=126) INFO 08-09 18:43:33 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore pid=126) INFO 08-09 18:43:33 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore pid=126) INFO 08-09 18:43:33 [core.py:114] Initializing a V1 LLM engine (v0.1.dev1+g54503ecec) with config: model='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', speculative_config=None, tokenizer='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=65536, download_dir=None, load_format=auto, tensor_parallel_size=2, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=ascend, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=npu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=True, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=vllm-ascend/DeepSeek-V2-Lite-W8A8, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'vllm_ascend.compilation.compiler_interface.AscendCompiler', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [1024], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=126) INFO 08-09 18:43:33 [multiproc_executor.py:140] DP group leader: node_rank=0, node_rank_within_dp=0, master_addr=127.0.0.1, mq_connect_ip=10.250.40.149 (local), world_size=2, local_world_size=2
+INFO 08-09 18:43:41 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:43:41 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:43:41 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:43:41 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:43:41 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-09 18:43:54 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-09 18:43:54 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 08-09 18:43:58 [ascend_config.py:843] Dynamic EPLB is False
+INFO 08-09 18:43:58 [ascend_config.py:844] The number of redundant experts is 0
+(Worker pid=159) INFO 08-09 18:44:00 [parallel_state.py:1607] world_size=2 rank=0 local_rank=0 distributed_init_method=tcp://127.0.0.1:60275 backend=hccl
+INFO 08-09 18:44:01 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:44:01 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:44:01 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:44:01 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:44:01 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-09 18:44:14 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-09 18:44:14 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 08-09 18:44:18 [ascend_config.py:843] Dynamic EPLB is False
+INFO 08-09 18:44:18 [ascend_config.py:844] The number of redundant experts is 0
+(Worker pid=184) INFO 08-09 18:44:20 [parallel_state.py:1607] world_size=2 rank=1 local_rank=1 distributed_init_method=tcp://127.0.0.1:60275 backend=hccl
+[Gloo] Rank 1 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 0 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank [Gloo] Rank 01 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+(Worker pid=159) INFO 08-09 18:44:20 [parallel_state.py:1942] rank 0 in world size 2 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+(Worker_TP1 pid=184) INFO 08-09 18:44:21 [model_runner_v1.py:3860] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_TP0 pid=159) INFO 08-09 18:44:21 [model_runner_v1.py:3860] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_TP0 pid=159) INFO 08-09 18:44:22 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+(Worker_TP0 pid=159) INFO 08-09 18:44:24 [weight_utils.py:857] Filesystem type for checkpoints: EXT4. Checkpoint size: 16.03 GiB. Available RAM: 1897.95 GiB.
+(Worker_TP0 pid=159) INFO 08-09 18:44:24 [weight_utils.py:880] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:02<00:08,  2.68s/it]
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:05<00:05,  2.81s/it]
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:08<00:02,  2.87s/it]
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:08<00:00,  1.93s/it]
+(Worker_TP0 pid=159) 
+Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:08<00:00,  2.25s/it]
+(Worker_TP0 pid=159) 
+(Worker_TP0 pid=159) INFO 08-09 18:44:33 [default_loader.py:430] Loading weights took 9.02 seconds
+INFO 08-09 18:44:43 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:44:43 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:44:43 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:44:43 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:44:43 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-09 18:44:44 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-09 18:44:44 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-09 18:44:44 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-09 18:44:44 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-09 18:44:44 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(Worker_TP1 pid=184) INFO 08-09 18:44:57 [model_runner_v1.py:3936] Loading model weights took 7.7056 GB
+(Worker_TP1 pid=184) INFO 08-09 18:44:57 [model_runner_v1.py:3962] Model runner load_model total time: 35.79 seconds
+(Worker_TP1 pid=184) /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/impl/ops_legacy/dynamic/gelu_grad_v2.py:97: SyntaxWarning: invalid escape sequence '\h'
+(Worker_TP1 pid=184)   gelu_grad_erf = erfc(-\hat{x}) / 2 + (1 /sqrt(Pi)) * (\hat{x}) * exp(-\hat{x}^2)
+(Worker_TP1 pid=184) /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/impl/ops_legacy/dynamic/gelu_grad_v2.py:157: SyntaxWarning: invalid escape sequence '\h'
+(Worker_TP1 pid=184)   gelu_grad_erf = erfc(-\hat{x}) / 2 + (1 /sqrt(Pi)) * (\hat{x}) * exp(-\hat{x}^2)
+(Worker_TP0 pid=159) INFO 08-09 18:44:59 [model_runner_v1.py:3936] Loading model weights took 7.7056 GB
+(Worker_TP0 pid=159) INFO 08-09 18:44:59 [model_runner_v1.py:3962] Model runner load_model total time: 38.45 seconds
+(Worker_TP0 pid=159) /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/impl/ops_legacy/dynamic/gelu_grad_v2.py:97: SyntaxWarning: invalid escape sequence '\h'
+(Worker_TP0 pid=159)   gelu_grad_erf = erfc(-\hat{x}) / 2 + (1 /sqrt(Pi)) * (\hat{x}) * exp(-\hat{x}^2)
+(Worker_TP0 pid=159) /usr/local/Ascend/ascend-toolkit/latest/opp/built-in/op_impl/ai_core/tbe/impl/ops_legacy/dynamic/gelu_grad_v2.py:157: SyntaxWarning: invalid escape sequence '\h'
+(Worker_TP0 pid=159)   gelu_grad_erf = erfc(-\hat{x}) / 2 + (1 /sqrt(Pi)) * (\hat{x}) * exp(-\hat{x}^2)
+(Worker_TP0 pid=159) INFO 08-09 18:45:13 [worker.py:616] Available KV cache memory: 18.32 GiB
+(EngineCore pid=126) INFO 08-09 18:45:13 [kv_cache_utils.py:2168] GPU KV cache size: 632,320 tokens
+(EngineCore pid=126) INFO 08-09 18:45:13 [kv_cache_utils.py:2169] Maximum concurrency for 65,536 tokens per request: 9.65x
+(Worker_TP1 pid=184) INFO 08-09 18:45:13 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: a16a0b26-8f71-4222-bd7d-2d71b7a05b38-6e50ef7807a442e48709db16885dda39
+(Worker_TP1 pid=184) WARNING 08-09 18:45:13 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_TP1 pid=184) INFO 08-09 18:45:13 [pool_worker.py:181] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+(Worker_TP0 pid=159) INFO 08-09 18:45:13 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: a16a0b26-8f71-4222-bd7d-2d71b7a05b38-6e50ef7807a442e48709db16885dda39
+(Worker_TP0 pid=159) WARNING 08-09 18:45:13 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(Worker_TP0 pid=159) INFO 08-09 18:45:13 [pool_worker.py:181] use_hybrid: False, use_mamba: False, num_kv_cache_groups: 1, hash_block_size: 128, lcm_block_size: 128
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0809 18:45:13.377414   184 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0809 18:45:13.377557   184 transfer_engine_impl.cpp:986] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0809 18:45:13.377581   184 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.149 port: 12001
+I0809 18:45:13.377633   184 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.149:15653
+I0809 18:45:13.377765   184 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.149:15653
+I0809 18:45:13.377777   184 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0809 18:45:13.377784   184 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0809 18:45:13.377786   184 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0809 18:45:13.377828   184 utils.cpp:219] Find available between 20600 and 20700
+I0809 18:45:13.378603   184 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0809 18:45:13.378651   184 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0809 18:45:13.378659   184 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0809 18:45:13.385232   159 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0809 18:45:13.385373   159 transfer_engine_impl.cpp:986] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0809 18:45:13.385397   159 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.149 port: 12001
+I0809 18:45:13.385448   159 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.149:16658
+I0809 18:45:13.385635   159 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.149:16658
+I0809 18:45:13.385650   159 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0809 18:45:13.385656   159 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0809 18:45:13.385660   159 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0809 18:45:13.385710   159 utils.cpp:219] Find available between 20500 and 20600
+I0809 18:45:13.387313   159 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0809 18:45:13.387348   159 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0809 18:45:13.387355   159 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0809 18:45:13.389061   184 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.149:20602, pid:184
+I0809 18:45:13.396207   159 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.149:20562, pid:159
+I0809 18:45:13.412737   184 client_metric.cpp:102] Client metrics enabled (default enabled)
+I0809 18:45:13.412793   184 client_metric.cpp:103] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0809 18:45:13.415637   184 client_service.cpp:376] client_id=13422555250346489679-2444376277782025888
+I0809 18:45:13.415668   184 client_service.cpp:378] client_id=13422555250346489679-2444376277782025888, host_id=10.250.40.149
+I0809 18:45:13.415674   184 client_service.cpp:390] Client metrics enabled but reporting disabled (interval=0)
+I0809 18:45:13.417042   159 client_metric.cpp:102] Client metrics enabled (default enabled)
+I0809 18:45:13.417076   159 client_metric.cpp:103] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0809 18:45:13.418711   184 client_service.cpp:1031] Storage root directory is not set. persisting data is disabled.
+I0809 18:45:13.418737   184 client_service.cpp:1079] Use existing transfer engine instance. Skip its initialization.
+I0809 18:45:13.419871   184 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0809 18:45:13.419893   184 real_client.cpp:758] Local buffer size is 0, skip registering local memory
+I0809 18:45:13.420086   159 client_service.cpp:376] client_id=7368906827762606012-15559832948184696767
+I0809 18:45:13.420111   159 client_service.cpp:378] client_id=7368906827762606012-15559832948184696767, host_id=10.250.40.149
+I0809 18:45:13.420117   159 client_service.cpp:390] Client metrics enabled but reporting disabled (interval=0)
+I0809 18:45:13.423380   159 client_service.cpp:1031] Storage root directory is not set. persisting data is disabled.
+I0809 18:45:13.423434   159 client_service.cpp:1079] Use existing transfer engine instance. Skip its initialization.
+I0809 18:45:13.424819   159 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0809 18:45:13.424846   159 real_client.cpp:758] Local buffer size is 0, skip registering local memory
+I0809 18:45:14.150346   184 ascend_allocator.cpp:211] aclrtMallocHost suc, addr: 0x12d300000000
+I0809 18:45:14.150456   184 real_client.cpp:857] Mounting segment: 137438953472 bytes, 137438953472 of 137438953472
+I0809 18:45:14.150529   184 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+I0809 18:45:14.173707   159 ascend_allocator.cpp:211] aclrtMallocHost suc, addr: 0x12d300000000
+I0809 18:45:14.173770   159 real_client.cpp:857] Mounting segment: 137438953472 bytes, 137438953472 of 137438953472
+I0809 18:45:14.173843   159 transfer_executor_base.cpp:427] Ignore register host mem:0x12d300000000 when buffer pool is enabled.
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [pool_worker.py:420] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [pool_worker.py:420] layerwise config: num_layers=27 num_groups=1 physical_layer_to_group_layers_sample={}
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [pool_worker.py:808] num_blocks: 4940
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [pool_worker.py:813] block_shape: torch.Size([128, 1, 512])
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [pool_worker.py:813] block_shape: torch.Size([128, 1, 64])
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [pool_worker.py:828] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([4940, 128, 1, 512])
+I0809 18:45:14.790784   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc36000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.790863   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5cc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.790904   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc61a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.790941   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc88600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.790980   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc8d400000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791023   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccb4000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791057   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccb9000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791090   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccdfc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791127   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cce4a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791160   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd0b600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791193   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd10600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791232   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd37000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791267   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd3c000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791299   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd62c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791330   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd67a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791361   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd8e600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791392   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791432   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdba000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791481   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdbf000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791514   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cde5c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791553   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdeaa00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791586   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce11600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791618   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce16600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791651   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce3d000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791685   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce42000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791723   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce68c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791759   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce6da00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791793   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791828   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce99600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791868   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec0200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791904   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec5000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.791941   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceebc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.791976   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cef0a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792011   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf17600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792044   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1c600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792084   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf43200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792121   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf48000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792157   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf6ec00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792196   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf73c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792232   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9a600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792264   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9f600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792302   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc6200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792335   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfcb000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792376   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff1c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792411   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff6c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792443   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d01d600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792474   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d022600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792512   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d049200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792546   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d04e000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792580   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d074c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792618   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d079c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792654   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a0600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.792689   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a5600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.792725   159 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0cc200000, length:80936960, mem type:device, engine index:0
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [pool_worker.py:808] num_blocks: 4940
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [pool_worker.py:813] block_shape: torch.Size([128, 1, 512])
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [pool_worker.py:813] block_shape: torch.Size([128, 1, 64])
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [pool_worker.py:828] Registering KV_Caches. use_mla: True, use_sparse: False, shape torch.Size([4940, 128, 1, 512])
+I0809 18:45:14.834287   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc36000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834375   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc5cc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834424   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc61a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834472   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc88600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834525   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cc8d400000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834568   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccb4000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834610   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccb9000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834653   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ccdfc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834702   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cce4a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834744   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd0b600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834784   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd10600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834836   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd37000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.834909   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd3c000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.834954   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd62c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835001   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd67a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835044   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd8e600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835086   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cd93600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835129   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdba000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835171   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdbf000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835214   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cde5c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835263   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cdeaa00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835304   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce11600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835347   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce16600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835399   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce3d000000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835444   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce42000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835490   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce68c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835532   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce6da00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835578   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce94600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835623   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ce99600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835686   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec0200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835733   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cec5000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835779   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12ceebc00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835827   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cef0a00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835871   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf17600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.835913   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf1c600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.835958   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf43200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836004   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf48000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836062   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf6ec00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836112   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf73c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836158   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9a600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836201   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cf9f600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836249   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfc6200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836292   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cfcb000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836334   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff1c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836383   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12cff6c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836428   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d01d600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836473   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d022600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836515   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d049200000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836561   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d04e000000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836603   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d074c00000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836654   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d079c00000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836699   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a0600000, length:80936960, mem type:device, engine index:0
+I0809 18:45:14.836745   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0a5600000, length:647495680, mem type:device, engine index:0
+I0809 18:45:14.836795   184 transfer_executor_base.cpp:493] TransferExecutor register mem addr:0x12d0cc200000, length:80936960, mem type:device, engine index:0
+(Worker_TP1 pid=184) INFO 08-09 18:45:14 [worker.py:811] Free memory on device (29.13/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 7.71 GiB for weights, 0.08 GiB for peak activation, 0.44 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=19511514726` (18.17 GiB) to fit into requested memory, or `--kv-cache-memory=22296735744` (20.77 GiB) to fully utilize NPU free memory. Current KV cache memory: 18.32 GiB. After warmup: torch reserved memory 26.3 GiB, torch allocated memory 26.27 GiB.
+(Worker_TP0 pid=159) INFO 08-09 18:45:14 [worker.py:811] Free memory on device (29.13/29.49 GiB) on startup. Desired GPU memory utilization is (0.9, 26.54 GiB). Actual usage: 7.71 GiB for weights, 0.08 GiB for peak activation, 0.44 GiB for non-torch memory, 0.0 GiB for NPU graph memory. Replace gpu_memory_utilization with `--kv-cache-memory=19511903846` (18.17 GiB) to fit into requested memory, or `--kv-cache-memory=22295474176` (20.76 GiB) to fully utilize NPU free memory. Current KV cache memory: 18.32 GiB. After warmup: torch reserved memory 26.3 GiB, torch allocated memory 26.27 GiB.
+(Worker_TP0 pid=159) INFO 08-09 18:45:16 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=0 visible_npus=[0, 1]
+(Worker_TP0 pid=159) WARNING 08-09 18:45:16 [worker.py:823] Bind cpus failed in rank0: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(Worker_TP1 pid=184) INFO 08-09 18:45:16 [cpu_binding.py:542] [cpu_bind_mode] mode=topo_affinity rank=1 visible_npus=[0, 1]
+(Worker_TP1 pid=184) WARNING 08-09 18:45:16 [worker.py:823] Bind cpus failed in rank1: CPUs available in 'Cpus_allowed_list' conflict with NUMA affinity. Skip binding cpu.
+(EngineCore pid=126) INFO 08-09 18:45:16 [core.py:344] init engine (profile, create kv cache, warmup model) took 16.70 s
+(EngineCore pid=126) INFO 08-09 18:45:17 [factory.py:62] Creating v1 connector with name: AscendStoreConnector and engine_id: a16a0b26-8f71-4222-bd7d-2d71b7a05b38-6e50ef7807a442e48709db16885dda39
+(EngineCore pid=126) WARNING 08-09 18:45:17 [base.py:190] Initializing KVConnectorBase_V1. This API is experimental and subject to change in the future as we iterate the design.
+(EngineCore pid=126) INFO 08-09 18:45:17 [pool_scheduler.py:165] KV pool page_size_bytes: 147456
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0809 18:45:19.255024   126 transfer_engine_py.cpp:100] Using default malloc/free for protocol: ascend
+I0809 18:45:19.255187   126 transfer_engine_impl.cpp:986] Metrics reporting is disabled (set MC_TE_METRIC=1 to enable)
+I0809 18:45:19.255210   126 transfer_engine_impl.cpp:115] Transfer Engine parseHostNameWithPort. server_name: 10.250.40.149 port: 12001
+I0809 18:45:19.255390   126 transfer_engine_impl.cpp:182] Transfer Engine RPC using P2P handshake, listening on 10.250.40.149:16834
+I0809 18:45:19.255604   126 ascend_direct_transport.cpp:83] install AscendDirectTransport for: 10.250.40.149:16834
+I0809 18:45:19.255620   126 utils.cpp:138] [AscendTE] resolving link config, te is created for store=false, HCCL_INTRA_ROCE_ENABLE=1
+I0809 18:45:19.255627   126 utils.cpp:144] [AscendTE] roce mode enabled via HCCL_INTRA_ROCE_ENABLE.
+I0809 18:45:19.255631   126 ascend_direct_transport.cpp:159] [AscendTE] init local segment, te is created for store=false, roce_mode=true, use_fabric_mem=false
+I0809 18:45:19.255671   126 utils.cpp:219] Find available between 20500 and 20600
+I0809 18:45:19.256753   126 transfer_executor_base.cpp:179] Set AutoConnect to: 1
+I0809 18:45:19.256804   126 transfer_executor_base.cpp:186] Set adxl.BufferPool to:4:8
+I0809 18:45:19.256811   126 transfer_executor_base.cpp:210] [AscendTE] init adxl, te is created for store=false, GlobalResourceConfig unset.
+I0809 18:45:19.266736   126 transfer_executor_base.cpp:238] Success to initialize adxl engine:10.250.40.149:20530, pid:126
+I0809 18:45:19.291307   126 client_metric.cpp:102] Client metrics enabled (default enabled)
+I0809 18:45:19.291353   126 client_metric.cpp:103] Client bandwidth summary enabled via MC_STORE_CLIENT_METRIC_BANDWIDTH
+I0809 18:45:19.294626   126 client_service.cpp:376] client_id=5640885493220223687-6620194019235213715
+I0809 18:45:19.294656   126 client_service.cpp:378] client_id=5640885493220223687-6620194019235213715, host_id=10.250.40.149
+I0809 18:45:19.294662   126 client_service.cpp:390] Client metrics enabled but reporting disabled (interval=0)
+I0809 18:45:19.297252   126 client_service.cpp:1031] Storage root directory is not set. persisting data is disabled.
+I0809 18:45:19.297271   126 client_service.cpp:1079] Use existing transfer engine instance. Skip its initialization.
+I0809 18:45:19.298699   126 transfer_task.cpp:956] MC_STORE_MEMCPY not set, auto-detected: non-TCP transport available, memcpy disabled
+I0809 18:45:19.298730   126 real_client.cpp:758] Local buffer size is 0, skip registering local memory
+I0809 18:45:19.298738   126 real_client.cpp:919] Global segment size is 0, skip mounting segment
+(EngineCore pid=126) INFO 08-09 18:45:20 [vllm.py:1090] Asynchronous scheduling is enabled.
+(EngineCore pid=126) WARNING 08-09 18:45:20 [vllm.py:1144] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore pid=126) WARNING 08-09 18:45:20 [vllm.py:1192] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore pid=126) INFO 08-09 18:45:20 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore pid=126) INFO 08-09 18:45:20 [vllm.py:1371] Cudagraph is disabled under eager mode
+(EngineCore pid=126) INFO 08-09 18:45:20 [ascend_config.py:843] Dynamic EPLB is False
+(EngineCore pid=126) INFO 08-09 18:45:20 [ascend_config.py:844] The number of redundant experts is 0
+(EngineCore pid=126) INFO 08-09 18:45:20 [platform.py:486] Compilation disabled, using eager mode by default
+(EngineCore pid=126) INFO 08-09 18:45:20 [platform.py:772] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(EngineCore pid=126) INFO 08-09 18:45:20 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+(APIServer pid=89) INFO 08-09 18:45:20 [api_server.py:673] Supported tasks: ['generate']
+(APIServer pid=89) WARNING 08-09 18:45:20 [model.py:1528] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.3, 'top_p': 0.95}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`.
+(APIServer pid=89) INFO 08-09 18:45:21 [hf.py:540] Detected the chat template content format to be 'string'. You can set `--chat-template-content-format` to override this.
+(APIServer pid=89) INFO 08-09 18:45:21 [api_server.py:677] Starting vLLM server on http://0.0.0.0:8100
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:37] Available routes are:
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /docs, Methods: GET, HEAD
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /load, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /version, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /health, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /metrics, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /tokenize, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /detokenize, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/models, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /ping, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /ping, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /invocations, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/chat/completions/batch, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/responses, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/responses/{response_id}, Methods: GET
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/completions, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/messages, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/messages/count_tokens, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /generative_scoring, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /scale_elastic_ep, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /is_scaling_elastic_ep, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/chat/completions/render, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/completions/render, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/chat/completions/derender, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /v1/completions/derender, Methods: POST
+(APIServer pid=89) INFO 08-09 18:45:21 [launcher.py:46] Route: /inference/v1/generate, Methods: POST
+(APIServer pid=89) INFO:     Started server process [89]
+(APIServer pid=89) INFO:     Waiting for application startup.
+(APIServer pid=89) INFO:     Application startup complete.
+(APIServer pid=89) INFO:     192.168.200.27:41602 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:57118 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:57130 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:34986 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:35002 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40728 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40740 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55956 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55960 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:49364 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:49374 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:48978 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:48988 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59806 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59810 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33070 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33080 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:56656 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:56672 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:52970 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:52978 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:38434 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:38448 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:45854 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:45864 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:34192 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:34196 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53312 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53322 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:37106 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:37116 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:54432 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:54436 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:57296 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:57300 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55558 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55562 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53104 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53116 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:48:34 [core.py:452] Iteration(0): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 22597.05 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(1): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.56 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(2): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 229.51 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(3): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 203.25 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(4): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.48 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(5): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.70 ms
+(EngineCore pid=126) INFO 08-09 18:48:35 [core.py:452] Iteration(6): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.10 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(7): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.33 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(8): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.98 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(9): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.84 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(10): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.77 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(11): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.72 ms
+(EngineCore pid=126) INFO 08-09 18:48:36 [core.py:452] Iteration(12): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 201.15 ms
+(EngineCore pid=126) INFO 08-09 18:48:37 [core.py:452] Iteration(13): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 178.50 ms
+(EngineCore pid=126) INFO 08-09 18:48:37 [core.py:452] Iteration(14): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.26 ms
+(EngineCore pid=126) INFO 08-09 18:48:37 [core.py:452] Iteration(15): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.59 ms
+(APIServer pid=89) INFO:     10.250.40.211:37414 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:37314 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:48:42 [loggers.py:273] Engine 000: Avg prompt throughput: 1638.3 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:37322 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:44942 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:48:52 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:44952 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:39690 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:39696 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:58228 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:58232 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59084 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59094 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53254 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53262 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40814 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40824 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(16): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.49 ms
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(17): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.52 ms
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(18): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.61 ms
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(19): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.74 ms
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(20): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.71 ms
+(EngineCore pid=126) INFO 08-09 18:49:45 [core.py:452] Iteration(21): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.22 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(22): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.56 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(23): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 154.46 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(24): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.68 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(25): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.85 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(26): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.08 ms
+(EngineCore pid=126) INFO 08-09 18:49:46 [core.py:452] Iteration(27): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.08 ms
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(28): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.16 ms
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(29): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.89 ms
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(30): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.95 ms
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(31): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.86 ms
+(APIServer pid=89) INFO:     10.250.40.211:41378 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(32): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 146.77 ms
+(EngineCore pid=126) INFO 08-09 18:49:47 [core.py:452] Iteration(33): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.28 ms
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(34): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.89 ms
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(35): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.10 ms
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(36): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.75 ms
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(37): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.71 ms
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(38): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.48 ms
+(APIServer pid=89) INFO:     192.168.200.27:50594 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:48 [core.py:452] Iteration(39): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.22 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(40): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 148.78 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(41): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.04 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(42): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.77 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(43): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.16 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(44): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.71 ms
+(EngineCore pid=126) INFO 08-09 18:49:49 [core.py:452] Iteration(45): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.06 ms
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(46): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.31 ms
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(47): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.12 ms
+(APIServer pid=89) INFO:     10.250.40.211:41394 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(48): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 146.80 ms
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(49): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.57 ms
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(50): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.08 ms
+(EngineCore pid=126) INFO 08-09 18:49:50 [core.py:452] Iteration(51): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 182.78 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(52): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.42 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(53): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.65 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(54): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.20 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(55): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.23 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(56): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.59 ms
+(EngineCore pid=126) INFO 08-09 18:49:51 [core.py:452] Iteration(57): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.09 ms
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(58): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.93 ms
+(APIServer pid=89) INFO 08-09 18:49:52 [loggers.py:273] Engine 000: Avg prompt throughput: 3276.6 tokens/s, Avg generation throughput: 0.2 tokens/s, Running: 1 reqs, Waiting: 5 reqs, GPU KV cache usage: 1.9%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(59): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.49 ms
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(60): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.35 ms
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(61): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.63 ms
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(62): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.77 ms
+(EngineCore pid=126) INFO 08-09 18:49:52 [core.py:452] Iteration(63): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.65 ms
+(APIServer pid=89) INFO:     10.250.40.211:41400 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(64): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 149.47 ms
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(65): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.76 ms
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(66): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.70 ms
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(67): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 154.94 ms
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(68): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.29 ms
+(APIServer pid=89) INFO:     192.168.200.27:50598 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:53 [core.py:452] Iteration(69): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.20 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(70): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.76 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(71): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 175.84 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(72): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.80 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(73): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 179.45 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(74): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 177.17 ms
+(EngineCore pid=126) INFO 08-09 18:49:54 [core.py:452] Iteration(75): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 178.06 ms
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(76): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.70 ms
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(77): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.82 ms
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(78): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 178.22 ms
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(79): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.91 ms
+(APIServer pid=89) INFO:     10.250.40.211:41410 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(80): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 139.38 ms
+(EngineCore pid=126) INFO 08-09 18:49:55 [core.py:452] Iteration(81): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.07 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(82): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.68 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(83): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.74 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(84): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.13 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(85): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.87 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(86): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.52 ms
+(EngineCore pid=126) INFO 08-09 18:49:56 [core.py:452] Iteration(87): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.46 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(88): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.31 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(89): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.73 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(90): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.24 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(91): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.37 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(92): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.71 ms
+(EngineCore pid=126) INFO 08-09 18:49:57 [core.py:452] Iteration(93): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.62 ms
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(94): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.66 ms
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(95): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.99 ms
+(APIServer pid=89) INFO:     10.250.40.211:41412 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(96): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 154.91 ms
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(97): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 184.64 ms
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(98): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.68 ms
+(APIServer pid=89) INFO:     192.168.200.27:54542 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:49:58 [core.py:452] Iteration(99): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.99 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(100): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.44 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(101): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.30 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(102): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.17 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(103): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.00 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(104): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.76 ms
+(EngineCore pid=126) INFO 08-09 18:49:59 [core.py:452] Iteration(105): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.66 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(106): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.99 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(107): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.16 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(108): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.94 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(109): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.23 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(110): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.60 ms
+(EngineCore pid=126) INFO 08-09 18:50:00 [core.py:452] Iteration(111): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.70 ms
+(APIServer pid=89) INFO:     10.250.40.211:41420 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(112): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 144.66 ms
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(113): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.80 ms
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(114): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.95 ms
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(115): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.64 ms
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(116): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.70 ms
+(EngineCore pid=126) INFO 08-09 18:50:01 [core.py:452] Iteration(117): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.35 ms
+(APIServer pid=89) INFO 08-09 18:50:02 [loggers.py:273] Engine 000: Avg prompt throughput: 6553.2 tokens/s, Avg generation throughput: 0.4 tokens/s, Running: 1 reqs, Waiting: 1 reqs, GPU KV cache usage: 1.1%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:50:02 [core.py:452] Iteration(118): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 184.08 ms
+(EngineCore pid=126) INFO 08-09 18:50:02 [core.py:452] Iteration(119): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 178.50 ms
+(EngineCore pid=126) INFO 08-09 18:50:02 [core.py:452] Iteration(120): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.06 ms
+(EngineCore pid=126) INFO 08-09 18:50:02 [core.py:452] Iteration(121): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 180.47 ms
+(EngineCore pid=126) INFO 08-09 18:50:02 [core.py:452] Iteration(122): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.08 ms
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(123): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.56 ms
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(124): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.48 ms
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(125): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.30 ms
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(126): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.53 ms
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(127): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.27 ms
+(APIServer pid=89) INFO:     10.250.40.211:41432 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(128): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 134.43 ms
+(APIServer pid=89) INFO:     192.168.200.27:54548 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:50:03 [core.py:452] Iteration(129): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.23 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(130): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.08 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(131): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.65 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(132): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.80 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(133): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.23 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(134): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.64 ms
+(EngineCore pid=126) INFO 08-09 18:50:04 [core.py:452] Iteration(135): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 188.25 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(136): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.99 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(137): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.68 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(138): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.03 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(139): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.67 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(140): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.18 ms
+(EngineCore pid=126) INFO 08-09 18:50:05 [core.py:452] Iteration(141): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 172.57 ms
+(EngineCore pid=126) INFO 08-09 18:50:06 [core.py:452] Iteration(142): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.11 ms
+(EngineCore pid=126) INFO 08-09 18:50:06 [core.py:452] Iteration(143): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.49 ms
+(APIServer pid=89) INFO:     10.250.40.211:41434 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:35050 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:50:12 [loggers.py:273] Engine 000: Avg prompt throughput: 3276.5 tokens/s, Avg generation throughput: 0.2 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:35056 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55056 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:50:22 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:55060 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:43670 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:43682 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33712 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33726 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:54098 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:54102 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33952 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(144): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 148.79 ms
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(145): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.91 ms
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(146): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.30 ms
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(147): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.16 ms
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(148): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.74 ms
+(EngineCore pid=126) INFO 08-09 18:51:01 [core.py:452] Iteration(149): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.16 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(150): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.67 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(151): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.30 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(152): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.94 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(153): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.29 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(154): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.54 ms
+(EngineCore pid=126) INFO 08-09 18:51:02 [core.py:452] Iteration(155): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.28 ms
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(156): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.30 ms
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(157): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.77 ms
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(158): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.87 ms
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(159): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.72 ms
+(APIServer pid=89) INFO:     10.250.40.211:54868 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(160): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 144.11 ms
+(APIServer pid=89) INFO:     192.168.200.27:33958 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:03 [core.py:452] Iteration(161): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.15 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(162): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.24 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(163): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.89 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(164): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.99 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(165): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.95 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(166): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.17 ms
+(EngineCore pid=126) INFO 08-09 18:51:04 [core.py:452] Iteration(167): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.65 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(168): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.07 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(169): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.31 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(170): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.85 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(171): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.06 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(172): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 180.14 ms
+(EngineCore pid=126) INFO 08-09 18:51:05 [core.py:452] Iteration(173): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 182.03 ms
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(174): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.32 ms
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(175): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.93 ms
+(APIServer pid=89) INFO:     10.250.40.211:54876 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(176): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 134.82 ms
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(177): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.94 ms
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(178): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.50 ms
+(EngineCore pid=126) INFO 08-09 18:51:06 [core.py:452] Iteration(179): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.70 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(180): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.85 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(181): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.62 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(182): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.74 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(183): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.86 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(184): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.63 ms
+(EngineCore pid=126) INFO 08-09 18:51:07 [core.py:452] Iteration(185): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.30 ms
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(186): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 172.60 ms
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(187): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.62 ms
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(188): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.43 ms
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(189): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.15 ms
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(190): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.14 ms
+(APIServer pid=89) INFO:     192.168.200.27:50892 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:08 [core.py:452] Iteration(191): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.69 ms
+(APIServer pid=89) INFO:     10.250.40.211:54886 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(192): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 139.69 ms
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(193): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 185.14 ms
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(194): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.59 ms
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(195): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.65 ms
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(196): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.84 ms
+(EngineCore pid=126) INFO 08-09 18:51:09 [core.py:452] Iteration(197): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 153.26 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(198): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.32 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(199): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.80 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(200): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 172.45 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(201): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.30 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(202): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 172.76 ms
+(EngineCore pid=126) INFO 08-09 18:51:10 [core.py:452] Iteration(203): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.86 ms
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(204): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.12 ms
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(205): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 180.19 ms
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(206): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.26 ms
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(207): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 183.19 ms
+(APIServer pid=89) INFO:     10.250.40.211:54902 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(208): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 151.91 ms
+(EngineCore pid=126) INFO 08-09 18:51:11 [core.py:452] Iteration(209): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 178.42 ms
+(APIServer pid=89) INFO 08-09 18:51:12 [loggers.py:273] Engine 000: Avg prompt throughput: 6553.4 tokens/s, Avg generation throughput: 0.4 tokens/s, Running: 1 reqs, Waiting: 3 reqs, GPU KV cache usage: 0.5%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(210): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.27 ms
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(211): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.66 ms
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(212): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.01 ms
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(213): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.59 ms
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(214): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 153.24 ms
+(EngineCore pid=126) INFO 08-09 18:51:12 [core.py:452] Iteration(215): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.35 ms
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(216): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.31 ms
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(217): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.69 ms
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(218): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.38 ms
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(219): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.53 ms
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(220): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.90 ms
+(APIServer pid=89) INFO:     192.168.200.27:50896 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:13 [core.py:452] Iteration(221): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.23 ms
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(222): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.91 ms
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(223): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.01 ms
+(APIServer pid=89) INFO:     10.250.40.211:54904 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(224): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 146.10 ms
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(225): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.18 ms
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(226): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.27 ms
+(EngineCore pid=126) INFO 08-09 18:51:14 [core.py:452] Iteration(227): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 182.86 ms
+(EngineCore pid=126) INFO 08-09 18:51:15 [core.py:452] Iteration(228): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 180.56 ms
+(EngineCore pid=126) INFO 08-09 18:51:15 [core.py:452] Iteration(229): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 177.87 ms
+(EngineCore pid=126) INFO 08-09 18:51:15 [core.py:452] Iteration(230): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.76 ms
+(EngineCore pid=126) INFO 08-09 18:51:15 [core.py:452] Iteration(231): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.47 ms
+(EngineCore pid=126) INFO 08-09 18:51:15 [core.py:452] Iteration(232): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.99 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(233): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.60 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(234): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.19 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(235): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.83 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(236): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.77 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(237): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.22 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(238): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.34 ms
+(EngineCore pid=126) INFO 08-09 18:51:16 [core.py:452] Iteration(239): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.23 ms
+(APIServer pid=89) INFO:     10.250.40.211:54912 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(240): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 138.57 ms
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(241): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.98 ms
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(242): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.44 ms
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(243): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.93 ms
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(244): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.52 ms
+(EngineCore pid=126) INFO 08-09 18:51:17 [core.py:452] Iteration(245): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.90 ms
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(246): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.67 ms
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(247): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.39 ms
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(248): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.95 ms
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(249): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.90 ms
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(250): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 175.29 ms
+(APIServer pid=89) INFO:     192.168.200.27:41094 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:18 [core.py:452] Iteration(251): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 175.94 ms
+(EngineCore pid=126) INFO 08-09 18:51:19 [core.py:452] Iteration(252): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 183.12 ms
+(EngineCore pid=126) INFO 08-09 18:51:19 [core.py:452] Iteration(253): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 177.92 ms
+(EngineCore pid=126) INFO 08-09 18:51:19 [core.py:452] Iteration(254): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 186.09 ms
+(EngineCore pid=126) INFO 08-09 18:51:19 [core.py:452] Iteration(255): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 176.66 ms
+(APIServer pid=89) INFO:     10.250.40.211:54916 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:51:19 [core.py:452] Iteration(256): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 144.13 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(257): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.37 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(258): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.20 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(259): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.24 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(260): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.95 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(261): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.93 ms
+(EngineCore pid=126) INFO 08-09 18:51:20 [core.py:452] Iteration(262): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.95 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(263): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.78 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(264): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.67 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(265): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.40 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(266): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.53 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(267): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.86 ms
+(EngineCore pid=126) INFO 08-09 18:51:21 [core.py:452] Iteration(268): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 172.71 ms
+(EngineCore pid=126) INFO 08-09 18:51:22 [core.py:452] Iteration(269): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 195.21 ms
+(APIServer pid=89) INFO 08-09 18:51:22 [loggers.py:273] Engine 000: Avg prompt throughput: 4914.7 tokens/s, Avg generation throughput: 0.3 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 2.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:51:22 [core.py:452] Iteration(270): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 175.88 ms
+(EngineCore pid=126) INFO 08-09 18:51:22 [core.py:452] Iteration(271): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.97 ms
+(APIServer pid=89) INFO:     10.250.40.211:54926 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:41096 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:36080 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:51:32 [loggers.py:273] Engine 000: Avg prompt throughput: 1638.2 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:36096 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:47354 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:51:42 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:47360 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:43410 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:43426 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33834 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:33838 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53906 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:53922 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:17 [core.py:452] Iteration(272): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 148.78 ms
+(EngineCore pid=126) INFO 08-09 18:52:17 [core.py:452] Iteration(273): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.78 ms
+(EngineCore pid=126) INFO 08-09 18:52:17 [core.py:452] Iteration(274): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.67 ms
+(EngineCore pid=126) INFO 08-09 18:52:17 [core.py:452] Iteration(275): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.19 ms
+(EngineCore pid=126) INFO 08-09 18:52:17 [core.py:452] Iteration(276): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.67 ms
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(277): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.38 ms
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(278): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.70 ms
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(279): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.84 ms
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(280): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.70 ms
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(281): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.45 ms
+(APIServer pid=89) INFO:     192.168.200.27:42884 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:18 [core.py:452] Iteration(282): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.71 ms
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(283): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.47 ms
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(284): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.99 ms
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(285): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.94 ms
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(286): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.10 ms
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(287): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.76 ms
+(APIServer pid=89) INFO:     10.250.40.211:47212 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:19 [core.py:452] Iteration(288): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 146.73 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(289): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.59 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(290): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.41 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(291): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.53 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(292): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.52 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(293): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.48 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(294): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.09 ms
+(EngineCore pid=126) INFO 08-09 18:52:20 [core.py:452] Iteration(295): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.51 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(296): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.37 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(297): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.85 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(298): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.02 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(299): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.14 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(300): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.10 ms
+(EngineCore pid=126) INFO 08-09 18:52:21 [core.py:452] Iteration(301): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.86 ms
+(APIServer pid=89) INFO 08-09 18:52:22 [loggers.py:273] Engine 000: Avg prompt throughput: 1638.4 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 2.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(302): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.09 ms
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(303): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.46 ms
+(APIServer pid=89) INFO:     10.250.40.211:47218 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(304): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 138.83 ms
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(305): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.77 ms
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(306): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.26 ms
+(EngineCore pid=126) INFO 08-09 18:52:22 [core.py:452] Iteration(307): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.91 ms
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(308): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.85 ms
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(309): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.64 ms
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(310): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.23 ms
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(311): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.12 ms
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(312): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.02 ms
+(APIServer pid=89) INFO:     192.168.200.27:42888 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:23 [core.py:452] Iteration(313): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.25 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(314): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.25 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(315): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.48 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(316): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.10 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(317): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.65 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(318): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.50 ms
+(EngineCore pid=126) INFO 08-09 18:52:24 [core.py:452] Iteration(319): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 173.93 ms
+(APIServer pid=89) INFO:     10.250.40.211:47228 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(320): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 146.23 ms
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(321): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.13 ms
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(322): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.82 ms
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(323): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.43 ms
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(324): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.47 ms
+(EngineCore pid=126) INFO 08-09 18:52:25 [core.py:452] Iteration(325): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.28 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(326): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.49 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(327): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.31 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(328): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.85 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(329): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.49 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(330): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.19 ms
+(EngineCore pid=126) INFO 08-09 18:52:26 [core.py:452] Iteration(331): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.61 ms
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(332): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.27 ms
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(333): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.93 ms
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(334): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.52 ms
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(335): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.07 ms
+(APIServer pid=89) INFO:     10.250.40.211:47230 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(336): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 141.60 ms
+(EngineCore pid=126) INFO 08-09 18:52:27 [core.py:452] Iteration(337): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.04 ms
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(338): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.32 ms
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(339): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.65 ms
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(340): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.15 ms
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(341): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.45 ms
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(342): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.38 ms
+(APIServer pid=89) INFO:     192.168.200.27:43910 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:28 [core.py:452] Iteration(343): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.23 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(344): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.01 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(345): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.89 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(346): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.20 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(347): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.89 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(348): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.22 ms
+(EngineCore pid=126) INFO 08-09 18:52:29 [core.py:452] Iteration(349): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.06 ms
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(350): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.56 ms
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(351): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.51 ms
+(APIServer pid=89) INFO:     10.250.40.211:47242 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(352): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 137.85 ms
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(353): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.40 ms
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(354): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.74 ms
+(EngineCore pid=126) INFO 08-09 18:52:30 [core.py:452] Iteration(355): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.76 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(356): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.31 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(357): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.40 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(358): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.71 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(359): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.87 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(360): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.66 ms
+(EngineCore pid=126) INFO 08-09 18:52:31 [core.py:452] Iteration(361): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.95 ms
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(362): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.56 ms
+(APIServer pid=89) INFO 08-09 18:52:32 [loggers.py:273] Engine 000: Avg prompt throughput: 6552.8 tokens/s, Avg generation throughput: 0.4 tokens/s, Running: 1 reqs, Waiting: 2 reqs, GPU KV cache usage: 1.9%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(363): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.77 ms
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(364): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.71 ms
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(365): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.21 ms
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(366): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.92 ms
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(367): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.08 ms
+(APIServer pid=89) INFO:     10.250.40.211:47248 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:32 [core.py:452] Iteration(368): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 140.38 ms
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(369): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.09 ms
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(370): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.79 ms
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(371): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.25 ms
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(372): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.44 ms
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(373): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.65 ms
+(APIServer pid=89) INFO:     192.168.200.27:43916 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:33 [core.py:452] Iteration(374): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.86 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(375): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.73 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(376): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.17 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(377): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.52 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(378): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.28 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(379): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.40 ms
+(EngineCore pid=126) INFO 08-09 18:52:34 [core.py:452] Iteration(380): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.44 ms
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(381): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.15 ms
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(382): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.76 ms
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(383): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.50 ms
+(APIServer pid=89) INFO:     10.250.40.211:47254 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(384): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 136.44 ms
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(385): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.69 ms
+(EngineCore pid=126) INFO 08-09 18:52:35 [core.py:452] Iteration(386): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.82 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(387): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.94 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(388): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.89 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(389): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.56 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(390): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.18 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(391): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.58 ms
+(EngineCore pid=126) INFO 08-09 18:52:36 [core.py:452] Iteration(392): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.43 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(393): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.21 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(394): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.97 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(395): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.52 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(396): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.61 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(397): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.24 ms
+(EngineCore pid=126) INFO 08-09 18:52:37 [core.py:452] Iteration(398): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.80 ms
+(EngineCore pid=126) INFO 08-09 18:52:38 [core.py:452] Iteration(399): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.66 ms
+(APIServer pid=89) INFO:     10.250.40.211:47256 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:39626 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:52:42 [loggers.py:273] Engine 000: Avg prompt throughput: 4914.8 tokens/s, Avg generation throughput: 0.3 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:39638 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:51836 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:52:52 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:51848 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59146 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:59158 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40614 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:40618 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:15 [core.py:452] Iteration(400): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 152.88 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(401): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.95 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(402): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.01 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(403): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.43 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(404): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.20 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(405): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.72 ms
+(EngineCore pid=126) INFO 08-09 18:53:16 [core.py:452] Iteration(406): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.70 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(407): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.77 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(408): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 181.01 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(409): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.51 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(410): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.40 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(411): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.80 ms
+(EngineCore pid=126) INFO 08-09 18:53:17 [core.py:452] Iteration(412): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.35 ms
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(413): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.21 ms
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(414): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.24 ms
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(415): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.21 ms
+(APIServer pid=89) INFO:     10.250.40.211:54572 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(416): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 140.51 ms
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(417): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.45 ms
+(APIServer pid=89) INFO:     192.168.200.27:45404 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:18 [core.py:452] Iteration(418): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.99 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(419): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.03 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(420): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.14 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(421): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.69 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(422): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.50 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(423): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.54 ms
+(EngineCore pid=126) INFO 08-09 18:53:19 [core.py:452] Iteration(424): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.25 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(425): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.00 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(426): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.90 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(427): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.07 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(428): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.61 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(429): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.01 ms
+(EngineCore pid=126) INFO 08-09 18:53:20 [core.py:452] Iteration(430): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.80 ms
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(431): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 153.03 ms
+(APIServer pid=89) INFO:     10.250.40.211:54578 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(432): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 140.10 ms
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(433): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.39 ms
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(434): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.80 ms
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(435): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.32 ms
+(EngineCore pid=126) INFO 08-09 18:53:21 [core.py:452] Iteration(436): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.09 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(437): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 180.34 ms
+(APIServer pid=89) INFO 08-09 18:53:22 [loggers.py:273] Engine 000: Avg prompt throughput: 3276.9 tokens/s, Avg generation throughput: 0.2 tokens/s, Running: 1 reqs, Waiting: 5 reqs, GPU KV cache usage: 1.1%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(438): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.89 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(439): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.84 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(440): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.46 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(441): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.05 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(442): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.51 ms
+(EngineCore pid=126) INFO 08-09 18:53:22 [core.py:452] Iteration(443): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.52 ms
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(444): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.09 ms
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(445): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.73 ms
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(446): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 151.73 ms
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(447): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 153.93 ms
+(APIServer pid=89) INFO:     10.250.40.211:54586 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(448): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 135.91 ms
+(APIServer pid=89) INFO:     192.168.200.27:45414 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:23 [core.py:452] Iteration(449): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.74 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(450): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.13 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(451): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.61 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(452): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.28 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(453): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 169.99 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(454): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.84 ms
+(EngineCore pid=126) INFO 08-09 18:53:24 [core.py:452] Iteration(455): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.33 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(456): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 155.15 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(457): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.15 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(458): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.32 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(459): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.40 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(460): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.97 ms
+(EngineCore pid=126) INFO 08-09 18:53:25 [core.py:452] Iteration(461): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.37 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(462): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.25 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(463): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.01 ms
+(APIServer pid=89) INFO:     10.250.40.211:54602 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(464): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 138.78 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(465): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 152.85 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(466): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 154.82 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(467): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.48 ms
+(EngineCore pid=126) INFO 08-09 18:53:26 [core.py:452] Iteration(468): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.76 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(469): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.66 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(470): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.30 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(471): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.53 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(472): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.79 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(473): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.63 ms
+(EngineCore pid=126) INFO 08-09 18:53:27 [core.py:452] Iteration(474): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.89 ms
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(475): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.19 ms
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(476): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.37 ms
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(477): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 165.35 ms
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(478): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.92 ms
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(479): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.29 ms
+(APIServer pid=89) INFO:     10.250.40.211:54604 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:48040 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:28 [core.py:452] Iteration(480): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 140.06 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(481): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.69 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(482): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 171.97 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(483): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.99 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(484): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.54 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(485): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.93 ms
+(EngineCore pid=126) INFO 08-09 18:53:29 [core.py:452] Iteration(486): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.00 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(487): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.50 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(488): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.81 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(489): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.17 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(490): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.47 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(491): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.89 ms
+(EngineCore pid=126) INFO 08-09 18:53:30 [core.py:452] Iteration(492): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.22 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(493): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.68 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(494): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.42 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(495): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 154.85 ms
+(APIServer pid=89) INFO:     10.250.40.211:54606 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(496): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 135.40 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(497): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 168.45 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(498): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 156.38 ms
+(EngineCore pid=126) INFO 08-09 18:53:31 [core.py:452] Iteration(499): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.68 ms
+(APIServer pid=89) INFO 08-09 18:53:32 [loggers.py:273] Engine 000: Avg prompt throughput: 6552.8 tokens/s, Avg generation throughput: 0.4 tokens/s, Running: 1 reqs, Waiting: 1 reqs, GPU KV cache usage: 0.8%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(500): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.59 ms
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(501): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.07 ms
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(502): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.38 ms
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(503): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.39 ms
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(504): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.67 ms
+(EngineCore pid=126) INFO 08-09 18:53:32 [core.py:452] Iteration(505): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.08 ms
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(506): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 157.46 ms
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(507): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.89 ms
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(508): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.86 ms
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(509): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.12 ms
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(510): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 166.13 ms
+(APIServer pid=89) INFO:     192.168.200.27:48050 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:33 [core.py:452] Iteration(511): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.56 ms
+(APIServer pid=89) INFO:     10.250.40.211:54610 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(512): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 147.17 ms
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(513): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.08 ms
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(514): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 167.02 ms
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(515): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.51 ms
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(516): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.74 ms
+(EngineCore pid=126) INFO 08-09 18:53:34 [core.py:452] Iteration(517): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.41 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(518): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.46 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(519): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.36 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(520): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 162.49 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(521): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 161.38 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(522): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 160.33 ms
+(EngineCore pid=126) INFO 08-09 18:53:35 [core.py:452] Iteration(523): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 163.95 ms
+(EngineCore pid=126) INFO 08-09 18:53:36 [core.py:452] Iteration(524): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 159.24 ms
+(EngineCore pid=126) INFO 08-09 18:53:36 [core.py:452] Iteration(525): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 158.14 ms
+(EngineCore pid=126) INFO 08-09 18:53:36 [core.py:452] Iteration(526): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 164.52 ms
+(EngineCore pid=126) INFO 08-09 18:53:36 [core.py:452] Iteration(527): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 170.28 ms
+(APIServer pid=89) INFO:     10.250.40.211:54614 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=89) INFO:     192.168.200.27:55534 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=89) INFO 08-09 18:53:42 [loggers.py:273] Engine 000: Avg prompt throughput: 3276.1 tokens/s, Avg generation throughput: 0.2 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=89) INFO:     192.168.200.27:55544 - "GET /v1/models HTTP/1.1" 200 OK

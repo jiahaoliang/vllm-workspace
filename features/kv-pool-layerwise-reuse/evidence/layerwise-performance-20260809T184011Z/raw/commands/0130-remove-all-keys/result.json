@@ -1,0 +1,5 @@
+{
+  "mutates_server": true,
+  "returncode": 0,
+  "sends_inference": false
+}

@@ -1,0 +1,18 @@
+{
+  "calculator": "total",
+  "expected_points": [
+    "dp1-16384-bulk-o128-c8",
+    "dp1-16384-bulk-o1-c8",
+    "dp1-16384-layerwise-o128-c8",
+    "dp1-16384-layerwise-o1-c8",
+    "dp1-16384-reuse3-o1-c8"
+  ],
+  "formal_repetitions": 1,
+  "image_digest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "raw_characterization_only": true,
+  "request_count": 8,
+  "single_wave": true,
+  "topologies": [
+    "dp1"
+  ]
+}

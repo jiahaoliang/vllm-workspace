@@ -1,0 +1,31 @@
+{
+  "benchmark_duration_ms": 21455.5693,
+  "detail_count": 8,
+  "errors": [],
+  "image_digest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "max_e2el_ms": 21416.2,
+  "measurement_stage": "total",
+  "metrics": {
+    "Achieved Concurrency": 4.5871,
+    "E2EL Max": 21416.2,
+    "E2EL Median": 12343.2,
+    "E2EL P95": 20516.2,
+    "ITL Max": 0.1,
+    "ITL Median": 0.1,
+    "ITL P95": 0.1,
+    "Input Token Throughput": 6108.9966,
+    "Output Token Throughput": 0.3729,
+    "Request Throughput": 0.3729,
+    "TTFT Max": 21416.0,
+    "TTFT Median": 12343.1,
+    "TTFT P95": 20516.0
+  },
+  "raw_common": "aisbench-output/20260809_185150/performances/bulk/bulk.json",
+  "raw_details": "aisbench-output/20260809_185150/performances/bulk/bulk_details.jsonl",
+  "raw_request_metrics": "aisbench-output/20260809_185150/performances/bulk/bulk.csv",
+  "request_count": 8,
+  "single_wave": true,
+  "stage_request_count": 8,
+  "success_count": 8,
+  "valid": true
+}

@@ -1,0 +1,17 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "chroot",
+  "/performance-workspace/rootfs",
+  "env",
+  "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "/client-tools/venv/bin/python",
+  "-c",
+  "import json\nfrom urllib.request import Request, urlopen\nrequest = Request(\n    \"http://mooncake-master-service:9003/api/v1/remove_all?force=true\",\n    data=b\"\",\n    method=\"POST\",\n)\nwith urlopen(request, timeout=30) as response:\n    assert response.status == 200, response.status\n    body = json.loads(response.read())\nassert body.get(\"success\") is True, body\nremoved_count = body.get(\"removed_count\")\nassert isinstance(removed_count, int) and removed_count >= 0, body\nprint(json.dumps(body, sort_keys=True))\n"
+]

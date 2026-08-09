@@ -4,7 +4,7 @@ status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
 generation: 8
-updated_at: 2026-08-10T02:38:57+08:00
+updated_at: 2026-08-10T03:22:04+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -191,6 +191,38 @@ HBM-release failures during startup/variant switch; the latter contains four
 valid formal points but is incomplete and cannot be combined with another run.
 Generation 8 freezes the corrected rapid five-point contract and
 128 GiB per serving rank, and requires a new performance run root.
+
+## Performance Acceptance
+
+Generation 8 authorized the immutable formal run before this final result was
+added. The accepted run is `20260809T184011Z`; this post-run handoff edit does
+not change the generation-8 source, image, functional evidence, or authorized
+scope.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Exact five-point DP1 matrix | PASS | `evidence/layerwise-performance-20260809T184011Z/raw/run-contract.json`; five `points/*/formal-1/attempt-1/raw/summary.json` files |
+| Formal requests | PASS | every point is `valid: true` with `8/8` successful requests |
+| Full report checker | PASS | `performance.report check --scope all` returned `{"scope":"all","valid":true,"errors":[]}` |
+| Raw checksum replay | PASS | `evidence/layerwise-performance-20260809T184011Z/raw/SHA256SUMS` digest `fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c` |
+| Repository import checksum replay | PASS | `evidence/layerwise-performance-20260809T184011Z/SHA256SUMS` digest `c1dd24cc79c5af6bef5b3f0e3f8b3b09b7fdac5904564c9a1f726135cf6440cf` |
+| Runtime cleanup/restoration | PASS | `raw/restoration.json`: completed, engines stopped, no errors, Mooncake empty; `raw/final-mooncake-empty.metrics`: zero keys and allocated bytes |
+| Raw report | PASS | `layerwise-performance-rapid-validation-2026-08-10.md` |
+
+Observed request throughput was `0.2063` (BULK o128), `0.3743` (BULK o1),
+`0.1552` (LAYERWISE o128), `0.2320` (LAYERWISE o1), and `0.2567` req/s
+(REUSE3 o1). REUSE3/LAYERWISE o1 throughput was `1.10647x`, with median TTFT
+at `0.933059x`. LAYERWISE/BULK throughput was `0.752302x` for o128 and
+`0.619824x` for o1, so this run does not show a layerwise-over-bulk gain.
+
+These are one-wave raw observations from DP1, 16384 input tokens, concurrency
+8. They are not steady-state results, have no outlier removal or significance
+test, and do not establish a general throughput pass/fail conclusion.
+
+Reusable image for follow-up validation:
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
+with manifest
+`sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`.
 
 ## Listener Message Template
 

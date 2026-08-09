@@ -1,0 +1,15 @@
+{
+  "control_commit": "22429c0b4d5a2880a368f4756e5504d8c9fa55fd",
+  "image_digest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "image_reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z",
+  "imported_at": "2026-08-10T03:22:04+08:00",
+  "nested_commits": {
+    "Mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm-ascend": "5355559175f9998f5d70866734fb79569dfc86f9"
+  },
+  "raw_manifest_digest": "fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c",
+  "report_path": "features/kv-pool-layerwise-reuse/layerwise-performance-rapid-validation-2026-08-10.md",
+  "run_id": "20260809T184011Z",
+  "source_path": "/tmp/layerwise-performance-rapid-20260809T184011Z"
+}

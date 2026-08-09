@@ -15,6 +15,35 @@ design in
 No older diagnostic performance root is indexed as accepted performance
 evidence.
 
+## Layerwise Rapid Performance Characterization 20260809T184011Z
+
+- Report:
+  [layerwise-performance-rapid-validation-2026-08-10.md](../layerwise-performance-rapid-validation-2026-08-10.md)
+- Evidence:
+  [layerwise-performance-20260809T184011Z](layerwise-performance-20260809T184011Z/)
+- Result: all five DP1/16384/c8 single-wave points passed the exact-matrix
+  checker with `8/8` successful requests. Raw request throughput was `0.2063`
+  (BULK o128), `0.3743` (BULK o1), `0.1552` (LAYERWISE o128), `0.2320`
+  (LAYERWISE o1), and `0.2567` req/s (REUSE3 o1).
+- Direct observation: REUSE3 improved o1 request throughput by `1.10647x`
+  over LAYERWISE and reduced median TTFT to `0.933059x`. LAYERWISE did not
+  outperform BULK in this single wave; no statistical significance or
+  steady-state claim is made.
+- Validation: `performance.report check --scope all` returned `valid: true`;
+  restoration completed with both engines stopped, no errors, and Mooncake
+  keys/allocated bytes at zero.
+- Raw `SHA256SUMS` digest:
+  `fa9c2bf9b5e73e9eb94f9cb273cb555a4ea0e74fbc49b00a4cd649fc708dd40c`.
+- Repository import `SHA256SUMS` digest (1128 entries):
+  `c1dd24cc79c5af6bef5b3f0e3f8b3b09b7fdac5904564c9a1f726135cf6440cf`.
+- Reusable `linux/arm64` image:
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`,
+  manifest
+  `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`.
+- Limits: one topology, one input length, one concurrency, one formal wave,
+  no outlier removal, no significance test, and no performance pass/fail
+  threshold. The result is raw characterization only.
+
 ## Native Revoke Ownership Full Validation 20260807T100722Z
 
 - Plan:

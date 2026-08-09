@@ -1,0 +1,13 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/decode-engine-deployment",
+  "-c",
+  "decode-engine",
+  "--",
+  "sh",
+  "-c",
+  "test ! -e /tmp/vllm-decode.pid"
+]

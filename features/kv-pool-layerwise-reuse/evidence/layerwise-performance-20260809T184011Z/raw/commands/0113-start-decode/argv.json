@@ -1,0 +1,11 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/decode-engine-deployment",
+  "-c",
+  "decode-engine",
+  "--",
+  "/opt/vllm-layerwise/start-decode.sh"
+]
