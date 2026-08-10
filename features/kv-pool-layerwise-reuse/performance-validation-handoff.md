@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 9
-updated_at: 2026-08-10T11:12:47+08:00
+generation: 10
+updated_at: 2026-08-10T11:30:20+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,7 +49,7 @@ updated_at: 2026-08-10T11:12:47+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` 64-request performance control parent | `4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54` | transition parent pushed as `origin/kv-pool-layerwise-reuse=4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54` |
+| control repo | `kv-pool-layerwise-reuse` 64-request performance control parent | `057f9fbcc3704a40af03554934084607ef271223` | transition parent pushed as `origin/kv-pool-layerwise-reuse=057f9fbcc3704a40af03554934084607ef271223` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `5355559175f9998f5d70866734fb79569dfc86f9` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -88,7 +88,7 @@ updated_at: 2026-08-10T11:12:47+08:00
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validator.log`; `npu/pure-consumer-canary/validator.log`; `REPORT.md` |
 | Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
 | Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
-| Performance runtime capacity CPU/mock | PASS | PASS | control parent `4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54`; complete performance harness `70 passed`; contract and fixture tests require 8 warmup requests, 64 formal requests, and eight formal concurrency waves; pinned `BaseAPIModel.infer` source confirms `retry=1` sends one total attempt |
+| Performance runtime capacity CPU/mock | PASS | PASS | control parent `057f9fbcc3704a40af03554934084607ef271223`; complete performance harness `70 passed`; contract, fixture, runner, and report tests require 8 warmup requests, 64 formal requests, c8 fixtures, and eight formal concurrency waves; pinned `BaseAPIModel.infer` source confirms `retry=1` sends one total attempt |
 
 ## Evidence Identity
 
@@ -195,19 +195,27 @@ requests, 64 formal requests, 128 GiB per serving rank, and requires a new
 performance run root. It does not authorize resuming or combining any
 generation-8 evidence root.
 
-## Generation 9 Rerun Authorization
+## Generation 10 Rerun Authorization
 
-Generation 9 is a handoff-only direct child of control parent
-`4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54`. The performance harness passed
+Generation 10 is a handoff-only direct child of control parent
+`057f9fbcc3704a40af03554934084607ef271223`. The performance harness passed
 `70` CPU/mock tests in `liangjiahao/vllm-ascend-ut`; all 15 performance Python
 files passed source `compile()`, and `git diff --check`, shell syntax, and
 namespace scans passed. The UT image does not contain a Ruff executable, so no
 new Ruff result is claimed for the performance-only control change; the frozen
 vLLM-Ascend functional-source Ruff evidence remains unchanged and valid.
 
+Generation 9's attempted root
+`/tmp/layerwise-performance-rapid-64-20260810T031839Z` stopped at the BULK
+correctness-canary because its old canary source still named the superseded
+`tokens-16384-c64` fixture path. It sent no formal warmup or formal benchmark
+requests; `restoration.json` records engines stopped and Mooncake empty. The
+canary path is fixed and covered by the new runner regression test. The failed
+root must not be resumed or combined.
+
 The next real run must create a completely new root and execute exactly five
 points with 8 warmup requests and 64 formal requests per point. No NPU workload
-has been started under generation 9 at the time of this transition.
+has been started under generation 10 at the time of this transition.
 
 ## Historical Generation 8 Performance Acceptance
 
