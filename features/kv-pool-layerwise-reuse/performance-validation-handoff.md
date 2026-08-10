@@ -3,8 +3,8 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 8
-updated_at: 2026-08-10T03:42:34+08:00
+generation: 9
+updated_at: 2026-08-10T11:12:47+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -49,7 +49,7 @@ updated_at: 2026-08-10T03:42:34+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` performance control parent | `e456668a36b03dd5f9841f5be61b35773c891365` | transition parent pushed as `origin/kv-pool-layerwise-reuse=e456668a36b03dd5f9841f5be61b35773c891365` |
+| control repo | `kv-pool-layerwise-reuse` 64-request performance control parent | `4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54` | transition parent pushed as `origin/kv-pool-layerwise-reuse=4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54` |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `5355559175f9998f5d70866734fb79569dfc86f9` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -88,7 +88,7 @@ updated_at: 2026-08-10T03:42:34+08:00
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validator.log`; `npu/pure-consumer-canary/validator.log`; `REPORT.md` |
 | Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
 | Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
-| Performance runtime capacity CPU/mock | PASS | PASS | control parent `e456668a36b03dd5f9841f5be61b35773c891365`; `deployment/performance/tests/test_runtime.py`; complete performance harness `69 passed`; AISBench 3.1.0 `build_dataset_from_cfg` smoke accepted 8-request metadata; pinned `BaseAPIModel.infer` source confirms `retry=1` sends one total attempt; live idle-engine HBM probe returned no errors |
+| Performance runtime capacity CPU/mock | PASS | PASS | control parent `4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54`; complete performance harness `70 passed`; contract and fixture tests require 8 warmup requests, 64 formal requests, and eight formal concurrency waves; pinned `BaseAPIModel.infer` source confirms `retry=1` sends one total attempt |
 
 ## Evidence Identity
 
@@ -117,10 +117,11 @@ After this handoff becomes ready, performance validation may use only:
 - model `vllm-ascend/DeepSeek-V2-Lite-W8A8`;
 - DP1 only, 16384 input tokens, concurrency 8;
 - exactly five points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1;
-- one 8-request warmup wave and one 8-request formal wave per point;
+- one 8-request warmup wave and one 64-request formal attempt per point;
+- exactly eight concurrency waves within each formal attempt;
 - `DefaultPerfMetricCalculator`, `total` stage, one formal repetition, and no
   automatic retry;
-- AISBench `sampling_mode=default`; single-wave and total-stage semantics are
+- AISBench `sampling_mode=default`; multi-wave and total-stage semantics are
   frozen by `run-contract.json`, not encoded as a custom AISBench sample mode;
 - AISBench `retry=1`, whose pinned implementation iterates `range(retry)`;
   therefore exactly one request attempt is sent and no retry occurs;
@@ -173,7 +174,7 @@ all unverified fields fail-closed.
 None. The TP2 REUSE3 non-save-owner save-gate defect is preserved in the
 diagnostic performance root `/tmp/layerwise-performance-20260809T010429Z` and
 resolved by vLLM-Ascend
-`5355559175f9998f5d70866734fb79569dfc86f9`. Generation-8 retains the
+`5355559175f9998f5d70866734fb79569dfc86f9`. Generation 9 retains the
 generation-4 functional evidence and
 includes both the real-thread TP non-save-owner CPU regression and an exact
 4096-token TP2 REUSE3 producer to pure-consumer Decode NPU canary.
@@ -189,10 +190,26 @@ requests in pinned AISBench 3.1.0. The diagnostic roots
 `/tmp/layerwise-performance-rapid-20260809T175640Z` preserve asynchronous NPU
 HBM-release failures during startup/variant switch; the latter contains four
 valid formal points but is incomplete and cannot be combined with another run.
-Generation 8 freezes the corrected rapid five-point contract and
-128 GiB per serving rank, and requires a new performance run root.
+Generation 9 freezes the corrected rapid five-point contract, 8 warmup
+requests, 64 formal requests, 128 GiB per serving rank, and requires a new
+performance run root. It does not authorize resuming or combining any
+generation-8 evidence root.
 
-## Performance Acceptance
+## Generation 9 Rerun Authorization
+
+Generation 9 is a handoff-only direct child of control parent
+`4eb9ce1d2156bd90cf1312b6943cbb0f9f1dfb54`. The performance harness passed
+`70` CPU/mock tests in `liangjiahao/vllm-ascend-ut`; all 15 performance Python
+files passed source `compile()`, and `git diff --check`, shell syntax, and
+namespace scans passed. The UT image does not contain a Ruff executable, so no
+new Ruff result is claimed for the performance-only control change; the frozen
+vLLM-Ascend functional-source Ruff evidence remains unchanged and valid.
+
+The next real run must create a completely new root and execute exactly five
+points with 8 warmup requests and 64 formal requests per point. No NPU workload
+has been started under generation 9 at the time of this transition.
+
+## Historical Generation 8 Performance Acceptance
 
 Generation 8 authorized the immutable formal run before this final result was
 added. The accepted run is `20260809T184011Z`; this post-run handoff edit does
