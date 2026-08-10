@@ -37,7 +37,7 @@ def valid_tree(tmp_path: Path) -> Path:
             (raw / "fixture-reference.json").write_text(
                 json.dumps(
                     {
-                        "path": f"fixtures/tokens-16384-c64/{phase}.jsonl",
+                        "path": f"fixtures/tokens-16384-c8/{phase}.jsonl",
                         "sha256": hashlib.sha256(b"fixture\n").hexdigest(),
                     }
                 )
@@ -55,7 +55,7 @@ def valid_tree(tmp_path: Path) -> Path:
                     }
                 )
                 + "\n"
-                for request_index in range(8)
+                for request_index in range(64)
             ),
             encoding="utf-8",
         )
@@ -64,10 +64,11 @@ def valid_tree(tmp_path: Path) -> Path:
                 {
                     "valid": True,
                     "image_digest": "sha256:image",
-                    "request_count": 8,
-                    "stage_request_count": 8,
+                    "request_count": 64,
+                    "stage_request_count": 64,
                     "measurement_stage": "total",
-                    "single_wave": True,
+                    "single_wave": False,
+                    "concurrency_waves": 8,
                     "raw_details": "details.jsonl",
                     "metrics": {
                         "Input Token Throughput": 100.0 * index,
@@ -83,7 +84,7 @@ def valid_tree(tmp_path: Path) -> Path:
             json.dumps({"image_digest": "sha256:image", "variant": variant})
         )
     (tmp_path / "run-contract.json").write_text(json.dumps(build_run_contract("sha256:image")))
-    fixture_root = tmp_path / "fixtures" / "tokens-16384-c64"
+    fixture_root = tmp_path / "fixtures" / "tokens-16384-c8"
     fixture_root.mkdir(parents=True)
     for name in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
         (fixture_root / name).write_text("fixture\n")
@@ -187,23 +188,23 @@ def test_raw_report_keeps_five_rows_and_output_matched_ratios(valid_tree: Path) 
     assert text.count("| LAYERWISE / BULK | dp1 | 16384 | 1 |") > 0
     assert text.count("| REUSE3 / LAYERWISE | dp1 | 16384 | 1 |") > 0
     assert text.count("| REUSE3 / BULK | dp1 | 16384 | 1 |") > 0
-    assert "Single-wave raw characterization; not a steady-state or statistically significant result." in text
+    assert "Single formal attempt with eight concurrency waves; not a statistically significant result." in text
     assert "p-value" not in text
     assert "confidence interval" not in text
     assert "Performance PASS" not in text
 
 
-def test_raw_report_keeps_all_forty_per_request_rows(valid_tree: Path) -> None:
+def test_raw_report_keeps_all_320_per_request_rows(valid_tree: Path) -> None:
     text = report.render_report(valid_tree)
 
     assert "## Per-Request Results" in text
     for point in POINTS:
-        assert text.count(f"| {point} | 1 |") == 8
-        for request_index in range(8):
+        assert text.count(f"| {point} | 1 |") == 64
+        for request_index in range(64):
             assert f"{point}-request-{request_index}" in text
 
 
-def test_aisbench_raw_summary_uses_all_single_wave_requests(tmp_path: Path) -> None:
+def test_aisbench_raw_summary_uses_all_formal_requests(tmp_path: Path) -> None:
     raw = tmp_path / "raw"
     performance = raw / "aisbench-output" / "performances" / "service"
     performance.mkdir(parents=True)
@@ -215,17 +216,17 @@ def test_aisbench_raw_summary_uses_all_single_wave_requests(tmp_path: Path) -> N
                 "Concurrency": {"total": 8},
                 "Output Token Throughput": {"total": "2 token/s"},
                 "Benchmark Duration": {"total": "4000 ms"},
-                "Total Requests": {"total": 8},
+                "Total Requests": {"total": 64},
                 "Failed Requests": {"total": 0},
-                "Success Requests": {"total": 8},
+                "Success Requests": {"total": 64},
             }
         ),
         encoding="utf-8",
     )
     (performance / "bulk.csv").write_text(
         "Performance Parameters,Stage,Average,Max,Median,P95,N\n"
-        "E2EL,total,1.0 ms,1000 ms,850 ms,900 ms,8\n"
-        "TTFT,total,1.0 ms,900 ms,800 ms,850 ms,8\n",
+        "E2EL,total,1.0 ms,1000 ms,850 ms,900 ms,64\n"
+        "TTFT,total,1.0 ms,900 ms,800 ms,850 ms,64\n",
         encoding="utf-8",
     )
     (performance / "bulk_details.jsonl").write_text(
@@ -238,7 +239,7 @@ def test_aisbench_raw_summary_uses_all_single_wave_requests(tmp_path: Path) -> N
                 }
             )
             + "\n"
-            for _ in range(8)
+            for _ in range(64)
         ),
         encoding="utf-8",
     )
@@ -246,15 +247,16 @@ def test_aisbench_raw_summary_uses_all_single_wave_requests(tmp_path: Path) -> N
     summary = report.summarize_aisbench_attempt(
         raw,
         WorkloadPoint("dp1", 16384, 1, "bulk", 8),
-        request_count=8,
+        request_count=64,
         image_digest="sha256:image",
     )
 
     assert summary["valid"] is True
     assert summary["measurement_stage"] == "total"
-    assert summary["single_wave"] is True
-    assert summary["request_count"] == 8
-    assert summary["success_count"] == 8
+    assert summary["single_wave"] is False
+    assert summary["concurrency_waves"] == 8
+    assert summary["request_count"] == 64
+    assert summary["success_count"] == 64
     metrics = summary["metrics"]
     assert isinstance(metrics, dict)
     assert metrics["TTFT Median"] == 800

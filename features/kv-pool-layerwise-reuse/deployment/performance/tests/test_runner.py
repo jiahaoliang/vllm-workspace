@@ -67,6 +67,8 @@ def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
     assert "dev/urandom" in devices_text
     tokenizer_link = next(call for call in fake.calls if call.description == "link-tokenizer-model-path")
     assert "/client-tools/tokenizer" in " ".join(tokenizer_link.argv)
+    fixture_generator = next(call for call in fake.calls if call.description == "generate-fixtures")
+    assert fixture_generator.argv[fixture_generator.argv.index("--concurrency") + 1] == "8"
 
 
 def test_run_checks_handoff_before_any_command(tmp_path: Path) -> None:
@@ -447,7 +449,7 @@ def test_execute_point_runs_one_warmup_and_one_formal(tmp_path: Path, monkeypatc
     assert not list(tmp_path.glob("points/**/formal-2"))
 
 
-def test_invalid_single_wave_is_not_retried(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_invalid_formal_attempt_is_not_retried(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeCommandRunner()
     point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
     request_counts: list[int] = []
@@ -484,7 +486,7 @@ def test_invalid_single_wave_is_not_retried(tmp_path: Path, monkeypatch: pytest.
             runner.RunEnvironment(image_digest="sha256:image"),
         )
 
-    assert request_counts == [8, 8]
+    assert request_counts == [8, 64]
     assert not list(tmp_path.glob("points/**/attempt-2"))
 
 
@@ -527,7 +529,7 @@ def test_execute_point_replaces_dataset_copies_with_fixture_references(
     for raw in raw_dirs:
         assert not (raw / "dataset.jsonl").exists()
         reference = json.loads((raw / "fixture-reference.json").read_text())
-        assert reference["path"].startswith("fixtures/tokens-16384-c64/")
+        assert reference["path"].startswith("fixtures/tokens-16384-c8/")
         assert len(reference["sha256"]) == 64
 
 

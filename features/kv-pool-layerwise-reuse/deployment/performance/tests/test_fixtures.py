@@ -72,7 +72,7 @@ def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None
 
     assert len(manifest.warmup_ids) == 8
     assert len(manifest.formal_ids) == 1
-    assert all(len(ids) == 8 for ids in manifest.formal_ids)
+    assert all(len(ids) == 64 for ids in manifest.formal_ids)
     partitions = (set(manifest.warmup_ids), *(set(ids) for ids in manifest.formal_ids))
     assert all(left.isdisjoint(right) for index, left in enumerate(partitions) for right in partitions[index + 1 :])
     row = json.loads(manifest.partition_files["warmup"].read_text().splitlines()[0])
@@ -87,7 +87,7 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     point = WorkloadPoint("dp1", 16384, 128, "bulk", 8)
     output = tmp_path / "point.py"
 
-    fixtures.write_aisbench_config(point, dataset, output, request_count=8)
+    fixtures.write_aisbench_config(point, dataset, output, request_count=64)
 
     text = output.read_text(encoding="utf-8")
     compile(text, str(output), "exec")
@@ -107,8 +107,8 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     assert "ignore_eos=True" in text
     assert 'template="{question}"' in text
     meta = json.loads(dataset.with_name(dataset.name + ".meta.json").read_text(encoding="utf-8"))
-    assert meta == {"request_count": 8, "sampling_mode": "default"}
-    assert "request_count=8" not in text
+    assert meta == {"request_count": 64, "sampling_mode": "default"}
+    assert "request_count=64" not in text
     assert "from ais_bench.benchmark.openicl.icl_prompt_template import PromptTemplate" in text
     assert "from ais_bench.benchmark.openicl.icl_retriever import ZeroRetriever" in text
     assert "from ais_bench.benchmark.openicl.icl_inferencer import GenInferencer" in text

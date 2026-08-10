@@ -32,8 +32,8 @@ def test_rapid_matrix_is_exactly_five_points() -> None:
         contract.build_matrix("dp2")
 
 
-def test_single_wave_counts_are_frozen() -> None:
-    assert contract.sample_counts(8) == (8, 8, 1)
+def test_request_counts_are_frozen() -> None:
+    assert contract.sample_counts(8) == (8, 64, 1)
     with pytest.raises(ValueError, match="concurrency must be 8"):
         contract.sample_counts(1)
 
@@ -50,9 +50,11 @@ def test_rapid_run_contract_is_self_describing() -> None:
             "dp1-16384-reuse3-o1-c8",
         ],
         "formal_repetitions": 1,
-        "request_count": 8,
+        "warmup_request_count": 8,
+        "formal_request_count": 64,
+        "formal_concurrency_waves": 8,
         "calculator": "total",
-        "single_wave": True,
+        "single_wave": False,
         "raw_characterization_only": True,
     }
 

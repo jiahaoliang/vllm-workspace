@@ -8,7 +8,13 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from performance.contract import WorkloadPoint, build_matrix, point_id
+from performance.contract import (
+    FORMAL_REQUEST_COUNT,
+    WARMUP_REQUEST_COUNT,
+    WorkloadPoint,
+    build_matrix,
+    point_id,
+)
 
 REQUIRED_ROOT_FILES = (
     "handoff.json",
@@ -183,7 +189,8 @@ def summarize_aisbench_attempt(
         "metrics": metrics,
         "request_count": request_count,
         "measurement_stage": "total",
-        "single_wave": True,
+        "single_wave": request_count == point.concurrency,
+        "concurrency_waves": request_count // point.concurrency,
         "stage_request_count": int(total_requests),
         "detail_count": detail_count,
         "success_count": success_count,
@@ -238,16 +245,20 @@ def validate_evidence(root: Path) -> list[str]:
         errors.append("run contract does not match the exact rapid point matrix")
     if repetitions != 1:
         errors.append("run contract formal_repetitions must be 1")
-    if contract.get("request_count") != 8:
-        errors.append("run contract request_count must be 8")
+    if contract.get("warmup_request_count") != WARMUP_REQUEST_COUNT:
+        errors.append("run contract warmup_request_count must be 8")
+    if contract.get("formal_request_count") != FORMAL_REQUEST_COUNT:
+        errors.append("run contract formal_request_count must be 64")
+    if contract.get("formal_concurrency_waves") != 8:
+        errors.append("run contract formal_concurrency_waves must be 8")
     if contract.get("calculator") != "total":
         errors.append("run contract calculator must be total")
-    if contract.get("single_wave") is not True:
-        errors.append("run contract single_wave must be true")
+    if contract.get("single_wave") is not False:
+        errors.append("run contract single_wave must be false")
     actual_points = sorted(path.name for path in (root / "points").glob("*") if path.is_dir())
     for point in sorted(set(actual_points) - set(rapid_points)):
         errors.append(f"unexpected point directory: {point}")
-    fixture_root = root / "fixtures" / "tokens-16384-c64"
+    fixture_root = root / "fixtures" / "tokens-16384-c8"
     for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
         if not (fixture_root / filename).is_file():
             errors.append(f"missing shared fixture: {filename}")
@@ -285,7 +296,7 @@ def validate_evidence(root: Path) -> list[str]:
             try:
                 reference = _load_json(reference_path)
                 relative = reference.get("path")
-                expected_relative = f"fixtures/tokens-16384-c64/{phase_name}.jsonl"
+                expected_relative = f"fixtures/tokens-16384-c8/{phase_name}.jsonl"
                 if relative != expected_relative:
                     errors.append(f"fixture reference path drift for {phase_name}: {point}")
                 shared = root / expected_relative
@@ -307,10 +318,11 @@ def validate_evidence(root: Path) -> list[str]:
                 if summary.get("valid") is not True:
                     errors.append(f"invalid formal repetition {repetition}: {point}")
                 if (
-                    summary.get("request_count") != 8
-                    or summary.get("stage_request_count") != 8
+                    summary.get("request_count") != FORMAL_REQUEST_COUNT
+                    or summary.get("stage_request_count") != FORMAL_REQUEST_COUNT
                     or summary.get("measurement_stage") != "total"
-                    or summary.get("single_wave") is not True
+                    or summary.get("single_wave") is not False
+                    or summary.get("concurrency_waves") != 8
                 ):
                     errors.append(f"formal summary contract drift: {point}")
             except ValueError as error:
@@ -391,8 +403,11 @@ def load_request_results(root: Path, results: tuple[ResultRow, ...]) -> tuple[Re
                         output_tokens=int(detail.get("output_tokens", 0)),
                     )
                 )
-        if len(point_rows) != 8:
-            raise ValueError(f"raw_details row count must be 8: {result.point_id}")
+        if len(point_rows) != FORMAL_REQUEST_COUNT:
+            raise ValueError(
+                f"raw_details row count must be {FORMAL_REQUEST_COUNT}: "
+                f"{result.point_id}"
+            )
         rows.extend(point_rows)
     return tuple(rows)
 
@@ -407,7 +422,7 @@ def render_report(root: Path) -> str:
     lines = [
         "# Mooncake Layerwise Performance Raw Characterization",
         "",
-        "Single-wave raw characterization; not a steady-state or statistically significant result.",
+        "Single formal attempt with eight concurrency waves; not a statistically significant result.",
         "",
         "## Raw Results",
         "",

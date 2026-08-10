@@ -478,7 +478,7 @@ kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
                 "--output",
                 "/client-tools/fixtures",
                 "--concurrency",
-                "64",
+                "8",
                 "--seed",
                 "20260808",
             ),
@@ -650,9 +650,9 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
 
 
 def _archive_shared_fixtures(command_runner: Runner, output_dir: Path) -> None:
-    destination = output_dir / "fixtures" / "tokens-16384-c64"
+    destination = output_dir / "fixtures" / "tokens-16384-c8"
     destination.mkdir(parents=True, exist_ok=False)
-    source = "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c64"
+    source = "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c8"
     for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
         command_runner.run(
             Command(
@@ -1587,7 +1587,7 @@ def _attempt_commands(
     rootfs = "/performance-workspace/rootfs"
     chroot_attempt = f"/client-tools/runs/{remote_attempt}"
     host_attempt = f"{rootfs}{chroot_attempt}"
-    fixture = f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c64/{phase}.jsonl"
+    fixture = f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c8/{phase}.jsonl"
     prepare_script = 'set -eu; test ! -e "$1"; mkdir -p "$1"; cp "$2" "$1/dataset.jsonl"'
     config_argv = (
         "kubectl",
@@ -1816,7 +1816,7 @@ def _replace_attempt_fixture(raw: Path, input_tokens: int, phase: str) -> None:
     _write_json(
         raw / "fixture-reference.json",
         {
-            "path": f"fixtures/tokens-{input_tokens}-c64/{phase}.jsonl",
+            "path": f"fixtures/tokens-{input_tokens}-c8/{phase}.jsonl",
             "sha256": hashlib.sha256(dataset.read_bytes()).hexdigest(),
         },
     )

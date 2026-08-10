@@ -67,7 +67,8 @@ VARIANTS = MappingProxyType(
 TOPOLOGIES = MappingProxyType({"dp1": Topology("dp1", 1, 2, 1, 2, (8,))})
 INPUT_TOKENS = (16384,)
 VARIANT_ORDER = ("bulk", "layerwise", "reuse3")
-REQUEST_COUNT = 8
+WARMUP_REQUEST_COUNT = 8
+FORMAL_REQUEST_COUNT = 64
 FORMAL_REPETITIONS = 1
 RUNTIME_CONSTANTS = MappingProxyType(
     {
@@ -112,9 +113,11 @@ def build_run_contract(image_digest: str) -> dict[str, object]:
         "image_digest": image_digest,
         "expected_points": [point_id(point) for point in build_matrix()],
         "formal_repetitions": FORMAL_REPETITIONS,
-        "request_count": REQUEST_COUNT,
+        "warmup_request_count": WARMUP_REQUEST_COUNT,
+        "formal_request_count": FORMAL_REQUEST_COUNT,
+        "formal_concurrency_waves": FORMAL_REQUEST_COUNT // TOPOLOGIES["dp1"].concurrency[0],
         "calculator": "total",
-        "single_wave": True,
+        "single_wave": False,
         "raw_characterization_only": True,
     }
 
@@ -122,4 +125,4 @@ def build_run_contract(image_digest: str) -> dict[str, object]:
 def sample_counts(concurrency: int) -> tuple[int, int, int]:
     if concurrency != 8:
         raise ValueError("concurrency must be 8")
-    return REQUEST_COUNT, REQUEST_COUNT, FORMAL_REPETITIONS
+    return WARMUP_REQUEST_COUNT, FORMAL_REQUEST_COUNT, FORMAL_REPETITIONS

@@ -2,7 +2,7 @@
 
 This directory implements the preparation, handoff gate, execution, and raw
 reporting contract in the approved
-[`2026-08-09-layerwise-performance-rapid-validation-design.md`](../../2026-08-09-layerwise-performance-rapid-validation-design.md).
+[`2026-08-10-layerwise-performance-64-request-rerun-design.md`](../../2026-08-10-layerwise-performance-64-request-rerun-design.md).
 
 ## Safety Boundary
 
@@ -20,7 +20,8 @@ reporting contract in the approved
   variants.
 - The formal matrix is exactly DP1, 16384 input tokens, concurrency 8, and five
   points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1.
-- Each point has one 8-request warmup wave and one 8-request formal wave. The
+- Each point has one 8-request warmup wave and one 64-request formal attempt.
+  At concurrency 8, the formal attempt contains eight concurrency waves. The
   runner starts the server once per variant, does not retry a point, and defines
   no performance timeout. A valid slow point continues naturally.
 
@@ -68,7 +69,7 @@ features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh 
   wait --output "/tmp/layerwise-performance-wait-${wait_id}" --poll-seconds 10
 ```
 
-After the listener accepts the generation-5 handoff, execute the rapid DP1 run
+After the listener accepts the current ready handoff, execute the rapid DP1 run
 in a new root. A failed root is retained as diagnostics and is never resumed.
 
 ```bash
@@ -80,16 +81,18 @@ PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
   python3 -m performance.report check --root "${run_root}" --scope all
 ```
 
-Render the five raw rows and output-matched direct ratios:
+Render the five aggregate rows, all 320 formal request rows, and output-matched
+direct ratios:
 
 ```bash
 PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
 python3 -m performance.report render \
   --root "${run_root}" \
-  --output features/kv-pool-layerwise-reuse/layerwise-performance-validation-2026-08-08.md
+  --output features/kv-pool-layerwise-reuse/layerwise-performance-64-request-validation-2026-08-10.md
 ```
 
-This is single-wave raw characterization, not a steady-state or statistically
-significant result. The report does not remove outliers or assign a performance
-pass/fail result. Point evidence keeps 10-second telemetry and lightweight
-diagnostics; complete Prefill and Decode logs are captured once per variant.
+This is one formal attempt with eight concurrency waves, not an independently
+repeated or statistically significant result. The report does not remove
+outliers or assign a performance pass/fail result. Point evidence keeps
+10-second telemetry and lightweight diagnostics; complete Prefill and Decode
+logs are captured once per variant.
