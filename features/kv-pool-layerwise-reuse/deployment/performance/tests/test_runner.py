@@ -613,6 +613,9 @@ def test_variant_canary_checks_live_master_before_inference(tmp_path: Path) -> N
         "correctness-canary",
     ]
     assert fake.calls[-1].sends_inference
+    canary_text = " ".join(fake.calls[-1].argv)
+    assert "tokens-{input_tokens}-c8/warmup.jsonl" in canary_text
+    assert "tokens-{input_tokens}-c64" not in canary_text
 
 
 def test_variant_canary_captures_diagnostics_before_restore(tmp_path: Path) -> None:

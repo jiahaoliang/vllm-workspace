@@ -988,7 +988,7 @@ def _canary_command(point: WorkloadPoint, environment: RunEnvironment) -> Comman
 from pathlib import Path
 from urllib.request import Request, urlopen
 input_tokens, output_tokens = map(int, sys.argv[1:])
-fixture = Path(f"/client-tools/fixtures/tokens-{input_tokens}-c64/warmup.jsonl")
+fixture = Path(f"/client-tools/fixtures/tokens-{input_tokens}-c8/warmup.jsonl")
 prompt = json.loads(fixture.read_text(encoding="utf-8").splitlines()[0])["question"]
 payload = json.dumps({
     "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
