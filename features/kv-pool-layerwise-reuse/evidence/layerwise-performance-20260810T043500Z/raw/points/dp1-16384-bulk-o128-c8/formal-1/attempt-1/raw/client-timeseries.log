@@ -1,0 +1,154 @@
+2026-08-10T04:43:58.272071333Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   22m          3648Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2384764858 2665202    0    0    0     0          0         0 830155786 2737003    0    0    0     0       0          0
+2026-08-10T04:44:08.572023774Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   318m         2732Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2384791515 2665212    0    0    0     0          0         0 830156753 2737014    0    0    0     0       0          0
+2026-08-10T04:44:18.798205010Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   318m         2732Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2384818148 2665222    0    0    0     0          0         0 830157696 2737025    0    0    0     0       0          0
+2026-08-10T04:44:29.047579647Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   943m         3069Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2384856208 2665346    0    0    0     0          0         0 830959197 2737159    0    0    0     0       0          0
+2026-08-10T04:44:39.343844519Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   928m         3665Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2384961021 2665575    0    0    0     0          0         0 830974618 2737389    0    0    0     0       0          0
+2026-08-10T04:44:49.619099751Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   23m          3665Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2385159561 2666087    0    0    0     0          0         0 831206557 2737908    0    0    0     0       0          0
+2026-08-10T04:44:59.875870726Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   23m          3665Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2385367374 2666646    0    0    0     0          0         0 831639264 2738479    0    0    0     0       0          0
+2026-08-10T04:45:10.149768571Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   29m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2385580621 2667217    0    0    0     0          0         0 832072919 2739064    0    0    0     0       0          0
+2026-08-10T04:45:20.423094483Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   21m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2385790536 2667777    0    0    0     0          0         0 832506112 2739642    0    0    0     0       0          0
+2026-08-10T04:45:30.696129724Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   21m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2386006211 2668359    0    0    0     0          0         0 832940361 2740236    0    0    0     0       0          0
+2026-08-10T04:45:41.015589367Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   21m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2386213249 2668916    0    0    0     0          0         0 833372936 2740805    0    0    0     0       0          0
+2026-08-10T04:45:51.295826375Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   28m          3665Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2386424319 2669476    0    0    0     0          0         0 833706513 2741369    0    0    0     0       0          0
+2026-08-10T04:46:01.556473881Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   28m          3665Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2386630271 2670029    0    0    0     0          0         0 834138728 2741932    0    0    0     0       0          0
+2026-08-10T04:46:11.837777165Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   21m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2386838218 2670587    0    0    0     0          0         0 834571513 2742504    0    0    0     0       0          0
+2026-08-10T04:46:22.156243903Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   28m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2387052598 2671167    0    0    0     0          0         0 835005564 2743095    0    0    0     0       0          0
+2026-08-10T04:46:32.437009254Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   28m          3666Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2387259733 2671725    0    0    0     0          0         0 835438229 2743665    0    0    0     0       0          0
+2026-08-10T04:46:42.683478085Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   24m          3670Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2387467513 2672288    0    0    0     0          0         0 835870960 2744236    0    0    0     0       0          0
+2026-08-10T04:46:53.029124945Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   32m          3528Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2387677870 2672855    0    0    0     0          0         0 836304063 2744813    0    0    0     0       0          0
+2026-08-10T04:47:03.289572210Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   32m          3528Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2387891013 2673428    0    0    0     0          0         0 836737718 2745398    0    0    0     0       0          0
+2026-08-10T04:47:13.576472753Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   23m          3528Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2388099082 2673974    0    0    0     0          0         0 837070827 2745956    0    0    0     0       0          0
+2026-08-10T04:47:23.908562842Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   39m          3528Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2388280566 2674425    0    0    0     0          0         0 837101182 2746413    0    0    0     0       0          0
+2026-08-10T04:47:34.145851556Z
+NAME                             CPU(cores)   MEMORY(bytes)   
+layerwise-performance-aisbench   39m          3528Mi          
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+  eth0: 2388348881 2674557    0    0    0     0          0         0 837110087 2746545    0    0    0     0       0          0

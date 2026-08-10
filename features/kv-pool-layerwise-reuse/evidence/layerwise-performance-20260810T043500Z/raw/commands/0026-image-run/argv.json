@@ -1,0 +1,14 @@
+[
+  "nerdctl",
+  "--namespace",
+  "k8s.io",
+  "run",
+  "--rm",
+  "--net",
+  "none",
+  "--entrypoint",
+  "python3",
+  "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z",
+  "-c",
+  "import hashlib\nimport json\nfrom pathlib import Path\n\npaths = tuple(Path(value).resolve() for value in ('/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py', '/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py', '/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py'))\nif len(paths) == 1:\n    digest = hashlib.sha256(paths[0].read_bytes()).hexdigest()\nelse:\n    rows = []\n    for path in paths:\n        file_digest = hashlib.sha256(path.read_bytes()).hexdigest()\n        parts = path.parts\n        package_index = parts.index(\"vllm_ascend\")\n        relative = Path(*parts[package_index:]).as_posix()\n        rows.append(f\"{file_digest}  {relative}\\n\")\n    digest = hashlib.sha256(\"\".join(rows).encode()).hexdigest()\nprint(json.dumps({\"path\": \",\".join(str(path) for path in paths), \"sha256\": digest}))\n"
+]

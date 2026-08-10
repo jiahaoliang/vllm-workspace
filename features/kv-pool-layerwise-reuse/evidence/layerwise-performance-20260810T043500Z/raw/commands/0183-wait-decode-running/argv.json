@@ -1,0 +1,11 @@
+[
+  "kubectl",
+  "wait",
+  "-n",
+  "liangjiahao",
+  "--for=jsonpath={.status.phase}=Running",
+  "pod",
+  "-l",
+  "app=decode",
+  "--timeout=600s"
+]

@@ -1,0 +1,23 @@
+{
+  "files": {
+    "00-aisbench-client.yaml": "070405534c5e5758427a51b699fc998909cb27d066810e4af7b42fcf4d335e5a",
+    "README.md": "837857b91777e09b20426bda0aec5a79c1200934caf1072fbb95020b0cd793d9",
+    "__init__.py": "fd957c8e64bb44fc6d39f7fce6486bf1164b20b34ae7509107e2961a502605f9",
+    "contract.py": "4aa296af9e67094a262c30d326495d46b4b20142a2f756b40fcca900c6b3f451",
+    "fixtures.py": "8e9583143990564f22e9c32409aa499413754b34ec1b4c423df1c685c855bdcf",
+    "handoff.py": "b3a4a1044255b8f9d703a59efb8f11d3c1804fe396fc0c52f2ff59c86d8647bb",
+    "image.py": "adefb0a5ddbaf4116c0854935a3f09831d4aca49e473ea4a72fe7cc7e43519af",
+    "report.py": "9b45e8fcc0f3133ba9d5142a03cb71081ea561b5d84b2ef72c1fa7dbbeedc251",
+    "run-performance-test.sh": "626dd5146c5be9a67c73d6f4df73916cf3073be92cb985533fa8fd4d0f639e13",
+    "run-performance-ut.sh": "9fc2d5e0e649e61527d52a18e244a44dee5dfdb7832f246f56f0713b598c4412",
+    "runner.py": "cff50f1746245671633b2d92873e314f72142a98ad978bfc67b41289aba2f351",
+    "runtime.py": "f915014810dc680891494983c0a437699079f0ae170ad8af4c6cf8e6561f28ea",
+    "tests/test_contract.py": "6b68a4f89dcd716feb6e7d2027d26a7b0a70eb660e6040d348b2b39f67ffbca5",
+    "tests/test_fixtures.py": "800d20e9d49786e9f47a83ef45eee80825a118eb03b4bf4c0fae4744199ffa8d",
+    "tests/test_handoff.py": "8b0ae3344b754cf6f31b676da9b6923544081a8b47fa43305ffa6670bc727383",
+    "tests/test_image.py": "a742377e0cf1577af99b58b4b9bcbdce662c8f026b0fe8c334fd1ce0f3deabb0",
+    "tests/test_report.py": "bd3ae36b541fa1ed8400dfd57dbe7e4cb3694ae76c28446088e14848c51454b3",
+    "tests/test_runner.py": "3c1bbaf16af13e22b8936c98b43cfc4d26693305402a16f4ee5f73394a35140e",
+    "tests/test_runtime.py": "33e873d884d72ebb780ff2d523bc07ab4714b1475c02ec5e49bee110199aeb03"
+  }
+}

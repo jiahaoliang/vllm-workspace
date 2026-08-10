@@ -1,0 +1,12 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/decode-engine-deployment",
+  "-c",
+  "decode-engine",
+  "--",
+  "npu-smi",
+  "info"
+]

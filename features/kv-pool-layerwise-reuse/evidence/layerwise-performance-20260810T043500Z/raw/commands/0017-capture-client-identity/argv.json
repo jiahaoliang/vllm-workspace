@@ -1,0 +1,10 @@
+[
+  "kubectl",
+  "get",
+  "pod",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-o",
+  "json"
+]

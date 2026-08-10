@@ -1,0 +1,7 @@
+{
+  "available_after_replacing_current_engines": 6,
+  "node": "n1",
+  "required": 4,
+  "resource": "huawei.com/Ascend910",
+  "vnpu_number_ignored": true
+}

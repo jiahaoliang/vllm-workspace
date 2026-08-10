@@ -1,0 +1,6 @@
+{
+  "mutates_server": false,
+  "returncode": 0,
+  "sends_inference": false,
+  "stdout_artifact": "points/dp1-16384-bulk-o128-c8/formal-1/attempt-1/raw/engine-pods.json"
+}

@@ -1,0 +1,70 @@
+{
+  "control repo": {
+    "commit": "fb1f27cf3a843ae3976501fac627103d59cebbaa",
+    "dirty": [
+      "?? deployment_yaml/",
+      "?? dockerfile.vllm23",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T125000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T143000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T144500Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T150000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T153000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T160000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T170000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-smoke-20260808T180000Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/performance-preparation-smoke-20260808T181500Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T042014Z/command-transcript.log",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T042014Z/cpu/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T042014Z/image/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T042014Z/npu/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T042014Z/steps.jsonl",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T054440Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T065335Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T073038Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T080633Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T083140Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T085132Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T090506Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T093733Z/",
+      "?? features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260808T104356Z/"
+    ]
+  },
+  "handoff": {
+    "control repo": {
+      "Branch / role": "kv-pool-layerwise-reuse 64-request performance control parent",
+      "Commit": "057f9fbcc3704a40af03554934084607ef271223",
+      "Component": "control repo",
+      "Remote equality": "transition parent pushed as origin/kv-pool-layerwise-reuse=057f9fbcc3704a40af03554934084607ef271223"
+    },
+    "repos/Mooncake": {
+      "Branch / role": "read-only detached collaborator baseline",
+      "Commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+      "Component": "repos/Mooncake",
+      "Remote equality": "collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+    },
+    "repos/vllm": {
+      "Branch / role": "frozen detached dependency",
+      "Commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+      "Component": "repos/vllm",
+      "Remote equality": "workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5; commit reachable from upstream/main"
+    },
+    "repos/vllm-ascend": {
+      "Branch / role": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
+      "Commit": "5355559175f9998f5d70866734fb79569dfc86f9",
+      "Component": "repos/vllm-ascend",
+      "Remote equality": "origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9"
+    }
+  },
+  "repos/Mooncake": {
+    "commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "dirty": []
+  },
+  "repos/vllm": {
+    "commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "dirty": []
+  },
+  "repos/vllm-ascend": {
+    "commit": "5355559175f9998f5d70866734fb79569dfc86f9",
+    "dirty": []
+  }
+}

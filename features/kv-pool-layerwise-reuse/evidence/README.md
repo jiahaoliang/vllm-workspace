@@ -9,11 +9,42 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
-The next formal performance import follows the five-point rapid-validation
+The accepted formal performance imports follow the five-point rapid-validation
 design in
 [`2026-08-09-layerwise-performance-rapid-validation-design.md`](../2026-08-09-layerwise-performance-rapid-validation-design.md).
 No older diagnostic performance root is indexed as accepted performance
 evidence.
+
+## Layerwise 64-request Performance Characterization 20260810T043500Z
+
+- Report:
+  [layerwise-performance-64-request-validation-2026-08-10.md](../layerwise-performance-64-request-validation-2026-08-10.md)
+- Evidence:
+  [layerwise-performance-20260810T043500Z](layerwise-performance-20260810T043500Z/)
+- Result: all five DP1/16384/c8 points passed the exact-matrix checker with
+  `64/64` successful formal requests: BULK o128 `0.343` req/s, BULK o1
+  `0.3805` req/s, LAYERWISE o128 `0.2337` req/s, LAYERWISE o1 `0.248`
+  req/s, and REUSE3 o1 `0.2409` req/s.
+- Formal protocol: one 8-request warmup wave and one 64-request formal
+  attempt per point, eight formal concurrency waves, `total` stage, and no
+  automatic retry or performance timeout.
+- Validation: `performance.report check --scope all` returned
+  `{"scope":"all","valid":true,"errors":[]}`; restoration completed with
+  both engines stopped and Mooncake empty. Raw and imported checksum replay
+  both passed.
+- Raw `SHA256SUMS` digest:
+  `ebbd9f707589748f4cc12bfaa0edd273eb7183a6efe7d003ed85158439d1d093`.
+- Repository evidence `SHA256SUMS` digest:
+  `723ac36b231edb68a51328ae6c09d87c4f69cb3c6888e534cdc3d5c3fb6341dd`.
+- Report SHA256:
+  `2d1d3fe91b5710e40213cd05a754cd23bbec8ed638b4859344f83c4cebb669f1`.
+- Reusable `linux/arm64` image:
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`,
+  manifest
+  `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`.
+- Limits: one topology, one input length, one concurrency, one formal
+  repetition, no outlier removal, no significance test, and no performance
+  pass/fail threshold. This is raw characterization only.
 
 ## Layerwise Rapid Performance Characterization 20260809T184011Z
 

@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "apply",
+  "-n",
+  "liangjiahao",
+  "-f",
+  "/tmp/layerwise-performance-rapid-64-20260810T043500Z/rendered/dp1/16384/bulk/runtime-configmap.json"
+]

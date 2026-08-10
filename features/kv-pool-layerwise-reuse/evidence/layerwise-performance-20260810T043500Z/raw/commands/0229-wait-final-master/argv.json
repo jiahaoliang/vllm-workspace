@@ -1,0 +1,9 @@
+[
+  "kubectl",
+  "rollout",
+  "status",
+  "-n",
+  "liangjiahao",
+  "deployment/mooncake-master-deployment",
+  "--timeout=300s"
+]

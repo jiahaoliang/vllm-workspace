@@ -1,0 +1,37 @@
+{
+  "run_id": "20260810T043500Z",
+  "source_path": "/tmp/layerwise-performance-rapid-64-20260810T043500Z",
+  "imported_at": "2026-08-10T05:32:33Z",
+  "control_repo_commit_at_run": "fb1f27cf3a843ae3976501fac627103d59cebbaa",
+  "authorized_handoff_control_parent": "057f9fbcc3704a40af03554934084607ef271223",
+  "vllm_commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+  "vllm_ascend_commit": "5355559175f9998f5d70866734fb79569dfc86f9",
+  "mooncake_commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+  "image_reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z",
+  "image_manifest_digest": "sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc",
+  "raw_sha256sums_digest": "ebbd9f707589748f4cc12bfaa0edd273eb7183a6efe7d003ed85158439d1d093",
+  "raw_file_count": 1127,
+  "raw_size_bytes": 34474444,
+  "report_path": "features/kv-pool-layerwise-reuse/layerwise-performance-64-request-validation-2026-08-10.md",
+  "report_sha256": "2d1d3fe91b5710e40213cd05a754cd23bbec8ed638b4859344f83c4cebb669f1",
+  "protocol": {
+    "topology": "dp1",
+    "input_tokens": 16384,
+    "concurrency": 8,
+    "warmup_requests": 8,
+    "formal_requests": 64,
+    "formal_repetitions": 1,
+    "points": [
+      "dp1-16384-bulk-o128-c8",
+      "dp1-16384-bulk-o1-c8",
+      "dp1-16384-layerwise-o128-c8",
+      "dp1-16384-layerwise-o1-c8",
+      "dp1-16384-reuse3-o1-c8"
+    ]
+  },
+  "notes": [
+    "raw artifacts were copied byte-for-byte from the completed run root",
+    "report is raw characterization only; no performance pass/fail or significance claim",
+    "runtime restoration completed with engines stopped and Mooncake empty"
+  ]
+}

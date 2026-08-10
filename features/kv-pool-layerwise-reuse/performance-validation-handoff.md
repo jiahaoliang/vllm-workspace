@@ -4,7 +4,7 @@ status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
 generation: 10
-updated_at: 2026-08-10T11:30:20+08:00
+updated_at: 2026-08-10T13:32:33+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -213,9 +213,37 @@ requests; `restoration.json` records engines stopped and Mooncake empty. The
 canary path is fixed and covered by the new runner regression test. The failed
 root must not be resumed or combined.
 
-The next real run must create a completely new root and execute exactly five
-points with 8 warmup requests and 64 formal requests per point. No NPU workload
-has been started under generation 10 at the time of this transition.
+The authorized generation-10 run completed in the new root recorded below.
+That root must not be resumed or combined with any other performance root.
+
+## Generation 10 Performance Acceptance
+
+The generation-10 handoff authorized the following immutable five-point run;
+this section was added only after the run completed and its raw evidence was
+imported and checked.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Exact five-point DP1 matrix | PASS | `evidence/layerwise-performance-20260810T043500Z/raw/run-contract.json` |
+| Formal requests | PASS | All five points are `valid: true` with `64/64` successful requests; report rows are in `layerwise-performance-64-request-validation-2026-08-10.md` |
+| Full report checker | PASS | `performance.report check --scope all` returned `{"scope":"all","valid":true,"errors":[]}` |
+| Raw checksum replay | PASS | `evidence/layerwise-performance-20260810T043500Z/raw/SHA256SUMS`; digest `ebbd9f707589748f4cc12bfaa0edd273eb7183a6efe7d003ed85158439d1d093` |
+| Repository import checksum replay | PASS | `evidence/layerwise-performance-20260810T043500Z/SHA256SUMS`; digest `723ac36b231edb68a51328ae6c09d87c4f69cb3c6888e534cdc3d5c3fb6341dd` |
+| Runtime cleanup/restoration | PASS | `evidence/layerwise-performance-20260810T043500Z/raw/restoration.json`: completed, engines stopped, no errors, Mooncake empty |
+| Raw report | PASS | `layerwise-performance-64-request-validation-2026-08-10.md`; SHA256 `2d1d3fe91b5710e40213cd05a754cd23bbec8ed638b4859344f83c4cebb669f1` |
+
+Observed request throughput was `0.343` (BULK o128), `0.3805` (BULK o1),
+`0.2337` (LAYERWISE o128), `0.248` (LAYERWISE o1), and `0.2409` req/s
+(REUSE3 o1). REUSE3/LAYERWISE o1 request-throughput ratio was `0.971371x`
+in this run. These are single-repetition raw observations from DP1,
+16384-input, concurrency-8, eight-wave formal attempts; they do not establish
+statistical significance, steady-state behavior, or a performance pass/fail
+claim.
+
+Reusable image for follow-up validation:
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
+with manifest
+`sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`.
 
 ## Historical Generation 8 Performance Acceptance
 
