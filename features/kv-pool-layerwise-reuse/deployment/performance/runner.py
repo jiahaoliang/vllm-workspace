@@ -145,20 +145,28 @@ def _clean_kubernetes_resource(value: dict[str, object]) -> dict[str, object]:
     return cleaned
 
 
-def _available_test_npus(nodes: dict[str, object], pods: dict[str, object]) -> int:
+def _available_test_npus(
+    nodes: dict[str, object],
+    pods: dict[str, object],
+    node_name: str = "n1",
+) -> int:
     node_items = nodes.get("items", [])
     if not isinstance(node_items, list):
         raise ValueError("node inventory items are malformed")
     matching = [
         node
         for node in node_items
-        if isinstance(node, dict) and isinstance(node.get("metadata"), dict) and node["metadata"].get("name") == "n1"
+        if isinstance(node, dict)
+        and isinstance(node.get("metadata"), dict)
+        and node["metadata"].get("name") == node_name
     ]
     if len(matching) != 1:
-        raise ValueError(f"expected exactly one n1 node, got {len(matching)}")
+        raise ValueError(
+            f"expected exactly one {node_name} node, got {len(matching)}"
+        )
     allocatable = matching[0].get("status", {}).get("allocatable", {})
     if not isinstance(allocatable, dict):
-        raise ValueError("n1 allocatable capacity is malformed")
+        raise ValueError(f"{node_name} allocatable capacity is malformed")
     physical = int(allocatable.get("huawei.com/Ascend910", 0))
     pod_items = pods.get("items", [])
     if not isinstance(pod_items, list):
@@ -172,7 +180,7 @@ def _available_test_npus(nodes: dict[str, object], pods: dict[str, object]) -> i
         status = pod.get("status", {})
         if not all(isinstance(value, dict) for value in (metadata, spec, status)):
             continue
-        if spec.get("nodeName") != "n1" or status.get("phase") in {
+        if spec.get("nodeName") != node_name or status.get("phase") in {
             "Succeeded",
             "Failed",
         }:

@@ -232,7 +232,12 @@ Expected gate: listener observation has `valid=true`, generation 1, and the comm
 ### Task 9: Revalidate Performance Preparation And Preflight
 
 **Files:**
-- Read/replay: `evidence/performance-preparation-20260808T170000Z/`
+- Read/replay: committed control evidence
+  `evidence/layerwise-performance-20260810T043500Z/`, including
+  `raw/fixtures/tokens-16384-c8/`, `raw/tooling-identity.json`, and
+  `raw/client-identity.json`
+- Historical only: the checksum-verified 2026-08-08 c64 preparation root was
+  archived outside the worktree and removed; it is not a portable dependency
 - Generate if drifted: a new preparation evidence root
 - Generate: the new performance run root and pre-run snapshot
 

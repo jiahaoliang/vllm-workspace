@@ -171,6 +171,39 @@ def test_physical_capacity_ignores_vnpu_and_replaced_engines() -> None:
     assert runner._available_test_npus(nodes, pods) == 7
 
 
+def test_physical_capacity_accepts_explicit_node_name() -> None:
+    nodes = {
+        "items": [
+            {
+                "metadata": {"name": "custom-node"},
+                "status": {
+                    "allocatable": {"huawei.com/Ascend910": "4"},
+                },
+            }
+        ]
+    }
+    pods = {
+        "items": [
+            {
+                "metadata": {"labels": {"app": "other"}},
+                "spec": {
+                    "nodeName": "custom-node",
+                    "containers": [
+                        {
+                            "resources": {
+                                "requests": {"huawei.com/Ascend910": "1"}
+                            }
+                        }
+                    ],
+                },
+                "status": {"phase": "Running"},
+            }
+        ]
+    }
+
+    assert runner._available_test_npus(nodes, pods, "custom-node") == 3
+
+
 def test_capacity_inventory_covers_all_namespaces(tmp_path: Path) -> None:
     class InventoryRunner(FakeCommandRunner):
         def run(self, command: runner.Command) -> str:

@@ -30,8 +30,13 @@ immutable evidence directories, and the checks described here.
   `features/kv-pool-layerwise-reuse/deployment/performance/README.md`
 - Functional-to-performance handoff:
   `features/kv-pool-layerwise-reuse/performance-validation-handoff.md`
-- Reusable preparation evidence:
-  `features/kv-pool-layerwise-reuse/evidence/performance-preparation-20260808T170000Z/`
+- Historical preparation evidence: the 2026-08-08 c64 preparation root was
+  checksum-verified, archived outside the worktree, and then removed. It is not
+  a cross-machine runtime dependency.
+- Current committed performance evidence:
+  `features/kv-pool-layerwise-reuse/evidence/layerwise-performance-20260810T043500Z/`
+  (exact fixture under `raw/fixtures/tokens-16384-c8/`; tooling and client
+  identities under `raw/tooling-identity.json` and `raw/client-identity.json`).
 - Historical listener observations:
   `/tmp/layerwise-performance-handoff-wait-resumed/observations.jsonl`
 
@@ -252,9 +257,10 @@ generation.
 
 ## Phase 7: Performance Preflight
 
-1. Replay
-   `evidence/performance-preparation-20260808T170000Z/SHA256SUMS` and verify the
-   preparation evidence was produced without server authorization or traffic.
+1. Verify the committed
+   `evidence/layerwise-performance-20260810T043500Z/SHA256SUMS` before reusing
+   its control result, fixture, tooling, or client identity. The removed c64
+   preparation root is historical only and must not be required by a new run.
 2. Recheck the retained AISBench Pod identity, `m1` placement, CPU/memory limits,
    absence of NPU requests, exact client rootfs, Python 3.12.13, uv 0.12.3,
    AISBench 3.1.0/`3fd27b4a`, installed packages, tokenizer, and fixtures.

@@ -96,3 +96,53 @@ repeated or statistically significant result. The report does not remove
 outliers or assign a performance pass/fail result. Point evidence keeps
 10-second telemetry and lightweight diagnostics; complete Prefill and Decode
 logs are captured once per variant.
+
+## Causal Self-load A/B
+
+The causal runner replays only `DP1 / 16384 input tokens / o1 / c8`, with one
+8-request warmup and one 64-request formal attempt. Its immutable control is
+`evidence/layerwise-performance-20260810T043500Z/`; the candidate source is
+vLLM-Ascend commit `57d3c214e642cdbb529400f0742d1a98a8d38708`. This is a
+single-point diagnosis of redundant layerwise self-loads, not a replacement
+for the five-point characterization.
+
+The candidate image must be `linux/arm64`, expose a manifest digest, and contain
+`pool_worker.py` with SHA-256
+`54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea`.
+The selected NPU node must have at least four replaceable physical
+`huawei.com/Ascend910` devices. `huawei.com/vnpu-number` is ignored. As of
+2026-08-11, the current cluster inventory contains only `m1`, whose allocatable
+resources do not advertise `huawei.com/Ascend910`. Do not start the A/B until
+an eligible node is restored.
+
+After setting the exact candidate reference and manifest digest:
+
+```bash
+: "${CANDIDATE_IMAGE:?set the committed candidate image reference}"
+: "${CANDIDATE_DIGEST:?set its sha256 manifest digest}"
+run_id=$(date -u +%Y%m%dT%H%M%SZ)
+run_root="/tmp/layerwise-self-load-ab-${run_id}"
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+python3 -m performance.run_layerwise_self_load_ab \
+  --output "${run_root}" \
+  --control features/kv-pool-layerwise-reuse/evidence/layerwise-performance-20260810T043500Z \
+  --image "${CANDIDATE_IMAGE}" \
+  --image-digest "${CANDIDATE_DIGEST}" \
+  --patch-sha256 54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea \
+  --source-commit 57d3c214e642cdbb529400f0742d1a98a8d38708 \
+  --npu-node "${NPU_NODE:-n1}"
+```
+
+Then compare the candidate against the original BULK and LAYERWISE Prefill
+iterations and Mooncake replica-list counters:
+
+```bash
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+python3 -m performance.diagnose_layerwise_prefill \
+  features/kv-pool-layerwise-reuse/evidence/layerwise-performance-20260810T043500Z \
+  --candidate "${run_root}"
+```
+
+The diagnosis exits zero only for `PRIMARY_CAUSE_CONFIRMED`; partial recovery
+is emitted as `PARTIAL_CAUSE_CONFIRMED` with a nonzero exit status so automation
+cannot silently promote it to a complete explanation.
