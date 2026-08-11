@@ -1,11 +1,11 @@
 # kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-10T17:31:01+08:00
+Captured At: 2026-08-11T17:30:22+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
 | vllm | `repos/vllm` | `detached:54503ecec` | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | false | Frozen main-verified validation dependency; the corrected lane passed startup and cold concurrent controls in run 20260731T064607Z |
-| vllm-ascend | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `1f306620cb53076f2979a51ae533db8f1084ab26` | false | Mooncake layerwise KVPool shared-buffer reuse with TP non-save-owner gate preservation |
+| vllm-ascend | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | false | Mooncake layerwise KVPool shared-buffer reuse with TP non-save-owner gate preservation |
 | Mooncake | `repos/Mooncake` | `detached:df3f74ed` | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | false | Read-only detached checkout of the frozen Mooncake collaborator session/range implementation with retryable local revoke ownership |
 
 The initial Mooncake shared-buffer policy change is confined to
@@ -31,14 +31,26 @@ the next shared-buffer occupant. The deterministic test changed from `[False,
 False]` to `[True, True]`; the complete AscendStore suite passed `515`, the MLA
 regression passed `1`, model-runner reuse passed `3`, and deployment/performance
 mocks passed `146`. Ruff, `py_compile`, and `git diff --check` passed against
-the source tree now represented by `1f306620`.
+the source tree represented by `1f306620`.
+
+Commit `57d3c214e642cdbb529400f0742d1a98a8d38708` is a normal DCO-signed child of
+`1f306620`. It skips tracker-history reloads only for ordinary Mooncake
+layerwise requests whose per-layer HBM buffers remain resident and which have
+no explicit remote recovery request. Shared-buffer reuse and explicit recovery
+retain the accumulated tracker behavior; tracker ownership, release lifecycle,
+and memcache are unchanged. After the Kubernetes reinstall, the current dirty
+checkout was tar-synchronized into the recreated CPU-only, no-hostPath
+`liangjiahao/vllm-ascend-ut` Pod on `m1`. The new regression passed `1`, the
+Mooncake layer-session class passed `27`, and the complete AscendStore
+collection passed `516`; `git diff --check` also passed. The restored Pod image
+contains no Ruff binary, so this commit does not claim a new Ruff gate.
 
 The validated reusable `linux/arm64` image remains
 `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
 with manifest `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`
 and config `sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c`.
 Its source label remains the historical pre-squash commit `535555917`; no new
-image was created for the tree-equivalent squash.
+image was created for the tree-equivalent squash or `57d3c214e`.
 
 Functional run `20260809T071622Z` passed the targeted TP2 4096-token REUSE3
 canary with 32/32 block hits, 4095 remote load tokens, `vllm_cached=0`, all-zero
@@ -54,5 +66,5 @@ Performance run `20260810T043500Z` completed the five-point DP1/16384/c8
 matrix with `64/64` successful formal requests per point. Full report checking,
 raw and imported checksum replay, and runtime restoration passed. The runtime
 evidence and image identity remain attributed to pre-squash source
-`535555917`; tree equivalence permits source comparison but is not a new NPU or
-performance run for `1f306620`.
+`535555917`; neither tree equivalence nor `57d3c214e` is a new NPU or
+performance run.

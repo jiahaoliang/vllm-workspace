@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-10T17:31:01+08:00",
+  "updated_at": "2026-08-11T17:30:22+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -21,7 +21,7 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "1f306620cb53076f2979a51ae533db8f1084ab26",
+      "commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
       "purpose": "Mooncake layerwise KVPool shared-buffer reuse with TP non-save-owner gate preservation"
     },
     "Mooncake": {
