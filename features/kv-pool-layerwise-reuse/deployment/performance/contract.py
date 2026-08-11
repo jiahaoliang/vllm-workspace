@@ -107,9 +107,10 @@ def point_id(point: WorkloadPoint) -> str:
     return f"{point.topology}-{point.input_tokens}-{point.variant}-o{point.output_tokens}-c{point.concurrency}"
 
 
-def build_run_contract(image_digest: str) -> dict[str, object]:
+def build_run_contract(image_digest: str, npu_node: str = "n1") -> dict[str, object]:
     return {
         "topologies": ["dp1"],
+        "npu_node": npu_node,
         "image_digest": image_digest,
         "expected_points": [point_id(point) for point in build_matrix()],
         "formal_repetitions": FORMAL_REPETITIONS,

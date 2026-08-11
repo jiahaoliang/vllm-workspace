@@ -1,16 +1,17 @@
 ---
 schema_version: 1
-status: READY_FOR_PERFORMANCE_VALIDATION
-ready: true
+status: BLOCKED
+ready: false
 placeholders_remaining: false
-generation: 10
-updated_at: 2026-08-10T13:32:33+08:00
+generation: 11
+updated_at: 2026-08-12T00:51:50+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
 
 本文件是功能验证 session 与性能验证 session 之间的 fail-closed handoff。
-本 generation 已用不可变源码、镜像和功能 evidence 完成验收。
+Generation 11 已完成不可变源码、镜像和全部非 NPU 准备，但尚未完成候选
+源码的真实 NPU correctness 与 performance rerun，因此保持 fail-closed。
 
 ## Listener Contract
 
@@ -49,9 +50,9 @@ updated_at: 2026-08-10T13:32:33+08:00
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` 64-request performance control parent | `057f9fbcc3704a40af03554934084607ef271223` | transition parent pushed as `origin/kv-pool-layerwise-reuse=057f9fbcc3704a40af03554934084607ef271223` |
+| control repo | `kv-pool-layerwise-reuse` generation-11 preparation parent | `a03ba8910f1056faba358ce10b0a6771f1a972d9` | preparation parent was pushed as `origin/kv-pool-layerwise-reuse=a03ba8910f1056faba358ce10b0a6771f1a972d9` before this generation-11 change |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
-| `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `5355559175f9998f5d70866734fb79569dfc86f9` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=5355559175f9998f5d70866734fb79569dfc86f9` |
+| `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
 
 ## Image Identity
@@ -59,46 +60,46 @@ updated_at: 2026-08-10T13:32:33+08:00
 | Field | Value |
 | --- | --- |
 | Image delivery mode | `ready-image` |
-| Base image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z` |
-| Base manifest digest | `sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351` |
-| Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/attention/mla_v1.py,/vllm-workspace/vllm-ascend/vllm_ascend/attention/utils.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/config_data.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/layerwise_config.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_scheduler.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py` |
-| Patched file SHA256 | `7b80604faad9d32750aa072d0540536d6e376a95f158a6e7483af7a9e445d44f` |
-| Patched source commit | `5355559175f9998f5d70866734fb79569dfc86f9` |
-| Derived image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z` |
+| Base image reference | `quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12` |
+| Base manifest digest | BuildKit-resolved base is not used as the runtime identity; the derived manifest and config below are authoritative |
+| Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py` |
+| Patched file SHA256 | `54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea` |
+| Patched source commit | `57d3c214e642cdbb529400f0742d1a98a8d38708` |
+| Derived image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z` |
 | Platform | `linux/arm64` |
-| Derived manifest digest | `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc` |
-| Derived config digest | `sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c` |
+| Derived manifest digest | `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3` |
+| Derived config digest | `sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd` |
 | vLLM source label | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
-| vLLM-Ascend source label | `5355559175f9998f5d70866734fb79569dfc86f9` |
+| vLLM-Ascend source label | `57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | Mooncake source label | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
-| Derived-image/run ID | `20260809T070557Z` |
+| Derived-image/run ID | `20260811T145302Z` |
 
 ## Functional Acceptance
 
 | Gate | Required result | Actual result | Evidence |
 | --- | --- | --- | --- |
-| Focused CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/cpu/pytest-non-save-owner.log`; `cpu/pytest-layerwise-roles.log`; `cpu/pytest-mla-decode-load.log`; `cpu/pytest-model-runner-layer-reuse.log`; `cpu/pytest-deployment-performance.log`; `cpu/pytest-performance-harness.log` |
-| Complete AscendStore CPU/mock UT | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/cpu/pytest-ascend-store.log` |
-| Ruff | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/cpu/ruff-check.log`; `cpu/ruff-format.log` |
-| Python compilation | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/cpu/python-compile.log` |
-| `git diff --check` | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/cpu/source-diff-check.log`; `cpu/control-diff-check.log` |
-| `kv_producer` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/producer-reuse/`; `npu/summary.json` |
-| `kv_both` Mooncake/NPU correctness | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/both-reuse/`; `npu/summary.json` |
-| Physical-slot/memory-factor proof | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/REPORT.md`; `validation-config.json`; `npu/producer-reuse/vllm-prefill.log`; `npu/pure-consumer-canary/prefill-runtime.json` |
-| Reuse-mate save-gate timeout/corruption check | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/validator.log`; `npu/pure-consumer-canary/validator.log`; `REPORT.md` |
-| Exact 4096-token pure-consumer Decode canary | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/pure-consumer-canary/summary.json`; `npu/pure-consumer-canary/validator.log` |
-| Final Mooncake resource cleanup | PASS | PASS | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/npu/summary.json`; per-case `final-assert.log`; `npu/pure-consumer-canary/final.metrics` |
-| Performance runtime capacity CPU/mock | PASS | PASS | control parent `057f9fbcc3704a40af03554934084607ef271223`; complete performance harness `70 passed`; contract, fixture, runner, and report tests require 8 warmup requests, 64 formal requests, c8 fixtures, and eight formal concurrency waves; pinned `BaseAPIModel.infer` source confirms `retry=1` sends one total attempt |
+| vLLM-Ascend focused self-load regression | PASS | PASS | CPU-only `liangjiahao/vllm-ascend-ut`: `1 passed` at source `57d3c214e` |
+| Mooncake layer-session class | PASS | PASS | CPU-only `liangjiahao/vllm-ascend-ut`: `27 passed` at source `57d3c214e` |
+| Complete AscendStore CPU/mock UT | PASS | PASS | CPU-only `liangjiahao/vllm-ascend-ut`: `516 passed` at source `57d3c214e` |
+| Performance harness CPU/mock | PASS | PASS | CPU-only `liangjiahao/vllm-ascend-ut`: `91 passed` with bytecode and pytest cache disabled |
+| Candidate image static/runtime identity | PASS | PASS | native `linux/arm64`; exact three Git HEADs and OCI labels; Mooncake seven session/range APIs; AArch64 ELF and dynamic dependencies; CPU import smoke |
+| CPU-only AISBench preparation | PASS | PASS | `/tmp/layerwise-non-npu-readiness-20260811/aisbench-success`; 8 warmup, 64 formal, 72 unique/disjoint IDs, 72/72 exact 16384-token re-encodes; root manifest digest `4d032f8853afd36e34d2e62aace692c3ef96f0e1dad0fe6d59f07cc09aa67d7e` |
+| Real CPU-only client preflight | PASS | PASS | candidate config marker, tokenizer link, tooling sync, and fixture archive passed under `/tmp/layerwise-non-npu-readiness-20260811/client-preflight-final`; checksum manifest digest `f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873` |
+| Historical formal evidence replay | PASS | PASS | both checksum manifests under `evidence/layerwise-performance-20260810T043500Z` replayed; report checker returned valid; report regenerated only under `/tmp` |
+| Physical Ascend910 readiness on `m1` | PASS | BLOCKED | `/tmp/layerwise-non-npu-readiness-20260811/npu-readiness-final.json`: SHA-256 `dfa88da974bcae9eaffb7a28a619bfd2d3380196e84b98f858485efc2ac73504`; allocatable 0, required exactly 8 and at least 4 free; `vnpu-number` ignored |
+| `kv_producer` and `kv_both` candidate NPU correctness | PASS | PENDING | must run against candidate `57d3c214e` after administrator restores Kubernetes NPU registration |
+| Five-point DP1 performance rerun | PASS | PENDING | no Prefill, Decode, Mooncake Master, Proxy, or AISBench inference traffic started in generation 11 |
 
 ## Evidence Identity
 
 | Field | Value |
 | --- | --- |
-| Evidence root | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z` |
-| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/SHA256SUMS` |
-| Root `SHA256SUMS` digest | `e8cf5ce3fbf332dada8c9bfeb6fd1d3ececc6f02b96fe4a0a5b28b6e1b556876` |
-| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/REPORT.md` |
-| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260809T071622Z/validation-config.json` |
+| Non-NPU preparation root | `/tmp/layerwise-non-npu-readiness-20260811/aisbench-success` |
+| Preparation `SHA256SUMS` path | `/tmp/layerwise-non-npu-readiness-20260811/aisbench-success/SHA256SUMS` |
+| Preparation `SHA256SUMS` digest | `4d032f8853afd36e34d2e62aace692c3ef96f0e1dad0fe6d59f07cc09aa67d7e` |
+| Fixture `SHA256SUMS` digest | `8848041c4f3cea186c016da8aed080327723e823e706c327991a1639aff05dfe` |
+| Client preflight `SHA256SUMS` digest | `f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873` |
+| Historical formal evidence | `features/kv-pool-layerwise-reuse/evidence/layerwise-performance-20260810T043500Z` |
 
 ## Authorized Performance Scope
 
@@ -114,6 +115,7 @@ After this handoff becomes ready, performance validation may use only:
   rank, identical across BULK, LAYERWISE, and REUSE3;
 - functional validation of `kv_producer` and `kv_both` roles;
 - namespace `liangjiahao`;
+- the single physical node `m1`, selected explicitly with `--npu-node m1`;
 - model `vllm-ascend/DeepSeek-V2-Lite-W8A8`;
 - DP1 only, 16384 input tokens, concurrency 8;
 - exactly five points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1;
@@ -171,13 +173,22 @@ all unverified fields fail-closed.
 
 ## Blocker
 
-None. The TP2 REUSE3 non-save-owner save-gate defect is preserved in the
+Kubernetes node `m1` is Ready but currently advertises no allocatable
+`huawei.com/Ascend910`. The generation-11 read-only gate therefore reports
+`BLOCKED` with `allocatable=0`, `free=0`; it requires exactly eight physical
+resources and at least four free. The administrator owns NPU device-plugin
+restoration. Do not install, restart, or modify that plugin from this workflow.
+
+After registration is restored, rerun the readiness gate, then complete the
+candidate `57d3c214e` real-NPU correctness checks for `kv_producer` and
+`kv_both`. Only a new handoff generation with those gates recorded as `PASS`
+may authorize the fresh five-point performance run. Generation 10's NPU and
+performance results remain historical evidence for `535555917`; they do not
+validate the new candidate.
+
+The earlier TP2 REUSE3 non-save-owner save-gate defect is preserved in the
 diagnostic performance root `/tmp/layerwise-performance-20260809T010429Z` and
-resolved by vLLM-Ascend
-`5355559175f9998f5d70866734fb79569dfc86f9`. Generation 9 retains the
-generation-4 functional evidence and
-includes both the real-thread TP non-save-owner CPU regression and an exact
-4096-token TP2 REUSE3 producer to pure-consumer Decode NPU canary.
+was resolved by vLLM-Ascend `5355559175f9998f5d70866734fb79569dfc86f9`.
 
 The invalid performance root `/tmp/layerwise-performance-20260809T010429Z`
 must not be resumed. Generation 8 also rejects the diagnostic roots

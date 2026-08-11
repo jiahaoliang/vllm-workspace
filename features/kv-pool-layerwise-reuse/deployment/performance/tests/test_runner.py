@@ -19,7 +19,26 @@ class FakeCommandRunner:
         self.calls.append(command)
         if command.description == self.fail_step:
             raise RuntimeError(f"failed at {self.fail_step}")
+        if command.description == "inspect-client-image":
+            return json.dumps(
+                [
+                    {
+                        "Id": "sha256:config",
+                        "RepoDigests": ["candidate@sha256:manifest"],
+                        "Architecture": "arm64",
+                        "Os": "linux",
+                    }
+                ]
+            )
         return ""
+
+
+def tokenizer_source(tmp_path: Path) -> Path:
+    source = tmp_path / "tokenizer"
+    source.mkdir()
+    for name in runner.TOKENIZER_FILES:
+        (source / name).write_text(name, encoding="utf-8")
+    return source
 
 
 def waiting_state(tmp_path: Path) -> handoff.HandoffState:
@@ -42,13 +61,25 @@ def waiting_state(tmp_path: Path) -> handoff.HandoffState:
 def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
     fake = FakeCommandRunner()
 
-    runner.prepare(fake, tmp_path)
+    runner.prepare(
+        fake,
+        tmp_path,
+        "candidate",
+        "sha256:manifest",
+        "sha256:config",
+        tokenizer_source(tmp_path),
+    )
 
     assert not any(call.mutates_server or call.sends_inference for call in fake.calls)
     command_text = "\n".join(" ".join(call.argv) for call in fake.calls)
     assert "vllm-proxy-service" not in command_text
     for call in fake.calls:
-        if call.description in {"apply-client", "wait-client", "client-identity", "bootstrap-client"}:
+        if call.description in {
+            "apply-client",
+            "wait-client",
+            "client-identity",
+            "bootstrap-client",
+        }:
             assert "liangjiahao" in call.argv
 
     bootstrap = next(call for call in fake.calls if call.description == "bootstrap-client")
@@ -68,7 +99,40 @@ def test_prepare_cannot_mutate_server_or_infer(tmp_path: Path) -> None:
     tokenizer_link = next(call for call in fake.calls if call.description == "link-tokenizer-model-path")
     assert "/client-tools/tokenizer" in " ".join(tokenizer_link.argv)
     fixture_generator = next(call for call in fake.calls if call.description == "generate-fixtures")
-    assert fixture_generator.argv[fixture_generator.argv.index("--concurrency") + 1] == "8"
+    assert (
+        fixture_generator.argv[fixture_generator.argv.index("--concurrency") + 1] == "8"
+    )
+    assert fake.calls[0].description == "inspect-client-image"
+    rootfs = next(
+        call for call in fake.calls if call.description == "sync-exact-client-rootfs"
+    )
+    assert "mkdir -p /performance-workspace/rootfs" in " ".join(rootfs.argv)
+    tokenizer = next(
+        call for call in fake.calls if call.description == "copy-tokenizer"
+    )
+    tokenizer_text = " ".join(tokenizer.argv)
+    assert "prefill-engine-deployment" not in tokenizer_text
+    assert str((tmp_path / "tokenizer").resolve()) in tokenizer_text
+    manifest = json.loads((tmp_path / "client-pod-manifest.json").read_text())
+    assert manifest["spec"]["containers"][0]["image"] == "candidate"
+
+
+def test_prepare_rejects_candidate_identity_before_cluster_commands(
+    tmp_path: Path,
+) -> None:
+    fake = FakeCommandRunner()
+
+    with pytest.raises(ValueError, match="manifest digest mismatch"):
+        runner.prepare(
+            fake,
+            tmp_path,
+            "candidate",
+            "sha256:wrong",
+            "sha256:config",
+            tokenizer_source(tmp_path),
+        )
+
+    assert [call.description for call in fake.calls] == ["inspect-client-image"]
 
 
 def test_run_checks_handoff_before_any_command(tmp_path: Path) -> None:
@@ -269,6 +333,7 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
         ready=True,
         generation=5,
         placeholders_remaining=False,
+        image_fields={"Derived config digest": "sha256:candidate"},
         contains_pending=False,
     )
     events: list[str] = []
@@ -278,7 +343,9 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
     monkeypatch.setattr(
         runner,
         "_sync_client_tooling",
-        lambda command_runner, output: events.append("sync"),
+        lambda command_runner, output, config_digest: events.append(
+            f"sync:{config_digest}"
+        ),
     )
     monkeypatch.setattr(
         runner,
@@ -296,7 +363,7 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
                 {
                     "items": [
                         {
-                            "metadata": {"name": "n1"},
+                            "metadata": {"name": "m1"},
                             "status": {"allocatable": {"huawei.com/Ascend910": "8"}},
                         }
                     ]
@@ -328,8 +395,10 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
         point: WorkloadPoint,
         reference: str,
         output: Path,
+        node_name: str = "n1",
     ) -> tuple[runtime.RenderedResources, tuple[Path, Path, Path]]:
         del inputs, reference, output
+        events.append(f"render:{point.variant}:{node_name}")
         resources = runtime.RenderedResources({}, {}, {"metadata": {"name": f"rapid-{point.variant}"}}, 2, 2)
         return resources, (Path("prefill"), Path("decode"), Path("config"))
 
@@ -362,11 +431,20 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
     monkeypatch.setattr(runner, "_restore_pre_run_state", lambda *args: [])
     monkeypatch.setattr(runner, "_write_checksums", lambda output: None)
 
-    runner.run(FakeCommandRunner(), state, tmp_path / "run", topology="dp1")
+    runner.run(
+        FakeCommandRunner(),
+        state,
+        tmp_path / "run",
+        topology="dp1",
+        npu_node="m1",
+    )
 
     assert events == [
-        "sync",
+        "sync:sha256:candidate",
         "fixtures",
+        "render:bulk:m1",
+        "render:layerwise:m1",
+        "render:reuse3:m1",
         "start:bulk",
         "logs:bulk",
         "start:layerwise",
@@ -382,6 +460,57 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
         "dp1-16384-reuse3-o1-c8",
     ]
     assert stop_count == 3
+    run_contract = json.loads((tmp_path / "run" / "run-contract.json").read_text())
+    assert run_contract["npu_node"] == "m1"
+
+
+def test_five_points_expand_to_exactly_ten_aisbench_attempts() -> None:
+    phases: list[str] = []
+
+    for point in runner.build_matrix("dp1"):
+        warmup_count, formal_count, repetitions = runner.sample_counts(
+            point.concurrency
+        )
+        assert repetitions == 1
+        for phase, count in (("warmup", warmup_count), ("formal-1", formal_count)):
+            commands = runner._attempt_commands(
+                point,
+                phase,
+                count,
+                f"{runner._point_id(point)}/{phase}/token",
+                runner.RunEnvironment(),
+            )
+            assert sum(command.sends_inference for command in commands) == 1
+            assert [command.description for command in commands].count("aisbench") == 1
+            config = next(
+                command
+                for command in commands
+                if command.description == "render-aisbench-config"
+            )
+            assert "--phase" in config.argv
+            assert "--fixture-manifest" in config.argv
+            phases.append(f"{runner._point_id(point)}:{phase}")
+
+    assert phases == [
+        "dp1-16384-bulk-o128-c8:warmup",
+        "dp1-16384-bulk-o128-c8:formal-1",
+        "dp1-16384-bulk-o1-c8:warmup",
+        "dp1-16384-bulk-o1-c8:formal-1",
+        "dp1-16384-layerwise-o128-c8:warmup",
+        "dp1-16384-layerwise-o128-c8:formal-1",
+        "dp1-16384-layerwise-o1-c8:warmup",
+        "dp1-16384-layerwise-o1-c8:formal-1",
+        "dp1-16384-reuse3-o1-c8:warmup",
+        "dp1-16384-reuse3-o1-c8:formal-1",
+    ]
+
+
+def test_run_cli_accepts_explicit_npu_node() -> None:
+    args = runner._parser().parse_args(
+        ["run", "--output", "/tmp/run", "--topology", "dp1", "--npu-node", "m1"]
+    )
+
+    assert args.npu_node == "m1"
 
 
 def test_point_failure_defers_restore_to_top_level_runner(tmp_path: Path) -> None:
@@ -408,14 +537,14 @@ def test_sync_client_tooling_prepares_chroot_shared_memory(tmp_path: Path) -> No
         def run(self, command: runner.Command) -> str:
             self.calls.append(command)
             if command.description == "verify-client-rootfs-marker":
-                return "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b\n"
+                return "sha256:candidate\n"
             if command.description == "verify-client-tokenizer-link":
                 return "/client-tools/tokenizer\n"
             return ""
 
     fake = ClientRunner()
 
-    runner._sync_client_tooling(fake, tmp_path)
+    runner._sync_client_tooling(fake, tmp_path, "sha256:candidate")
 
     shared_memory = next(call for call in fake.calls if call.description == "prepare-client-shared-memory")
     assert "/performance-workspace/rootfs/dev/shm" in shared_memory.argv
@@ -748,17 +877,22 @@ def test_aisbench_manifest_is_cpu_only_on_m1() -> None:
     assert pod["metadata"]["namespace"] == "liangjiahao"
     assert pod["metadata"]["name"] == "layerwise-performance-aisbench"
     assert pod["spec"]["nodeName"] == "m1"
-    assert container["image"] == "docker.io/library/vllm-ascend:latest"
+    assert container["image"] == pod["metadata"]["annotations"][
+        "performance.vllm.ai/source-image"
+    ]
     assert pod["metadata"]["annotations"]["performance.vllm.ai/source-image"].endswith(
-        "45b2e785-df3f74ed-20260807T100722Z"
+        "57d3c214e-df3f74ed-20260811T145302Z"
     )
     assert pod["metadata"]["annotations"]["performance.vllm.ai/repo-digest"] == (
-        "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351"
+        "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3"
     )
     assert pod["metadata"]["annotations"]["performance.vllm.ai/config-digest"] == (
-        "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
+        "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd"
     )
-    assert pod["metadata"]["annotations"]["performance.vllm.ai/execution-mode"] == "exact-rootfs-chroot"
+    assert (
+        pod["metadata"]["annotations"]["performance.vllm.ai/execution-mode"]
+        == "exact-rootfs-chroot"
+    )
     assert resources == {
         "requests": {"cpu": "4", "memory": "16Gi"},
         "limits": {"cpu": "8", "memory": "32Gi"},

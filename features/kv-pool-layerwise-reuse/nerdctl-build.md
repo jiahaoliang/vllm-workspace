@@ -1,6 +1,6 @@
 # 使用 nerdctl 构建 vLLM Ascend 镜像
 
-Captured At: 2026-08-07T18:07:22+08:00
+Captured At: 2026-08-11T22:53:08+08:00
 
 本文记录如何通过 `nerdctl` 调用 BuildKit Pod，使用 `Dockerfile.a2` 构建
 vLLM Ascend layerwise KV pool 镜像。该流程不创建或修改 Kubernetes workload。
@@ -37,10 +37,10 @@ Pod。如果出现
 nerdctl -n k8s.io build \
   --progress=plain \
   --build-arg VLLM_COMMIT=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5 \
-  --build-arg VLLM_ASCEND_COMMIT=45b2e785b10ca4604cd6314819ed15f3ff674781 \
+  --build-arg VLLM_ASCEND_COMMIT=57d3c214e642cdbb529400f0742d1a98a8d38708 \
   --build-arg MOONCAKE_COMMIT=df3f74ed8ebdb0c935554beea6299a9f11c723e2 \
   -f features/kv-pool-layerwise-reuse/Dockerfile.a2 \
-  -t docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z \
+  -t docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z \
   features/kv-pool-layerwise-reuse
 ```
 
@@ -90,14 +90,14 @@ containerd 中的实际镜像信息：
 
 ```bash
 nerdctl -n k8s.io images
-nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
+  nerdctl -n k8s.io images --digests docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z
 ```
 
 检查镜像配置、平台和 labels：
 
 ```bash
 nerdctl -n k8s.io image inspect \
-  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z
+  docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z
 ```
 
 删除镜像引用：

@@ -1,6 +1,6 @@
 # kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-11T17:30:22+08:00
+Captured At: 2026-08-12T00:51:50+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
@@ -42,15 +42,18 @@ and memcache are unchanged. After the Kubernetes reinstall, the current dirty
 checkout was tar-synchronized into the recreated CPU-only, no-hostPath
 `liangjiahao/vllm-ascend-ut` Pod on `m1`. The new regression passed `1`, the
 Mooncake layer-session class passed `27`, and the complete AscendStore
-collection passed `516`; `git diff --check` also passed. The restored Pod image
-contains no Ruff binary, so this commit does not claim a new Ruff gate.
+collection passed `516`; `git diff --check` also passed.
 
-The validated reusable `linux/arm64` image remains
-`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-535555917-df3f74ed-20260809T070557Z`
-with manifest `sha256:cf5da7c1da7dcb72f4c22e201d628b9e4aa819f53c15711651ebc9241cb955bc`
-and config `sha256:b138ce816ae0b4183f77a6e9b83bc95061a6c1053f770d2f0462699de86a7a0c`.
-Its source label remains the historical pre-squash commit `535555917`; no new
-image was created for the tree-equivalent squash or `57d3c214e`.
+The new reusable `linux/arm64` candidate image is
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`
+with manifest `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3`
+and config `sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd`.
+Embedded Git HEADs and OCI labels match all three frozen commits;
+`pool_worker.py` has SHA-256
+`54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea`.
+The seven Mooncake session/range APIs, AArch64 native modules, dynamic
+dependencies, and CPU-only import smoke were verified. This is image and
+non-NPU evidence only; it is not a new NPU correctness or performance result.
 
 Functional run `20260809T071622Z` passed the targeted TP2 4096-token REUSE3
 canary with 32/32 block hits, 4095 remote load tokens, `vllm_cached=0`, all-zero
@@ -68,3 +71,31 @@ raw and imported checksum replay, and runtime restoration passed. The runtime
 evidence and image identity remain attributed to pre-squash source
 `535555917`; neither tree equivalence nor `57d3c214e` is a new NPU or
 performance run.
+
+Generation-11 non-NPU preparation parameterizes the server node while keeping
+the public default `n1`, renders the single-node rerun explicitly onto `m1`,
+validates each dataset and writes `attempt-contract.json` before AISBench can
+send traffic. The complete performance harness passed `91` tests in the
+CPU-only UT Pod. Targeted Ruff 0.16.2 core/import lint passed for all 11 changed
+performance Python files, and 20 performance Python files compiled in memory.
+Formatter-only churn was removed mechanically while proving that every Python
+token remained identical.
+
+The retained CPU-only `liangjiahao/layerwise-performance-aisbench` Pod uses the
+exact candidate image and has no NPU or hostPath resources. AISBench is pinned
+to `3fd27b4a5fd022fcb5484fb084307f49955491ba` / `3.1.0`; its prepared fixture
+contains 8 warmup and 64 formal rows, 72 unique/disjoint request IDs, and 72/72
+exact 16384-token re-encodes. The compact preparation root is 7.7 MB under
+`/tmp/layerwise-non-npu-readiness-20260811/aisbench-success`; its checksum
+manifest digest is
+`4d032f8853afd36e34d2e62aace692c3ef96f0e1dad0fe6d59f07cc09aa67d7e`.
+The real CPU-only client preflight also passed current-tooling sync, candidate
+config marker validation, tokenizer-link validation, and fixture archive; its
+2.8 MB root checksum manifest digest is
+`f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873`.
+
+Node `m1` remains Ready but advertises zero allocatable physical Ascend910
+resources. Generation 11 is therefore `BLOCKED`, `ready=false`; no serving Pod
+or inference request was started. The read-only gate requires exactly eight
+allocatable physical `huawei.com/Ascend910` resources and at least four free,
+and deliberately ignores `huawei.com/vnpu-number`.

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from copy import deepcopy
-from dataclasses import dataclass
 import json
 import shlex
+from copy import deepcopy
+from dataclasses import dataclass
 from typing import Any
 
 from performance.contract import RUNTIME_CONSTANTS, TOPOLOGIES, VARIANTS, WorkloadPoint
-
 
 MOONCAKE_GLOBAL_SEGMENT_SIZE = "128GB"
 
@@ -40,11 +39,16 @@ class RenderedResources:
 
 
 def _render_deployment(
-    source: dict[str, Any], image: str, npus: int, configmap_name: str
+    source: dict[str, Any],
+    image: str,
+    npus: int,
+    configmap_name: str,
+    node_name: str,
 ) -> dict[str, Any]:
     deployment = deepcopy(source)
     pod_spec = deployment["spec"]["template"]["spec"]
     container = pod_spec["containers"][0]
+    pod_spec["nodeName"] = node_name
     container["image"] = image
     for resource_type in ("requests", "limits"):
         container.setdefault("resources", {}).setdefault(resource_type, {})[
@@ -239,7 +243,10 @@ print(json.dumps({
 
 
 def render_resources(
-    inputs: RuntimeInputs, point: WorkloadPoint, image: str
+    inputs: RuntimeInputs,
+    point: WorkloadPoint,
+    image: str,
+    node_name: str = "n1",
 ) -> RenderedResources:
     topology = TOPOLOGIES[point.topology]
     configmap_name = (
@@ -255,10 +262,18 @@ def render_resources(
     )
     data["check-runtime.py"] = _check_runtime_script()
     prefill = _render_deployment(
-        inputs.prefill_deployment, image, topology.prefill_npus, configmap_name
+        inputs.prefill_deployment,
+        image,
+        topology.prefill_npus,
+        configmap_name,
+        node_name,
     )
     decode = _render_deployment(
-        inputs.decode_deployment, image, topology.decode_npus, configmap_name
+        inputs.decode_deployment,
+        image,
+        topology.decode_npus,
+        configmap_name,
+        node_name,
     )
     return RenderedResources(
         prefill,

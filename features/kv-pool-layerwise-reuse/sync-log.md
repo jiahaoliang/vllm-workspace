@@ -958,3 +958,58 @@
   `121a11b331cffeb4d031dac21637d70c0395d83ee971b07a138e4d4f4e03f449`
   replayed successfully. Formal performance must start from a new run root and
   must not resume the generation-1 `a3c97358` run.
+
+## 2026-08-11
+
+- Froze the next five-point rerun at vLLM `54503ece`, vLLM-Ascend
+  `57d3c214e`, and Mooncake `df3f74ed`; all nested checkouts are clean and the
+  vLLM-Ascend feature branch is equal to its origin.
+- Added explicit `--npu-node` propagation while preserving the public default
+  `n1`. The single-node run renders Prefill and Decode onto `m1`, records that
+  node in `run-contract.json`, retains the exact five points, and expands them
+  to ten ordered AISBench attempts: one 8-request warmup and one 64-request
+  formal attempt per point.
+- Added pre-traffic dataset/manifest validation and an immutable
+  `attempt-contract.json` for every attempt. The complete performance harness
+  passed `91` tests in the CPU-only `liangjiahao/vllm-ascend-ut` Pod. Targeted
+  Ruff 0.16.2 core/import lint passed for 11 changed Python files; 20
+  performance files compiled in memory. Formatter-only churn was removed with
+  a mechanical Python-token identity check.
+- Built native `linux/arm64` image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`.
+  Manifest is
+  `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3`;
+  config is
+  `sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd`.
+  Exact embedded Git HEADs/labels, seven Mooncake session/range APIs,
+  AArch64 ELF dependencies, `pool_worker.py` SHA-256, and CPU import smoke
+  passed. `default/buildkitd` remains Ready on `m1`.
+- Parameterized CPU-only AISBench preparation with the exact image reference,
+  manifest digest, config digest, and local tokenizer source. Image identity is
+  checked before Pod creation/rootfs sync. Tokenizer files are tar-streamed
+  without a Prefill dependency or hostPath. The first attempt stopped before
+  rootfs sync because a fresh emptyDir lacked the rootfs directory; the harness
+  now creates it explicitly and the focused regression passed.
+- Removed the remaining old client-rootfs config digest from both rapid and
+  causal A/B execution paths. A real CPU-only preflight then passed current
+  tooling sync, candidate config marker, tokenizer link, and three-fixture
+  archive; its compact checksum manifest digest is
+  `f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873`.
+- The successful retained `liangjiahao/layerwise-performance-aisbench` Pod is
+  Ready with no NPU request. AISBench commit `3fd27b4a` / version `3.1.0`
+  generated 8 warmup and 64 formal rows. All 72 IDs are unique/disjoint, both
+  checksum levels replayed, and 72/72 prompts re-encoded to exactly 16384
+  tokens. Compact preparation evidence is 7.7 MB under
+  `/tmp/layerwise-non-npu-readiness-20260811/aisbench-success`.
+- Replayed both checksum manifests for historical formal run
+  `20260810T043500Z`; the report checker remained valid and regeneration wrote
+  only to `/tmp`. No historical evidence was changed.
+- Added a read-only physical-resource gate requiring node `m1`, exactly eight
+  allocatable `huawei.com/Ascend910` resources, and at least four free after
+  non-terminal Pod requests; `huawei.com/vnpu-number` is ignored. The live gate
+  reports `BLOCKED` because allocatable/free are `0/0`.
+- Replaced generation 10 authorization with generation 11 `BLOCKED`,
+  `ready=false`. No Prefill, Decode, Proxy, Mooncake Master, correctness
+  request, or AISBench inference traffic was started. Administrator restoration
+  of NPU registration, candidate NPU correctness for `kv_producer`/`kv_both`,
+  and the fresh five-point rerun remain pending.

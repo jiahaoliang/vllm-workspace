@@ -16,7 +16,6 @@ from performance.contract import (
     point_id,
 )
 
-
 POINT = WorkloadPoint("dp1", 16384, 1, "layerwise", 8)
 PATCH_TARGET = (
     "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/"
@@ -343,7 +342,7 @@ def run_ab(args: argparse.Namespace) -> None:
         args.image_digest,
         args.patch_sha256,
     )
-    runner._sync_client_tooling(command_runner, output)
+    runner._sync_client_tooling(command_runner, output, candidate_config_digest)
     runner._archive_shared_fixtures(command_runner, output)
     source_commit = _capture_source_identity(
         command_runner, output, args.source_commit

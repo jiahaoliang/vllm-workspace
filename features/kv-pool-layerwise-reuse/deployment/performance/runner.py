@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import shlex
 import subprocess
 from copy import deepcopy
 from dataclasses import dataclass, replace
@@ -23,6 +24,15 @@ from performance.contract import (
 )
 
 WORKSPACE_ROOT = Path(os.environ.get("VLLM_WORKSPACE_ROOT", Path.cwd())).resolve()
+TOKENIZER_FILES = (
+    "config.json",
+    "configuration.json",
+    "configuration_deepseek.py",
+    "generation_config.json",
+    "tokenization_deepseek_fast.py",
+    "tokenizer.json",
+    "tokenizer_config.json",
+)
 
 
 @dataclass(frozen=True)
@@ -209,13 +219,113 @@ class _ImageRunner:
         return self.command_runner.run(Command(argv, description="image-" + argv[3]))
 
 
-def prepare(command_runner: Runner, output_dir: Path) -> None:
+def _verify_prepare_image(
+    command_runner: Runner,
+    output_dir: Path,
+    reference: str,
+    manifest_digest: str,
+    config_digest: str,
+) -> None:
+    raw = command_runner.run(
+        Command(
+            ("nerdctl", "--namespace", "k8s.io", "image", "inspect", reference),
+            description="inspect-client-image",
+        )
+    )
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise ValueError("candidate image inspect output is not JSON") from error
+    if (
+        not isinstance(parsed, list)
+        or len(parsed) != 1
+        or not isinstance(parsed[0], dict)
+    ):
+        raise ValueError("candidate image inspect did not return exactly one image")
+    inspected = parsed[0]
+    platform = f"{inspected.get('Os', '')}/{inspected.get('Architecture', '')}"
+    if platform != "linux/arm64":
+        raise ValueError(f"candidate image platform mismatch: {platform}")
+    if inspected.get("Id") != config_digest:
+        raise ValueError("candidate image config digest mismatch")
+    repo_digests = inspected.get("RepoDigests", [])
+    if not isinstance(repo_digests, list) or not any(
+        str(value).endswith(f"@{manifest_digest}") for value in repo_digests
+    ):
+        raise ValueError("candidate image manifest digest mismatch")
+    _write_json(
+        output_dir / "client-image.json",
+        {
+            "reference": reference,
+            "manifest_digest": manifest_digest,
+            "config_digest": config_digest,
+            "platform": platform,
+        },
+    )
+
+
+def _render_client_manifest(
+    source: Path,
+    output: Path,
+    reference: str,
+    manifest_digest: str,
+    config_digest: str,
+) -> Path:
+    pod = json.loads(source.read_text(encoding="utf-8"))
+    annotations = pod["metadata"].setdefault("annotations", {})
+    annotations["performance.vllm.ai/source-image"] = reference
+    annotations["performance.vllm.ai/repo-digest"] = manifest_digest
+    annotations["performance.vllm.ai/config-digest"] = config_digest
+    pod_spec = pod["spec"]
+    if pod_spec.get("nodeName") != "m1":
+        raise ValueError("AISBench client must be pinned to m1")
+    container = pod_spec["containers"][0]
+    container["image"] = reference
+    resources = json.dumps(container.get("resources", {}), sort_keys=True)
+    if "huawei.com/Ascend910" in resources or "huawei.com/vnpu-number" in resources:
+        raise ValueError("AISBench client manifest must remain CPU-only")
+    _write_json(output, pod)
+    return output
+
+
+def _validate_tokenizer_source(source: Path) -> None:
+    if not source.is_dir():
+        raise FileNotFoundError(f"tokenizer source directory is unavailable: {source}")
+    missing = [name for name in TOKENIZER_FILES if not (source / name).is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "tokenizer source lacks required files: " + ", ".join(missing)
+        )
+
+
+def prepare(
+    command_runner: Runner,
+    output_dir: Path,
+    image_reference: str,
+    manifest_digest: str,
+    config_digest: str,
+    tokenizer_source: Path,
+) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     _append(
         output_dir / "steps.jsonl",
         {"phase": "prepare", "status": "started", "server_authorized": False},
     )
-    manifest = Path(__file__).with_name("00-aisbench-client.yaml")
+    _validate_tokenizer_source(tokenizer_source)
+    _verify_prepare_image(
+        command_runner,
+        output_dir,
+        image_reference,
+        manifest_digest,
+        config_digest,
+    )
+    manifest = _render_client_manifest(
+        Path(__file__).with_name("00-aisbench-client.yaml"),
+        output_dir / "client-pod-manifest.json",
+        image_reference,
+        manifest_digest,
+        config_digest,
+    )
     bootstrap = r"""
 set -euo pipefail
 root=/client-tools
@@ -266,16 +376,16 @@ test "$(git -C "${src}" rev-parse HEAD)" = \
   >"${root}/provenance/requirements.freeze.txt"
 git -C "${src}" rev-parse HEAD >"${root}/provenance/aisbench-commit.txt"
 """.strip()
-    exact_image = "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z"
-    exact_config_digest = "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
     rootfs_sync = f"""
 set -euo pipefail
 marker=/performance-workspace/rootfs/.performance-image-config-digest
+kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
+  mkdir -p /performance-workspace/rootfs
 if kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
   test -f "${{marker}}"; then
   actual=$(kubectl exec -n liangjiahao layerwise-performance-aisbench \
     -c aisbench -- cat "${{marker}}")
-  test "${{actual}}" = {exact_config_digest!r}
+  test "${{actual}}" = {config_digest!r}
   exit 0
 fi
 existing=$(kubectl exec -n liangjiahao layerwise-performance-aisbench \
@@ -287,22 +397,19 @@ cleanup_mount() {{
   rmdir "${{mount_dir}}" >/dev/null 2>&1 || true
 }}
 trap cleanup_mount EXIT
-ctr --namespace k8s.io images mount {exact_image!r} "${{mount_dir}}"
+ctr --namespace k8s.io images mount {image_reference!r} "${{mount_dir}}"
 tar --numeric-owner -C "${{mount_dir}}" -cf - . | \
   kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
     -c aisbench -- tar --numeric-owner \
     -C /performance-workspace/rootfs -xf -
 kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
   sh -c 'printf "%s\\n" "$1" >"$2"' sh \
-  {exact_config_digest!r} "${{marker}}"
+  {config_digest!r} "${{marker}}"
 """.strip()
-    tokenizer_copy = r"""
+    tokenizer_copy = f"""
 set -euo pipefail
-kubectl exec -n liangjiahao deployment/prefill-engine-deployment \
-  -c prefill-engine -- tar \
-  -C /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 -cf - \
-  config.json configuration.json configuration_deepseek.py generation_config.json \
-  tokenization_deepseek_fast.py tokenizer.json tokenizer_config.json | \
+tar -C {shlex.quote(str(tokenizer_source.resolve()))} -cf - \
+  {" ".join(shlex.quote(name) for name in TOKENIZER_FILES)} | \
 kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
   -c aisbench -- tar -C /performance-workspace/rootfs/client-tools/tokenizer -xf -
 """.strip()
@@ -524,7 +631,11 @@ kubectl exec -i -n liangjiahao layerwise-performance-aisbench \
             output = command_runner.run(command)
             _append(
                 output_dir / "steps.jsonl",
-                {"phase": "prepare", "status": "completed", "step": command.description},
+                {
+                    "phase": "prepare",
+                    "status": "completed",
+                    "step": command.description,
+                },
             )
             if command.description == "client-identity":
                 (output_dir / "client-pod.json").write_text(output, encoding="utf-8")
@@ -553,7 +664,13 @@ def _run_and_save(command_runner: Runner, command: Command, destination: Path) -
     return output
 
 
-def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
+def _sync_client_tooling(
+    command_runner: Runner,
+    output_dir: Path,
+    expected_config_digest: str,
+) -> None:
+    if not expected_config_digest.startswith("sha256:"):
+        raise ValueError("expected client rootfs config digest is malformed")
     package = Path(__file__).resolve().parent
     files = sorted(
         path
@@ -633,8 +750,7 @@ def _sync_client_tooling(command_runner: Runner, output_dir: Path) -> None:
             description="verify-client-rootfs-marker",
         )
     ).strip()
-    expected = "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b"
-    if marker != expected:
+    if marker != expected_config_digest:
         raise RuntimeError(f"client rootfs config digest mismatch: {marker}")
     link = command_runner.run(
         Command(
@@ -840,9 +956,14 @@ def _write_rendered_block(
     point: WorkloadPoint,
     image_reference: str,
     output_dir: Path,
+    node_name: str = "n1",
 ) -> tuple[runtime.RenderedResources, tuple[Path, Path, Path]]:
-    rendered = runtime.render_resources(inputs, point, image_reference)
-    block = output_dir / "rendered" / point.topology / str(point.input_tokens) / point.variant
+    rendered = runtime.render_resources(
+        inputs, point, image_reference, node_name=node_name
+    )
+    block = (
+        output_dir / "rendered" / point.topology / str(point.input_tokens) / point.variant
+    )
     paths = (
         block / "runtime-configmap.json",
         block / "prefill-deployment.json",
@@ -1238,6 +1359,7 @@ def run(
     output_dir: Path,
     topology: str,
     resume: bool = False,
+    npu_node: str = "n1",
 ) -> None:
     errors = handoff.validate_readiness(state)
     if errors:
@@ -1247,21 +1369,24 @@ def run(
         raise handoff.HandoffError("handoff validation failed: " + "; ".join(errors))
     if resume:
         raise ValueError("rapid run does not support resume")
+    expected_config_digest = state.image_fields.get("Derived config digest", "")
+    if not expected_config_digest:
+        raise handoff.HandoffError("handoff lacks Derived config digest")
     if output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(f"run output is not empty: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=True)
-    _sync_client_tooling(command_runner, output_dir)
+    _sync_client_tooling(command_runner, output_dir, expected_config_digest)
     _archive_shared_fixtures(command_runner, output_dir)
     _capture_identity(command_runner, state, output_dir)
     inputs = _capture_pre_run_state(command_runner, output_dir)
     nodes = json.loads((output_dir / "cluster" / "nodes.json").read_text())
     pods = json.loads((output_dir / "cluster" / "pods.json").read_text())
-    available_npus = _available_test_npus(nodes, pods)
+    available_npus = _available_test_npus(nodes, pods, npu_node)
     required_npus = TOPOLOGIES[topology].prefill_npus + TOPOLOGIES[topology].decode_npus
     _write_json(
         output_dir / "cluster" / f"{topology}-capacity.json",
         {
-            "node": "n1",
+            "node": npu_node,
             "resource": "huawei.com/Ascend910",
             "available_after_replacing_current_engines": available_npus,
             "required": required_npus,
@@ -1272,7 +1397,7 @@ def run(
         raise RuntimeError(f"insufficient physical Ascend910 capacity: {available_npus} < {required_npus}")
     image_identity = image.resolve_server_image(state, _ImageRunner(command_runner), output_dir / "image")
     points = build_matrix(topology)
-    run_contract = build_run_contract(image_identity.digest)
+    run_contract = build_run_contract(image_identity.digest, npu_node=npu_node)
     _write_json(output_dir / "run-contract.json", run_contract)
     environment = RunEnvironment(
         restore_manifest=output_dir / "pre-run-state",
@@ -1290,6 +1415,7 @@ def run(
                 representative,
                 image_identity.reference,
                 output_dir,
+                node_name=npu_node,
             )
             rendered_variants[variant] = rendered
             rendered_paths[variant] = paths
@@ -1595,8 +1721,15 @@ def _attempt_commands(
     rootfs = "/performance-workspace/rootfs"
     chroot_attempt = f"/client-tools/runs/{remote_attempt}"
     host_attempt = f"{rootfs}{chroot_attempt}"
-    fixture = f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c8/{phase}.jsonl"
-    prepare_script = 'set -eu; test ! -e "$1"; mkdir -p "$1"; cp "$2" "$1/dataset.jsonl"'
+    fixture = (
+        f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c8/{phase}.jsonl"
+    )
+    fixture_manifest = (
+        f"/client-tools/fixtures/tokens-{point.input_tokens}-c8/manifest.json"
+    )
+    prepare_script = (
+        'set -eu; test ! -e "$1"; mkdir -p "$1"; cp "$2" "$1/dataset.jsonl"'
+    )
     config_argv = (
         "kubectl",
         "exec",
@@ -1630,6 +1763,10 @@ def _attempt_commands(
         f"{chroot_attempt}/dataset.jsonl",
         "--request-count",
         str(request_count),
+        "--phase",
+        phase,
+        "--fixture-manifest",
+        fixture_manifest,
         "--output",
         f"{chroot_attempt}/config.py",
     )
@@ -1693,7 +1830,9 @@ def _attempt_commands(
     )
 
 
-def _diagnostic_commands(environment: RunEnvironment) -> tuple[tuple[Command, str], ...]:
+def _diagnostic_commands(
+    environment: RunEnvironment,
+) -> tuple[tuple[Command, str], ...]:
     namespace = environment.namespace
     metrics = _client_python(
         environment,
@@ -1901,18 +2040,29 @@ def _parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     prepare_parser = subparsers.add_parser("prepare")
     prepare_parser.add_argument("--output", type=Path, required=True)
+    prepare_parser.add_argument("--image", required=True)
+    prepare_parser.add_argument("--manifest-digest", required=True)
+    prepare_parser.add_argument("--config-digest", required=True)
+    prepare_parser.add_argument(
+        "--tokenizer-source",
+        type=Path,
+        default=Path("/home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"),
+    )
     wait_parser = subparsers.add_parser("wait")
     wait_parser.add_argument("--output", type=Path, required=True)
     wait_parser.add_argument("--poll-seconds", type=float, default=10.0)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--output", type=Path, required=True)
     run_parser.add_argument("--topology", choices=("dp1", "dp2"), required=True)
+    run_parser.add_argument("--npu-node", default="n1")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    handoff_path = WORKSPACE_ROOT / "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
+    handoff_path = (
+        WORKSPACE_ROOT / "features/kv-pool-layerwise-reuse/performance-validation-handoff.md"
+    )
     if args.command == "wait":
         handoff.wait_for_ready(
             handoff_path,
@@ -1923,7 +2073,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     command_runner = SubprocessCommandRunner(args.output)
     if args.command == "prepare":
-        prepare(command_runner, args.output)
+        prepare(
+            command_runner,
+            args.output,
+            args.image,
+            args.manifest_digest,
+            args.config_digest,
+            args.tokenizer_source,
+        )
         return 0
     state = handoff.parse_handoff(handoff_path)
     run(
@@ -1932,6 +2089,7 @@ def main(argv: list[str] | None = None) -> int:
         args.output,
         topology=args.topology,
         resume=False,
+        npu_node=args.npu_node,
     )
     return 0
 

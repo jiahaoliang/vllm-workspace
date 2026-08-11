@@ -40,15 +40,22 @@ fixtures without waiting for the functional handoff:
 ```bash
 prepare_id=$(date -u +%Y%m%dT%H%M%SZ)
 features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh \
-  prepare --output "/tmp/layerwise-performance-prepare-${prepare_id}"
+  prepare \
+  --output "/tmp/layerwise-performance-prepare-${prepare_id}" \
+  --image docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z \
+  --manifest-digest sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3 \
+  --config-digest sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd \
+  --tokenizer-source /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
 ```
 
-The `m1` kubelet starts a cached CPU-only wrapper image. Preparation verifies
-the requested source-image manifest and config digests in local containerd,
-mounts that exact image read-only, streams its merged rootfs into the Pod, and
-executes benchmark Python through `chroot`. The wrapper is not treated as the
-benchmark environment. The retained `layerwise-performance-aisbench` Pod may
-be inspected with:
+The `m1` kubelet starts the exact cached candidate as a CPU-only wrapper.
+Preparation verifies its `linux/arm64` platform plus manifest and config
+digests in local containerd before creating the Pod, mounts the same image
+read-only, streams its merged rootfs into the Pod, and executes benchmark
+Python through `chroot`. Only the seven tokenizer/config files required for
+exact prompt generation are tar-streamed from the local model directory; the
+Pod has no `hostPath` and preparation does not depend on a Prefill Pod. The
+retained `layerwise-performance-aisbench` Pod may be inspected with:
 
 ```bash
 kubectl get pod -n liangjiahao layerwise-performance-aisbench -o json
@@ -69,6 +76,17 @@ features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh 
   wait --output "/tmp/layerwise-performance-wait-${wait_id}" --poll-seconds 10
 ```
 
+Before changing a blocked handoff to ready, run the read-only physical-resource
+gate. It requires node `m1`, exactly eight allocatable physical Ascend910
+resources, and at least four free after non-terminal Pod requests. It ignores
+`huawei.com/vnpu-number` and returns exit code 1 while blocked:
+
+```bash
+python3 features/kv-pool-layerwise-reuse/deployment/performance/check-npu-readiness.py \
+  --node m1 \
+  --output /tmp/layerwise-npu-readiness.json
+```
+
 After the listener accepts the current ready handoff, execute the rapid DP1 run
 in a new root. A failed root is retained as diagnostics and is never resumed.
 
@@ -76,7 +94,7 @@ in a new root. A failed root is retained as diagnostics and is never resumed.
 run_id=$(date -u +%Y%m%dT%H%M%SZ)
 run_root="/tmp/layerwise-performance-rapid-${run_id}"
 features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh \
-  run --topology dp1 --output "${run_root}"
+  run --topology dp1 --npu-node m1 --output "${run_root}"
 PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
   python3 -m performance.report check --root "${run_root}" --scope all
 ```

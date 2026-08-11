@@ -41,6 +41,7 @@ def test_request_counts_are_frozen() -> None:
 def test_rapid_run_contract_is_self_describing() -> None:
     assert contract.build_run_contract("sha256:image") == {
         "topologies": ["dp1"],
+        "npu_node": "n1",
         "image_digest": "sha256:image",
         "expected_points": [
             "dp1-16384-bulk-o128-c8",
@@ -57,6 +58,10 @@ def test_rapid_run_contract_is_self_describing() -> None:
         "single_wave": False,
         "raw_characterization_only": True,
     }
+
+    assert (
+        contract.build_run_contract("sha256:image", npu_node="m1")["npu_node"] == "m1"
+    )
 
 
 def test_runtime_constants_are_frozen() -> None:

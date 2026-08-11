@@ -5,9 +5,9 @@
     "name": "layerwise-performance-aisbench",
     "namespace": "liangjiahao",
     "annotations": {
-      "performance.vllm.ai/source-image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-45b2e785-df3f74ed-20260807T100722Z",
-      "performance.vllm.ai/repo-digest": "sha256:411c381c0802547462636f897e73b986b01a3297577c7c3fe55c50d352c8e351",
-      "performance.vllm.ai/config-digest": "sha256:eca977c2db3e6a45c331087298b0592cfa2af3794b39c06f03dc54219a7bba2b",
+      "performance.vllm.ai/source-image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+      "performance.vllm.ai/repo-digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+      "performance.vllm.ai/config-digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
       "performance.vllm.ai/execution-mode": "exact-rootfs-chroot"
     },
     "labels": {
@@ -24,7 +24,7 @@
     "containers": [
       {
         "name": "aisbench",
-        "image": "docker.io/library/vllm-ascend:latest",
+        "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
         "imagePullPolicy": "Never",
         "command": ["/bin/bash", "-lc"],
         "args": ["exec sleep infinity"],

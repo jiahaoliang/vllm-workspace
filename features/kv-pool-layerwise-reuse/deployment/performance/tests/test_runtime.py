@@ -66,6 +66,20 @@ def test_topology_allocations_and_image_identity() -> None:
     assert inputs == original
 
 
+def test_render_resources_places_engines_on_explicit_node_and_keeps_default() -> None:
+    point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
+
+    default = runtime.render_resources(base_inputs(), point, "image@sha256:x")
+    selected = runtime.render_resources(
+        base_inputs(), point, "image@sha256:x", node_name="m1"
+    )
+
+    assert default.prefill_deployment["spec"]["template"]["spec"]["nodeName"] == "n1"
+    assert default.decode_deployment["spec"]["template"]["spec"]["nodeName"] == "n1"
+    assert selected.prefill_deployment["spec"]["template"]["spec"]["nodeName"] == "m1"
+    assert selected.decode_deployment["spec"]["template"]["spec"]["nodeName"] == "m1"
+
+
 def test_runtime_keeps_frozen_mooncake_pool_size() -> None:
     for variant in ("bulk", "layerwise", "reuse3"):
         rendered = runtime.render_resources(
@@ -120,7 +134,9 @@ def test_unique_difference_rejects_hidden_runtime_drift() -> None:
         "image@sha256:x",
     )
 
-    assert runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3}) == []
+    assert (
+        runtime.validate_unique_difference({"layerwise": layerwise, "reuse3": reuse3}) == []
+    )
     reuse3.decode_deployment["spec"]["template"]["spec"]["nodeName"] = "m2"
     assert any(
         "non-experimental runtime drift" in error
@@ -172,4 +188,6 @@ def test_runtime_check_avoids_loading_a_second_npu_runtime(tmp_path: Path) -> No
                 text=True,
             )
             checked = json.loads(result.stdout)
-            assert checked["physical_slots"] == json.loads(data["runtime-identity.json"])[f"{role}_physical_slots"]
+            assert (
+                checked["physical_slots"] == json.loads(data["runtime-identity.json"])[f"{role}_physical_slots"]
+            )

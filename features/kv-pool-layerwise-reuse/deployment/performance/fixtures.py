@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from performance.contract import INPUT_TOKENS, WorkloadPoint, sample_counts
+from performance.contract import INPUT_TOKENS, WorkloadPoint, point_id, sample_counts
 
 BLOCK_SIZE = 128
 
@@ -246,17 +246,135 @@ def replay_fixture(manifest: FixtureManifest) -> list[str]:
     return errors
 
 
+def _read_json_object(path: Path, description: str) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"{description} is not valid UTF-8 JSON: {path}") from error
+    if not isinstance(value, dict):
+        raise TypeError(f"{description} is not a JSON object: {path}")
+    return value
+
+
+def build_attempt_contract(
+    point: WorkloadPoint,
+    phase: str,
+    dataset_path: Path,
+    fixture_manifest: Path,
+    request_count: int,
+) -> dict[str, object]:
+    if request_count <= 0:
+        raise ValueError("request_count must be positive")
+    if phase not in {"warmup", "formal-1"}:
+        raise ValueError(f"unsupported attempt phase: {phase}")
+    if not dataset_path.is_file():
+        raise FileNotFoundError(dataset_path)
+    if not fixture_manifest.is_file():
+        raise FileNotFoundError(fixture_manifest)
+
+    manifest = _read_json_object(fixture_manifest, "fixture manifest")
+    if manifest.get("input_tokens") != point.input_tokens:
+        raise ValueError(
+            "fixture input token mismatch: "
+            f"{manifest.get('input_tokens')} != {point.input_tokens}"
+        )
+    if manifest.get("concurrency") != point.concurrency:
+        raise ValueError(
+            "fixture concurrency mismatch: "
+            f"{manifest.get('concurrency')} != {point.concurrency}"
+        )
+
+    expected_ids: object
+    if phase == "warmup":
+        expected_ids = manifest.get("warmup_ids")
+    else:
+        formal_ids = manifest.get("formal_ids")
+        expected_ids = (
+            formal_ids[0] if isinstance(formal_ids, list) and formal_ids else None
+        )
+    if not isinstance(expected_ids, list) or not all(
+        isinstance(value, str) for value in expected_ids
+    ):
+        raise ValueError(f"fixture manifest lacks request IDs for {phase}")
+    if len(expected_ids) != request_count:
+        raise ValueError(
+            f"fixture request count mismatch: {len(expected_ids)} != {request_count}"
+        )
+
+    try:
+        dataset_text = dataset_path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as error:
+        raise ValueError("dataset is not valid UTF-8") from error
+    lines = dataset_text.splitlines()
+    if len(lines) != request_count:
+        raise ValueError(
+            f"dataset line count mismatch: {len(lines)} != {request_count}"
+        )
+    actual_ids: list[str] = []
+    for index, line in enumerate(lines, start=1):
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"dataset row {index} is not valid JSON") from error
+        if not isinstance(row, dict):
+            raise TypeError(f"dataset row {index} is not a JSON object")
+        if not isinstance(row.get("question"), str):
+            raise TypeError(f"dataset row {index} lacks a string question")
+        request_id = row.get("request_id")
+        if not isinstance(request_id, str):
+            raise TypeError(f"dataset row {index} lacks a string request_id")
+        actual_ids.append(request_id)
+    if actual_ids != expected_ids:
+        raise ValueError("dataset request IDs do not match fixture manifest")
+
+    dataset_sha256 = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+    checksums = manifest.get("artifact_checksums")
+    expected_checksum = (
+        checksums.get(f"{phase}.jsonl") if isinstance(checksums, dict) else None
+    )
+    if expected_checksum != dataset_sha256:
+        raise ValueError(
+            f"dataset checksum mismatch: {dataset_sha256} != {expected_checksum}"
+        )
+    return {
+        "schema_version": 1,
+        "phase": phase,
+        "point_id": point_id(point),
+        "topology": point.topology,
+        "variant": point.variant,
+        "input_tokens": point.input_tokens,
+        "output_tokens": point.output_tokens,
+        "concurrency": point.concurrency,
+        "request_count": request_count,
+        "dataset_line_count": len(lines),
+        "dataset_sha256": dataset_sha256,
+        "fixture_manifest_sha256": hashlib.sha256(
+            fixture_manifest.read_bytes()
+        ).hexdigest(),
+    }
+
+
 def write_aisbench_config(
     point: WorkloadPoint,
     dataset_path: Path,
     output_path: Path,
     request_count: int,
+    phase: str,
+    fixture_manifest: Path,
     endpoint: str = "http://vllm-proxy-service:8000/",
 ) -> Path:
-    if request_count <= 0:
-        raise ValueError("request_count must be positive")
-    if not dataset_path.is_file():
-        raise FileNotFoundError(dataset_path)
+    attempt_contract = build_attempt_contract(
+        point,
+        phase,
+        dataset_path,
+        fixture_manifest,
+        request_count,
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    (output_path.parent / "attempt-contract.json").write_text(
+        json.dumps(attempt_contract, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     dataset_path.with_name(dataset_path.name + ".meta.json").write_text(
         json.dumps(
             {"request_count": request_count, "sampling_mode": "default"},
@@ -325,7 +443,6 @@ infer = dict(
 work_dir={str((output_path.parent / "aisbench-output").resolve())!r}
 """
     compile(text, str(output_path), "exec")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(text, encoding="utf-8")
     return output_path
 
@@ -346,6 +463,8 @@ def _parser() -> argparse.ArgumentParser:
     config.add_argument("--concurrency", type=int, required=True)
     config.add_argument("--dataset", type=Path, required=True)
     config.add_argument("--request-count", type=int, required=True)
+    config.add_argument("--phase", choices=("warmup", "formal-1"), required=True)
+    config.add_argument("--fixture-manifest", type=Path, required=True)
     config.add_argument("--output", type=Path, required=True)
     return parser
 
@@ -365,6 +484,8 @@ def main(argv: list[str] | None = None) -> int:
             args.dataset,
             args.output,
             request_count=args.request_count,
+            phase=args.phase,
+            fixture_manifest=args.fixture_manifest,
         )
         return 0
     from transformers import AutoTokenizer
