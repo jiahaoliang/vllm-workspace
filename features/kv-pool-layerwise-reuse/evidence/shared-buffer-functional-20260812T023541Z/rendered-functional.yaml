@@ -1,0 +1,1137 @@
+apiVersion: v1
+data:
+  check-runtime.py: |
+    import inspect
+    import os
+    from pathlib import Path
+
+    import vllm
+    import vllm_ascend
+    from mooncake.store import MooncakeDistributedStore
+    from vllm.v1.core.kv_cache_coordinator import get_kv_cache_coordinator
+    from vllm_ascend.utils import vllm_version_is
+
+    methods = (
+        "batch_put_session_start",
+        "batch_put_from_multi_buffer_ranges",
+        "batch_put_session_end",
+        "batch_put_session_revoke",
+        "batch_get_session_start",
+        "batch_get_into_multi_buffer_ranges",
+        "batch_get_session_end",
+    )
+    missing = [name for name in methods if not callable(getattr(MooncakeDistributedStore, name, None))]
+    assert not missing, f"missing Mooncake session/range APIs: {missing}"
+
+    source = Path(vllm_ascend.__file__).resolve()
+    expected = Path("/vllm-workspace/vllm-ascend").resolve()
+    assert source.is_relative_to(expected), f"vllm-ascend is not imported from editable source: {source}"
+    assert os.environ.get("PYTHONHASHSEED") == "0", (
+        "PYTHONHASHSEED must have the same fixed value in every engine Pod"
+    )
+    assert os.environ.get("PYTHONDONTWRITEBYTECODE") == "1", (
+        "engine processes must not write stale Python bytecode"
+    )
+    assert os.environ.get("VLLM_VERSION") is None, (
+        "main-verified lane must not force a release VLLM_VERSION override"
+    )
+    assert not vllm_version_is("0.25.1"), (
+        f"main-verified lane selected the v0.25.1 release path; installed version={vllm.__version__}"
+    )
+    coordinator_parameters = inspect.signature(get_kv_cache_coordinator).parameters
+    assert "max_in_flight_tokens" in coordinator_parameters, coordinator_parameters
+    print(f"vllm-ascend source: {source}")
+    print(f"installed vLLM package version: {vllm.__version__}; compatibility lane: main-verified")
+    print("coordinator keyword: max_in_flight_tokens")
+    print("cross-process block hash seed: 0")
+    print("Mooncake session/range APIs: OK")
+  mooncake.json: |
+    {
+      "metadata_server": "P2PHANDSHAKE",
+      "protocol": "ascend",
+      "device_name": "",
+      "master_server_address": "mooncake-master-service:30089",
+      "global_segment_size": "1GB",
+      "local_buffer_size": 0,
+      "preferred_segment": false,
+      "prefer_alloc_in_same_node": true,
+      "enable_ssd_offload": false
+    }
+  pid-state.sh: |
+    #!/usr/bin/env bash
+
+    pid_process_state() {
+      local pid=${1:-} state
+      if [[ ! ${pid} =~ ^[1-9][0-9]*$ ]]; then
+        printf '%s\n' absent
+        return 0
+      fi
+      state=$(ps -o stat= -p "${pid}" 2>/dev/null | awk 'NF {print $1; exit}') || state=
+      case ${state:0:1} in
+        Z) printf '%s\n' zombie ;;
+        '') printf '%s\n' absent ;;
+        *) printf '%s\n' live ;;
+      esac
+    }
+  smoke-test.py: |
+    import asyncio
+    import json
+    import time
+    from pathlib import Path
+
+    import httpx
+    from transformers import AutoTokenizer
+
+    model_path = "/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"
+    served_model = "vllm-ascend/DeepSeek-V2-Lite-W8A8"
+    proxy_url = "http://vllm-proxy-service:8000/v1/completions"
+    master_metrics_url = "http://mooncake-master-service:9003/metrics"
+    output_dir = Path("/tmp/layerwise-smoke")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = output_dir / "concurrent-summary.json"
+
+    block_size = 128
+    expected_hit_blocks = 25
+    expected_hit_tokens = block_size * expected_hit_blocks
+    expected_shared_blocks = 12
+    concurrency = 4
+
+    summary = {
+        "schema_version": 1,
+        "status": "initializing",
+        "validated": False,
+        "diagnosis": "not_completed",
+        "concurrency": concurrency,
+        "block_size": block_size,
+        "expected_hit_blocks": expected_hit_blocks,
+        "expected_hit_tokens": expected_hit_tokens,
+        "expected_master_key_count": None,
+        "prompt_layout": {},
+        "phases": {
+            "empty_pool_baseline": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "warmup": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "direct_kv_load": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+            "proxy_kv_load": {
+                "status": "pending",
+                "validated": False,
+                "cases": [],
+            },
+        },
+    }
+
+
+    def write_summary():
+        summary_path.write_text(
+            json.dumps(summary, indent=2, ensure_ascii=True), encoding="utf-8"
+        )
+
+
+    def write_response(path, status_code, text):
+        path.write_text(text, encoding="utf-8")
+        if status_code != 200:
+            raise RuntimeError(
+                f"request returned HTTP {status_code}, expected 200; response={path}"
+            )
+        body = json.loads(text)
+        if not body.get("choices"):
+            raise RuntimeError(f"request returned no choices: {json.dumps(body)}")
+        return body
+
+
+    def response_signature(body):
+        choice = body["choices"][0]
+        usage = body.get("usage") or {}
+        return {
+            "text": choice.get("text"),
+            "token_ids": choice.get("token_ids"),
+            "finish_reason": choice.get("finish_reason"),
+            "stop_reason": choice.get("stop_reason"),
+            "prompt_tokens": usage.get("prompt_tokens"),
+            "completion_tokens": usage.get("completion_tokens"),
+        }
+
+
+    def normalized_text(text):
+        return " ".join((text or "").split())
+
+
+    def metric_value(metrics_text, name):
+        prefix = f"{name} "
+        for line in metrics_text.splitlines():
+            if line.startswith(prefix):
+                return float(line[len(prefix) :])
+        raise RuntimeError(f"metric not found: {name}")
+
+
+    def request_isolation(text, own_marker, markers):
+        text = text or ""
+        foreign_markers = [
+            marker for marker in markers if marker != own_marker and marker in text
+        ]
+        return own_marker in text and not foreign_markers, foreign_markers
+
+
+    def validate_completion_signature(
+        signature,
+        expected_marker_text,
+        expected_marker_token_ids,
+        own_marker,
+        markers,
+        expected_prompt_tokens,
+        expected_completion_tokens,
+    ):
+        errors = []
+        token_ids = signature.get("token_ids")
+        token_ids_present = isinstance(token_ids, list) and all(
+            type(token_id) is int for token_id in token_ids
+        )
+        generated_token_count = len(token_ids) if token_ids_present else None
+        marker_token_prefix_match = (
+            token_ids_present
+            and token_ids[: len(expected_marker_token_ids)]
+            == expected_marker_token_ids
+        )
+        text = signature.get("text")
+        text_marker_prefix_match = (
+            isinstance(text, str) and text.startswith(expected_marker_text)
+        )
+        isolated, foreign_markers = request_isolation(text, own_marker, markers)
+        if not token_ids_present:
+            errors.append("response token_ids are missing or invalid")
+        elif generated_token_count != expected_completion_tokens:
+            errors.append(
+                f"generated token count expected {expected_completion_tokens}, "
+                f"got {generated_token_count}"
+            )
+        if not marker_token_prefix_match:
+            errors.append("generated token_ids do not start with expected marker token_ids")
+        if not text_marker_prefix_match:
+            errors.append("response text does not start with expected marker text")
+        if foreign_markers:
+            errors.append(f"response text contains foreign markers: {foreign_markers}")
+        if signature.get("prompt_tokens") != expected_prompt_tokens:
+            errors.append(
+                f"usage prompt_tokens expected {expected_prompt_tokens}, "
+                f"got {signature.get('prompt_tokens')}"
+            )
+        if signature.get("completion_tokens") != expected_completion_tokens:
+            errors.append(
+                f"usage completion_tokens expected {expected_completion_tokens}, "
+                f"got {signature.get('completion_tokens')}"
+            )
+        if signature.get("finish_reason") != "length":
+            errors.append(
+                f"finish_reason expected 'length', got "
+                f"{signature.get('finish_reason')!r}"
+            )
+        return {
+            "validated": not errors,
+            "response_token_ids_present": token_ids_present,
+            "generated_token_count": generated_token_count,
+            "generated_token_count_match": generated_token_count
+            == expected_completion_tokens,
+            "marker_token_prefix_match": marker_token_prefix_match,
+            "text_marker_prefix_match": text_marker_prefix_match,
+            "isolated": isolated,
+            "foreign_markers": foreign_markers,
+            "prompt_tokens_match": signature.get("prompt_tokens")
+            == expected_prompt_tokens,
+            "completion_tokens_match": signature.get("completion_tokens")
+            == expected_completion_tokens,
+            "finish_reason_match": signature.get("finish_reason") == "length",
+            "errors": errors,
+        }
+
+
+    def wait_for_master_key_count(client, expected, artifact_name):
+        deadline = time.monotonic() + 30
+        while True:
+            metrics = client.get(master_metrics_url)
+            metrics.raise_for_status()
+            actual = metric_value(metrics.text, "master_key_count")
+            if actual == expected:
+                (output_dir / artifact_name).write_text(
+                    metrics.text, encoding="utf-8"
+                )
+                return actual
+            if actual > expected:
+                raise RuntimeError(
+                    "Mooncake contains more keys than the prompt layout predicts; "
+                    f"expected={expected}, actual={actual:g}"
+                )
+            if time.monotonic() >= deadline:
+                raise RuntimeError(
+                    "Mooncake key count did not reach the expected value; "
+                    f"expected={expected}, actual={actual:g}"
+                )
+            time.sleep(0.5)
+
+
+    async def post_concurrently(url, payloads):
+        limits = httpx.Limits(
+            max_connections=len(payloads),
+            max_keepalive_connections=len(payloads),
+        )
+        async with httpx.AsyncClient(timeout=1200.0, limits=limits) as client:
+            requests = [client.post(url, json=payload) for payload in payloads]
+            responses = await asyncio.gather(*requests)
+        return [(response.status_code, response.text) for response in responses]
+
+
+    def build_payloads(tokenizer):
+        markers = ("CASE_ZERO", "CASE_ONE", "CASE_TWO", "CASE_THREE")
+        names = ("zero", "one", "two", "three")
+        shared_unit = (
+            "Shared layerwise cache content is identical for every concurrent request. "
+        )
+        shared_token_target = expected_shared_blocks * block_size
+        unique_token_target = expected_hit_tokens - shared_token_target
+
+        shared_text = shared_unit
+        while len(tokenizer.encode(shared_text, add_special_tokens=False)) < shared_token_target:
+            shared_text += shared_unit
+        shared_tokens = tokenizer.encode(
+            shared_text, add_special_tokens=False
+        )[:shared_token_target]
+
+        instruction = (
+            "\nQuestion: What is the private cache branch identity marker?"
+            "\nAnswer:"
+        )
+        instruction_tokens = tokenizer.encode(
+            instruction, add_special_tokens=False
+        )
+
+        prompts = []
+        token_ids_by_case = []
+        for index, (name, marker) in enumerate(zip(names, markers)):
+            unique_unit = (
+                f"Private cache branch {name} belongs only to request {index}; "
+                f"its identity marker is {marker}. "
+            )
+            unique_text = unique_unit
+            while len(tokenizer.encode(unique_text, add_special_tokens=False)) < unique_token_target:
+                unique_text += unique_unit
+            unique_tokens = tokenizer.encode(
+                unique_text, add_special_tokens=False
+            )[:unique_token_target]
+            cached_tokens = shared_tokens + unique_tokens
+            cached_text = tokenizer.decode(cached_tokens)
+            if marker not in cached_text:
+                raise RuntimeError(
+                    f"case {index} marker is not present in its cached tokens"
+                )
+            token_ids = cached_tokens + instruction_tokens
+            prompts.append(token_ids)
+            token_ids_by_case.append(token_ids)
+
+        uncached_suffixes = {
+            tuple(token_ids[expected_hit_tokens:])
+            for token_ids in token_ids_by_case
+        }
+        if len(uncached_suffixes) != 1:
+            raise RuntimeError("uncached prompt suffix differs across cases")
+        uncached_text = tokenizer.decode(next(iter(uncached_suffixes)))
+        leaked_markers = [marker for marker in markers if marker in uncached_text]
+        if leaked_markers:
+            raise RuntimeError(
+                f"request markers leaked into the uncached suffix: {leaked_markers}"
+            )
+
+        common_blocks = 0
+        for block_index in range(expected_hit_blocks):
+            start = block_index * block_size
+            stop = start + block_size
+            blocks = {
+                tuple(token_ids[start:stop]) for token_ids in token_ids_by_case
+            }
+            if len(blocks) == 1:
+                if block_index != common_blocks:
+                    raise RuntimeError("prompt branches converge after diverging")
+                common_blocks += 1
+            elif len(blocks) != concurrency:
+                raise RuntimeError(
+                    "prompt branch blocks are not fully isolated; "
+                    f"block={block_index}, distinct={len(blocks)}"
+                )
+
+        if common_blocks != expected_shared_blocks:
+            raise RuntimeError(
+                "unexpected shared block count; "
+                f"expected={expected_shared_blocks}, actual={common_blocks}"
+            )
+
+        expected_keys = common_blocks + concurrency * (
+            expected_hit_blocks - common_blocks
+        )
+        payloads = [
+            {
+                "model": served_model,
+                "prompt": prompt,
+                "max_tokens": 16,
+                "temperature": 0,
+                "seed": 2026072300 + index,
+                "stream": False,
+                "return_token_ids": True,
+            }
+            for index, prompt in enumerate(prompts)
+        ]
+        layout = {
+            "shared_blocks": common_blocks,
+            "shared_prefix_tokens": len(shared_tokens),
+            "unique_blocks_per_case": expected_hit_blocks - common_blocks,
+            "prompt_tokens_by_case": [len(tokens) for tokens in token_ids_by_case],
+            "uncached_suffix_tokens": len(instruction_tokens),
+            "uncached_suffix_identical": True,
+            "markers": list(markers),
+            "expected_marker_texts": [f" {marker}" for marker in markers],
+            "expected_marker_token_ids": [
+                tokenizer.encode(f" {marker}", add_special_tokens=False)
+                for marker in markers
+            ],
+        }
+        return payloads, markers, expected_keys, layout
+
+
+    def baseline_case(index, status_code, body, markers, payloads, layout):
+        signature = response_signature(body)
+        checks = validate_completion_signature(
+            signature,
+            layout["expected_marker_texts"][index],
+            layout["expected_marker_token_ids"][index],
+            markers[index],
+            markers,
+            len(payloads[index]["prompt"]),
+            payloads[index]["max_tokens"],
+        )
+        return {
+            "case": index,
+            "marker": markers[index],
+            "seed": payloads[index]["seed"],
+            "http_status": status_code,
+            "response_id": body.get("id"),
+            "signature": signature,
+            "hard_gate_checks": checks,
+            "request_isolation": checks["isolated"],
+            "foreign_markers": checks["foreign_markers"],
+            "validated": checks["validated"],
+            "classification": "recompute_baseline" if checks["validated"] else "invalid",
+        }
+
+
+    def compare_case(index, status_code, body, baseline, markers, payloads, layout):
+        signature = response_signature(body)
+        baseline_signature = baseline["signature"]
+        exact_match = signature == baseline_signature
+        normalized_match = (
+            normalized_text(signature["text"])
+            == normalized_text(baseline_signature["text"])
+        )
+        metadata_match = {
+            key: value for key, value in signature.items() if key != "text"
+        } == {
+            key: value for key, value in baseline_signature.items() if key != "text"
+        }
+        checks = validate_completion_signature(
+            signature,
+            layout["expected_marker_texts"][index],
+            layout["expected_marker_token_ids"][index],
+            markers[index],
+            markers,
+            len(payloads[index]["prompt"]),
+            payloads[index]["max_tokens"],
+        )
+        return {
+            "case": index,
+            "marker": markers[index],
+            "seed": payloads[index]["seed"],
+            "http_status": status_code,
+            "response_id": body.get("id"),
+            "baseline_response_id": baseline["response_id"],
+            "signature": signature,
+            "baseline_signature": baseline_signature,
+            "exact_match": exact_match,
+            "normalized_match": normalized_match,
+            "metadata_match": metadata_match,
+            "hard_gate_checks": checks,
+            "request_isolation": checks["isolated"],
+            "foreign_markers": checks["foreign_markers"],
+            "serial_replay_response_id": None,
+            "serial_replay_http_status": None,
+            "serial_replay_signature": None,
+            "serial_replay_match": None,
+            "validated": False,
+            "classification": "pending",
+        }
+
+
+    def run_concurrent_phase(client, phase_name, url, payloads, markers, baselines, layout):
+        phase = summary["phases"][phase_name]
+        phase["status"] = "running"
+        write_summary()
+        responses = asyncio.run(post_concurrently(url, payloads))
+        for index, (status_code, text) in enumerate(responses):
+            artifact = output_dir / f"{phase_name}-{index}.json"
+            body = write_response(artifact, status_code, text)
+            phase["cases"].append(
+                compare_case(
+                    index, status_code, body, baselines[index], markers, payloads, layout
+                )
+            )
+            write_summary()
+
+        for case in phase["cases"]:
+            if case["exact_match"]:
+                continue
+            index = case["case"]
+            replay = client.post(url, json=payloads[index])
+            artifact = output_dir / f"{phase_name}-serial-replay-{index}.json"
+            replay_body = write_response(artifact, replay.status_code, replay.text)
+            replay_signature = response_signature(replay_body)
+            replay_checks = validate_completion_signature(
+                replay_signature,
+                layout["expected_marker_texts"][index],
+                layout["expected_marker_token_ids"][index],
+                markers[index],
+                markers,
+                len(payloads[index]["prompt"]),
+                payloads[index]["max_tokens"],
+            )
+            case["serial_replay_response_id"] = replay_body.get("id")
+            case["serial_replay_http_status"] = replay.status_code
+            case["serial_replay_signature"] = replay_signature
+            case["serial_replay_match"] = (
+                replay_signature == case["baseline_signature"]
+            )
+            case["serial_replay_hard_gate_checks"] = replay_checks
+            case["serial_replay_isolation"] = replay_checks["isolated"]
+            case["serial_replay_foreign_markers"] = replay_checks["foreign_markers"]
+            write_summary()
+
+        for case in phase["cases"]:
+            case["validated"] = case["hard_gate_checks"]["validated"]
+            if not case["validated"]:
+                case["classification"] = "invalid"
+            elif case["exact_match"]:
+                case["classification"] = "exact_match"
+            else:
+                case["classification"] = "hard_gates_passed_with_generation_variation"
+
+        phase["validated_cases"] = sum(case["validated"] for case in phase["cases"])
+        phase["exact_matches"] = sum(case["exact_match"] for case in phase["cases"])
+        phase["validated"] = phase["validated_cases"] == concurrency
+        phase["status"] = "passed" if phase["validated"] else "failed"
+        write_summary()
+
+
+    def run():
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        payloads, markers, expected_keys, layout = build_payloads(tokenizer)
+        summary["expected_master_key_count"] = expected_keys
+        summary["prompt_layout"] = layout
+        summary["status"] = "running"
+        write_summary()
+
+        with httpx.Client(timeout=1200.0) as client:
+            health = client.get("http://vllm-proxy-service:8000/health")
+            health.raise_for_status()
+            endpoints = client.get("http://vllm-proxy-service:8000/listEndPoints")
+            endpoints.raise_for_status()
+            endpoint_body = endpoints.json()
+            prefiller_count = len(endpoint_body.get("prefill_nodes", []))
+            decoder_count = len(endpoint_body.get("decode_nodes", []))
+            if prefiller_count != 1 or decoder_count != 1:
+                raise RuntimeError(
+                    "proxy did not discover exactly one engine for each role: "
+                    f"{endpoint_body}"
+                )
+            (output_dir / "proxy-endpoints.json").write_text(
+                json.dumps(endpoint_body, indent=2), encoding="utf-8"
+            )
+            decoder_url = (
+                endpoint_body["decode_nodes"][0]["endpoint"] + "/v1/completions"
+            )
+
+            baseline_phase = summary["phases"]["empty_pool_baseline"]
+            baseline_phase["status"] = "running"
+            initial_metrics = client.get(master_metrics_url)
+            initial_metrics.raise_for_status()
+            (output_dir / "mooncake-master-initial.metrics").write_text(
+                initial_metrics.text, encoding="utf-8"
+            )
+            initial_key_count = metric_value(initial_metrics.text, "master_key_count")
+            baseline_phase["master_key_count_before"] = initial_key_count
+            write_summary()
+            if initial_key_count != 0:
+                raise RuntimeError(
+                    "concurrent correctness test requires an empty Mooncake pool; "
+                    f"master_key_count={initial_key_count:g}. Restart Mooncake Master "
+                    "before running smoke-test.py"
+                )
+
+            responses = asyncio.run(post_concurrently(decoder_url, payloads))
+            for index, (status_code, text) in enumerate(responses):
+                artifact = output_dir / f"empty-pool-baseline-{index}.json"
+                body = write_response(artifact, status_code, text)
+                baseline_phase["cases"].append(
+                    baseline_case(index, status_code, body, markers, payloads, layout)
+                )
+                write_summary()
+
+            post_baseline_metrics = client.get(master_metrics_url)
+            post_baseline_metrics.raise_for_status()
+            baseline_key_count = metric_value(
+                post_baseline_metrics.text, "master_key_count"
+            )
+            (output_dir / "mooncake-master-after-baseline.metrics").write_text(
+                post_baseline_metrics.text, encoding="utf-8"
+            )
+            baseline_phase["master_key_count_after"] = baseline_key_count
+            baseline_phase["validated"] = (
+                baseline_key_count == 0
+                and all(case["validated"] for case in baseline_phase["cases"])
+            )
+            baseline_phase["status"] = (
+                "passed" if baseline_phase["validated"] else "failed"
+            )
+            write_summary()
+            if not baseline_phase["validated"]:
+                raise RuntimeError(
+                    "empty-pool decoder baseline failed request isolation or "
+                    f"unexpectedly populated Mooncake; master_key_count={baseline_key_count:g}"
+                )
+
+            warmup_phase = summary["phases"]["warmup"]
+            warmup_phase["status"] = "running"
+            write_summary()
+            warmup_steps = (
+                (0, "populate"),
+                (0, "reuse"),
+                (1, "populate"),
+                (2, "populate"),
+                (3, "populate"),
+            )
+            for index, operation in warmup_steps:
+                response = client.post(proxy_url, json=payloads[index])
+                artifact = output_dir / f"warmup-case-{index}-{operation}.json"
+                body = write_response(artifact, response.status_code, response.text)
+                signature = response_signature(body)
+                checks = validate_completion_signature(
+                    signature,
+                    layout["expected_marker_texts"][index],
+                    layout["expected_marker_token_ids"][index],
+                    markers[index],
+                    markers,
+                    len(payloads[index]["prompt"]),
+                    payloads[index]["max_tokens"],
+                )
+                warmup_phase["cases"].append(
+                    {
+                        "case": index,
+                        "operation": operation,
+                        "marker": markers[index],
+                        "http_status": response.status_code,
+                        "response_id": body.get("id"),
+                        "signature": signature,
+                        "hard_gate_checks": checks,
+                        "request_isolation": checks["isolated"],
+                        "foreign_markers": checks["foreign_markers"],
+                        "validated": checks["validated"],
+                        "classification": "hard_gates_passed" if checks["validated"] else "invalid",
+                    }
+                )
+                write_summary()
+                if index == 0 and operation == "populate":
+                    warmup_phase["case_zero_populate_key_count"] = (
+                        wait_for_master_key_count(
+                            client,
+                            expected_hit_blocks,
+                            "mooncake-master-after-case-zero-populate.metrics",
+                        )
+                    )
+                    write_summary()
+
+            warmup_phase["master_key_count_after"] = wait_for_master_key_count(
+                client, expected_keys, "mooncake-master-after-warmup.metrics"
+            )
+            warmup_phase["validated"] = all(
+                case["validated"] for case in warmup_phase["cases"]
+            )
+            warmup_phase["status"] = (
+                "passed" if warmup_phase["validated"] else "failed"
+            )
+            write_summary()
+
+            baselines = baseline_phase["cases"]
+            run_concurrent_phase(
+                client,
+                "direct_kv_load",
+                decoder_url,
+                payloads,
+                markers,
+                baselines,
+                layout,
+            )
+            direct_metrics = client.get(master_metrics_url)
+            direct_metrics.raise_for_status()
+            (output_dir / "mooncake-master-after-direct-kv-load.metrics").write_text(
+                direct_metrics.text, encoding="utf-8"
+            )
+            direct_phase = summary["phases"]["direct_kv_load"]
+            direct_phase["master_key_count_after"] = metric_value(
+                direct_metrics.text, "master_key_count"
+            )
+            if direct_phase["master_key_count_after"] != expected_keys:
+                direct_phase["validated"] = False
+                direct_phase["status"] = "failed"
+            write_summary()
+
+            run_concurrent_phase(
+                client,
+                "proxy_kv_load",
+                proxy_url,
+                payloads,
+                markers,
+                baselines,
+                layout,
+            )
+
+            final_metrics = client.get(master_metrics_url)
+            final_metrics.raise_for_status()
+            (output_dir / "mooncake-master.metrics").write_text(
+                final_metrics.text, encoding="utf-8"
+            )
+            summary["actual_master_key_count"] = metric_value(
+                final_metrics.text, "master_key_count"
+            )
+            proxy_phase = summary["phases"]["proxy_kv_load"]
+            proxy_phase["master_key_count_after"] = summary[
+                "actual_master_key_count"
+            ]
+            if proxy_phase["master_key_count_after"] != expected_keys:
+                proxy_phase["validated"] = False
+                proxy_phase["status"] = "failed"
+            write_summary()
+
+        direct_valid = summary["phases"]["direct_kv_load"]["validated"]
+        proxy_valid = summary["phases"]["proxy_kv_load"]["validated"]
+        warmup_valid = summary["phases"]["warmup"]["validated"]
+        summary["validated"] = direct_valid and proxy_valid and warmup_valid
+        if not direct_valid:
+            summary["diagnosis"] = "decoder_concurrent_kv_load_failure"
+        elif not proxy_valid or not warmup_valid:
+            summary["diagnosis"] = "proxy_or_prefiller_concurrent_path_failure"
+        else:
+            summary["diagnosis"] = "passed"
+        summary["status"] = "passed" if summary["validated"] else "failed"
+        write_summary()
+
+        if not summary["validated"]:
+            raise RuntimeError(
+                "concurrent KV-load correctness validation failed; "
+                f"diagnosis={summary['diagnosis']}; summary={summary_path}"
+            )
+
+        print(
+            f"prompt layout: {layout['shared_blocks']} shared blocks + "
+            f"{layout['unique_blocks_per_case']} unique blocks per case"
+        )
+        print(
+            "concurrent KV-load correctness: direct decoder and proxy phases "
+            f"validated {concurrency}/{concurrency} cases"
+        )
+        print(f"smoke artifacts: {output_dir}")
+
+
+    write_summary()
+    try:
+        run()
+    except Exception as error:
+        if summary["status"] != "failed":
+            summary["status"] = "failed"
+            summary["validated"] = False
+        if summary["diagnosis"] == "not_completed":
+            summary["diagnosis"] = "setup_or_execution_failure"
+        summary["error"] = {
+            "type": type(error).__name__,
+            "message": str(error),
+        }
+        write_summary()
+        raise
+  start-decode.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
+
+    pid_file=/tmp/vllm-decode.pid
+    log_file=/tmp/vllm-decode.log
+
+    if [[ -e "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      old_state=$(pid_process_state "${old_pid}")
+      if [[ ${old_state} == live ]]; then
+        echo "decode vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      echo "clearing stale decode PID file: PID ${old_pid:-unset} is ${old_state}"
+      rm -f "${pid_file}"
+    fi
+
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 \
+      --port 8200 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend \
+      --trust-remote-code \
+      --enforce-eager \
+      --data-parallel-size 1 \
+      --tensor-parallel-size 1 \
+      --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 \
+      --decode-context-parallel-size 1 \
+      --block-size 128 \
+      --enable-chunked-prefill \
+      --max-model-len 4096 \
+      --max-num-batched-tokens 1024 \
+      --max-num-seqs 4 \
+      --no-enable-prefix-caching \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config '{"kv_connector":"AscendStoreConnector","kv_role":"kv_consumer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0,"consumer_is_to_load":true}}' \
+      >"${log_file}" 2>&1 </dev/null &
+
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if [[ $(pid_process_state "${new_pid}") != live ]]; then
+      echo "decode vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+
+    echo "decode vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  start-prefill.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
+
+    pid_file=/tmp/vllm-prefill.pid
+    log_file=/tmp/vllm-prefill.log
+    kv_transfer_config=${PREFILL_KV_TRANSFER_CONFIG:-'{"kv_connector":"AscendStoreConnector","kv_role":"kv_producer","kv_load_failure_policy":"fail","kv_connector_extra_config":{"backend":"mooncake","use_layerwise":true,"layerwise_prefetch_layers":1,"lookup_rpc_port":0}}'}
+
+    if [[ -e "${pid_file}" ]]; then
+      old_pid="$(<"${pid_file}")"
+      old_state=$(pid_process_state "${old_pid}")
+      if [[ ${old_state} == live ]]; then
+        echo "prefill vLLM is already running with PID ${old_pid}" >&2
+        exit 1
+      fi
+      echo "clearing stale prefill PID file: PID ${old_pid:-unset} is ${old_state}"
+      rm -f "${pid_file}"
+    fi
+
+    : >"${log_file}"
+    nohup env VLLM_USE_V1=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --host 0.0.0.0 \
+      --port 8100 \
+      --model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --served-model-name vllm-ascend/DeepSeek-V2-Lite-W8A8 \
+      --quantization ascend \
+      --trust-remote-code \
+      --enforce-eager \
+      --data-parallel-size 1 \
+      --tensor-parallel-size 1 \
+      --pipeline-parallel-size 1 \
+      --prefill-context-parallel-size 1 \
+      --decode-context-parallel-size 1 \
+      --block-size 128 \
+      --enable-chunked-prefill \
+      --max-model-len 4096 \
+      --max-num-batched-tokens 1024 \
+      --max-num-seqs 4 \
+      --no-enable-prefix-caching \
+      --gpu-memory-utilization 0.90 \
+      --kv-transfer-config "${kv_transfer_config}" \
+      >"${log_file}" 2>&1 </dev/null &
+
+    new_pid=$!
+    echo "${new_pid}" >"${pid_file}"
+    sleep 3
+    if [[ $(pid_process_state "${new_pid}") != live ]]; then
+      echo "prefill vLLM exited during startup; recent log follows" >&2
+      tail -n 80 "${log_file}" >&2 || true
+      rm -f "${pid_file}"
+      exit 1
+    fi
+
+    echo "prefill vLLM started with PID ${new_pid}"
+    echo "log: ${log_file}"
+  stop-engine.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    source /opt/vllm-layerwise/pid-state.sh
+
+    if [[ $# -ne 1 || ( "$1" != "prefill" && "$1" != "decode" ) ]]; then
+      echo "usage: $0 <prefill|decode>" >&2
+      exit 2
+    fi
+
+    role=$1
+    pid_file="/tmp/vllm-${role}.pid"
+    if [[ ! -e "${pid_file}" ]]; then
+      echo "${role} vLLM has no PID file"
+      exit 0
+    fi
+
+    pid="$(<"${pid_file}")"
+    state=$(pid_process_state "${pid}")
+    if [[ ${state} != live ]]; then
+      echo "${role} vLLM PID ${pid:-unset} is ${state}"
+      rm -f "${pid_file}"
+      exit 0
+    fi
+
+    kill -TERM "${pid}" 2>/dev/null || true
+    for _ in $(seq 1 60); do
+      state=$(pid_process_state "${pid}")
+      if [[ ${state} != live ]]; then
+        rm -f "${pid_file}"
+        echo "${role} vLLM stopped; PID ${pid} is ${state}"
+        exit 0
+      fi
+      sleep 1
+    done
+
+    echo "${role} vLLM did not exit after 60 seconds; sending SIGKILL" >&2
+    kill -KILL "${pid}" 2>/dev/null || true
+    for _ in $(seq 1 10); do
+      state=$(pid_process_state "${pid}")
+      if [[ ${state} != live ]]; then
+        rm -f "${pid_file}"
+        echo "${role} vLLM stopped after SIGKILL; PID ${pid} is ${state}"
+        exit 0
+      fi
+      sleep 1
+    done
+    echo "${role} vLLM PID ${pid} remains live after SIGKILL" >&2
+    exit 1
+kind: ConfigMap
+metadata:
+  name: layerwise-runtime-config
+  namespace: liangjiahao
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mooncake-master-service
+  namespace: liangjiahao
+spec:
+  ports:
+  - name: master-rpc
+    port: 30089
+    protocol: TCP
+    targetPort: master-rpc
+  - name: metrics
+    port: 9003
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app: mooncake-master
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mooncake-master-deployment
+  namespace: liangjiahao
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mooncake-master
+  template:
+    metadata:
+      labels:
+        app: mooncake-master
+    spec:
+      containers:
+      - args:
+        - exec mooncake_master --rpc_port=50001 --metrics_port=9003 --default_kv_lease_ttl=30s
+          --enable_offload=false --logtostderr=true
+        command:
+        - /bin/bash
+        - -lc
+        image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z
+        imagePullPolicy: Never
+        name: mooncake-master
+        ports:
+        - containerPort: 50001
+          name: master-rpc
+        - containerPort: 9003
+          name: metrics
+        readinessProbe:
+          failureThreshold: 20
+          initialDelaySeconds: 2
+          periodSeconds: 3
+          tcpSocket:
+            port: master-rpc
+      nodeName: m1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prefill-engine-deployment
+  namespace: liangjiahao
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prefill
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prefill
+    spec:
+      containers:
+      - args:
+        - exec sleep infinity
+        command:
+        - /bin/bash
+        - -lc
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: HCCL_IF_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: GLOO_SOCKET_IFNAME
+          value: eth0
+        - name: TP_SOCKET_IFNAME
+          value: eth0
+        - name: HCCL_SOCKET_IFNAME
+          value: eth0
+        - name: HCCL_INTRA_ROCE_ENABLE
+          value: "1"
+        - name: ASCEND_BUFFER_POOL
+          value: "4:8"
+        - name: MOONCAKE_CONFIG_PATH
+          value: /opt/vllm-layerwise/mooncake.json
+        - name: MOONCAKE_MASTER
+          value: mooncake-master-service:30089
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: PYTHONHASHSEED
+          value: "0"
+        - name: PYTHONDONTWRITEBYTECODE
+          value: "1"
+        - name: MOONCAKE_GLOBAL_SEGMENT_SIZE
+          value: 128GB
+        image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z
+        imagePullPolicy: Never
+        name: prefill-engine
+        ports:
+        - containerPort: 8100
+          name: prefill-port
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /v1/models
+            port: prefill-port
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          limits:
+            huawei.com/Ascend910: "1"
+          requests:
+            huawei.com/Ascend910: "1"
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: shm
+        - mountPath: /usr/local/dcmi
+          name: dcmi
+        - mountPath: /usr/local/bin/npu-smi
+          name: npusmi
+        - mountPath: /usr/local/Ascend/driver/lib64
+          name: driver-lib64
+        - mountPath: /usr/local/Ascend/driver/version.info
+          name: driver-version
+        - mountPath: /etc/ascend_install.info
+          name: ascend-install-info
+        - mountPath: /root/.cache
+          name: model-cache
+        - mountPath: /usr/bin/hccn_tool
+          name: hccn-tool
+        - mountPath: /etc/hccn.conf
+          name: hccn-conf
+        - mountPath: /opt/vllm-layerwise
+          name: runtime-config
+          readOnly: true
+      nodeName: m1
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 24Gi
+        name: shm
+      - hostPath:
+          path: /usr/local/dcmi
+          type: Directory
+        name: dcmi
+      - hostPath:
+          path: /usr/local/bin/npu-smi
+          type: File
+        name: npusmi
+      - hostPath:
+          path: /usr/local/Ascend/driver/lib64
+          type: Directory
+        name: driver-lib64
+      - hostPath:
+          path: /usr/local/Ascend/driver/version.info
+          type: File
+        name: driver-version
+      - hostPath:
+          path: /etc/ascend_install.info
+          type: File
+        name: ascend-install-info
+      - hostPath:
+          path: /home/llm_cache
+          type: Directory
+        name: model-cache
+      - hostPath:
+          path: /usr/bin/hccn_tool
+          type: File
+        name: hccn-tool
+      - hostPath:
+          path: /etc/hccn.conf
+          type: File
+        name: hccn-conf
+      - configMap:
+          defaultMode: 365
+          name: layerwise-runtime-config
+        name: runtime-config

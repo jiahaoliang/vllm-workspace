@@ -94,8 +94,23 @@ config marker validation, tokenizer-link validation, and fixture archive; its
 2.8 MB root checksum manifest digest is
 `f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873`.
 
-Node `m1` remains Ready but advertises zero allocatable physical Ascend910
-resources. Generation 11 is therefore `BLOCKED`, `ready=false`; no serving Pod
-or inference request was started. The read-only gate requires exactly eight
-allocatable physical `huawei.com/Ascend910` resources and at least four free,
-and deliberately ignores `huawei.com/vnpu-number`.
+The administrator restored the physical Ascend device plugin on `m1`. The
+read-only gate now reports exactly eight allocatable
+`huawei.com/Ascend910` resources; it reported eight free before validation and
+again after cleanup, while deliberately ignoring `huawei.com/vnpu-number`.
+
+Candidate functional run `20260812T023541Z` used the exact `57d3c214e` image
+above on `m1`. Its no-reuse baseline, `kv_producer` REUSE3, and `kv_both`
+REUSE3 cold/warm requests passed with identical responses. The strict validator
+proved all 27 layers, five physical slots, logical memory factor 5.4, and
+all-zero ranged save/load/commit results. All 63 runtime ledger steps passed;
+each case released its NPU and ended with Mooncake Master `0/0/0`.
+
+Current-candidate CPU/mock reruns passed the complete performance harness
+(`91`), focused self-load regression (`1`), Mooncake layer-session class (`27`),
+and complete AscendStore suite (`516`) in the no-NPU, no-hostPath UT Pod.
+Candidate source-delta Ruff including import checks, performance-delta Ruff
+core checks, Python compilation, and `git diff --check` passed. The compact
+89-file functional evidence root is
+`evidence/shared-buffer-functional-20260812T023541Z`; its checksum manifest
+digest is `0c80987652db2189bd8cf7d91b7bd666622696353660b8f32d01eab3a95a3f96`.

@@ -1013,3 +1013,31 @@
   request, or AISBench inference traffic was started. Administrator restoration
   of NPU registration, candidate NPU correctness for `kv_producer`/`kv_both`,
   and the fresh five-point rerun remain pending.
+
+## 2026-08-12
+
+- Revalidated device-plugin recovery on `m1`: Kubernetes reports exactly eight
+  allocatable physical `huawei.com/Ascend910` resources. The pre-run and final
+  post-cleanup gates both passed; final free capacity is eight and
+  `huawei.com/vnpu-number` remains excluded from accounting.
+- Ran candidate functional acceptance under run ID `20260812T023541Z` with
+  image
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`.
+  The live Pod imageID, embedded vLLM/vLLM-Ascend/Mooncake HEADs, and
+  `pool_worker.py` SHA-256 matched the frozen candidate.
+- The no-reuse baseline, `kv_producer` REUSE3, and `kv_both` REUSE3 cold/warm
+  cases completed 63/63 runner steps. All four 525+16-token responses were
+  identical; the validator proved 27-layer ranged traffic, five physical
+  slots, logical memory factor 5.4, expected 4/20/36 key counts, no whole-key
+  calls, and no timeout, traceback, or corruption.
+- Re-ran candidate CPU/mock gates in the dedicated no-NPU UT Pod: performance
+  harness `91 passed`, focused self-load `1 passed`, Mooncake layer-session
+  `27 passed`, and complete AscendStore `516 passed`. Ruff 0.16.2, in-memory
+  compilation, and `git diff --check` passed at their recorded scopes.
+- Deleted only the temporary functional Prefill/Mooncake resources; retained
+  the CPU-only AISBench and UT Pods. Final host NPU process state was empty and
+  Kubernetes readiness returned `allocatable=8`, `free=8`.
+- Imported a compact 1.8 MB, 89-file evidence root at
+  `evidence/shared-buffer-functional-20260812T023541Z`. Its independent
+  validator and checksum replay passed; root `SHA256SUMS` digest is
+  `0c80987652db2189bd8cf7d91b7bd666622696353660b8f32d01eab3a95a3f96`.

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "20260812T023541Z",
+  "control_parent": "dfe9b805b6647bafb4d25f03f8ace1599f5f1832",
+  "namespace": "liangjiahao",
+  "node": "m1",
+  "resource": "huawei.com/Ascend910",
+  "vnpu_number_ignored": true,
+  "commits": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+  "image_manifest_digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "image_config_digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+  "model": "vllm-ascend/DeepSeek-V2-Lite-W8A8",
+  "functional_matrix": [
+    {"case": "baseline", "kv_role": "kv_producer", "layerwise_num_shared_buffers": null, "requests": 1},
+    {"case": "producer-reuse", "kv_role": "kv_producer", "layerwise_num_shared_buffers": 3, "requests": 1},
+    {"case": "both-reuse", "kv_role": "kv_both", "layerwise_num_shared_buffers": 3, "requests": 2}
+  ],
+  "expected": {
+    "logical_layers": 27,
+    "shared_buffers": 3,
+    "physical_slots": 5,
+    "logical_memory_factor": 5.4,
+    "prompt_tokens": 525,
+    "completion_tokens": 16
+  }
+}

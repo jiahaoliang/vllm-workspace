@@ -1,0 +1,15 @@
+{
+  "environment": "liangjiahao/vllm-ascend-ut CPU/mock Pod on m1",
+  "errors": [],
+  "gates": {
+    "ascend_store": "516 passed",
+    "focused_self_load_regression": "1 passed",
+    "mooncake_layer_session": "27 passed"
+  },
+  "host_path_mounted": false,
+  "npu_requested": false,
+  "schema_version": 1,
+  "source_head": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+  "status": "passed",
+  "validated": true
+}

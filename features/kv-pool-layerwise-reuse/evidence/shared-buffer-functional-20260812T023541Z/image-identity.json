@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "validated": true,
+  "reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+  "platform": "linux/arm64",
+  "manifest_digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "config_digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+  "labels": {
+    "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "org.opencontainers.image.vllm-ascend.commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "embedded_heads": {
+    "vllm": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vllm_ascend": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "mooncake": "df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+  },
+  "pool_worker_sha256": "54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea",
+  "live_functional_pod_image_id": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+  "errors": []
+}

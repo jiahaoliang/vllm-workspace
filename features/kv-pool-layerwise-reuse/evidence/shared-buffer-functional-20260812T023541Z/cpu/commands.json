@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "environment": "liangjiahao/vllm-ascend-ut",
+  "source_head": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+  "commands": [
+    "python3 -m pytest -q performance/tests",
+    "python3 -m pytest -q tests/ut/distributed/ascend_store/test_pool_worker.py::TestKVPoolWorkerMooncakeLayerSessions::test_no_reuse_next_chunk_does_not_reload_prior_complete_keys",
+    "python3 -m pytest -q tests/ut/distributed/ascend_store/test_pool_worker.py::TestKVPoolWorkerMooncakeLayerSessions",
+    "python3 -m pytest -q tests/ut/distributed/ascend_store",
+    "ruff 0.16.2 check --select E4,E7,E9,F,I <candidate two-file source delta>",
+    "ruff 0.16.2 check --select E4,E7,E9,F <generation-11 eleven-file performance delta>",
+    "compile() candidate two-file source delta and twenty performance Python files",
+    "git diff --check in control and vLLM-Ascend repositories"
+  ]
+}
