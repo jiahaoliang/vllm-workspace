@@ -1,0 +1,19 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "chroot",
+  "/performance-workspace/rootfs",
+  "env",
+  "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "/client-tools/venv/bin/python",
+  "-c",
+  "import json, sys\nfrom pathlib import Path\nfrom urllib.request import Request, urlopen\ninput_tokens, output_tokens = map(int, sys.argv[1:])\nfixture = Path(f\"/client-tools/fixtures/tokens-{input_tokens}-c8/warmup.jsonl\")\nprompt = json.loads(fixture.read_text(encoding=\"utf-8\").splitlines()[0])[\"question\"]\npayload = json.dumps({\n    \"model\": \"vllm-ascend/DeepSeek-V2-Lite-W8A8\",\n    \"prompt\": prompt,\n    \"max_tokens\": output_tokens,\n    \"temperature\": 0,\n    \"ignore_eos\": True,\n    \"stream\": False,\n}).encode()\nrequest = Request(\n    \"http://vllm-proxy-service:8000/v1/completions\",\n    data=payload,\n    headers={\"Content-Type\": \"application/json\"},\n)\nwith urlopen(request, timeout=1800) as response:\n    assert response.status == 200, response.status\n    body = json.loads(response.read())\nusage = body[\"usage\"]\nassert usage[\"prompt_tokens\"] == input_tokens, usage\nassert usage[\"completion_tokens\"] == output_tokens, usage\nassert len(body[\"choices\"]) == 1, body\nprint(json.dumps(body, sort_keys=True))\n",
+  "16384",
+  "1"
+]

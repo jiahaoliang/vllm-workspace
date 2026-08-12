@@ -1,0 +1,476 @@
+(APIServer pid=88) INFO:     192.168.200.27:49718 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO 08-12 14:42:21 [loggers.py:273] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 0.0%
+(APIServer pid=88) INFO:     192.168.200.27:49720 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:53010 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:53020 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:52772 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:52786 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:46 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-93ae1466-1e30-48dd-a5e4-12d39984faec-0-b05bd58a hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:46 [pool_scheduler.py:663] Reqid: cmpl-93ae1466-1e30-48dd-a5e4-12d39984faec-0-b05bd58a, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:46 [pool_scheduler.py:683] KV pool load spec created req=cmpl-93ae1466-1e30-48dd-a5e4-12d39984faec-0-b05bd58a vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:46 [core.py:452] Iteration(976): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 433.11 ms
+(APIServer pid=88) INFO:     192.168.200.27:39542 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:47 [core.py:452] Iteration(977): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.78 ms
+(EngineCore pid=126) INFO 08-12 14:42:47 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-4275929b-5441-4046-92d5-55e24f6d5447-0-94d63157 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:47 [pool_scheduler.py:663] Reqid: cmpl-4275929b-5441-4046-92d5-55e24f6d5447-0-94d63157, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:47 [pool_scheduler.py:683] KV pool load spec created req=cmpl-4275929b-5441-4046-92d5-55e24f6d5447-0-94d63157 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:47 [core.py:452] Iteration(978): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.97 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:47 [core.py:452] Iteration(979): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 313.36 ms
+(EngineCore pid=126) INFO 08-12 14:42:48 [core.py:452] Iteration(980): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 285.89 ms
+(EngineCore pid=126) INFO 08-12 14:42:48 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-476339f1-9922-4156-92f7-b9d5166076d2-0-9fd9d3bf hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:48 [pool_scheduler.py:663] Reqid: cmpl-476339f1-9922-4156-92f7-b9d5166076d2-0-9fd9d3bf, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:48 [pool_scheduler.py:683] KV pool load spec created req=cmpl-476339f1-9922-4156-92f7-b9d5166076d2-0-9fd9d3bf vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:48 [core.py:452] Iteration(981): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 300.42 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:48 [core.py:452] Iteration(982): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 314.16 ms
+(EngineCore pid=126) INFO 08-12 14:42:49 [core.py:452] Iteration(983): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.96 ms
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-cdbf0e27-4b97-4bb5-94d7-7b1dd8600434-0-b31ab0c3 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:663] Reqid: cmpl-cdbf0e27-4b97-4bb5-94d7-7b1dd8600434-0-b31ab0c3, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:683] KV pool load spec created req=cmpl-cdbf0e27-4b97-4bb5-94d7-7b1dd8600434-0-b31ab0c3 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:49 [core.py:452] Iteration(984): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 285.99 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:49 [core.py:452] Iteration(985): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.36 ms
+(EngineCore pid=126) INFO 08-12 14:42:49 [core.py:452] Iteration(986): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 303.73 ms
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-66185f33-4d5d-4efd-bd69-6209295938de-0-974f45b7 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:663] Reqid: cmpl-66185f33-4d5d-4efd-bd69-6209295938de-0-974f45b7, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:49 [pool_scheduler.py:683] KV pool load spec created req=cmpl-66185f33-4d5d-4efd-bd69-6209295938de-0-974f45b7 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:50 [core.py:452] Iteration(987): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 309.21 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:50 [core.py:452] Iteration(988): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.16 ms
+(EngineCore pid=126) INFO 08-12 14:42:50 [core.py:452] Iteration(989): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 283.03 ms
+(EngineCore pid=126) INFO 08-12 14:42:50 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-0bef7fe2-c942-45ec-a3a3-fd8b7ce288dc-0-9146ed22 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:50 [pool_scheduler.py:663] Reqid: cmpl-0bef7fe2-c942-45ec-a3a3-fd8b7ce288dc-0-9146ed22, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:50 [pool_scheduler.py:683] KV pool load spec created req=cmpl-0bef7fe2-c942-45ec-a3a3-fd8b7ce288dc-0-9146ed22 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:51 [core.py:452] Iteration(990): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.79 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=88) INFO 08-12 14:42:51 [loggers.py:273] Engine 000: Avg prompt throughput: 1536.0 tokens/s, Avg generation throughput: 0.5 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 7.3%
+(EngineCore pid=126) INFO 08-12 14:42:51 [core.py:452] Iteration(991): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.81 ms
+(EngineCore pid=126) INFO 08-12 14:42:51 [core.py:452] Iteration(992): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 306.80 ms
+(EngineCore pid=126) INFO 08-12 14:42:51 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ef216169-27f4-4a8e-8e2d-487bf4e5601f-0-a1eccaa2 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:51 [pool_scheduler.py:663] Reqid: cmpl-ef216169-27f4-4a8e-8e2d-487bf4e5601f-0-a1eccaa2, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:51 [pool_scheduler.py:683] KV pool load spec created req=cmpl-ef216169-27f4-4a8e-8e2d-487bf4e5601f-0-a1eccaa2 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:39558 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:52 [core.py:452] Iteration(993): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.26 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:52 [core.py:452] Iteration(994): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 308.68 ms
+(EngineCore pid=126) INFO 08-12 14:42:52 [core.py:452] Iteration(995): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 303.96 ms
+(EngineCore pid=126) INFO 08-12 14:42:52 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-806eabb0-2685-4cf1-bda7-4b9a4957bbd9-0-a828894d hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:52 [pool_scheduler.py:663] Reqid: cmpl-806eabb0-2685-4cf1-bda7-4b9a4957bbd9-0-a828894d, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:52 [pool_scheduler.py:683] KV pool load spec created req=cmpl-806eabb0-2685-4cf1-bda7-4b9a4957bbd9-0-a828894d vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:53 [core.py:452] Iteration(996): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 372.51 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:53 [core.py:452] Iteration(997): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.74 ms
+(EngineCore pid=126) INFO 08-12 14:42:53 [core.py:452] Iteration(998): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.04 ms
+(EngineCore pid=126) INFO 08-12 14:42:53 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-7d4a00ac-809a-422e-8ad4-845ce1422cf6-0-a7f4da8e hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:53 [pool_scheduler.py:663] Reqid: cmpl-7d4a00ac-809a-422e-8ad4-845ce1422cf6-0-a7f4da8e, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:53 [pool_scheduler.py:683] KV pool load spec created req=cmpl-7d4a00ac-809a-422e-8ad4-845ce1422cf6-0-a7f4da8e vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:53 [core.py:452] Iteration(999): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.81 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:54 [core.py:452] Iteration(1000): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.41 ms
+(EngineCore pid=126) INFO 08-12 14:42:54 [core.py:452] Iteration(1001): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.11 ms
+(EngineCore pid=126) INFO 08-12 14:42:54 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-14bc19b7-db6b-4ef8-8a1a-bc4804f35413-0-a6cb1bb3 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:54 [pool_scheduler.py:663] Reqid: cmpl-14bc19b7-db6b-4ef8-8a1a-bc4804f35413-0-a6cb1bb3, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:54 [pool_scheduler.py:683] KV pool load spec created req=cmpl-14bc19b7-db6b-4ef8-8a1a-bc4804f35413-0-a6cb1bb3 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:54 [core.py:452] Iteration(1002): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.54 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:55 [core.py:452] Iteration(1003): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.27 ms
+(EngineCore pid=126) INFO 08-12 14:42:55 [core.py:452] Iteration(1004): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.77 ms
+(EngineCore pid=126) INFO 08-12 14:42:55 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-eddb1759-e886-4434-9f76-478cc84e64d8-0-8c7009c4 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:55 [pool_scheduler.py:663] Reqid: cmpl-eddb1759-e886-4434-9f76-478cc84e64d8-0-8c7009c4, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:55 [pool_scheduler.py:683] KV pool load spec created req=cmpl-eddb1759-e886-4434-9f76-478cc84e64d8-0-8c7009c4 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:55 [core.py:452] Iteration(1005): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.43 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:56 [core.py:452] Iteration(1006): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.16 ms
+(EngineCore pid=126) INFO 08-12 14:42:56 [core.py:452] Iteration(1007): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.05 ms
+(EngineCore pid=126) INFO 08-12 14:42:56 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-cd26cbab-72c5-4bb8-b3ed-554b357e9933-0-95aaf6d8 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:56 [pool_scheduler.py:663] Reqid: cmpl-cd26cbab-72c5-4bb8-b3ed-554b357e9933-0-95aaf6d8, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:56 [pool_scheduler.py:683] KV pool load spec created req=cmpl-cd26cbab-72c5-4bb8-b3ed-554b357e9933-0-95aaf6d8 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:51076 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:57 [core.py:452] Iteration(1008): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 1580.15 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:58 [core.py:452] Iteration(1009): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 310.30 ms
+(EngineCore pid=126) INFO 08-12 14:42:58 [core.py:452] Iteration(1010): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 281.39 ms
+(EngineCore pid=126) INFO 08-12 14:42:58 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-dfa74cb5-955d-416b-b9fb-ee246f1c6048-0-a2b4c5f1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:58 [pool_scheduler.py:663] Reqid: cmpl-dfa74cb5-955d-416b-b9fb-ee246f1c6048-0-a2b4c5f1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:58 [pool_scheduler.py:683] KV pool load spec created req=cmpl-dfa74cb5-955d-416b-b9fb-ee246f1c6048-0-a2b4c5f1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:58 [core.py:452] Iteration(1011): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.50 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:42:59 [core.py:452] Iteration(1012): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.52 ms
+(EngineCore pid=126) INFO 08-12 14:42:59 [core.py:452] Iteration(1013): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.69 ms
+(EngineCore pid=126) INFO 08-12 14:42:59 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-1f6db3cc-fbb4-4783-95aa-fb2407430af5-0-b1caf460 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:42:59 [pool_scheduler.py:663] Reqid: cmpl-1f6db3cc-fbb4-4783-95aa-fb2407430af5-0-b1caf460, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:42:59 [pool_scheduler.py:683] KV pool load spec created req=cmpl-1f6db3cc-fbb4-4783-95aa-fb2407430af5-0-b1caf460 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:42:59 [core.py:452] Iteration(1014): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.90 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:00 [core.py:452] Iteration(1015): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.08 ms
+(EngineCore pid=126) INFO 08-12 14:43:00 [core.py:452] Iteration(1016): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.02 ms
+(EngineCore pid=126) INFO 08-12 14:43:00 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-27463001-c129-4422-8751-633682957ff0-0-91d2b983 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:00 [pool_scheduler.py:663] Reqid: cmpl-27463001-c129-4422-8751-633682957ff0-0-91d2b983, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:00 [pool_scheduler.py:683] KV pool load spec created req=cmpl-27463001-c129-4422-8751-633682957ff0-0-91d2b983 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:00 [core.py:452] Iteration(1017): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 302.04 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:00 [core.py:452] Iteration(1018): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.65 ms
+(EngineCore pid=126) INFO 08-12 14:43:01 [core.py:452] Iteration(1019): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.95 ms
+(EngineCore pid=126) INFO 08-12 14:43:01 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-fa8f4104-4683-460d-b960-a03d03d07422-0-8e5c4cc4 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:01 [pool_scheduler.py:663] Reqid: cmpl-fa8f4104-4683-460d-b960-a03d03d07422-0-8e5c4cc4, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:01 [pool_scheduler.py:683] KV pool load spec created req=cmpl-fa8f4104-4683-460d-b960-a03d03d07422-0-8e5c4cc4 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO 08-12 14:43:01 [loggers.py:273] Engine 000: Avg prompt throughput: 2764.6 tokens/s, Avg generation throughput: 0.9 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.5%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 16.0%
+(EngineCore pid=126) INFO 08-12 14:43:01 [core.py:452] Iteration(1020): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.33 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:01 [core.py:452] Iteration(1021): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 420.33 ms
+(APIServer pid=88) INFO:     192.168.200.27:51080 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:02 [core.py:452] Iteration(1022): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.02 ms
+(EngineCore pid=126) INFO 08-12 14:43:02 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-e3ad2306-a273-41c3-98db-d0647f910fc7-0-9fc263e1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:02 [pool_scheduler.py:663] Reqid: cmpl-e3ad2306-a273-41c3-98db-d0647f910fc7-0-9fc263e1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:02 [pool_scheduler.py:683] KV pool load spec created req=cmpl-e3ad2306-a273-41c3-98db-d0647f910fc7-0-9fc263e1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:02 [core.py:452] Iteration(1023): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 376.43 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:02 [core.py:452] Iteration(1024): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.46 ms
+(EngineCore pid=126) INFO 08-12 14:43:03 [core.py:452] Iteration(1025): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 285.24 ms
+(EngineCore pid=126) INFO 08-12 14:43:03 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-037eaf14-fa95-44c4-af20-8dc4cb05e744-0-b7efd2f2 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:03 [pool_scheduler.py:663] Reqid: cmpl-037eaf14-fa95-44c4-af20-8dc4cb05e744-0-b7efd2f2, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:03 [pool_scheduler.py:683] KV pool load spec created req=cmpl-037eaf14-fa95-44c4-af20-8dc4cb05e744-0-b7efd2f2 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:03 [core.py:452] Iteration(1026): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 309.84 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:03 [core.py:452] Iteration(1027): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 322.92 ms
+(EngineCore pid=126) INFO 08-12 14:43:04 [core.py:452] Iteration(1028): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.89 ms
+(EngineCore pid=126) INFO 08-12 14:43:04 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-05abe253-64d5-4462-aac8-01e20163baef-0-a1a2596c hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:04 [pool_scheduler.py:663] Reqid: cmpl-05abe253-64d5-4462-aac8-01e20163baef-0-a1a2596c, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:04 [pool_scheduler.py:683] KV pool load spec created req=cmpl-05abe253-64d5-4462-aac8-01e20163baef-0-a1a2596c vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:04 [core.py:452] Iteration(1029): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.71 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:04 [core.py:452] Iteration(1030): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 309.09 ms
+(EngineCore pid=126) INFO 08-12 14:43:05 [core.py:452] Iteration(1031): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 284.79 ms
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-f9184c1a-3222-47d1-83a0-3536f3b5f9b3-0-a6aac1bf hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:663] Reqid: cmpl-f9184c1a-3222-47d1-83a0-3536f3b5f9b3-0-a6aac1bf, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:683] KV pool load spec created req=cmpl-f9184c1a-3222-47d1-83a0-3536f3b5f9b3-0-a6aac1bf vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:05 [core.py:452] Iteration(1032): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.83 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:05 [core.py:452] Iteration(1033): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.81 ms
+(EngineCore pid=126) INFO 08-12 14:43:05 [core.py:452] Iteration(1034): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.06 ms
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-14dc8dda-87f5-4b76-b368-60b4c99fcb8c-0-953b1054 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:663] Reqid: cmpl-14dc8dda-87f5-4b76-b368-60b4c99fcb8c-0-953b1054, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:05 [pool_scheduler.py:683] KV pool load spec created req=cmpl-14dc8dda-87f5-4b76-b368-60b4c99fcb8c-0-953b1054 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:06 [core.py:452] Iteration(1035): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.52 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:06 [core.py:452] Iteration(1036): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 308.24 ms
+(EngineCore pid=126) INFO 08-12 14:43:06 [core.py:452] Iteration(1037): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.07 ms
+(EngineCore pid=126) INFO 08-12 14:43:06 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-6863b9b8-96bc-4220-a51d-66ef757078c4-0-864008a1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:06 [pool_scheduler.py:663] Reqid: cmpl-6863b9b8-96bc-4220-a51d-66ef757078c4-0-864008a1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:06 [pool_scheduler.py:683] KV pool load spec created req=cmpl-6863b9b8-96bc-4220-a51d-66ef757078c4-0-864008a1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:38774 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:07 [core.py:452] Iteration(1038): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.40 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:07 [core.py:452] Iteration(1039): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 305.25 ms
+(EngineCore pid=126) INFO 08-12 14:43:07 [core.py:452] Iteration(1040): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.09 ms
+(EngineCore pid=126) INFO 08-12 14:43:07 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-29db6543-7731-491b-86cb-f28fd9b9d2ab-0-bd2799f5 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:07 [pool_scheduler.py:663] Reqid: cmpl-29db6543-7731-491b-86cb-f28fd9b9d2ab-0-bd2799f5, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:07 [pool_scheduler.py:683] KV pool load spec created req=cmpl-29db6543-7731-491b-86cb-f28fd9b9d2ab-0-bd2799f5 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:08 [core.py:452] Iteration(1041): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 317.06 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:08 [core.py:452] Iteration(1042): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.77 ms
+(EngineCore pid=126) INFO 08-12 14:43:08 [core.py:452] Iteration(1043): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 276.76 ms
+(EngineCore pid=126) INFO 08-12 14:43:08 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-58815222-f21e-4785-ad5d-508598d29cb4-0-9fdbeff1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:08 [pool_scheduler.py:663] Reqid: cmpl-58815222-f21e-4785-ad5d-508598d29cb4-0-9fdbeff1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:08 [pool_scheduler.py:683] KV pool load spec created req=cmpl-58815222-f21e-4785-ad5d-508598d29cb4-0-9fdbeff1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:08 [core.py:452] Iteration(1044): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 307.97 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:09 [core.py:452] Iteration(1045): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.05 ms
+(EngineCore pid=126) INFO 08-12 14:43:09 [core.py:452] Iteration(1046): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 283.12 ms
+(EngineCore pid=126) INFO 08-12 14:43:09 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-77ee35e4-9271-4add-a0ce-e6f6638201c4-0-ac5003e1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:09 [pool_scheduler.py:663] Reqid: cmpl-77ee35e4-9271-4add-a0ce-e6f6638201c4-0-ac5003e1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:09 [pool_scheduler.py:683] KV pool load spec created req=cmpl-77ee35e4-9271-4add-a0ce-e6f6638201c4-0-ac5003e1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:09 [core.py:452] Iteration(1047): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.02 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:10 [core.py:452] Iteration(1048): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 287.31 ms
+(EngineCore pid=126) INFO 08-12 14:43:10 [core.py:452] Iteration(1049): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 353.05 ms
+(EngineCore pid=126) INFO 08-12 14:43:10 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-a7814f33-f616-4c6a-be5b-410fa9ddf37c-0-a5b84d23 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:10 [pool_scheduler.py:663] Reqid: cmpl-a7814f33-f616-4c6a-be5b-410fa9ddf37c-0-a5b84d23, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:10 [pool_scheduler.py:683] KV pool load spec created req=cmpl-a7814f33-f616-4c6a-be5b-410fa9ddf37c-0-a5b84d23 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:10 [core.py:452] Iteration(1050): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.29 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:11 [core.py:452] Iteration(1051): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.54 ms
+(APIServer pid=88) INFO 08-12 14:43:11 [loggers.py:273] Engine 000: Avg prompt throughput: 3378.8 tokens/s, Avg generation throughput: 1.1 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 24.3%
+(EngineCore pid=126) INFO 08-12 14:43:11 [core.py:452] Iteration(1052): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.14 ms
+(EngineCore pid=126) INFO 08-12 14:43:11 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-91d783ef-7444-447a-9ac7-1fcffb1197e2-0-acb0efb1 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:11 [pool_scheduler.py:663] Reqid: cmpl-91d783ef-7444-447a-9ac7-1fcffb1197e2-0-acb0efb1, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:11 [pool_scheduler.py:683] KV pool load spec created req=cmpl-91d783ef-7444-447a-9ac7-1fcffb1197e2-0-acb0efb1 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:11 [core.py:452] Iteration(1053): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 333.84 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:11 [core.py:452] Iteration(1054): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.89 ms
+(APIServer pid=88) INFO:     192.168.200.27:38780 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:12 [core.py:452] Iteration(1055): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.97 ms
+(EngineCore pid=126) INFO 08-12 14:43:12 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-5df9d720-2d53-46ec-8cff-dbb8101704d6-0-857b1395 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:12 [pool_scheduler.py:663] Reqid: cmpl-5df9d720-2d53-46ec-8cff-dbb8101704d6-0-857b1395, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:12 [pool_scheduler.py:683] KV pool load spec created req=cmpl-5df9d720-2d53-46ec-8cff-dbb8101704d6-0-857b1395 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:12 [core.py:452] Iteration(1056): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 320.79 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:12 [core.py:452] Iteration(1057): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.73 ms
+(EngineCore pid=126) INFO 08-12 14:43:13 [core.py:452] Iteration(1058): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.88 ms
+(EngineCore pid=126) INFO 08-12 14:43:13 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-11b96c19-961f-4a85-b820-0f8a78712b68-0-8d493f40 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:13 [pool_scheduler.py:663] Reqid: cmpl-11b96c19-961f-4a85-b820-0f8a78712b68-0-8d493f40, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:13 [pool_scheduler.py:683] KV pool load spec created req=cmpl-11b96c19-961f-4a85-b820-0f8a78712b68-0-8d493f40 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:13 [core.py:452] Iteration(1059): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.04 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:13 [core.py:452] Iteration(1060): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.02 ms
+(EngineCore pid=126) INFO 08-12 14:43:14 [core.py:452] Iteration(1061): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.27 ms
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-145d36f4-7223-48d0-8518-0f1e3b56e327-0-804d7669 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:663] Reqid: cmpl-145d36f4-7223-48d0-8518-0f1e3b56e327-0-804d7669, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:683] KV pool load spec created req=cmpl-145d36f4-7223-48d0-8518-0f1e3b56e327-0-804d7669 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:14 [core.py:452] Iteration(1062): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.54 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:14 [core.py:452] Iteration(1063): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.56 ms
+(EngineCore pid=126) INFO 08-12 14:43:14 [core.py:452] Iteration(1064): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.47 ms
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-1e064e3d-86dc-4cc4-bf4f-37ec7ab74065-0-af1e41ca hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:663] Reqid: cmpl-1e064e3d-86dc-4cc4-bf4f-37ec7ab74065-0-af1e41ca, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:14 [pool_scheduler.py:683] KV pool load spec created req=cmpl-1e064e3d-86dc-4cc4-bf4f-37ec7ab74065-0-af1e41ca vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:15 [core.py:452] Iteration(1065): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.62 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:15 [core.py:452] Iteration(1066): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.48 ms
+(EngineCore pid=126) INFO 08-12 14:43:15 [core.py:452] Iteration(1067): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.17 ms
+(EngineCore pid=126) INFO 08-12 14:43:15 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-e7cfa50b-160f-45cf-899e-a967b227fd38-0-8f8e0a20 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:15 [pool_scheduler.py:663] Reqid: cmpl-e7cfa50b-160f-45cf-899e-a967b227fd38-0-8f8e0a20, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:15 [pool_scheduler.py:683] KV pool load spec created req=cmpl-e7cfa50b-160f-45cf-899e-a967b227fd38-0-8f8e0a20 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:16 [core.py:452] Iteration(1068): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.43 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:16 [core.py:452] Iteration(1069): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.64 ms
+(EngineCore pid=126) INFO 08-12 14:43:16 [core.py:452] Iteration(1070): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.34 ms
+(EngineCore pid=126) INFO 08-12 14:43:16 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-aa77fd02-a3f4-4e6e-b469-f78d37345170-0-be9658df hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:16 [pool_scheduler.py:663] Reqid: cmpl-aa77fd02-a3f4-4e6e-b469-f78d37345170-0-be9658df, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:16 [pool_scheduler.py:683] KV pool load spec created req=cmpl-aa77fd02-a3f4-4e6e-b469-f78d37345170-0-be9658df vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:46946 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:17 [core.py:452] Iteration(1071): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.06 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:17 [core.py:452] Iteration(1072): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.50 ms
+(EngineCore pid=126) INFO 08-12 14:43:17 [core.py:452] Iteration(1073): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.12 ms
+(EngineCore pid=126) INFO 08-12 14:43:17 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-7683382a-6c96-4e6d-b98a-4997c48ba829-0-810f08ff hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:17 [pool_scheduler.py:663] Reqid: cmpl-7683382a-6c96-4e6d-b98a-4997c48ba829-0-810f08ff, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:17 [pool_scheduler.py:683] KV pool load spec created req=cmpl-7683382a-6c96-4e6d-b98a-4997c48ba829-0-810f08ff vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:17 [core.py:452] Iteration(1074): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.75 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:18 [core.py:452] Iteration(1075): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 294.66 ms
+(EngineCore pid=126) INFO 08-12 14:43:18 [core.py:452] Iteration(1076): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.37 ms
+(EngineCore pid=126) INFO 08-12 14:43:18 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-fe613dbf-2b18-4766-a12d-572340b8b3ec-0-a94f13de hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:18 [pool_scheduler.py:663] Reqid: cmpl-fe613dbf-2b18-4766-a12d-572340b8b3ec-0-a94f13de, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:18 [pool_scheduler.py:683] KV pool load spec created req=cmpl-fe613dbf-2b18-4766-a12d-572340b8b3ec-0-a94f13de vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:18 [core.py:452] Iteration(1077): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 289.78 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:19 [core.py:452] Iteration(1078): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 322.71 ms
+(EngineCore pid=126) INFO 08-12 14:43:19 [core.py:452] Iteration(1079): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 323.69 ms
+(EngineCore pid=126) INFO 08-12 14:43:19 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-fea13475-771c-4722-926f-4cd5b8d7bad3-0-99a0ecfc hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:19 [pool_scheduler.py:663] Reqid: cmpl-fea13475-771c-4722-926f-4cd5b8d7bad3-0-99a0ecfc, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:19 [pool_scheduler.py:683] KV pool load spec created req=cmpl-fea13475-771c-4722-926f-4cd5b8d7bad3-0-99a0ecfc vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:19 [core.py:452] Iteration(1080): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.18 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:20 [core.py:452] Iteration(1081): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.72 ms
+(EngineCore pid=126) INFO 08-12 14:43:20 [core.py:452] Iteration(1082): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 406.16 ms
+(EngineCore pid=126) INFO 08-12 14:43:20 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-f8ab853b-0b79-42d6-80e3-ef5d21fed6dd-0-a6ef1f10 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:20 [pool_scheduler.py:663] Reqid: cmpl-f8ab853b-0b79-42d6-80e3-ef5d21fed6dd-0-a6ef1f10, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:20 [pool_scheduler.py:683] KV pool load spec created req=cmpl-f8ab853b-0b79-42d6-80e3-ef5d21fed6dd-0-a6ef1f10 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:20 [core.py:452] Iteration(1083): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.71 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:21 [core.py:452] Iteration(1084): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 318.51 ms
+(APIServer pid=88) INFO 08-12 14:43:21 [loggers.py:273] Engine 000: Avg prompt throughput: 3378.8 tokens/s, Avg generation throughput: 1.1 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 30.7%
+(EngineCore pid=126) INFO 08-12 14:43:21 [core.py:452] Iteration(1085): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 282.37 ms
+(EngineCore pid=126) INFO 08-12 14:43:21 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-fe79475e-ad7c-40e5-b472-afcd1d05af94-0-817f33dd hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:21 [pool_scheduler.py:663] Reqid: cmpl-fe79475e-ad7c-40e5-b472-afcd1d05af94-0-817f33dd, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:21 [pool_scheduler.py:683] KV pool load spec created req=cmpl-fe79475e-ad7c-40e5-b472-afcd1d05af94-0-817f33dd vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:21 [core.py:452] Iteration(1086): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.14 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:21 [core.py:452] Iteration(1087): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 287.38 ms
+(APIServer pid=88) INFO:     192.168.200.27:46956 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:22 [core.py:452] Iteration(1088): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.61 ms
+(EngineCore pid=126) INFO 08-12 14:43:22 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-92ff7dea-b30a-402f-94e8-6e8a0085bea5-0-a9cb1439 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:22 [pool_scheduler.py:663] Reqid: cmpl-92ff7dea-b30a-402f-94e8-6e8a0085bea5-0-a9cb1439, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:22 [pool_scheduler.py:683] KV pool load spec created req=cmpl-92ff7dea-b30a-402f-94e8-6e8a0085bea5-0-a9cb1439 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:22 [core.py:452] Iteration(1089): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.97 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:22 [core.py:452] Iteration(1090): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.22 ms
+(EngineCore pid=126) INFO 08-12 14:43:23 [core.py:452] Iteration(1091): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.53 ms
+(EngineCore pid=126) INFO 08-12 14:43:23 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-1f48e649-2f05-4ec3-8608-3aeb13fe9665-0-8599b8f5 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:23 [pool_scheduler.py:663] Reqid: cmpl-1f48e649-2f05-4ec3-8608-3aeb13fe9665-0-8599b8f5, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:23 [pool_scheduler.py:683] KV pool load spec created req=cmpl-1f48e649-2f05-4ec3-8608-3aeb13fe9665-0-8599b8f5 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:23 [core.py:452] Iteration(1092): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 316.16 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:23 [core.py:452] Iteration(1093): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 324.53 ms
+(EngineCore pid=126) INFO 08-12 14:43:24 [core.py:452] Iteration(1094): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 280.45 ms
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-19514ebb-5991-4862-9dad-a8b8cdb0510c-0-a1d56f7f hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:663] Reqid: cmpl-19514ebb-5991-4862-9dad-a8b8cdb0510c-0-a1d56f7f, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:683] KV pool load spec created req=cmpl-19514ebb-5991-4862-9dad-a8b8cdb0510c-0-a1d56f7f vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:24 [core.py:452] Iteration(1095): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.03 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:24 [core.py:452] Iteration(1096): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.56 ms
+(EngineCore pid=126) INFO 08-12 14:43:24 [core.py:452] Iteration(1097): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 286.82 ms
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-6fbf5c99-1eae-4671-99b8-80de4dcfee03-0-9f33b17d hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:663] Reqid: cmpl-6fbf5c99-1eae-4671-99b8-80de4dcfee03-0-9f33b17d, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:24 [pool_scheduler.py:683] KV pool load spec created req=cmpl-6fbf5c99-1eae-4671-99b8-80de4dcfee03-0-9f33b17d vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:25 [core.py:452] Iteration(1098): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.35 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:25 [core.py:452] Iteration(1099): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.87 ms
+(EngineCore pid=126) INFO 08-12 14:43:25 [core.py:452] Iteration(1100): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.70 ms
+(EngineCore pid=126) INFO 08-12 14:43:25 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b31e0331-5418-4da3-a2de-64c542a8902a-0-9ce28893 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:25 [pool_scheduler.py:663] Reqid: cmpl-b31e0331-5418-4da3-a2de-64c542a8902a-0-9ce28893, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:25 [pool_scheduler.py:683] KV pool load spec created req=cmpl-b31e0331-5418-4da3-a2de-64c542a8902a-0-9ce28893 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:26 [core.py:452] Iteration(1101): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.23 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:26 [core.py:452] Iteration(1102): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 326.29 ms
+(EngineCore pid=126) INFO 08-12 14:43:26 [core.py:452] Iteration(1103): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 306.38 ms
+(EngineCore pid=126) INFO 08-12 14:43:26 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-7d825b34-d833-4fd5-8e40-51c69adc1b9f-0-846b91f4 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:26 [pool_scheduler.py:663] Reqid: cmpl-7d825b34-d833-4fd5-8e40-51c69adc1b9f-0-846b91f4, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:26 [pool_scheduler.py:683] KV pool load spec created req=cmpl-7d825b34-d833-4fd5-8e40-51c69adc1b9f-0-846b91f4 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:41658 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:27 [core.py:452] Iteration(1104): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 334.05 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:27 [core.py:452] Iteration(1105): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 306.91 ms
+(EngineCore pid=126) INFO 08-12 14:43:27 [core.py:452] Iteration(1106): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 312.88 ms
+(EngineCore pid=126) INFO 08-12 14:43:27 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-f949239e-839c-4fb1-b375-4247044a4af4-0-88ee3b53 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:27 [pool_scheduler.py:663] Reqid: cmpl-f949239e-839c-4fb1-b375-4247044a4af4-0-88ee3b53, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:27 [pool_scheduler.py:683] KV pool load spec created req=cmpl-f949239e-839c-4fb1-b375-4247044a4af4-0-88ee3b53 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:28 [core.py:452] Iteration(1107): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 312.68 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:28 [core.py:452] Iteration(1108): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 307.95 ms
+(EngineCore pid=126) INFO 08-12 14:43:28 [core.py:452] Iteration(1109): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.89 ms
+(EngineCore pid=126) INFO 08-12 14:43:28 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-8dcc6b1c-087c-467f-bc24-6986c1b6e901-0-a3ca0848 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:28 [pool_scheduler.py:663] Reqid: cmpl-8dcc6b1c-087c-467f-bc24-6986c1b6e901-0-a3ca0848, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:28 [pool_scheduler.py:683] KV pool load spec created req=cmpl-8dcc6b1c-087c-467f-bc24-6986c1b6e901-0-a3ca0848 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:29 [core.py:452] Iteration(1110): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 317.17 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:29 [core.py:452] Iteration(1111): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 385.75 ms
+(EngineCore pid=126) INFO 08-12 14:43:29 [core.py:452] Iteration(1112): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.06 ms
+(EngineCore pid=126) INFO 08-12 14:43:29 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-0745413a-de89-47a9-8975-596a2bce7a4a-0-822a35b6 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:29 [pool_scheduler.py:663] Reqid: cmpl-0745413a-de89-47a9-8975-596a2bce7a4a-0-822a35b6, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:29 [pool_scheduler.py:683] KV pool load spec created req=cmpl-0745413a-de89-47a9-8975-596a2bce7a4a-0-822a35b6 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:30 [core.py:452] Iteration(1113): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.18 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:30 [core.py:452] Iteration(1114): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 324.61 ms
+(EngineCore pid=126) INFO 08-12 14:43:30 [core.py:452] Iteration(1115): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.31 ms
+(EngineCore pid=126) INFO 08-12 14:43:30 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-9ec83ebf-fef7-4a30-b7dd-1196649bb7d6-0-bf720fa2 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:30 [pool_scheduler.py:663] Reqid: cmpl-9ec83ebf-fef7-4a30-b7dd-1196649bb7d6-0-bf720fa2, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:30 [pool_scheduler.py:683] KV pool load spec created req=cmpl-9ec83ebf-fef7-4a30-b7dd-1196649bb7d6-0-bf720fa2 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:30 [core.py:452] Iteration(1116): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 305.15 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:31 [core.py:452] Iteration(1117): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.75 ms
+(APIServer pid=88) INFO 08-12 14:43:31 [loggers.py:273] Engine 000: Avg prompt throughput: 3378.1 tokens/s, Avg generation throughput: 1.1 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.4%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 35.8%
+(EngineCore pid=126) INFO 08-12 14:43:31 [core.py:452] Iteration(1118): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.11 ms
+(EngineCore pid=126) INFO 08-12 14:43:31 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-d5cd59cb-76a9-42ff-af58-658d2852d1f3-0-a0445687 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:31 [pool_scheduler.py:663] Reqid: cmpl-d5cd59cb-76a9-42ff-af58-658d2852d1f3-0-a0445687, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:31 [pool_scheduler.py:683] KV pool load spec created req=cmpl-d5cd59cb-76a9-42ff-af58-658d2852d1f3-0-a0445687 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:31 [core.py:452] Iteration(1119): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 314.32 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:41660 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:32 [core.py:452] Iteration(1120): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 303.31 ms
+(EngineCore pid=126) INFO 08-12 14:43:32 [core.py:452] Iteration(1121): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.59 ms
+(EngineCore pid=126) INFO 08-12 14:43:32 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-c58f949c-a64c-4614-b1bd-9bbaa2bdf5c2-0-9e271bee hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:32 [pool_scheduler.py:663] Reqid: cmpl-c58f949c-a64c-4614-b1bd-9bbaa2bdf5c2-0-9e271bee, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:32 [pool_scheduler.py:683] KV pool load spec created req=cmpl-c58f949c-a64c-4614-b1bd-9bbaa2bdf5c2-0-9e271bee vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:32 [core.py:452] Iteration(1122): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.41 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:33 [core.py:452] Iteration(1123): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 317.13 ms
+(EngineCore pid=126) INFO 08-12 14:43:33 [core.py:452] Iteration(1124): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 286.71 ms
+(EngineCore pid=126) INFO 08-12 14:43:33 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b11e7750-5ccb-40b6-8064-5c9222c09bc2-0-9a2f9434 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:33 [pool_scheduler.py:663] Reqid: cmpl-b11e7750-5ccb-40b6-8064-5c9222c09bc2-0-9a2f9434, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:33 [pool_scheduler.py:683] KV pool load spec created req=cmpl-b11e7750-5ccb-40b6-8064-5c9222c09bc2-0-9a2f9434 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:33 [core.py:452] Iteration(1125): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 321.58 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:33 [core.py:452] Iteration(1126): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 299.76 ms
+(EngineCore pid=126) INFO 08-12 14:43:34 [core.py:452] Iteration(1127): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 286.03 ms
+(EngineCore pid=126) INFO 08-12 14:43:34 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-f6b9636e-aa45-4345-8c4f-9fa0cdf964c4-0-b0d14a54 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:34 [pool_scheduler.py:663] Reqid: cmpl-f6b9636e-aa45-4345-8c4f-9fa0cdf964c4-0-b0d14a54, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:34 [pool_scheduler.py:683] KV pool load spec created req=cmpl-f6b9636e-aa45-4345-8c4f-9fa0cdf964c4-0-b0d14a54 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:34 [core.py:452] Iteration(1128): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 316.54 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:34 [core.py:452] Iteration(1129): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.00 ms
+(EngineCore pid=126) INFO 08-12 14:43:35 [core.py:452] Iteration(1130): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 283.70 ms
+(EngineCore pid=126) INFO 08-12 14:43:35 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-03e80a2e-b8dc-4254-8298-effdbc2e6de3-0-a1925a89 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:35 [pool_scheduler.py:663] Reqid: cmpl-03e80a2e-b8dc-4254-8298-effdbc2e6de3-0-a1925a89, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:35 [pool_scheduler.py:683] KV pool load spec created req=cmpl-03e80a2e-b8dc-4254-8298-effdbc2e6de3-0-a1925a89 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:35 [core.py:452] Iteration(1131): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 302.57 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:35 [core.py:452] Iteration(1132): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.37 ms
+(EngineCore pid=126) INFO 08-12 14:43:36 [core.py:452] Iteration(1133): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.70 ms
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-5372be6c-e1ab-4ec7-80a3-999acba15a74-0-af2c56c7 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:663] Reqid: cmpl-5372be6c-e1ab-4ec7-80a3-999acba15a74-0-af2c56c7, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:683] KV pool load spec created req=cmpl-5372be6c-e1ab-4ec7-80a3-999acba15a74-0-af2c56c7 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:36 [core.py:452] Iteration(1134): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 307.82 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:36 [core.py:452] Iteration(1135): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.59 ms
+(EngineCore pid=126) INFO 08-12 14:43:36 [core.py:452] Iteration(1136): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 282.32 ms
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-4d0274e5-a12b-41f2-9aaa-6912e4c340a0-0-972c7ccb hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:663] Reqid: cmpl-4d0274e5-a12b-41f2-9aaa-6912e4c340a0-0-972c7ccb, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:36 [pool_scheduler.py:683] KV pool load spec created req=cmpl-4d0274e5-a12b-41f2-9aaa-6912e4c340a0-0-972c7ccb vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO:     192.168.200.27:51192 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:37 [core.py:452] Iteration(1137): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.37 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:37 [core.py:452] Iteration(1138): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 307.15 ms
+(EngineCore pid=126) INFO 08-12 14:43:37 [core.py:452] Iteration(1139): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 302.66 ms
+(EngineCore pid=126) INFO 08-12 14:43:37 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-f1f79d97-cffa-4af0-86c0-e116abfcf356-0-a1b5d5e2 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:37 [pool_scheduler.py:663] Reqid: cmpl-f1f79d97-cffa-4af0-86c0-e116abfcf356-0-a1b5d5e2, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:37 [pool_scheduler.py:683] KV pool load spec created req=cmpl-f1f79d97-cffa-4af0-86c0-e116abfcf356-0-a1b5d5e2 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:38 [core.py:452] Iteration(1140): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 298.69 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:38 [core.py:452] Iteration(1141): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 311.24 ms
+(EngineCore pid=126) INFO 08-12 14:43:38 [core.py:452] Iteration(1142): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 397.73 ms
+(EngineCore pid=126) INFO 08-12 14:43:38 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-ab24dc49-21b0-4766-b621-c88859d63148-0-a8b22a02 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:38 [pool_scheduler.py:663] Reqid: cmpl-ab24dc49-21b0-4766-b621-c88859d63148-0-a8b22a02, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:38 [pool_scheduler.py:683] KV pool load spec created req=cmpl-ab24dc49-21b0-4766-b621-c88859d63148-0-a8b22a02 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:39 [core.py:452] Iteration(1143): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 896.99 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:40 [core.py:452] Iteration(1144): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 286.29 ms
+(EngineCore pid=126) INFO 08-12 14:43:40 [core.py:452] Iteration(1145): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 286.73 ms
+(EngineCore pid=126) INFO 08-12 14:43:40 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-6abe7823-dad8-4ee4-983b-6e05b72178e6-0-bd21a4c2 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:40 [pool_scheduler.py:663] Reqid: cmpl-6abe7823-dad8-4ee4-983b-6e05b72178e6-0-bd21a4c2, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:40 [pool_scheduler.py:683] KV pool load spec created req=cmpl-6abe7823-dad8-4ee4-983b-6e05b72178e6-0-bd21a4c2 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:40 [core.py:452] Iteration(1146): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 295.59 ms
+(APIServer pid=88) INFO:     10.250.202.7:37726 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:40 [core.py:452] Iteration(1147): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 296.05 ms
+(EngineCore pid=126) INFO 08-12 14:43:41 [core.py:452] Iteration(1148): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 287.15 ms
+(EngineCore pid=126) INFO 08-12 14:43:41 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-fe9a0fb5-58a5-46b2-a162-25cff1b23456-0-8664d09a hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:41 [pool_scheduler.py:663] Reqid: cmpl-fe9a0fb5-58a5-46b2-a162-25cff1b23456-0-8664d09a, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:41 [pool_scheduler.py:683] KV pool load spec created req=cmpl-fe9a0fb5-58a5-46b2-a162-25cff1b23456-0-8664d09a vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(APIServer pid=88) INFO 08-12 14:43:41 [loggers.py:273] Engine 000: Avg prompt throughput: 3071.9 tokens/s, Avg generation throughput: 1.0 tokens/s, Running: 1 reqs, Waiting: 6 reqs, GPU KV cache usage: 0.5%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 39.6%
+(EngineCore pid=126) INFO 08-12 14:43:41 [core.py:452] Iteration(1149): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 326.37 ms
+(APIServer pid=88) INFO:     10.250.202.7:37736 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:41 [core.py:452] Iteration(1150): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.46 ms
+(APIServer pid=88) INFO:     192.168.200.27:51204 - "GET /v1/models HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:42 [core.py:452] Iteration(1151): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 279.94 ms
+(EngineCore pid=126) INFO 08-12 14:43:42 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-4bcf22d7-534d-4fa3-80a7-f333a4c8c6f7-0-890138da hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:42 [pool_scheduler.py:663] Reqid: cmpl-4bcf22d7-534d-4fa3-80a7-f333a4c8c6f7-0-890138da, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:42 [pool_scheduler.py:683] KV pool load spec created req=cmpl-4bcf22d7-534d-4fa3-80a7-f333a4c8c6f7-0-890138da vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:42 [core.py:452] Iteration(1152): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 297.36 ms
+(APIServer pid=88) INFO:     10.250.202.7:37746 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:42 [core.py:452] Iteration(1153): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.23 ms
+(EngineCore pid=126) INFO 08-12 14:43:43 [core.py:452] Iteration(1154): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.06 ms
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-b9f97016-fc47-4c2e-ab34-0ac29237cb38-0-9da06a3a hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:663] Reqid: cmpl-b9f97016-fc47-4c2e-ab34-0ac29237cb38-0-9da06a3a, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:683] KV pool load spec created req=cmpl-b9f97016-fc47-4c2e-ab34-0ac29237cb38-0-9da06a3a vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:43 [core.py:452] Iteration(1155): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 320.77 ms
+(APIServer pid=88) INFO:     10.250.202.7:37760 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:43 [core.py:452] Iteration(1156): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 288.65 ms
+(EngineCore pid=126) INFO 08-12 14:43:43 [core.py:452] Iteration(1157): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 278.06 ms
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-d370e354-59ca-4ead-870a-9ee40c99ef72-0-8b0915a9 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:663] Reqid: cmpl-d370e354-59ca-4ead-870a-9ee40c99ef72-0-8b0915a9, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:43 [pool_scheduler.py:683] KV pool load spec created req=cmpl-d370e354-59ca-4ead-870a-9ee40c99ef72-0-8b0915a9 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:44 [core.py:452] Iteration(1158): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.14 ms
+(APIServer pid=88) INFO:     10.250.202.7:37764 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:44 [core.py:452] Iteration(1159): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 290.01 ms
+(EngineCore pid=126) INFO 08-12 14:43:44 [core.py:452] Iteration(1160): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 292.09 ms
+(EngineCore pid=126) INFO 08-12 14:43:44 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-33d86b96-4ec0-42b8-8b21-4d39f043ede0-0-8cad1166 hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:44 [pool_scheduler.py:663] Reqid: cmpl-33d86b96-4ec0-42b8-8b21-4d39f043ede0-0-8cad1166, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:44 [pool_scheduler.py:683] KV pool load spec created req=cmpl-33d86b96-4ec0-42b8-8b21-4d39f043ede0-0-8cad1166 vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:45 [core.py:452] Iteration(1161): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.58 ms
+(APIServer pid=88) INFO:     10.250.202.7:37766 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:45 [core.py:452] Iteration(1162): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 293.38 ms
+(EngineCore pid=126) INFO 08-12 14:43:45 [core.py:452] Iteration(1163): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 285.15 ms
+(EngineCore pid=126) INFO 08-12 14:43:45 [pool_scheduler.py:478] [KVPOOL] block_key_hit_check req=cmpl-0d5c2112-6d0d-4ff6-870c-1ce276dd5b30-0-84df109e hit_blocks=104/128 states_sample=[1, 1, 1, 1, 1, 1, 1, 1]
+(EngineCore pid=126) INFO 08-12 14:43:45 [pool_scheduler.py:663] Reqid: cmpl-0d5c2112-6d0d-4ff6-870c-1ce276dd5b30-0-84df109e, Total tokens 16384, kvpool hit tokens: 13312, need to load: 13312
+(EngineCore pid=126) INFO 08-12 14:43:45 [pool_scheduler.py:683] KV pool load spec created req=cmpl-0d5c2112-6d0d-4ff6-870c-1ce276dd5b30-0-84df109e vllm_cached=0 kvpool_cached=13312 need_to_allocate=13312 load_async=False use_layerwise=True
+(EngineCore pid=126) INFO 08-12 14:43:46 [core.py:452] Iteration(1164): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 300.85 ms
+(APIServer pid=88) INFO:     10.250.202.7:37780 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=126) INFO 08-12 14:43:46 [core.py:452] Iteration(1165): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 291.27 ms
+(EngineCore pid=126) INFO 08-12 14:43:46 [core.py:452] Iteration(1166): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 301.94 ms
+(EngineCore pid=126) INFO 08-12 14:43:46 [core.py:452] Iteration(1167): 1 context requests, 1024 context tokens, 0 generation requests, 0 generation tokens, iteration elapsed time: 316.53 ms
+(APIServer pid=88) INFO:     10.250.202.7:37794 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=88) INFO:     192.168.200.27:58910 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=88) INFO 08-12 14:43:51 [loggers.py:273] Engine 000: Avg prompt throughput: 2150.4 tokens/s, Avg generation throughput: 0.7 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%, External prefix cache hit rate: 41.6%
+(APIServer pid=88) INFO:     192.168.200.27:58920 - "GET /v1/models HTTP/1.1" 200 OK

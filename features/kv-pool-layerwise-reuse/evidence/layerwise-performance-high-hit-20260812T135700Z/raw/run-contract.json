@@ -1,0 +1,27 @@
+{
+  "calculator": "total",
+  "expected_hit_rate": 0.8125,
+  "expected_hit_tokens": 13312,
+  "expected_need_to_load_tokens": 13312,
+  "expected_points": [
+    "dp1-16384-bulk-o1-c8",
+    "dp1-16384-layerwise-o1-c8",
+    "dp1-16384-reuse3-o1-c8"
+  ],
+  "formal_blocks": 128,
+  "formal_concurrency_waves": 8,
+  "formal_repetitions": 1,
+  "formal_request_count": 64,
+  "image_digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "local_prefix_caching": false,
+  "npu_node": "m1",
+  "raw_characterization_only": true,
+  "seed_blocks": 104,
+  "seed_request_count": 64,
+  "seed_tokens": 13312,
+  "single_wave": false,
+  "topologies": [
+    "dp1"
+  ],
+  "warmup_request_count": 8
+}

@@ -1,0 +1,17 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "chroot",
+  "/performance-workspace/rootfs",
+  "env",
+  "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "/client-tools/venv/bin/python",
+  "-c",
+  "from urllib.request import urlopen; print(urlopen(\"http://mooncake-master-service:9003/metrics\", timeout=10).read().decode(), end=\"\")"
+]

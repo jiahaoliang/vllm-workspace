@@ -1,0 +1,11 @@
+[
+  "kubectl",
+  "wait",
+  "-n",
+  "liangjiahao",
+  "--for=condition=Ready",
+  "pod",
+  "-l",
+  "app=prefill",
+  "--timeout=1800s"
+]

@@ -1,0 +1,47 @@
+{
+  "control repo": {
+    "commit": "10211ed80ef9d89ef757a6fca0c41e6267ad7cad",
+    "dirty": [
+      "?? deployment_yaml/",
+      "?? dockerfile.vllm23"
+    ]
+  },
+  "handoff": {
+    "control repo": {
+      "Branch / role": "kv-pool-layerwise-reuse generation-15 high-hit harness parent",
+      "Commit": "6a5bfa785bbc9bc4a37684e4fc0fd643126279d1",
+      "Component": "control repo",
+      "Remote equality": "high-hit harness parent pushed as origin/kv-pool-layerwise-reuse=6a5bfa785bbc9bc4a37684e4fc0fd643126279d1 before this handoff-only transition"
+    },
+    "repos/Mooncake": {
+      "Branch / role": "read-only detached collaborator baseline",
+      "Commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+      "Component": "repos/Mooncake",
+      "Remote equality": "collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+    },
+    "repos/vllm": {
+      "Branch / role": "frozen detached dependency",
+      "Commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+      "Component": "repos/vllm",
+      "Remote equality": "workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5; commit reachable from upstream/main"
+    },
+    "repos/vllm-ascend": {
+      "Branch / role": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
+      "Commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+      "Component": "repos/vllm-ascend",
+      "Remote equality": "origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708"
+    }
+  },
+  "repos/Mooncake": {
+    "commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "dirty": []
+  },
+  "repos/vllm": {
+    "commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "dirty": []
+  },
+  "repos/vllm-ascend": {
+    "commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "dirty": []
+  }
+}

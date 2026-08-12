@@ -1,0 +1,403 @@
+{
+  "errors": [],
+  "expected_hit_rate": 0.8125,
+  "expected_hit_tokens": 13312,
+  "expected_need_to_load_tokens": 13312,
+  "expected_request_count": 64,
+  "expected_total_tokens": 16384,
+  "hit_rate": 0.8125,
+  "local_hit_tokens": 0,
+  "max_hit_tokens": 13312,
+  "max_need_to_load_tokens": 13312,
+  "min_hit_tokens": 13312,
+  "min_need_to_load_tokens": 13312,
+  "records": [
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-17b10391-036a-4879-9317-7c3394d3a3b1-0-9dcf2e38",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-3ee4dbdf-2ca8-42c1-a0a1-355e693df8d2-0-b450d96d",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-364dd62d-21da-4f28-89a1-31784860b9af-0-88f75910",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-9579bc3b-c6e3-4874-bc9b-c7f17281e654-0-a9c4fa05",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-5663d7cf-0685-462e-922d-d3a5aaed5ab3-0-845da55d",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-01cf3c21-b343-402b-bd37-d71a07c93be3-0-a245762b",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-5f12a7d8-5c41-490a-9fec-b05b2faf5132-0-acba39a6",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-264e3dff-121c-4e0a-a353-7dbcbd722e7a-0-9c8bf907",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-087090d3-32cd-45e9-bd4e-ad3fbe6ef602-0-863de8bf",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-70112713-1767-4903-9a19-08330b070f07-0-ac978558",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-5aa71ad0-415e-4d60-be57-0e5eedaf7854-0-93c5cea2",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-eabe0907-d3af-46b7-93e6-5526659122b1-0-bcdc649c",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-dd6531d7-8e87-47a8-bf01-50d244c42b8d-0-a3968797",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-5de26418-160a-48ab-96a0-427dd96dd654-0-831ecaa1",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-af3d26d4-b426-42d6-b00a-846854df75be-0-9e2eff36",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-9a4e0b6c-7f35-4609-b757-6c33fd69eb39-0-ad5fc058",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-2fc530e3-8f51-48fa-8c18-1ae193a2fb60-0-9fadbbfa",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-2be54ad7-01d8-4abc-8c57-369db1e0fc4f-0-88ad7e67",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-9a785608-1bf3-4a1a-aab7-a57bbe517568-0-87fd48d6",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-b2d451ec-087e-4bf6-92d4-67557e25eece-0-a1ed9281",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-e08c97d5-16b8-4b31-85e7-5efb8f906120-0-9cb51979",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-cdd3709e-cf40-47e6-87f4-c5e6ebceb985-0-ad6303bc",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-6e6f57fa-e874-46b9-b789-b8a9d1da39f3-0-92402f13",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-2c888553-b09f-4020-8c6e-fd11e80968be-0-ab4de094",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-28b86a5b-9949-4c17-b5cb-8cf3badfc65d-0-833d21fa",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-e5c6b23b-14d4-4c1a-992f-3e04724a5efc-0-8428f80c",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-5d2a4498-9790-427c-b186-292da3716369-0-b7e1b8f3",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-436b8f8f-7ac2-4a03-97ca-052091cae5b8-0-b08742fb",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-1a77142a-8282-4d36-b9ab-641071d2668e-0-bf6877b9",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-0ca6c8ed-7270-4e60-824a-21dfb545962c-0-a9d6ec22",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-c39a5c68-a074-48de-b5a6-233d36bd76a4-0-b7089361",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-a9d3fa88-d0bd-46e4-ad53-5d5f3505dec4-0-9af86739",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-8d72b76f-8f76-4897-8772-24eb402c38a8-0-907d0907",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-c71e1d6d-7c5d-4140-8efc-c10b8f7400ef-0-bc6ee453",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-43719521-e9ba-42dc-b419-1cf7f7e2412b-0-8ff5fe38",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-69eb5e30-d7ec-4068-a693-8f0865a20755-0-ae600dad",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-b55edd45-f3f1-4468-b2f5-3b4b4e32fd38-0-8eb60ca4",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-86c09c18-e8ba-4f52-8be0-2730bdebcaf3-0-996174b4",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-614803cf-3ca9-4161-9451-fbc485f4848b-0-b1ad9ade",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-0fa07bf9-9bda-4ecb-86d1-9f595d628d0c-0-ad39e1a0",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-38b2c7e1-496c-4c3b-944a-272afa08d107-0-9f808c05",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-29729625-c7d1-4bcd-812b-f4a04c9a2a0d-0-bb4966dc",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-d0831caf-a94b-47d0-b54a-655f73c0db41-0-96a3e623",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-13f7a3cd-8f61-4661-b59e-288f974aa375-0-9ec14055",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-1c14bf21-ea10-457c-85ee-d82c916a09f5-0-9cf91fef",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-63b0789c-75c4-4431-bf64-dad9c74f4cd5-0-ac538459",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-209e28aa-b191-4c99-b3d0-c456a17a9647-0-bb58e719",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-39e20410-aac4-4eaa-ba3e-39338362194c-0-8d5531df",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-d80ab8ef-47cd-4a7b-a786-dbd25a96a7c0-0-a19a813b",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-31970368-7fd4-4277-aaec-6c0a17fc7509-0-9ae09a74",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-edb7c8c3-fb04-41c4-842b-a11fef7f7515-0-98d1b44f",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-53f094a9-0352-4d8d-8871-1be454f2673d-0-bf4623af",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-cdb8e6d9-6dd3-4bb1-9c20-ba8565e942e8-0-a785b242",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-3a1204c0-c0d3-4276-ac01-8de0aba1ae58-0-964b1b95",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-3db4d9f8-24ea-4f6f-b6d8-03476028328e-0-9e068561",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-2f56a392-8081-4aa1-98ae-396839d4809b-0-8784d7d5",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-8a21824e-71aa-4f5d-b90f-de18196973ba-0-b9ca5e76",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-f8fcc230-e562-4a5f-8bf1-36fc0a009a6c-0-b22284f9",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-b88ff7ab-2503-490b-a38a-7b2c12262e4a-0-ba367d70",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-1b1d9ddd-c3a9-4d30-9050-704d998b2262-0-ae12146e",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-ea40954d-eebd-404f-a160-9430b94f5b01-0-9225f050",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-785d4694-8dbd-4736-930c-a708ed210bfe-0-a9bb40d1",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-6db2cbfe-9722-4842-bdea-44ddc673e5f5-0-9f029698",
+      "total_tokens": 16384
+    },
+    {
+      "hit_tokens": 13312,
+      "need_to_load": 13312,
+      "request_id": "cmpl-a154e69b-e4d6-4df0-a964-6c22fe8fa5f5-0-a10c7682",
+      "total_tokens": 16384
+    }
+  ],
+  "request_count": 64,
+  "schema_version": 1,
+  "valid": true
+}

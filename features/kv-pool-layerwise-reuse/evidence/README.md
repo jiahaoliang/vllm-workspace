@@ -9,11 +9,44 @@ Use the current runbooks linked from the feature
 directories describe their original environment and must not be executed as
 current test entry points.
 
-The accepted formal performance imports follow the five-point rapid-validation
-design in
-[`2026-08-09-layerwise-performance-rapid-validation-design.md`](../2026-08-09-layerwise-performance-rapid-validation-design.md).
-No older diagnostic performance root is indexed as accepted performance
-evidence.
+The current high-hit formal import follows the three-point design in
+[`2026-08-12-layerwise-high-hit-performance-validation-design.md`](../2026-08-12-layerwise-high-hit-performance-validation-design.md).
+The older five-point imports remain accepted cold-cache characterizations, but
+they do not answer the external Prefix KV high-hit comparison. No diagnostic
+performance root is indexed as accepted performance evidence.
+
+## Layerwise High-Hit Performance Characterization 20260812T135700Z
+
+- Report:
+  [layerwise-performance-high-hit-validation-2026-08-12.md](../layerwise-performance-high-hit-validation-2026-08-12.md)
+- Evidence:
+  [layerwise-performance-high-hit-20260812T135700Z](layerwise-performance-high-hit-20260812T135700Z/)
+- Contract: DP1/TP2, 16,384 input tokens, output 1, concurrency 8, one
+  repetition, 8 warmup requests, 64 unmeasured seed requests, and 64 formal
+  requests for each of BULK, LAYERWISE, and REUSE3. Local prefix caching was
+  disabled.
+- Hit validation: all `192/192` formal requests loaded exactly 13,312 external
+  KV tokens, or `81.25%` of the 16,384-token prompt; inferred local hits were
+  zero. Every seed and formal phase completed `64/64` requests.
+- Result: request throughput was `1.5476` req/s for BULK, `1.1747` req/s for
+  LAYERWISE, and `1.0538` req/s for REUSE3. LAYERWISE/BULK was `0.759046x`;
+  REUSE3/LAYERWISE was `0.89708x`; REUSE3/BULK was `0.680925x`.
+- Validation: `performance.report check --scope all` returned `valid: true`;
+  restoration completed with both engines stopped and Mooncake empty. Raw and
+  repository checksum replay both passed.
+- Raw `SHA256SUMS` digest:
+  `5fe2f5219d82fd33e4763c326df73bc9e5a1583a55aa396ed976b38b66882864`.
+- Repository evidence `SHA256SUMS` digest:
+  `b4dc6dcd5e494784ab2d47082d78b8ec8f8cc0017c9599f456355a8734446e7f`.
+- Report SHA256:
+  `d8fed3cf7f5fd33c6829fefaede5199eb9a965547d16e08d97ebc1f2f74412def`.
+- Reusable `linux/arm64` image:
+  `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`,
+  manifest
+  `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3`.
+- Limits: one topology, one input length, one concurrency, one formal
+  repetition, no outlier removal, no significance test, and no capacity-benefit
+  claim. This is raw characterization only.
 
 ## Layerwise 64-request Performance Characterization 20260810T043500Z
 

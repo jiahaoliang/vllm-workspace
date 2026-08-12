@@ -1,0 +1,15 @@
+{
+  "concurrency": 8,
+  "dataset_line_count": 64,
+  "dataset_sha256": "3bd5601ffb20d089a7ac4ae8ebfbb8d4b89363e9e6a3c9eefec3eac31b2d2aaa",
+  "fixture_manifest_sha256": "dd8e70a4e578514218339c70324f9ba257fd781b055b5598adfdf5f1e19b41d1",
+  "formal_input_tokens": 16384,
+  "input_tokens": 16384,
+  "output_tokens": 1,
+  "phase": "formal-1",
+  "point_id": "dp1-16384-reuse3-o1-c8",
+  "request_count": 64,
+  "schema_version": 1,
+  "topology": "dp1",
+  "variant": "reuse3"
+}

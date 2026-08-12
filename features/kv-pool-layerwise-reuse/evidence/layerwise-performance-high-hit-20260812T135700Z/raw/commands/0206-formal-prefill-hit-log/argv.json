@@ -1,0 +1,14 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/prefill-engine-deployment",
+  "-c",
+  "prefill-engine",
+  "--",
+  "tail",
+  "-c",
+  "+263659",
+  "/tmp/vllm-prefill.log"
+]

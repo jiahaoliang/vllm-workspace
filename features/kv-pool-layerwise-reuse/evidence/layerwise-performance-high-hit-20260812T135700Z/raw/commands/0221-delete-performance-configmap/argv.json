@@ -1,0 +1,9 @@
+[
+  "kubectl",
+  "delete",
+  "configmap",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-dp1-16384-layerwise",
+  "--ignore-not-found=true"
+]

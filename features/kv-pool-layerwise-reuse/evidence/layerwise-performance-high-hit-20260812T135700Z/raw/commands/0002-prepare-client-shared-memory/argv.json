@@ -1,0 +1,16 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "sh",
+  "-c",
+  "set -eu; mkdir -p \"$1\"; chmod \"$2\" \"$1\"; test \"$(stat -c %a \"$1\")\" = \"$2\"",
+  "sh",
+  "/performance-workspace/rootfs/dev/shm",
+  "1777"
+]

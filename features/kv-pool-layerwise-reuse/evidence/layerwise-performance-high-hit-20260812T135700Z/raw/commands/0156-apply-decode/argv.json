@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "apply",
+  "-n",
+  "liangjiahao",
+  "-f",
+  "/tmp/layerwise-performance-high-hit-20260812T135700Z/rendered/dp1/16384/reuse3/decode-deployment.json"
+]

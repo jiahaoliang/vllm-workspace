@@ -1,0 +1,6 @@
+{
+  "mutates_server": false,
+  "returncode": 0,
+  "sends_inference": false,
+  "stdout_artifact": "points/dp1-16384-layerwise-o1-c8/seed/attempt-1/raw/decode-npu.txt"
+}

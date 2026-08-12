@@ -1,0 +1,40 @@
+can not use command: npu-smi info
+[2026-08-12 14:42:32,234] [ais_bench] [[32mINFO[0m] Current exp folder: /client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218
+[2026-08-12 14:42:32,250] [ais_bench] [[32mINFO[0m] Starting inference tasks...
+[2026-08-12 14:42:32,252] [ais_bench] [[32mINFO[0m] Partitioned into 1 tasks.
+[2026-08-12 14:42:32,252] [ais_bench] [[32mINFO[0m] Merging datasets with the same model and inferencer...
+[2026-08-12 14:42:32,320] [ais_bench] [[33mWARNING[0m] Can't set cursor because of setupterm: could not find terminal, running in background mode
+[2026-08-12 14:42:32,320] [ais_bench] [[32mINFO[0m] Launch TasksMonitor, PID: 11382, Refresh interval: 0.5, Run in background: True
+
+Monitoring tasks progress:   0%|          | 0/1 [00:00<?, ?it/s][2026-08-12 14:42:32,322] [ais_bench] [[33mWARNING[0m] Failed to read status file '/client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218/status_tmp/tmp_reuse3_reuse3.json': [Errno 2] No such file or directory: '/client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218/status_tmp/tmp_reuse3_reuse3.json'. Attempting to clear and continuing.
+
+Monitoring tasks progress: 100%|██████████| 1/1 [01:16<00:00, 76.62s/it]
+Monitoring tasks progress: 100%|██████████| 1/1 [01:16<00:00, 76.62s/it]
+[2026-08-12 14:43:50,240] [ais_bench] [[32mINFO[0m] Inference tasks completed.
+[2026-08-12 14:43:50,241] [ais_bench] [[32mINFO[0m] Summarizing performance results...
+
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:01<?, ?it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 57.79it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 52.99it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 52.98it/s]
+[2026-08-12 14:43:52,777] [ais_bench] [[32mINFO[0m] Request timeline and concurrency chart saved to /client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218/performances/reuse3/reuse3_plot.html
+[2026-08-12 14:43:52,777] [ais_bench] [[32mINFO[0m] The reuse3_plot has been saved in /client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218/performances/reuse3/reuse3_plot.html
+[2026-08-12 14:43:52,780] [ais_bench] [[32mINFO[0m] Converting performance results for stage...
+[2026-08-12 14:43:52,780] [ais_bench] [[32mINFO[0m] Performance results conversion completed!
+[2026-08-12 14:43:52,780] [ais_bench] [[32mINFO[0m] Starting metrics calculation...
+[2026-08-12 14:43:52,789] [ais_bench] [[32mINFO[0m] Starting common metrics calculation...
+[2026-08-12 14:43:52,790] [ais_bench] [[32mINFO[0m] Adding units to metrics...
+[2026-08-12 14:43:52,790] [ais_bench] [[32mINFO[0m] Performance data calculation completed!
+[2026-08-12 14:43:52,791] [ais_bench] [[32mINFO[0m] Performance Results of task [reuse3/reuse3]: 
+[2026-08-12 14:43:52,798] [ais_bench] [[32mINFO[0m] Performance Result files located in /client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/b75ad787925db085/aisbench-output/20260812_144218/performances/reuse3.

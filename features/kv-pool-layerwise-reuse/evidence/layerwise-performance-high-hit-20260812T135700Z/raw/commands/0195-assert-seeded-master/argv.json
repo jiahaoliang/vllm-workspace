@@ -1,0 +1,17 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "chroot",
+  "/performance-workspace/rootfs",
+  "env",
+  "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "/client-tools/venv/bin/python",
+  "-c",
+  "import time\nfrom urllib.request import urlopen\n\nwhile True:\n    text = urlopen(\n        \"http://mooncake-master-service:9003/metrics\", timeout=10\n    ).read().decode()\n    values = {}\n    for line in text.splitlines():\n        fields = line.split()\n        if len(fields) == 2:\n            try:\n                values[fields[0]] = float(fields[1])\n            except ValueError:\n                pass\n    actual = values.get(\"master_key_count\")\n    if actual == 6656:\n        print(text, end=\"\")\n        break\n    if actual is not None and actual > 6656:\n        raise AssertionError(values)\n    time.sleep(1)\n"
+]

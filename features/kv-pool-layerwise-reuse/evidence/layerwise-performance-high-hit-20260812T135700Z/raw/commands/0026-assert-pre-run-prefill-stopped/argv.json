@@ -1,0 +1,13 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/prefill-engine-deployment",
+  "-c",
+  "prefill-engine",
+  "--",
+  "sh",
+  "-c",
+  "test ! -e /tmp/vllm-prefill.pid"
+]

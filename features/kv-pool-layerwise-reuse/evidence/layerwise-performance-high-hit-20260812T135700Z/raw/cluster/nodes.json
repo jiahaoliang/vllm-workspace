@@ -1,0 +1,600 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "baseDeviceInfos": "{\"Ascend910-0\":{\"IP\":\"192.168.102.25\",\"SuperDeviceID\":4290772992},\"Ascend910-1\":{\"IP\":\"192.168.102.26\",\"SuperDeviceID\":4291035137},\"Ascend910-2\":{\"IP\":\"192.168.102.27\",\"SuperDeviceID\":4291297282},\"Ascend910-3\":{\"IP\":\"192.168.102.28\",\"SuperDeviceID\":4291559427},\"Ascend910-4\":{\"IP\":\"192.168.102.29\",\"SuperDeviceID\":4291821572},\"Ascend910-5\":{\"IP\":\"192.168.102.30\",\"SuperDeviceID\":4292083717},\"Ascend910-6\":{\"IP\":\"192.168.102.31\",\"SuperDeviceID\":4292345862},\"Ascend910-7\":{\"IP\":\"192.168.102.32\",\"SuperDeviceID\":4292608007}}",
+                    "cluster.x-k8s.io/cluster-name": "bke-cluster",
+                    "cluster.x-k8s.io/cluster-namespace": "bke-cluster",
+                    "cluster.x-k8s.io/labels-from-machine": "",
+                    "cluster.x-k8s.io/machine": "bke-cluster-controlplane-bqbl5",
+                    "cluster.x-k8s.io/owner-kind": "KubeadmControlPlane",
+                    "cluster.x-k8s.io/owner-name": "bke-cluster-controlplane",
+                    "nfd.node.kubernetes.io/feature-labels": "cpu-cpuid.AES,cpu-cpuid.ASIMD,cpu-cpuid.ASIMDDP,cpu-cpuid.ASIMDFHM,cpu-cpuid.ASIMDHP,cpu-cpuid.ASIMDRDM,cpu-cpuid.ATOMICS,cpu-cpuid.CPUID,cpu-cpuid.CRC32,cpu-cpuid.DCPOP,cpu-cpuid.EVTSTRM,cpu-cpuid.FCMA,cpu-cpuid.FP,cpu-cpuid.FPHP,cpu-cpuid.JSCVT,cpu-cpuid.PMULL,cpu-cpuid.SHA1,cpu-cpuid.SHA2,cpu-cpuid.SSBS,cpu-hardware_multithreading,cpu-model.family,cpu-model.id,cpu-model.vendor_id,kernel-config.NO_HZ,kernel-config.NO_HZ_FULL,kernel-selinux.enabled,kernel-version.full,kernel-version.major,kernel-version.minor,kernel-version.revision,memory-numa,network-sriov.capable,pci-0200_15b3_1017.present,pci-0200_15b3_1017.sriov.capable,pci-0200_19e5_a221.present,pci-0200_19e5_a221.sriov.capable,pci-0200_19e5_a222.present,pci-0200_19e5_a222.sriov.capable,pci-0300_19e5_1711.present,pci-1200_19e5_d802.present,pci-1200_19e5_d802.sriov.capable,rdma.available,rdma.capable,storage-nonrotationaldisk,system-os_release.ID,system-os_release.VERSION_ID,system-os_release.VERSION_ID.major,system-os_release.VERSION_ID.minor",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "openfuyao.com/container.runtime.endpoint": "unix:///run/containerd/containerd.sock",
+                    "openfuyao.com/container.runtime.version": "2.1.1",
+                    "product-serial-number": "2102314YYU10R6100007",
+                    "projectcalico.org/IPv4Address": "192.168.200.27/24",
+                    "projectcalico.org/IPv4VXLANTunnelAddr": "10.250.202.0",
+                    "projectcalico.org/Interfaces": "[{\"name\":\"enp189s0f0\"},{\"name\":\"enp189s0f1\"},{\"name\":\"enp189s0f2\"},{\"name\":\"enp189s0f3\"},{\"name\":\"enp195s0f0np0\"},{\"name\":\"enp195s0f1np1\"},{\"name\":\"enp61s0f0\",\"addresses\":[\"192.168.200.27\"]},{\"name\":\"enp61s0f1\"},{\"name\":\"enp61s0f2\"},{\"name\":\"enp61s0f3\"},{\"name\":\"enp67s0f0np0\"},{\"name\":\"enp67s0f1np1\"},{\"name\":\"nerdctl0\",\"addresses\":[\"10.4.0.1\"]}]",
+                    "serverIndex": "1023",
+                    "serverType": "",
+                    "superPodID": "-1",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-08-11T07:55:00Z",
+                "labels": {
+                    "accelerator": "huawei-Ascend910",
+                    "accelerator-type": "module-910b-8",
+                    "beta.kubernetes.io/arch": "arm64",
+                    "beta.kubernetes.io/os": "linux",
+                    "card-side-roce-bandwidth": "200Gbps",
+                    "feature.node.kubernetes.io/cpu-cpuid.AES": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMD": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDDP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDFHM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ASIMDRDM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.ATOMICS": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CPUID": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.CRC32": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.DCPOP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.EVTSTRM": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FCMA": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.FPHP": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.JSCVT": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.PMULL": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA1": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SHA2": "true",
+                    "feature.node.kubernetes.io/cpu-cpuid.SSBS": "true",
+                    "feature.node.kubernetes.io/cpu-hardware_multithreading": "false",
+                    "feature.node.kubernetes.io/cpu-model.family": "31",
+                    "feature.node.kubernetes.io/cpu-model.id": "53264",
+                    "feature.node.kubernetes.io/cpu-model.vendor_id": "VendorUnknown",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ": "true",
+                    "feature.node.kubernetes.io/kernel-config.NO_HZ_FULL": "true",
+                    "feature.node.kubernetes.io/kernel-selinux.enabled": "true",
+                    "feature.node.kubernetes.io/kernel-version.full": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "feature.node.kubernetes.io/kernel-version.major": "5",
+                    "feature.node.kubernetes.io/kernel-version.minor": "10",
+                    "feature.node.kubernetes.io/kernel-version.revision": "0",
+                    "feature.node.kubernetes.io/memory-numa": "true",
+                    "feature.node.kubernetes.io/network-sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_15b3_1017.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a221.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.present": "true",
+                    "feature.node.kubernetes.io/pci-0200_19e5_a222.sriov.capable": "true",
+                    "feature.node.kubernetes.io/pci-0300_19e5_1711.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.present": "true",
+                    "feature.node.kubernetes.io/pci-1200_19e5_d802.sriov.capable": "true",
+                    "feature.node.kubernetes.io/rdma.available": "true",
+                    "feature.node.kubernetes.io/rdma.capable": "true",
+                    "feature.node.kubernetes.io/storage-nonrotationaldisk": "true",
+                    "feature.node.kubernetes.io/system-os_release.ID": "openEuler",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID": "22.03",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.major": "22",
+                    "feature.node.kubernetes.io/system-os_release.VERSION_ID.minor": "03",
+                    "fuyao-harbor-local-install-node": "m1",
+                    "host-arch": "huawei-arm",
+                    "kubernetes.customized/bocloud_custom_version": "boc4.0",
+                    "kubernetes.io/alert": "elastalert",
+                    "kubernetes.io/arch": "arm64",
+                    "kubernetes.io/hostname": "m1",
+                    "kubernetes.io/os": "linux",
+                    "masterselector": "dls-master-node",
+                    "mind-cluster/npu-chip-memory": "32G",
+                    "node-role.kubernetes.io/control-plane": "control-plane",
+                    "node-role.kubernetes.io/master": "",
+                    "node-role.kubernetes.io/node": "",
+                    "node-role.kubernetes.io/worker": "worker",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-cap-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-cap-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-cap-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp61s0f0": "2.5GTps",
+                    "node-side-rdma-pcie-lnk-sta-speed-enp67s0f0np0": "8GTps",
+                    "node-side-rdma-pcie-lnk-sta-width-enp61s0f0": "x1",
+                    "node-side-rdma-pcie-lnk-sta-width-enp67s0f0np0": "x8",
+                    "node-side-rdma-speed-enp61s0f0": "10000Mbps",
+                    "node-side-rdma-speed-enp67s0f0np0": "10000Mbps",
+                    "node.kubernetes.io/npu.chip.name": "910B4",
+                    "nodeDEnable": "on",
+                    "openfuyao.com/container.runtime": "containerd",
+                    "openfuyao.com/npu.present": "",
+                    "openfuyao.io/m1": "m1",
+                    "server-usage": "infer",
+                    "servertype": "Ascend910B-20",
+                    "workerselector": "dls-worker-node"
+                },
+                "name": "m1",
+                "resourceVersion": "1327637",
+                "uid": "21c7aa8c-d2f3-4edd-84c4-7b3088634224"
+            },
+            "spec": {
+                "podCIDR": "10.250.0.0/24",
+                "podCIDRs": [
+                    "10.250.0.0/24"
+                ],
+                "providerID": "bke://bke-cluster/MTkyLjE2OC4yMDAuMjc="
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "192.168.200.27",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "m1",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "192",
+                    "ephemeral-storage": "5818555534738",
+                    "huawei.com/Ascend910": "8",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112088940Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "192",
+                    "ephemeral-storage": "6313536832Ki",
+                    "huawei.com/Ascend910": "8",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "hugepages-32Mi": "0",
+                    "hugepages-64Ki": "0",
+                    "memory": "2112191340Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-08-11T07:55:54Z",
+                        "lastTransitionTime": "2026-08-11T07:55:54Z",
+                        "message": "Calico is running on this node",
+                        "reason": "CalicoIsUp",
+                        "status": "False",
+                        "type": "NetworkUnavailable"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-08-12T13:58:20Z",
+                        "lastTransitionTime": "2026-08-11T07:55:00Z",
+                        "message": "kubelet has sufficient memory available",
+                        "reason": "KubeletHasSufficientMemory",
+                        "status": "False",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-08-12T13:58:20Z",
+                        "lastTransitionTime": "2026-08-11T07:55:00Z",
+                        "message": "kubelet has no disk pressure",
+                        "reason": "KubeletHasNoDiskPressure",
+                        "status": "False",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-08-12T13:58:20Z",
+                        "lastTransitionTime": "2026-08-11T07:55:00Z",
+                        "message": "kubelet has sufficient PID available",
+                        "reason": "KubeletHasSufficientPID",
+                        "status": "False",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-08-12T13:58:20Z",
+                        "lastTransitionTime": "2026-08-11T07:55:09Z",
+                        "message": "kubelet is posting ready status",
+                        "reason": "KubeletReady",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z"
+                        ],
+                        "sizeBytes": 6799342175
+                    },
+                    {
+                        "names": [
+                            "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1"
+                        ],
+                        "sizeBytes": 6750536442
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/console-website@sha256:2960eb5cf576bffe11414d44e4c53c41b3e32acd1e0e39e67833e92f5f82a2d8",
+                            "cr.openfuyao.cn/openfuyao/console-website:latest"
+                        ],
+                        "sizeBytes": 233973198
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/installer-website@sha256:2cce4acce2a0f3aa0943a7824c742c16c07d7e6187c843b717cde513aa54b373",
+                            "cr.openfuyao.cn/openfuyao/installer-website:latest"
+                        ],
+                        "sizeBytes": 207456532
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/calico/node@sha256:f2339c4ff3a57228cbc39a1f67ab81abded1997d843e0e0b1e86664c7c4eb6c0",
+                            "hub.oepkgs.net/openfuyao/calico/node:v3.31.3"
+                        ],
+                        "sizeBytes": 153583680
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/proxy-server@sha256:0cf064a248c5c3419491061cdc14aba92f5bf7cbe3505a72174b5595b23abbca",
+                            "cr.openfuyao.cn/openfuyao/proxy-server:latest"
+                        ],
+                        "sizeBytes": 126675785
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ingress-nginx/controller@sha256:5b161f051d017e55d358435f295f5e9a297e66158f136321d9b04520ec6c48a3",
+                            "hub.oepkgs.net/openfuyao/ingress-nginx/controller:v1.9.4"
+                        ],
+                        "sizeBytes": 105604017
+                    },
+                    {
+                        "names": [
+                            "docker.io/moby/buildkit@sha256:55eb9da1fbac8520aa368e4d0773411da424c516203cc568431ba944ab16d116",
+                            "docker.io/moby/buildkit:master"
+                        ],
+                        "sizeBytes": 103286162
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/prometheus/prometheus@sha256:5c435642ca4d8427ca26f4901c11114023004709037880cd7860d5b7176aa731",
+                            "hub.oepkgs.net/openfuyao/prometheus/prometheus:v2.52.0"
+                        ],
+                        "sizeBytes": 101270863
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/openfuyao-system-controller@sha256:f9e0b7a78947d07b9e8a1966e5f6235b0f187d4f7732e807b403bb5fb3153a31",
+                            "cr.openfuyao.cn/openfuyao/openfuyao-system-controller:latest"
+                        ],
+                        "sizeBytes": 88659533
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-jobservice@sha256:bbc8d5816015f8a4185e86d50fd79818d59511688c5efdd1e27db07d2476db6c",
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-jobservice:v2.7.0"
+                        ],
+                        "sizeBytes": 80897755
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-db@sha256:de6f7b4e77a643ec9372a971345dbf4738b1d6dc721180d7f7382661ae41746a",
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-db:v2.7.0"
+                        ],
+                        "sizeBytes": 77796247
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/vc-scheduler@sha256:928a99a335ab0f76729c949121ff067420731b86b4dab802baf68aad97113d1e",
+                            "hub.oepkgs.net/openfuyao/ascendhub/vc-scheduler:v1.9.0-v7.3.0"
+                        ],
+                        "sizeBytes": 76375789
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/chartmuseum-photon@sha256:a44ae6437ff7eb08e1da90c383817bfb425a8d552dad6d927dbda72b4ca64e06",
+                            "cr.openfuyao.cn/openfuyao/harbor/chartmuseum-photon:v2.7.0"
+                        ],
+                        "sizeBytes": 75152062
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/rancher/k3s:v1.25.16-k3s4"
+                        ],
+                        "sizeBytes": 71573817
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/cluster-api-provider-bke@sha256:e9abbb1c302cef6e55c54d8aeb567a0e2ef82754cc9ce0e1c1f1d6b0e9a0d256",
+                            "cr.openfuyao.cn/openfuyao/cluster-api-provider-bke:latest"
+                        ],
+                        "sizeBytes": 70913271
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/calico/cni@sha256:a6ddb6d00a53f98c5392eb3b525cf00af10cace1f6ca9414230ff652e6700e78",
+                            "hub.oepkgs.net/openfuyao/calico/cni:v3.31.3"
+                        ],
+                        "sizeBytes": 67396180
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/nfd/node-feature-discovery@sha256:d3f0fb2d50c2f5461f83f8a3fed1280fdc7b1bdd065a6ec8d32c9c53af7de990",
+                            "hub.oepkgs.net/openfuyao/nfd/node-feature-discovery:v0.16.4"
+                        ],
+                        "sizeBytes": 62601395
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/kubectl-openfuyao@sha256:19a28a81c7200cff2dc393b66fe79d9d7b45dd3abf55694a550c528a2416b5fc",
+                            "cr.openfuyao.cn/openfuyao/kubectl-openfuyao:latest"
+                        ],
+                        "sizeBytes": 61720709
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-portal@sha256:2045f0c222a65ed10452193a98a78392d2210d3c90efcc0ee3dad258ec7f9b2d",
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-portal:v2.7.0"
+                        ],
+                        "sizeBytes": 58743055
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/redis-photon@sha256:76c0edcd35e58697f3ee34a2e73c5030e07ff59341f32026541c9e671c02b956",
+                            "cr.openfuyao.cn/openfuyao/harbor/redis-photon:v2.7.0"
+                        ],
+                        "sizeBytes": 57942606
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/nginx-photon@sha256:df3a2642b977b0c6bc7aab7f2b25177bad4e05c32e6c1e9dd73e15f73b540d0e",
+                            "cr.openfuyao.cn/openfuyao/harbor/nginx-photon:v2.7.0"
+                        ],
+                        "sizeBytes": 56568338
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-registryctl@sha256:beb2e4c1b69a49b045e588bfc60cc640e907c95a3b5137f79ffa720e07de127c",
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-registryctl:v2.7.0"
+                        ],
+                        "sizeBytes": 54844059
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/clusterd@sha256:76104fb96397540c14a22cdabd014625745f1826c8fc707df373de2250e1ca03",
+                            "hub.oepkgs.net/openfuyao/ascendhub/clusterd:v7.3.0"
+                        ],
+                        "sizeBytes": 54218380
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-core@sha256:b477e776d87a1641d3a79d41bfc1f49cb164e4cf8484ab079974e631d24f7492",
+                            "cr.openfuyao.cn/openfuyao/harbor/harbor-core:v2.7.0"
+                        ],
+                        "sizeBytes": 54080583
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/noded@sha256:f940f3b7d84861e8448db77b1fb0d1a9d60558430375249e506e79fb44e5272d",
+                            "hub.oepkgs.net/openfuyao/ascendhub/noded:v7.3.0"
+                        ],
+                        "sizeBytes": 53561813
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/ascend-operator@sha256:c57fe3861369e3330b5fdb6b6569cac52f37faedddfdc49cd5a15530934f5672",
+                            "hub.oepkgs.net/openfuyao/ascendhub/ascend-operator:v7.3.0"
+                        ],
+                        "sizeBytes": 51752934
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/resilience-controller@sha256:aff3e3279a2e36ab981f755dbbea73c535c30779099cd7e3b1c3dcf9638a6a55",
+                            "hub.oepkgs.net/openfuyao/ascendhub/resilience-controller:v7.1.RC1"
+                        ],
+                        "sizeBytes": 51747712
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/ascend-k8sdeviceplugin@sha256:7ba94c6ba6528da8e0402c550669fe7e5b44736ddd8c2b54ebf5bfc291830f53",
+                            "hub.oepkgs.net/openfuyao/ascendhub/ascend-k8sdeviceplugin:v7.3.0"
+                        ],
+                        "sizeBytes": 51401696
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/calico/kube-controllers@sha256:3470040e0995deb6f6e23245a5149c9db1fc698a8a49da376cabe8dece62a0dd",
+                            "hub.oepkgs.net/openfuyao/calico/kube-controllers:v3.31.3"
+                        ],
+                        "sizeBytes": 50555619
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/installer-service@sha256:fbb05c27e8d6705565f6fb718cfb0d6ba5073948544c5d22821eb2dd35a66444",
+                            "cr.openfuyao.cn/openfuyao/installer-service:latest"
+                        ],
+                        "sizeBytes": 48791304
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/bkeagent-launcher@sha256:c1bc448fd360f7086ae4e52f00b3a8baa2347f0de13d6781acc6ddc64daccc0c",
+                            "cr.openfuyao.cn/openfuyao/bkeagent-launcher:latest"
+                        ],
+                        "sizeBytes": 42729928
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/npu-exporter@sha256:73b9ab7815681b418421d73792f6441c931e7d394b11bb4e6de3d1e9a0d7cd32",
+                            "hub.oepkgs.net/openfuyao/ascendhub/npu-exporter:v7.3.0"
+                        ],
+                        "sizeBytes": 40525130
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/cluster-api/cluster-api-controller@sha256:d2d1566285af3344a00e70d0bbf4293200b8cf09c1c258324035d0f77a73c92c",
+                            "hub.oepkgs.net/openfuyao/cluster-api/cluster-api-controller:v1.4.3"
+                        ],
+                        "sizeBytes": 31287581
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/prometheus/alertmanager@sha256:e13b6ed5cb929eeaee733479dce55e10eb3bc2e9c4586c705a4e8da41e5eacf5",
+                            "hub.oepkgs.net/openfuyao/prometheus/alertmanager:v0.27.0"
+                        ],
+                        "sizeBytes": 30584415
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/brancz/kube-rbac-proxy@sha256:754ab2a723c8fc7ea8e09ae1224f8af5be91849b8b2f2a3735c6237f1c534187",
+                            "hub.oepkgs.net/openfuyao/brancz/kube-rbac-proxy:v0.18.0"
+                        ],
+                        "sizeBytes": 29089064
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/harbor/registry-photon@sha256:fcbf52832f32f3c4a661daa165157d388175f66ff7a5a1382827fe0be0256686",
+                            "cr.openfuyao.cn/openfuyao/harbor/registry-photon:v2.7.0"
+                        ],
+                        "sizeBytes": 28977124
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ascendhub/vc-controller-manager@sha256:7cafe7895ea38970c08c10683ffec9d9fba1992a79f3b9d5cdc98d68506ff5ba",
+                            "hub.oepkgs.net/openfuyao/ascendhub/vc-controller-manager:v1.9.0-v7.3.0"
+                        ],
+                        "sizeBytes": 28322370
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/cluster-api/kubeadm-control-plane-controller@sha256:f08aeb43da2d1899761185ede3d58dd68b9bba94850a4242a89e36b101ce8afe",
+                            "hub.oepkgs.net/openfuyao/cluster-api/kubeadm-control-plane-controller:v1.4.3"
+                        ],
+                        "sizeBytes": 26969258
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/kube-proxy@sha256:ba262a64ad01d1d6fb3fc422dfc8bdd550e73f15c7ea91ad23c7511643ca9096",
+                            "cr.openfuyao.cn/openfuyao/kube-proxy:1.34.3-of.1"
+                        ],
+                        "sizeBytes": 24787571
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/cluster-api/kubeadm-bootstrap-controller@sha256:f305972e110f6494e2cca6ec904f86480182c893d51899d6daef163d33b375a9",
+                            "hub.oepkgs.net/openfuyao/cluster-api/kubeadm-bootstrap-controller:v1.4.3"
+                        ],
+                        "sizeBytes": 24267831
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/kube-apiserver@sha256:c4d6825c2eff4ba3771994ca6644d49c28f1a8807c983ef7a392af3c5a4aed28",
+                            "cr.openfuyao.cn/openfuyao/kube-apiserver:1.34.3-of.1"
+                        ],
+                        "sizeBytes": 23943859
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/helm/chartmuseum:v0.16.2"
+                        ],
+                        "sizeBytes": 23436218
+                    },
+                    {
+                        "names": [
+                            "hub.oepkgs.net/openfuyao/ingress-nginx/kube-webhook-certgen@sha256:a7943503b45d552785aa3b5e457f169a5661fb94d82b8a3373bcd9ebaf9aac80",
+                            "hub.oepkgs.net/openfuyao/ingress-nginx/kube-webhook-certgen:v20231011-8b53cabe0"
+                        ],
+                        "sizeBytes": 21588234
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/kube-controller-manager@sha256:460dfdd92aa2b36d41490cf78a2add0666ec1d3fec787cfe59c736544dbfa865",
+                            "cr.openfuyao.cn/openfuyao/kube-controller-manager:1.34.3-of.1"
+                        ],
+                        "sizeBytes": 20208987
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/coredns@sha256:0f82d312df82765f3aa4e5ed4145674f4428bc27430911c595b4c442dadb2584",
+                            "cr.openfuyao.cn/openfuyao/coredns:1.12.2-of.1"
+                        ],
+                        "sizeBytes": 19801479
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/application-management-service@sha256:4983fd8c7d470e2259ce19a35279ac9406476e95f94e8a9747ef2812ad5ae760",
+                            "cr.openfuyao.cn/openfuyao/application-management-service:latest"
+                        ],
+                        "sizeBytes": 19788988
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/oauth-server@sha256:1fab5fb48d29b5478452b6f59beb5ce87a6d69ba11758b74079898dbb074461c",
+                            "cr.openfuyao.cn/openfuyao/oauth-server:latest"
+                        ],
+                        "sizeBytes": 19684339
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/marketplace-service@sha256:8bae7b2720a7b31aa8ec6341b317b17427fa54381d92dd5be77ff323489f8f02",
+                            "cr.openfuyao.cn/openfuyao/marketplace-service:latest"
+                        ],
+                        "sizeBytes": 18653843
+                    },
+                    {
+                        "names": [
+                            "cr.openfuyao.cn/openfuyao/oauth-webhook@sha256:a16538cd2c37aa279013ce4f6d31ce3cab0ce0cb7080cb28555da63878d1d529",
+                            "cr.openfuyao.cn/openfuyao/oauth-webhook:latest"
+                        ],
+                        "sizeBytes": 17864586
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "arm64",
+                    "bootID": "fa8967f5-a3c9-4423-b738-f840ce6cf9fc",
+                    "containerRuntimeVersion": "containerd://2.1.1",
+                    "kernelVersion": "5.10.0-182.0.0.95.oe2203sp3.aarch64",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.34.3-of.1",
+                    "machineID": "223c80196bcc4c2d809a8b8adc3797f1",
+                    "operatingSystem": "linux",
+                    "osImage": "openEuler 22.03 (LTS-SP3)",
+                    "systemUUID": "3f118b03-2cda-9f19-f011-6642945e61a2"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "ascend"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

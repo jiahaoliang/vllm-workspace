@@ -1,0 +1,14 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/decode-engine-deployment",
+  "-c",
+  "decode-engine",
+  "--",
+  "python3",
+  "/opt/vllm-layerwise/check-runtime.py",
+  "--role",
+  "decode"
+]

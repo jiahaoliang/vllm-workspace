@@ -1,0 +1,16 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "sh",
+  "-c",
+  "set -eu; mkdir -p \"$1\"; cp \"$2\" \"$1/meminfo\"; test -s \"$1/meminfo\"",
+  "sh",
+  "/performance-workspace/rootfs/proc",
+  "/proc/meminfo"
+]

@@ -1,0 +1,15 @@
+{
+  "concurrency": 8,
+  "dataset_line_count": 8,
+  "dataset_sha256": "02aa6e30bb54bf7d6d51ec99e8373baea2d14dc73c402e58e21503cb2cf11932",
+  "fixture_manifest_sha256": "dd8e70a4e578514218339c70324f9ba257fd781b055b5598adfdf5f1e19b41d1",
+  "formal_input_tokens": 16384,
+  "input_tokens": 16384,
+  "output_tokens": 1,
+  "phase": "warmup",
+  "point_id": "dp1-16384-bulk-o1-c8",
+  "request_count": 8,
+  "schema_version": 1,
+  "topology": "dp1",
+  "variant": "bulk"
+}

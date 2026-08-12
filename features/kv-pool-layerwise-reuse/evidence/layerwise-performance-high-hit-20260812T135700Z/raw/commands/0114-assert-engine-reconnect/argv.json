@@ -1,0 +1,17 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "chroot",
+  "/performance-workspace/rootfs",
+  "env",
+  "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "/client-tools/venv/bin/python",
+  "-c",
+  "from urllib.request import urlopen\nfor url in (\n    \"http://vllm-proxy-service:8000/health\",\n    \"http://vllm-proxy-service:8000/listEndPoints\",\n):\n    with urlopen(url, timeout=30) as response:\n        assert response.status == 200, (url, response.status)\n        print(url, response.read().decode())\n"
+]

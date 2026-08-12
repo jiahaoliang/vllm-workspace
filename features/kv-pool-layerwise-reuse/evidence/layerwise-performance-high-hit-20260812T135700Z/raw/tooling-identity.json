@@ -1,0 +1,28 @@
+{
+  "files": {
+    "00-aisbench-client.yaml": "61f4aac3b96309f9a5d39229b60d0305850f9f754310f20066cfa8372315edb3",
+    "README.md": "cefd2168e9a2661f88930ef6a3c063e7721bb078b601ddfd9501988ef4208367",
+    "__init__.py": "fd957c8e64bb44fc6d39f7fce6486bf1164b20b34ae7509107e2961a502605f9",
+    "check-npu-readiness.py": "88e174b0c26e6b10fbcf4581bc0212157fe2a27d5ecf764304f78545ce890a5e",
+    "contract.py": "4e36dfd2a792c7796af94b879ab1e19c46b1d7c0daa08932411ebb59c61ad32e",
+    "diagnose_layerwise_prefill.py": "e14964012982c19498fd0249a2e65bc492cb410f100ba465aeb0ceb238c4c3df",
+    "fixtures.py": "7b84b1fd6f37e87c02997c82e6113e03dad0d686850f5ee0baee4ea41f4dae30",
+    "handoff.py": "b3a4a1044255b8f9d703a59efb8f11d3c1804fe396fc0c52f2ff59c86d8647bb",
+    "image.py": "adefb0a5ddbaf4116c0854935a3f09831d4aca49e473ea4a72fe7cc7e43519af",
+    "report.py": "d5528f7b26549b58d287af73d22ab487614379dcda5e03e11fc5ed6005dde214",
+    "run-performance-test.sh": "626dd5146c5be9a67c73d6f4df73916cf3073be92cb985533fa8fd4d0f639e13",
+    "run-performance-ut.sh": "9fc2d5e0e649e61527d52a18e244a44dee5dfdb7832f246f56f0713b598c4412",
+    "run_layerwise_self_load_ab.py": "4dff3bc179234f29f6e789bcfcc64ef1d5bd3170c20f4c85e7696117b74b071c",
+    "runner.py": "420768579e0d8067ea1e353040c7e151018a058de945b6e1f7e75fcc9af8f909",
+    "runtime.py": "2c6d77f977129eca11967dca3d8547959aec58b1e30137d5678902373d70aad2",
+    "tests/test_check_npu_readiness.py": "3b77eb1f38e448f21e1c898fee61a8965900493e74bb54b0864500c5d14e8f87",
+    "tests/test_contract.py": "649cf3ded0dd0675941dc5fa2f3770976dd3690a1c6a5d0df030877ad4a29d4f",
+    "tests/test_fixtures.py": "77d05ae49f76f211d7390eddc813abb305a534b7e663b01966370eee73c37c38",
+    "tests/test_handoff.py": "8b0ae3344b754cf6f31b676da9b6923544081a8b47fa43305ffa6670bc727383",
+    "tests/test_image.py": "a742377e0cf1577af99b58b4b9bcbdce662c8f026b0fe8c334fd1ce0f3deabb0",
+    "tests/test_report.py": "f31685f8d8392a62fbed62c810b2b075e01a965a2d4572e5f0338bd49c21dac0",
+    "tests/test_run_layerwise_self_load_ab.py": "91ed3578a0b75feecb0c90609582f1e7f598decbe005b9562636d6e429ef450a",
+    "tests/test_runner.py": "fd60f05254c8f4b5839813556b4360df1d85df67507aa8990c03ab542856b7f0",
+    "tests/test_runtime.py": "dfe2478237077cdec7a92eb160a84af8c209acd3e6084b845a2107f147d00616"
+  }
+}

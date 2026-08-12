@@ -1,0 +1,9 @@
+[
+  "kubectl",
+  "wait",
+  "-n",
+  "liangjiahao",
+  "--for=delete",
+  "pod/decode-engine-deployment-5879b6c7fb-f2f25",
+  "--timeout=300s"
+]

@@ -99,8 +99,9 @@
 
 - [x] Review exact diffs and source/image identities.
 - [x] Commit and push only owned paths; harness commit `dc52274` is published.
-- [ ] Advance the handoff generation without claiming new functional validation.
-- [ ] Run the handoff checker against the published commit.
+- [x] Advance the handoff generation without claiming new functional validation.
+- [x] Run the handoff checker against the published commit; generation 15
+  authorized the run from direct parent `6a5bfa785bbc9bc4a37684e4fc0fd643126279d1`.
 
 ### Task 6: Execute And Publish The NPU Run
 
@@ -113,9 +114,9 @@
 - Consumes the exact published high-hit contract, fixtures, image, and available four-NPU single-node deployment.
 - Produces immutable raw evidence, three valid performance rows, 192 formal request rows, exact hit validation, checksums, and restoration proof.
 
-- [ ] Recheck cluster context, `liangjiahao` resources, four replaceable physical Ascend910 devices, and AISBench/Prefill/Decode node placement.
-- [ ] Run `prepare` for the published tooling and verify paired fixture checksums.
-- [ ] Run the DP1 three-point benchmark once; retain failed Pods/logs if startup fails.
-- [ ] Validate the evidence tree, render the report, and independently replay SHA-256 checksums.
-- [ ] Compare the three variants without extrapolating beyond 16K, c8, o1, one repetition, and 81.25 percent hits.
+- [x] Recheck cluster context, `liangjiahao` resources, four replaceable physical Ascend910 devices, and AISBench/Prefill/Decode node placement; accepted allocation was Prefill 4,5 and Decode 3,6 on `m1`.
+- [x] Run `prepare` for the published tooling and verify paired fixture checksums; preparation root was `/tmp/layerwise-performance-high-hit-prepare-20260812T133300Z`.
+- [x] Run the DP1 three-point benchmark once; accepted run root was `/tmp/layerwise-performance-high-hit-20260812T135700Z`.
+- [x] Validate the evidence tree, render the report, and independently replay SHA-256 checksums.
+- [x] Compare the three variants without extrapolating beyond 16K, c8, o1, one repetition, and 81.25 percent hits.
 - [ ] Import, commit, and push the immutable result artifacts; update the handoff with the usable image and report identity.

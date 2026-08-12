@@ -1,0 +1,9 @@
+[
+  "kubectl",
+  "wait",
+  "-n",
+  "liangjiahao",
+  "--for=delete",
+  "pod/prefill-engine-deployment-66f64cb5c4-pnrq6",
+  "--timeout=300s"
+]
