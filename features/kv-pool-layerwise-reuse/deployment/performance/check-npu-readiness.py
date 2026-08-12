@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ruff: noqa: N999
-"""Read-only physical Ascend910 readiness check for the rapid DP1 run."""
+"""Read-only physical Ascend910 readiness check for the high-hit DP1 run."""
 
 from __future__ import annotations
 

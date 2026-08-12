@@ -9,7 +9,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from performance.contract import (
+    EXPECTED_HIT_RATE,
     FORMAL_REQUEST_COUNT,
+    SEED_REQUEST_COUNT,
+    SEED_TOKENS,
     WARMUP_REQUEST_COUNT,
     WorkloadPoint,
     build_matrix,
@@ -222,6 +225,203 @@ def validate_checksums(root: Path) -> list[str]:
     return errors
 
 
+def _load_jsonl_objects(path: Path, description: str) -> tuple[list[dict[str, object]], list[str]]:
+    rows: list[dict[str, object]] = []
+    errors: list[str] = []
+    try:
+        stream = path.open(encoding="utf-8")
+    except OSError as error:
+        return [], [f"missing {description}: {error}"]
+    with stream:
+        for line_number, line in enumerate(stream, 1):
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                errors.append(f"malformed {description} row {line_number}")
+                continue
+            if not isinstance(row, dict):
+                errors.append(f"{description} row {line_number} is not an object")
+                continue
+            rows.append(row)
+    return rows, errors
+
+
+def _validate_high_hit_fixture(fixture_root: Path) -> list[str]:
+    errors: list[str] = []
+    manifest_path = fixture_root / "manifest.json"
+    try:
+        manifest = _load_json(manifest_path)
+    except ValueError as error:
+        return [str(error)]
+    if manifest.get("schema_version") != 2:
+        errors.append("fixture manifest schema_version must be 2")
+    if manifest.get("formal_tokens") != 16384:
+        errors.append("fixture manifest formal_tokens must be 16384")
+    if manifest.get("seed_tokens") != SEED_TOKENS:
+        errors.append("fixture manifest seed_tokens must be 13312")
+    if manifest.get("expected_hit_rate") != EXPECTED_HIT_RATE:
+        errors.append("fixture manifest expected_hit_rate must be 0.8125")
+
+    artifact_checksums = manifest.get("artifact_checksums")
+    if not isinstance(artifact_checksums, dict):
+        errors.append("fixture manifest lacks artifact_checksums")
+        artifact_checksums = {}
+    for filename in ("warmup.jsonl", "seed.jsonl", "formal-1.jsonl", "metadata.jsonl"):
+        path = fixture_root / filename
+        actual = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else ""
+        if artifact_checksums.get(filename) != actual:
+            errors.append(f"fixture artifact checksum mismatch: {filename}")
+
+    inner_manifest = fixture_root / "SHA256SUMS"
+    if not inner_manifest.is_file():
+        errors.append("missing shared fixture: SHA256SUMS")
+    else:
+        expected_inner = {
+            line.partition("  ")[2]: line.partition("  ")[0]
+            for line in inner_manifest.read_text(encoding="utf-8").splitlines()
+            if line.partition("  ")[1]
+        }
+        for filename in (
+            "formal-1.jsonl",
+            "manifest.json",
+            "metadata.jsonl",
+            "seed.jsonl",
+            "warmup.jsonl",
+        ):
+            path = fixture_root / filename
+            actual = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else ""
+            if expected_inner.get(filename) != actual:
+                errors.append(f"fixture SHA256SUMS replay failed: {filename}")
+
+    phase_rows: dict[str, list[dict[str, object]]] = {}
+    for phase, expected_count in (("warmup", 8), ("seed", 64), ("formal-1", 64)):
+        rows, row_errors = _load_jsonl_objects(
+            fixture_root / f"{phase}.jsonl", f"fixture {phase}"
+        )
+        errors.extend(row_errors)
+        if len(rows) != expected_count:
+            errors.append(
+                f"fixture {phase} row count must be {expected_count}: {len(rows)}"
+            )
+        phase_rows[phase] = rows
+
+    phase_ids = {
+        phase: [row.get("request_id") for row in rows]
+        for phase, rows in phase_rows.items()
+    }
+    if phase_ids["warmup"] != manifest.get("warmup_ids"):
+        errors.append("fixture warmup IDs do not match manifest")
+    if phase_ids["seed"] != manifest.get("seed_ids"):
+        errors.append("fixture seed IDs do not match manifest")
+    formal_ids = manifest.get("formal_ids")
+    expected_formal_ids = formal_ids[0] if isinstance(formal_ids, list) and len(formal_ids) == 1 else None
+    if phase_ids["formal-1"] != expected_formal_ids:
+        errors.append("fixture formal IDs do not match manifest")
+    all_ids = phase_ids["warmup"] + phase_ids["seed"] + phase_ids["formal-1"]
+    if not all(isinstance(value, str) for value in all_ids) or len(set(all_ids)) != 136:
+        errors.append("fixture request IDs must be 136 unique strings")
+
+    pairs = manifest.get("seed_formal_pairs")
+    if not isinstance(pairs, list) or len(pairs) != SEED_REQUEST_COUNT:
+        errors.append("fixture manifest must contain 64 seed/formal pairs")
+    else:
+        for index, pair in enumerate(pairs):
+            if not isinstance(pair, dict):
+                errors.append(f"fixture pair {index} is not an object")
+                continue
+            seed_id = (
+                phase_ids["seed"][index]
+                if index < len(phase_ids["seed"])
+                else None
+            )
+            formal_id = (
+                phase_ids["formal-1"][index]
+                if index < len(phase_ids["formal-1"])
+                else None
+            )
+            if pair.get("seed_request_id") != seed_id:
+                errors.append(f"fixture pair {index} seed ID mismatch")
+            if pair.get("formal_request_id") != formal_id:
+                errors.append(f"fixture pair {index} formal ID mismatch")
+            seed_digest = pair.get("seed_token_ids_sha256")
+            prefix_digest = pair.get("formal_prefix_token_ids_sha256")
+            formal_digest = pair.get("formal_token_ids_sha256")
+            if (
+                not isinstance(seed_digest, str)
+                or len(seed_digest) != 64
+                or seed_digest != prefix_digest
+                or not isinstance(formal_digest, str)
+                or len(formal_digest) != 64
+            ):
+                errors.append(f"fixture pair {index} lacks exact token-prefix proof")
+
+    metadata_rows, metadata_errors = _load_jsonl_objects(
+        fixture_root / "metadata.jsonl", "fixture metadata"
+    )
+    errors.extend(metadata_errors)
+    metadata_by_id = {
+        row.get("request_id"): row
+        for row in metadata_rows
+        if isinstance(row.get("request_id"), str)
+    }
+    if len(metadata_rows) != 136 or len(metadata_by_id) != 136:
+        errors.append("fixture metadata must contain 136 unique request rows")
+    for phase, expected_tokens in (("warmup", 16384), ("seed", SEED_TOKENS), ("formal-1", 16384)):
+        for row in phase_rows[phase]:
+            request_id = row.get("request_id")
+            metadata = metadata_by_id.get(request_id)
+            question = row.get("question")
+            if (
+                metadata is None
+                or metadata.get("partition") != phase
+                or metadata.get("token_count") != expected_tokens
+                or not isinstance(question, str)
+                or metadata.get("prompt_sha256")
+                != hashlib.sha256(question.encode("utf-8")).hexdigest()
+            ):
+                errors.append(f"fixture metadata mismatch for {request_id}")
+    if isinstance(pairs, list) and len(pairs) == SEED_REQUEST_COUNT:
+        for index, pair in enumerate(pairs):
+            if not isinstance(pair, dict):
+                continue
+            seed_metadata = metadata_by_id.get(pair.get("seed_request_id"))
+            formal_metadata = metadata_by_id.get(pair.get("formal_request_id"))
+            seed_token_ids = (
+                seed_metadata.get("token_ids")
+                if isinstance(seed_metadata, dict)
+                else None
+            )
+            formal_token_ids = (
+                formal_metadata.get("token_ids")
+                if isinstance(formal_metadata, dict)
+                else None
+            )
+            if (
+                not isinstance(seed_token_ids, list)
+                or len(seed_token_ids) != SEED_TOKENS
+                or not all(isinstance(value, int) for value in seed_token_ids)
+                or not isinstance(formal_token_ids, list)
+                or len(formal_token_ids) != 16384
+                or not all(isinstance(value, int) for value in formal_token_ids)
+                or seed_token_ids != formal_token_ids[:SEED_TOKENS]
+            ):
+                errors.append(f"fixture pair {index} token prefix mismatch")
+                continue
+            seed_digest = hashlib.sha256(
+                json.dumps(seed_token_ids, separators=(",", ":")).encode("ascii")
+            ).hexdigest()
+            formal_digest = hashlib.sha256(
+                json.dumps(formal_token_ids, separators=(",", ":")).encode("ascii")
+            ).hexdigest()
+            if (
+                pair.get("seed_token_ids_sha256") != seed_digest
+                or pair.get("formal_prefix_token_ids_sha256") != seed_digest
+                or pair.get("formal_token_ids_sha256") != formal_digest
+            ):
+                errors.append(f"fixture pair {index} token digest mismatch")
+    return errors
+
+
 def validate_evidence(root: Path) -> list[str]:
     errors = validate_checksums(root)
     for name in REQUIRED_ROOT_FILES:
@@ -240,28 +440,49 @@ def validate_evidence(root: Path) -> list[str]:
     if not isinstance(expected_points, list):
         errors.append("run contract expected_points is not a list")
         return errors
-    rapid_points = [point_id(point) for point in build_matrix("dp1")]
-    if expected_points != rapid_points:
-        errors.append("run contract does not match the exact rapid point matrix")
+    high_hit_points = [point_id(point) for point in build_matrix("dp1")]
+    if expected_points != high_hit_points:
+        errors.append("run contract does not match the exact high-hit point matrix")
     if repetitions != 1:
         errors.append("run contract formal_repetitions must be 1")
     if contract.get("warmup_request_count") != WARMUP_REQUEST_COUNT:
         errors.append("run contract warmup_request_count must be 8")
+    if contract.get("seed_request_count") != SEED_REQUEST_COUNT:
+        errors.append("run contract seed_request_count must be 64")
     if contract.get("formal_request_count") != FORMAL_REQUEST_COUNT:
         errors.append("run contract formal_request_count must be 64")
     if contract.get("formal_concurrency_waves") != 8:
         errors.append("run contract formal_concurrency_waves must be 8")
+    if contract.get("seed_tokens") != SEED_TOKENS:
+        errors.append("run contract seed_tokens must be 13312")
+    if contract.get("expected_hit_tokens") != SEED_TOKENS:
+        errors.append("run contract expected_hit_tokens must be 13312")
+    if contract.get("expected_hit_rate") != EXPECTED_HIT_RATE:
+        errors.append("run contract expected_hit_rate must be 0.8125")
+    if contract.get("expected_need_to_load_tokens") != SEED_TOKENS:
+        errors.append("run contract expected_need_to_load_tokens must be 13312")
+    if contract.get("local_prefix_caching") is not False:
+        errors.append("run contract local_prefix_caching must be false")
     if contract.get("calculator") != "total":
         errors.append("run contract calculator must be total")
     if contract.get("single_wave") is not False:
         errors.append("run contract single_wave must be false")
     actual_points = sorted(path.name for path in (root / "points").glob("*") if path.is_dir())
-    for point in sorted(set(actual_points) - set(rapid_points)):
+    for point in sorted(set(actual_points) - set(high_hit_points)):
         errors.append(f"unexpected point directory: {point}")
     fixture_root = root / "fixtures" / "tokens-16384-c8"
-    for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
+    for filename in (
+        "manifest.json",
+        "metadata.jsonl",
+        "SHA256SUMS",
+        "warmup.jsonl",
+        "seed.jsonl",
+        "formal-1.jsonl",
+    ):
         if not (fixture_root / filename).is_file():
             errors.append(f"missing shared fixture: {filename}")
+    if (fixture_root / "manifest.json").is_file():
+        errors.extend(_validate_high_hit_fixture(fixture_root))
     for variant in ("bulk", "layerwise", "reuse3"):
         for filename in ("vllm-prefill.log", "vllm-decode.log"):
             if not (root / "variants" / variant / "raw" / filename).is_file():
@@ -280,11 +501,13 @@ def validate_evidence(root: Path) -> list[str]:
                 errors.append(str(error))
         if not (point_root / "warmup").is_dir():
             errors.append(f"missing warmup: {point}")
+        if not (point_root / "seed").is_dir():
+            errors.append(f"missing seed: {point}")
         formal_phases = sorted(path.name for path in point_root.glob("formal-*") if path.is_dir())
         for phase_name in formal_phases:
             if phase_name != "formal-1":
                 errors.append(f"unexpected formal phase {phase_name}: {point}")
-        for phase_name in ("warmup", "formal-1"):
+        for phase_name in ("warmup", "seed", "formal-1"):
             attempts = list((point_root / phase_name).glob("attempt-*"))
             if len(attempts) != 1:
                 errors.append(f"missing or ambiguous {phase_name} attempt: {point}")
@@ -303,6 +526,22 @@ def validate_evidence(root: Path) -> list[str]:
                 digest = hashlib.sha256(shared.read_bytes()).hexdigest() if shared.is_file() else ""
                 if reference.get("sha256") != digest:
                     errors.append(f"fixture reference digest drift for {phase_name}: {point}")
+            except ValueError as error:
+                errors.append(str(error))
+        seed_summaries = list(
+            (point_root / "seed").glob("attempt-*/raw/summary.json")
+        )
+        if len(seed_summaries) != 1:
+            errors.append(f"missing or ambiguous seed summary: {point}")
+        else:
+            try:
+                seed_summary = _load_json(seed_summaries[0])
+                if (
+                    seed_summary.get("valid") is not True
+                    or seed_summary.get("request_count") != SEED_REQUEST_COUNT
+                    or seed_summary.get("success_count") != SEED_REQUEST_COUNT
+                ):
+                    errors.append(f"invalid seed summary: {point}")
             except ValueError as error:
                 errors.append(str(error))
         for repetition in range(1, repetitions + 1):
@@ -327,6 +566,27 @@ def validate_evidence(root: Path) -> list[str]:
                     errors.append(f"formal summary contract drift: {point}")
             except ValueError as error:
                 errors.append(str(error))
+            hit_path = summaries[0].parent / "hit-validation.json"
+            if not hit_path.is_file():
+                errors.append(f"missing formal hit evidence: {point}")
+            else:
+                try:
+                    hit = _load_json(hit_path)
+                    if (
+                        hit.get("valid") is not True
+                        or hit.get("request_count") != FORMAL_REQUEST_COUNT
+                        or hit.get("expected_hit_tokens") != SEED_TOKENS
+                        or hit.get("min_hit_tokens") != SEED_TOKENS
+                        or hit.get("max_hit_tokens") != SEED_TOKENS
+                        or hit.get("hit_rate") != EXPECTED_HIT_RATE
+                        or hit.get("expected_need_to_load_tokens") != SEED_TOKENS
+                        or hit.get("min_need_to_load_tokens") != SEED_TOKENS
+                        or hit.get("max_need_to_load_tokens") != SEED_TOKENS
+                        or hit.get("local_hit_tokens") != 0
+                    ):
+                        errors.append(f"invalid formal hit evidence: {point}")
+                except ValueError as error:
+                    errors.append(str(error))
     return errors
 
 
@@ -423,6 +683,7 @@ def render_report(root: Path) -> str:
         "# Mooncake Layerwise Performance Raw Characterization",
         "",
         "Single formal attempt with eight concurrency waves; not a statistically significant result.",
+        "All formal requests passed the frozen 13,312/16,384-token external Prefix KV hit contract (81.25%).",
         "",
         "## Raw Results",
         "",

@@ -2,7 +2,7 @@
 
 This directory implements the preparation, handoff gate, execution, and raw
 reporting contract in the approved
-[`2026-08-10-layerwise-performance-64-request-rerun-design.md`](../../2026-08-10-layerwise-performance-64-request-rerun-design.md).
+[`2026-08-12-layerwise-high-hit-performance-validation-design.md`](../../2026-08-12-layerwise-high-hit-performance-validation-design.md).
 
 ## Safety Boundary
 
@@ -18,10 +18,16 @@ reporting contract in the approved
 - Generated Prefill and Decode start scripts freeze
   `MOONCAKE_GLOBAL_SEGMENT_SIZE=128GB` per serving rank, identically across all
   variants.
-- The formal matrix is exactly DP1, 16384 input tokens, concurrency 8, and five
-  points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1.
-- Each point has one 8-request warmup wave and one 64-request formal attempt.
-  At concurrency 8, the formal attempt contains eight concurrency waves. The
+- The formal matrix is exactly DP1, 16384 input tokens, output 1, concurrency
+  8, and three points: BULK, LAYERWISE, and REUSE3.
+- Each point runs 8 runtime warmups, clears Mooncake, seeds 64 paired 13312-token
+  prefixes outside the measured interval, then runs one 64-request formal
+  attempt without clearing Mooncake. The exact external Prefix KV hit rate is
+  `13312/16384 = 81.25%`.
+- All serving variants use `--no-enable-prefix-caching`. The run is rejected
+  unless every formal Prefill log reports both `kvpool hit tokens: 13312` and
+  `need to load: 13312`, proving that the hit is external rather than local HBM.
+- At concurrency 8, the formal attempt contains eight concurrency waves. The
   runner starts the server once per variant, does not retry a point, and defines
   no performance timeout. A valid slow point continues naturally.
 
@@ -87,37 +93,39 @@ python3 features/kv-pool-layerwise-reuse/deployment/performance/check-npu-readin
   --output /tmp/layerwise-npu-readiness.json
 ```
 
-After the listener accepts the current ready handoff, execute the rapid DP1 run
+After the listener accepts the current ready handoff, execute the high-hit DP1 run
 in a new root. A failed root is retained as diagnostics and is never resumed.
 
 ```bash
 run_id=$(date -u +%Y%m%dT%H%M%SZ)
-run_root="/tmp/layerwise-performance-rapid-${run_id}"
+run_root="/tmp/layerwise-performance-high-hit-${run_id}"
 features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh \
   run --topology dp1 --npu-node m1 --output "${run_root}"
 PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
   python3 -m performance.report check --root "${run_root}" --scope all
 ```
 
-Render the five aggregate rows, all 320 formal request rows, and output-matched
-direct ratios:
+Render the three aggregate rows, all 192 formal request rows, and direct ratios:
 
 ```bash
 PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
 python3 -m performance.report render \
   --root "${run_root}" \
-  --output features/kv-pool-layerwise-reuse/layerwise-performance-64-request-validation-2026-08-10.md
+  --output features/kv-pool-layerwise-reuse/layerwise-performance-high-hit-validation-2026-08-12.md
 ```
 
 This is one formal attempt with eight concurrency waves, not an independently
-repeated or statistically significant result. The report does not remove
-outliers or assign a performance pass/fail result. Point evidence keeps
-10-second telemetry and lightweight diagnostics; complete Prefill and Decode
-logs are captured once per variant.
+repeated or statistically significant result. Seed traffic is excluded from
+the measured results. The report does not remove outliers or assign a
+performance pass/fail result. Point evidence keeps 10-second telemetry,
+per-request external-hit proof, and lightweight diagnostics; complete Prefill
+and Decode logs are captured once per variant.
 
 ## Causal Self-load A/B
 
-The causal runner replays only `DP1 / 16384 input tokens / o1 / c8`, with one
+This historical diagnosis concerns the earlier cold-cache characterization.
+It does not replace or validate the high-hit three-point run above. The causal
+runner replays only `DP1 / 16384 input tokens / o1 / c8`, with one
 8-request warmup and one 64-request formal attempt. Its immutable control is
 `evidence/layerwise-performance-20260810T043500Z/`; the candidate source is
 vLLM-Ascend commit `57d3c214e642cdbb529400f0742d1a98a8d38708`. This is a

@@ -8,7 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from performance.contract import INPUT_TOKENS, WorkloadPoint, point_id, sample_counts
+from performance.contract import (
+    INPUT_TOKENS,
+    SEED_REQUEST_COUNT,
+    SEED_TOKENS,
+    WorkloadPoint,
+    point_id,
+    sample_counts,
+)
 
 BLOCK_SIZE = 128
 
@@ -32,6 +39,7 @@ class FixtureManifest:
     concurrency: int
     seed: int
     warmup_ids: tuple[str, ...]
+    seed_ids: tuple[str, ...]
     formal_ids: tuple[tuple[str, ...], ...]
     partition_files: dict[str, Path]
     metadata_file: Path
@@ -130,6 +138,11 @@ def _digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _token_ids_digest(token_ids: list[int] | tuple[int, ...]) -> str:
+    encoded = json.dumps(token_ids, separators=(",", ":")).encode("ascii")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def write_fixture(
     tokenizer: Any,
     input_tokens: int,
@@ -137,77 +150,151 @@ def write_fixture(
     seed: int,
     output_dir: Path,
     stable_tokens: tuple[int, ...] | None = None,
+    seed_tokens: int = SEED_TOKENS,
 ) -> FixtureManifest:
     warmup_count, formal_count, repetitions = sample_counts(concurrency)
+    if formal_count != SEED_REQUEST_COUNT or repetitions != 1:
+        raise ValueError("high-hit fixture requires one formal partition matching the seed count")
+    if seed_tokens < BLOCK_SIZE or seed_tokens % BLOCK_SIZE:
+        raise ValueError(f"seed_tokens must be a positive multiple of {BLOCK_SIZE}")
+    if input_tokens <= seed_tokens:
+        raise ValueError(f"input_tokens must be greater than seed tokens ({seed_tokens})")
     root = output_dir / f"tokens-{input_tokens}-c{concurrency}"
     root.mkdir(parents=True, exist_ok=False)
-    partition_sizes = [("warmup", warmup_count)] + [
-        (f"formal-{index}", formal_count) for index in range(1, repetitions + 1)
-    ]
     partition_files: dict[str, Path] = {}
     partition_ids: dict[str, tuple[str, ...]] = {}
     metadata_file = root / "metadata.jsonl"
     request_index = 0
     stable = stable_tokens or find_roundtrip_tokens(tokenizer)
     with metadata_file.open("x", encoding="utf-8") as metadata_stream:
-        for partition, count in partition_sizes:
-            path = root / f"{partition}.jsonl"
-            ids: list[str] = []
-            with path.open("x", encoding="utf-8") as partition_stream:
-                for _ in range(count):
-                    record = build_prompt(
-                        tokenizer,
-                        input_tokens,
-                        request_index,
-                        seed,
-                        stable_tokens=stable,
+        def write_metadata(record: PromptRecord, partition: str) -> None:
+            metadata_stream.write(
+                json.dumps(
+                    {
+                        "request_id": record.request_id,
+                        "partition": partition,
+                        "seed": record.seed,
+                        "tokenizer_identity": record.tokenizer_identity,
+                        "token_count": len(record.token_ids),
+                        "token_ids": record.token_ids,
+                        "prompt_sha256": record.prompt_sha256,
+                        "first_block_sha256": record.first_block_sha256,
+                    },
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                + "\n"
+            )
+
+        warmup_path = root / "warmup.jsonl"
+        warmup_ids: list[str] = []
+        with warmup_path.open("x", encoding="utf-8") as warmup_stream:
+            for _ in range(warmup_count):
+                record = build_prompt(
+                    tokenizer,
+                    input_tokens,
+                    request_index,
+                    seed,
+                    stable_tokens=stable,
+                )
+                request_index += 1
+                warmup_ids.append(record.request_id)
+                warmup_stream.write(
+                    json.dumps(
+                        {"question": record.text, "answer": "", "request_id": record.request_id},
+                        ensure_ascii=False,
+                        sort_keys=True,
                     )
-                    request_index += 1
-                    ids.append(record.request_id)
-                    partition_stream.write(
+                    + "\n"
+                )
+                write_metadata(record, "warmup")
+        partition_files["warmup"] = warmup_path
+        partition_ids["warmup"] = tuple(warmup_ids)
+
+        seed_path = root / "seed.jsonl"
+        formal_path = root / "formal-1.jsonl"
+        seed_ids: list[str] = []
+        formal_ids: list[str] = []
+        seed_formal_pairs: list[dict[str, str]] = []
+        with (
+            seed_path.open("x", encoding="utf-8") as seed_stream,
+            formal_path.open("x", encoding="utf-8") as formal_stream,
+        ):
+            for _ in range(formal_count):
+                formal = build_prompt(
+                    tokenizer,
+                    input_tokens,
+                    request_index,
+                    seed,
+                    stable_tokens=stable,
+                )
+                request_index += 1
+                seed_token_ids = list(formal.token_ids[:seed_tokens])
+                seed_text = _decode(tokenizer, seed_token_ids)
+                if _encode(tokenizer, seed_text) != seed_token_ids:
+                    raise ValueError("seed prefix does not round-trip to the exact token sequence")
+                seed_request_id = f"seed-{formal.request_id}"
+                first_block = json.dumps(seed_token_ids[:BLOCK_SIZE], separators=(",", ":"))
+                seed_record = PromptRecord(
+                    request_id=seed_request_id,
+                    seed=seed,
+                    input_tokens=seed_tokens,
+                    text=seed_text,
+                    token_ids=tuple(seed_token_ids),
+                    tokenizer_identity=formal.tokenizer_identity,
+                    prompt_sha256=hashlib.sha256(seed_text.encode("utf-8")).hexdigest(),
+                    first_block_sha256=hashlib.sha256(first_block.encode("ascii")).hexdigest(),
+                )
+                seed_ids.append(seed_record.request_id)
+                formal_ids.append(formal.request_id)
+                seed_formal_pairs.append(
+                    {
+                        "seed_request_id": seed_record.request_id,
+                        "formal_request_id": formal.request_id,
+                        "seed_token_ids_sha256": _token_ids_digest(
+                            seed_record.token_ids
+                        ),
+                        "formal_prefix_token_ids_sha256": _token_ids_digest(
+                            formal.token_ids[:seed_tokens]
+                        ),
+                        "formal_token_ids_sha256": _token_ids_digest(
+                            formal.token_ids
+                        ),
+                    }
+                )
+                for stream, record in ((seed_stream, seed_record), (formal_stream, formal)):
+                    stream.write(
                         json.dumps(
-                            {
-                                "question": record.text,
-                                "answer": "",
-                                "request_id": record.request_id,
-                            },
+                            {"question": record.text, "answer": "", "request_id": record.request_id},
                             ensure_ascii=False,
                             sort_keys=True,
                         )
                         + "\n"
                     )
-                    metadata_stream.write(
-                        json.dumps(
-                            {
-                                "request_id": record.request_id,
-                                "partition": partition,
-                                "seed": record.seed,
-                                "tokenizer_identity": record.tokenizer_identity,
-                                "token_count": len(record.token_ids),
-                                "token_ids": record.token_ids,
-                                "prompt_sha256": record.prompt_sha256,
-                                "first_block_sha256": record.first_block_sha256,
-                            },
-                            separators=(",", ":"),
-                            sort_keys=True,
-                        )
-                        + "\n"
-                    )
-            partition_files[partition] = path
-            partition_ids[partition] = tuple(ids)
+                write_metadata(seed_record, "seed")
+                write_metadata(formal, "formal-1")
+        partition_files["seed"] = seed_path
+        partition_files["formal-1"] = formal_path
+        partition_ids["seed"] = tuple(seed_ids)
+        partition_ids["formal-1"] = tuple(formal_ids)
     checksum_paths = [*partition_files.values(), metadata_file]
     checksums = {path.name: _digest(path) for path in checksum_paths}
     manifest_file = root / "manifest.json"
     manifest_file.write_text(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "input_tokens": input_tokens,
+                "formal_tokens": input_tokens,
+                "seed_tokens": seed_tokens,
+                "expected_hit_rate": seed_tokens / input_tokens,
                 "concurrency": concurrency,
                 "seed": seed,
                 "tokenizer_identity": str(getattr(tokenizer, "name_or_path", type(tokenizer).__name__)),
                 "warmup_ids": partition_ids["warmup"],
+                "seed_ids": partition_ids["seed"],
                 "formal_ids": [partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)],
+                "seed_formal_pairs": seed_formal_pairs,
                 "artifact_checksums": checksums,
             },
             indent=2,
@@ -228,6 +315,7 @@ def write_fixture(
         concurrency=concurrency,
         seed=seed,
         warmup_ids=partition_ids["warmup"],
+        seed_ids=partition_ids["seed"],
         formal_ids=tuple(partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)),
         partition_files=partition_files,
         metadata_file=metadata_file,
@@ -265,7 +353,7 @@ def build_attempt_contract(
 ) -> dict[str, object]:
     if request_count <= 0:
         raise ValueError("request_count must be positive")
-    if phase not in {"warmup", "formal-1"}:
+    if phase not in {"warmup", "seed", "formal-1"}:
         raise ValueError(f"unsupported attempt phase: {phase}")
     if not dataset_path.is_file():
         raise FileNotFoundError(dataset_path)
@@ -287,6 +375,8 @@ def build_attempt_contract(
     expected_ids: object
     if phase == "warmup":
         expected_ids = manifest.get("warmup_ids")
+    elif phase == "seed":
+        expected_ids = manifest.get("seed_ids")
     else:
         formal_ids = manifest.get("formal_ids")
         expected_ids = (
@@ -336,13 +426,18 @@ def build_attempt_contract(
         raise ValueError(
             f"dataset checksum mismatch: {dataset_sha256} != {expected_checksum}"
         )
+    manifest_seed_tokens = manifest.get("seed_tokens")
+    if not isinstance(manifest_seed_tokens, int):
+        raise ValueError("fixture manifest lacks integer seed_tokens")
+    attempt_input_tokens = manifest_seed_tokens if phase == "seed" else point.input_tokens
     return {
         "schema_version": 1,
         "phase": phase,
         "point_id": point_id(point),
         "topology": point.topology,
         "variant": point.variant,
-        "input_tokens": point.input_tokens,
+        "input_tokens": attempt_input_tokens,
+        "formal_input_tokens": point.input_tokens,
         "output_tokens": point.output_tokens,
         "concurrency": point.concurrency,
         "request_count": request_count,
@@ -463,7 +558,7 @@ def _parser() -> argparse.ArgumentParser:
     config.add_argument("--concurrency", type=int, required=True)
     config.add_argument("--dataset", type=Path, required=True)
     config.add_argument("--request-count", type=int, required=True)
-    config.add_argument("--phase", choices=("warmup", "formal-1"), required=True)
+    config.add_argument("--phase", choices=("warmup", "seed", "formal-1"), required=True)
     config.add_argument("--fixture-manifest", type=Path, required=True)
     config.add_argument("--output", type=Path, required=True)
     return parser

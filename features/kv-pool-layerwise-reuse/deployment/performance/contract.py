@@ -43,13 +43,13 @@ VARIANTS = MappingProxyType(
             "bulk",
             _settings(use_layerwise=False, layerwise_prefetch_layers=3),
             _settings(use_layerwise=False, layerwise_prefetch_layers=3),
-            (1, 128),
+            (1,),
         ),
         "layerwise": Variant(
             "layerwise",
             _settings(use_layerwise=True, layerwise_prefetch_layers=3),
             _settings(use_layerwise=True, layerwise_prefetch_layers=3),
-            (1, 128),
+            (1,),
         ),
         "reuse3": Variant(
             "reuse3",
@@ -68,8 +68,13 @@ TOPOLOGIES = MappingProxyType({"dp1": Topology("dp1", 1, 2, 1, 2, (8,))})
 INPUT_TOKENS = (16384,)
 VARIANT_ORDER = ("bulk", "layerwise", "reuse3")
 WARMUP_REQUEST_COUNT = 8
+SEED_REQUEST_COUNT = 64
 FORMAL_REQUEST_COUNT = 64
 FORMAL_REPETITIONS = 1
+SEED_TOKENS = 13312
+SEED_BLOCKS = SEED_TOKENS // 128
+FORMAL_BLOCKS = INPUT_TOKENS[0] // 128
+EXPECTED_HIT_RATE = SEED_BLOCKS / FORMAL_BLOCKS
 RUNTIME_CONSTANTS = MappingProxyType(
     {
         "block_size": 128,
@@ -82,6 +87,7 @@ RUNTIME_CONSTANTS = MappingProxyType(
         "prefill_context_parallel_size": 1,
         "decode_context_parallel_size": 1,
         "enable_chunked_prefill": True,
+        "enable_prefix_caching": False,
         "layerwise_prefetch_layers": 3,
     }
 )
@@ -95,9 +101,7 @@ def build_matrix(topology: str | None = None) -> tuple[WorkloadPoint, ...]:
     if topology not in (None, "dp1"):
         raise ValueError(f"unsupported topology: {topology}")
     return (
-        WorkloadPoint("dp1", 16384, 128, "bulk", 8),
         WorkloadPoint("dp1", 16384, 1, "bulk", 8),
-        WorkloadPoint("dp1", 16384, 128, "layerwise", 8),
         WorkloadPoint("dp1", 16384, 1, "layerwise", 8),
         WorkloadPoint("dp1", 16384, 1, "reuse3", 8),
     )
@@ -115,8 +119,16 @@ def build_run_contract(image_digest: str, npu_node: str = "n1") -> dict[str, obj
         "expected_points": [point_id(point) for point in build_matrix()],
         "formal_repetitions": FORMAL_REPETITIONS,
         "warmup_request_count": WARMUP_REQUEST_COUNT,
+        "seed_request_count": SEED_REQUEST_COUNT,
         "formal_request_count": FORMAL_REQUEST_COUNT,
         "formal_concurrency_waves": FORMAL_REQUEST_COUNT // TOPOLOGIES["dp1"].concurrency[0],
+        "seed_tokens": SEED_TOKENS,
+        "seed_blocks": SEED_BLOCKS,
+        "formal_blocks": FORMAL_BLOCKS,
+        "expected_hit_tokens": SEED_TOKENS,
+        "expected_hit_rate": EXPECTED_HIT_RATE,
+        "expected_need_to_load_tokens": SEED_TOKENS,
+        "local_prefix_caching": False,
         "calculator": "total",
         "single_wave": False,
         "raw_characterization_only": True,

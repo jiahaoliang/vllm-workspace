@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shlex
 import subprocess
 from copy import deepcopy
@@ -14,6 +15,11 @@ from typing import Protocol
 
 from performance import handoff, image, report, runtime
 from performance.contract import (
+    EXPECTED_HIT_RATE,
+    FORMAL_REQUEST_COUNT,
+    SEED_BLOCKS,
+    SEED_REQUEST_COUNT,
+    SEED_TOKENS,
     TOPOLOGIES,
     VARIANT_ORDER,
     WorkloadPoint,
@@ -117,8 +123,11 @@ def _append(path: Path, event: dict[str, object]) -> None:
 
 
 def _write_checksums(root: Path) -> None:
-    paths = sorted(path for path in root.rglob("*") if path.is_file() and path.name != "SHA256SUMS")
-    (root / "SHA256SUMS").write_text(
+    root_manifest = root / "SHA256SUMS"
+    paths = sorted(
+        path for path in root.rglob("*") if path.is_file() and path != root_manifest
+    )
+    root_manifest.write_text(
         "".join(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(root)}\n" for path in paths),
         encoding="utf-8",
     )
@@ -777,7 +786,14 @@ def _archive_shared_fixtures(command_runner: Runner, output_dir: Path) -> None:
     destination = output_dir / "fixtures" / "tokens-16384-c8"
     destination.mkdir(parents=True, exist_ok=False)
     source = "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c8"
-    for filename in ("manifest.json", "warmup.jsonl", "formal-1.jsonl"):
+    for filename in (
+        "manifest.json",
+        "metadata.jsonl",
+        "SHA256SUMS",
+        "warmup.jsonl",
+        "seed.jsonl",
+        "formal-1.jsonl",
+    ):
         command_runner.run(
             Command(
                 (
@@ -1572,6 +1588,32 @@ print(json.dumps(body, sort_keys=True))
 """
 
 
+def _master_key_count_script(expected: int) -> str:
+    return f"""import time
+from urllib.request import urlopen
+
+while True:
+    text = urlopen(
+        "http://mooncake-master-service:9003/metrics", timeout=10
+    ).read().decode()
+    values = {{}}
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) == 2:
+            try:
+                values[fields[0]] = float(fields[1])
+            except ValueError:
+                pass
+    actual = values.get("master_key_count")
+    if actual == {expected}:
+        print(text, end="")
+        break
+    if actual is not None and actual > {expected}:
+        raise AssertionError(values)
+    time.sleep(1)
+"""
+
+
 def _client_python(environment: RunEnvironment, script: str) -> Command:
     return Command(
         (
@@ -1791,8 +1833,18 @@ def _attempt_commands(
         "0",
         f"{chroot_attempt}/config.py",
     )
+    lifecycle_commands = (
+        _master_cleanup_commands(environment)
+        if phase in {"warmup", "seed"}
+        else (
+            Command(
+                _client_python(environment, _http_ok_script()).argv,
+                description="assert-engine-reconnect",
+            ),
+        )
+    )
     return (
-        *_master_cleanup_commands(environment),
+        *lifecycle_commands,
         Command(
             (
                 "kubectl",
@@ -1970,6 +2022,114 @@ def _replace_attempt_fixture(raw: Path, input_tokens: int, phase: str) -> None:
     dataset.unlink()
 
 
+_HIT_PATTERN = re.compile(
+    r"Reqid:\s+(?P<request>\S+),\s+Total tokens\s+(?P<total>\d+),\s+"
+    r"kvpool hit tokens:\s+(?P<hit>\d+),\s+need to load:\s+(?P<load>\d+)"
+)
+
+
+def validate_prefill_hits(text: str) -> dict[str, object]:
+    records = [
+        {
+            "request_id": match.group("request"),
+            "total_tokens": int(match.group("total")),
+            "hit_tokens": int(match.group("hit")),
+            "need_to_load": int(match.group("load")),
+        }
+        for match in _HIT_PATTERN.finditer(text)
+    ]
+    errors: list[str] = []
+    if len(records) != FORMAL_REQUEST_COUNT:
+        errors.append(
+            f"expected {FORMAL_REQUEST_COUNT} hit records, got {len(records)}"
+        )
+    request_ids = [str(record["request_id"]) for record in records]
+    if len(set(request_ids)) != len(request_ids):
+        errors.append("duplicate request ID in Prefill hit records")
+    for record in records:
+        if record["total_tokens"] != 16384:
+            errors.append(
+                f"unexpected total tokens for {record['request_id']}: "
+                f"{record['total_tokens']}"
+            )
+        if record["hit_tokens"] != SEED_TOKENS:
+            errors.append(
+                f"unexpected hit tokens for {record['request_id']}: "
+                f"{record['hit_tokens']}"
+            )
+        if record["need_to_load"] != SEED_TOKENS:
+            errors.append(
+                f"unexpected load tokens for {record['request_id']}: "
+                f"{record['need_to_load']}"
+            )
+    hits = [int(record["hit_tokens"]) for record in records]
+    loads = [int(record["need_to_load"]) for record in records]
+    return {
+        "schema_version": 1,
+        "valid": not errors,
+        "errors": errors,
+        "request_count": len(records),
+        "expected_request_count": FORMAL_REQUEST_COUNT,
+        "expected_total_tokens": 16384,
+        "expected_hit_tokens": SEED_TOKENS,
+        "expected_hit_rate": EXPECTED_HIT_RATE,
+        "min_hit_tokens": min(hits) if hits else None,
+        "max_hit_tokens": max(hits) if hits else None,
+        "hit_rate": (min(hits) / 16384) if hits else None,
+        "expected_need_to_load_tokens": SEED_TOKENS,
+        "min_need_to_load_tokens": min(loads) if loads else None,
+        "max_need_to_load_tokens": max(loads) if loads else None,
+        "local_hit_tokens": (
+            max(hit - load for hit, load in zip(hits, loads, strict=True))
+            if hits
+            else None
+        ),
+        "records": records,
+    }
+
+
+def _prefill_log_offset_command(environment: RunEnvironment) -> Command:
+    return Command(
+        (
+            "kubectl",
+            "exec",
+            "-n",
+            environment.namespace,
+            environment.prefill_resource,
+            "-c",
+            "prefill-engine",
+            "--",
+            "sh",
+            "-c",
+            "wc -c < /tmp/vllm-prefill.log",
+        ),
+        description="prefill-log-offset",
+    )
+
+
+def _formal_prefill_hit_log_command(
+    environment: RunEnvironment,
+    offset: int,
+) -> Command:
+    return Command(
+        (
+            "kubectl",
+            "exec",
+            "-n",
+            environment.namespace,
+            environment.prefill_resource,
+            "-c",
+            "prefill-engine",
+            "--",
+            "tail",
+            "-c",
+            f"+{offset + 1}",
+            "/tmp/vllm-prefill.log",
+        ),
+        description="formal-prefill-hit-log",
+    )
+
+
 def execute_point(
     command_runner: Runner,
     point: WorkloadPoint,
@@ -1980,12 +2140,30 @@ def execute_point(
     point_root = output_dir / "points" / _point_id(point)
     warmup_count, formal_count, repetitions = sample_counts(point.concurrency)
     assert repetitions == 1
-    phases = (("warmup", warmup_count), ("formal-1", formal_count))
+    phases = (
+        ("warmup", warmup_count),
+        ("seed", SEED_REQUEST_COUNT),
+        ("formal-1", formal_count),
+    )
     current_attempt = point_root
     formal_summaries: list[dict[str, object]] = []
     try:
         for phase, request_count in phases:
             current_attempt = _new_attempt(point_root, phase)
+            formal_log_offset: int | None = None
+            if phase == "formal-1":
+                offset_text = _capture(
+                    command_runner,
+                    _prefill_log_offset_command(environment),
+                    current_attempt,
+                    "prefill-log-offset.txt",
+                )
+                try:
+                    formal_log_offset = int(offset_text.strip())
+                except ValueError as error:
+                    raise RuntimeError(
+                        f"invalid Prefill log offset: {offset_text!r}"
+                    ) from error
             attempt_token = hashlib.sha256(str(current_attempt.resolve()).encode("utf-8")).hexdigest()[:16]
             remote_attempt = f"{_point_id(point)}/{phase}/{attempt_token}"
             for command in _attempt_commands(point, phase, request_count, remote_attempt, environment):
@@ -1998,11 +2176,45 @@ def execute_point(
             _replace_attempt_fixture(current_attempt / "raw", point.input_tokens, phase)
             for command, filename in _point_diagnostic_commands(environment):
                 _capture(command_runner, command, current_attempt, filename)
+            if phase == "seed":
+                seeded = _client_python(
+                    environment,
+                    _master_key_count_script(SEED_REQUEST_COUNT * SEED_BLOCKS),
+                )
+                _capture(
+                    command_runner,
+                    Command(seeded.argv, description="assert-seeded-master"),
+                    current_attempt,
+                    "seeded-mooncake.metrics",
+                )
+            if phase == "formal-1":
+                assert formal_log_offset is not None
+                hit_text = _capture(
+                    command_runner,
+                    _formal_prefill_hit_log_command(environment, formal_log_offset),
+                    current_attempt,
+                    "prefill-hit.log",
+                )
+                hit_validation = validate_prefill_hits(hit_text)
+                _write_json(
+                    current_attempt / "raw" / "hit-validation.json",
+                    hit_validation,
+                )
+                if hit_validation["valid"] is not True:
+                    raise RuntimeError(
+                        "invalid Prefill hit evidence: "
+                        + "; ".join(str(error) for error in hit_validation["errors"])
+                    )
             if not environment.image_digest:
                 continue
+            summary_point = (
+                replace(point, input_tokens=SEED_TOKENS)
+                if phase == "seed"
+                else point
+            )
             summary = report.summarize_aisbench_attempt(
                 current_attempt / "raw",
-                point,
+                summary_point,
                 request_count,
                 environment.image_digest,
             )

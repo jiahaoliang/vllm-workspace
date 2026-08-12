@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from performance import fixtures
-from performance.contract import WorkloadPoint
+from performance.contract import SEED_TOKENS, WorkloadPoint
 
 
 class FakeTokenizer:
@@ -37,9 +37,10 @@ class MergingTokenizer:
         return values
 
 
-def _formal_fixture(tmp_path: Path, input_tokens: int = 128) -> tuple[Path, Path]:
+def _formal_fixture(tmp_path: Path, input_tokens: int = 256) -> tuple[Path, Path]:
+    input_tokens = max(input_tokens, 256)
     generated = fixtures.write_fixture(
-        FakeTokenizer(), input_tokens, 8, 20260808, tmp_path
+        FakeTokenizer(), input_tokens, 8, 20260808, tmp_path, seed_tokens=128
     )
     return generated.partition_files["formal-1"], generated.manifest_file
 
@@ -70,18 +71,23 @@ def test_fixture_scans_tokenizer_alphabet_once(tmp_path: Path, monkeypatch: pyte
         return original(tokenizer, minimum)
 
     monkeypatch.setattr(fixtures, "find_roundtrip_tokens", counted)
-    fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
+    fixtures.write_fixture(FakeTokenizer(), 256, 8, 20260808, tmp_path, seed_tokens=128)
 
     assert calls == 1
 
 
 def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None:
-    manifest = fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
+    manifest = fixtures.write_fixture(FakeTokenizer(), 256, 8, 20260808, tmp_path, seed_tokens=128)
 
     assert len(manifest.warmup_ids) == 8
+    assert len(manifest.seed_ids) == 64
     assert len(manifest.formal_ids) == 1
     assert all(len(ids) == 64 for ids in manifest.formal_ids)
-    partitions = (set(manifest.warmup_ids), *(set(ids) for ids in manifest.formal_ids))
+    partitions = (
+        set(manifest.warmup_ids),
+        set(manifest.seed_ids),
+        *(set(ids) for ids in manifest.formal_ids),
+    )
     assert all(left.isdisjoint(right) for index, left in enumerate(partitions) for right in partitions[index + 1 :])
     row = json.loads(manifest.partition_files["warmup"].read_text().splitlines()[0])
     assert set(row) == {"question", "answer", "request_id"}
@@ -89,9 +95,69 @@ def test_fixture_partitions_are_disjoint_and_checksummed(tmp_path: Path) -> None
     assert fixtures.replay_fixture(manifest) == []
 
 
+def test_seed_rows_are_exact_formal_prefixes(tmp_path: Path) -> None:
+    input_tokens = SEED_TOKENS + 128
+    manifest = fixtures.write_fixture(
+        FakeTokenizer(), input_tokens, 8, 20260808, tmp_path
+    )
+
+    seed_rows = [
+        json.loads(line)
+        for line in manifest.partition_files["seed"].read_text(encoding="utf-8").splitlines()
+    ]
+    formal_rows = [
+        json.loads(line)
+        for line in manifest.partition_files["formal-1"].read_text(encoding="utf-8").splitlines()
+    ]
+    fixture_manifest = json.loads(manifest.manifest_file.read_text(encoding="utf-8"))
+
+    assert len(seed_rows) == len(formal_rows) == 64
+    assert fixture_manifest["seed_tokens"] == SEED_TOKENS
+    assert fixture_manifest["formal_tokens"] == input_tokens
+    assert fixture_manifest["expected_hit_rate"] == SEED_TOKENS / input_tokens
+    assert len(fixture_manifest["seed_formal_pairs"]) == 64
+    for seed, formal, pair in zip(seed_rows, formal_rows, fixture_manifest["seed_formal_pairs"], strict=True):
+        seed_tokens = FakeTokenizer().encode(seed["question"])
+        formal_tokens = FakeTokenizer().encode(formal["question"])
+        assert len(seed_tokens) == SEED_TOKENS
+        assert len(formal_tokens) == input_tokens
+        assert seed_tokens == formal_tokens[:SEED_TOKENS]
+        assert pair["seed_request_id"] == seed["request_id"]
+        assert pair["formal_request_id"] == formal["request_id"]
+        seed_digest = hashlib.sha256(
+            json.dumps(seed_tokens, separators=(",", ":")).encode("ascii")
+        ).hexdigest()
+        formal_digest = hashlib.sha256(
+            json.dumps(formal_tokens, separators=(",", ":")).encode("ascii")
+        ).hexdigest()
+        assert pair["seed_token_ids_sha256"] == seed_digest
+        assert pair["formal_prefix_token_ids_sha256"] == seed_digest
+        assert pair["formal_token_ids_sha256"] == formal_digest
+
+
+def test_seed_attempt_contract_uses_seed_length(tmp_path: Path) -> None:
+    manifest = fixtures.write_fixture(
+        FakeTokenizer(), SEED_TOKENS + 128, 8, 20260808, tmp_path
+    )
+    point = WorkloadPoint("dp1", SEED_TOKENS + 128, 1, "bulk", 8)
+
+    attempt = fixtures.build_attempt_contract(
+        point,
+        "seed",
+        manifest.partition_files["seed"],
+        manifest.manifest_file,
+        64,
+    )
+
+    assert attempt["phase"] == "seed"
+    assert attempt["input_tokens"] == SEED_TOKENS
+    assert attempt["formal_input_tokens"] == SEED_TOKENS + 128
+    assert attempt["request_count"] == 64
+
+
 def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     dataset, manifest = _formal_fixture(tmp_path)
-    point = WorkloadPoint("dp1", 128, 128, "bulk", 8)
+    point = WorkloadPoint("dp1", 256, 128, "bulk", 8)
     output = tmp_path / "point.py"
 
     fixtures.write_aisbench_config(point, dataset, output, request_count=64,
@@ -137,10 +203,11 @@ def test_aisbench_config_preserves_point_and_prompt(tmp_path: Path) -> None:
     assert attempt_contract == {
         "schema_version": 1,
         "phase": "formal-1",
-        "point_id": "dp1-128-bulk-o128-c8",
+        "point_id": "dp1-256-bulk-o128-c8",
         "topology": "dp1",
         "variant": "bulk",
-        "input_tokens": 128,
+        "input_tokens": 256,
+        "formal_input_tokens": 256,
         "output_tokens": 128,
         "concurrency": 8,
         "request_count": 64,
@@ -160,7 +227,7 @@ def test_attempt_contract_rejects_wrong_line_count_before_config(
 
     with pytest.raises(ValueError, match="dataset line count mismatch"):
         fixtures.write_aisbench_config(
-            WorkloadPoint("dp1", 128, 1, "bulk", 8),
+            WorkloadPoint("dp1", 256, 1, "bulk", 8),
             dataset,
             tmp_path / "config.py",
             request_count=64,
@@ -179,7 +246,7 @@ def test_attempt_contract_rejects_malformed_json_before_config(tmp_path: Path) -
 
     with pytest.raises(ValueError, match="dataset row 1 is not valid JSON"):
         fixtures.write_aisbench_config(
-            WorkloadPoint("dp1", 128, 1, "bulk", 8),
+            WorkloadPoint("dp1", 256, 1, "bulk", 8),
             dataset,
             tmp_path / "config.py",
             request_count=64,
@@ -200,7 +267,7 @@ def test_attempt_contract_rejects_wrong_prompt_shape_before_config(
 
     with pytest.raises(TypeError, match="dataset row 1 lacks a string question"):
         fixtures.write_aisbench_config(
-            WorkloadPoint("dp1", 128, 1, "bulk", 8),
+            WorkloadPoint("dp1", 256, 1, "bulk", 8),
             dataset,
             tmp_path / "config.py",
             request_count=64,
@@ -235,7 +302,7 @@ def test_attempt_contract_rejects_dataset_checksum_mismatch(tmp_path: Path) -> N
 
     with pytest.raises(ValueError, match="dataset checksum mismatch"):
         fixtures.write_aisbench_config(
-            WorkloadPoint("dp1", 128, 1, "bulk", 8),
+            WorkloadPoint("dp1", 256, 1, "bulk", 8),
             dataset,
             tmp_path / "config.py",
             request_count=64,
@@ -245,7 +312,7 @@ def test_attempt_contract_rejects_dataset_checksum_mismatch(tmp_path: Path) -> N
 
 
 def test_fixture_corruption_breaks_checksum_replay(tmp_path: Path) -> None:
-    manifest = fixtures.write_fixture(FakeTokenizer(), 128, 8, 20260808, tmp_path)
+    manifest = fixtures.write_fixture(FakeTokenizer(), 256, 8, 20260808, tmp_path, seed_tokens=128)
     manifest.partition_files["formal-1"].write_text("changed\n", encoding="utf-8")
 
     assert fixtures.replay_fixture(manifest) == ["fixture checksum mismatch: formal-1.jsonl"]
@@ -260,7 +327,7 @@ def test_config_cli_writes_attempt_local_metadata(tmp_path: Path) -> None:
             "--topology",
             "dp1",
             "--input-tokens",
-            "128",
+            "256",
             "--output-tokens",
             "1",
             "--variant",

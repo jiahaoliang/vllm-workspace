@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from performance import handoff, image, runner, runtime
-from performance.contract import WorkloadPoint
+from performance.contract import FORMAL_REQUEST_COUNT, SEED_TOKENS, WorkloadPoint
 
 
 class FakeCommandRunner:
@@ -29,6 +29,14 @@ class FakeCommandRunner:
                         "Os": "linux",
                     }
                 ]
+            )
+        if command.description == "prefill-log-offset":
+            return "0\n"
+        if command.description == "formal-prefill-hit-log":
+            return "".join(
+                f"Reqid: request-{index}, Total tokens 16384, "
+                f"kvpool hit tokens: {SEED_TOKENS}, need to load: {SEED_TOKENS}\n"
+                for index in range(FORMAL_REQUEST_COUNT)
             )
         return ""
 
@@ -453,9 +461,7 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
         "logs:reuse3",
     ]
     assert executed == [
-        "dp1-16384-bulk-o128-c8",
         "dp1-16384-bulk-o1-c8",
-        "dp1-16384-layerwise-o128-c8",
         "dp1-16384-layerwise-o1-c8",
         "dp1-16384-reuse3-o1-c8",
     ]
@@ -464,7 +470,7 @@ def test_rapid_run_groups_exact_points_into_three_variant_starts(
     assert run_contract["npu_node"] == "m1"
 
 
-def test_five_points_expand_to_exactly_ten_aisbench_attempts() -> None:
+def test_three_points_expand_to_exactly_nine_aisbench_attempts() -> None:
     phases: list[str] = []
 
     for point in runner.build_matrix("dp1"):
@@ -472,7 +478,11 @@ def test_five_points_expand_to_exactly_ten_aisbench_attempts() -> None:
             point.concurrency
         )
         assert repetitions == 1
-        for phase, count in (("warmup", warmup_count), ("formal-1", formal_count)):
+        for phase, count in (
+            ("warmup", warmup_count),
+            ("seed", formal_count),
+            ("formal-1", formal_count),
+        ):
             commands = runner._attempt_commands(
                 point,
                 phase,
@@ -492,15 +502,14 @@ def test_five_points_expand_to_exactly_ten_aisbench_attempts() -> None:
             phases.append(f"{runner._point_id(point)}:{phase}")
 
     assert phases == [
-        "dp1-16384-bulk-o128-c8:warmup",
-        "dp1-16384-bulk-o128-c8:formal-1",
         "dp1-16384-bulk-o1-c8:warmup",
+        "dp1-16384-bulk-o1-c8:seed",
         "dp1-16384-bulk-o1-c8:formal-1",
-        "dp1-16384-layerwise-o128-c8:warmup",
-        "dp1-16384-layerwise-o128-c8:formal-1",
         "dp1-16384-layerwise-o1-c8:warmup",
+        "dp1-16384-layerwise-o1-c8:seed",
         "dp1-16384-layerwise-o1-c8:formal-1",
         "dp1-16384-reuse3-o1-c8:warmup",
+        "dp1-16384-reuse3-o1-c8:seed",
         "dp1-16384-reuse3-o1-c8:formal-1",
     ]
 
@@ -554,25 +563,31 @@ def test_sync_client_tooling_prepares_chroot_shared_memory(tmp_path: Path) -> No
     assert "/proc/meminfo" in procfs.argv
 
 
-def test_archive_shared_fixtures_copies_only_rapid_slices(tmp_path: Path) -> None:
+def test_archive_shared_fixtures_copies_high_hit_evidence(tmp_path: Path) -> None:
     fake = FakeCommandRunner()
 
     runner._archive_shared_fixtures(fake, tmp_path)
 
     assert [call.description for call in fake.calls] == [
         "archive-fixture-manifest",
+        "archive-fixture-metadata",
+        "archive-fixture-SHA256SUMS",
         "archive-fixture-warmup",
+        "archive-fixture-seed",
         "archive-fixture-formal-1",
     ]
     assert [Path(call.argv[-1]).name for call in fake.calls] == [
         "manifest.json",
+        "metadata.jsonl",
+        "SHA256SUMS",
         "warmup.jsonl",
+        "seed.jsonl",
         "formal-1.jsonl",
     ]
     assert all("-n" in call.argv and "liangjiahao" in call.argv for call in fake.calls)
 
 
-def test_execute_point_runs_one_warmup_and_one_formal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_execute_point_runs_warmup_seed_and_one_formal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeCommandRunner()
     point = WorkloadPoint("dp1", 16384, 1, "bulk", 8)
 
@@ -602,11 +617,20 @@ def test_execute_point_runs_one_warmup_and_one_formal(tmp_path: Path, monkeypatc
     descriptions = [call.description for call in fake.calls]
     assert len(summaries) == 1
     assert descriptions.count("remove-all-keys") == 2
-    assert descriptions.count("mooncake-metrics") == 2
+    assert descriptions.count("mooncake-metrics") == 3
+    assert descriptions.index("remove-all-keys", descriptions.index("aisbench") + 1) < descriptions.index(
+        "aisbench", descriptions.index("aisbench") + 1
+    )
+    formal_index = len(descriptions) - 1 - descriptions[::-1].index("aisbench")
+    seed_index = descriptions.index("aisbench", descriptions.index("aisbench") + 1)
+    assert "remove-all-keys" not in descriptions[seed_index + 1 : formal_index]
+    assert descriptions.count("prefill-log-offset") == 1
+    assert descriptions.count("formal-prefill-hit-log") == 1
     assert "prefill-log" not in descriptions
     assert "decode-log" not in descriptions
     assert "reset-master" not in descriptions
     assert len(list(tmp_path.glob("points/**/warmup/attempt-1/raw"))) == 1
+    assert len(list(tmp_path.glob("points/**/seed/attempt-1/raw"))) == 1
     assert len(list(tmp_path.glob("points/**/formal-1/attempt-1/raw"))) == 1
     assert not list(tmp_path.glob("points/**/formal-2"))
 
@@ -624,7 +648,7 @@ def test_invalid_formal_attempt_is_not_retried(tmp_path: Path, monkeypatch: pyte
     ) -> dict[str, object]:
         del raw, selected
         request_counts.append(request_count)
-        if len(request_counts) == 1:
+        if len(request_counts) < 3:
             return {
                 "valid": True,
                 "image_digest": image_digest,
@@ -648,7 +672,7 @@ def test_invalid_formal_attempt_is_not_retried(tmp_path: Path, monkeypatch: pyte
             runner.RunEnvironment(image_digest="sha256:image"),
         )
 
-    assert request_counts == [8, 64]
+    assert request_counts == [8, 64, 64]
     assert not list(tmp_path.glob("points/**/attempt-2"))
 
 
@@ -662,6 +686,14 @@ def test_execute_point_replaces_dataset_copies_with_fixture_references(
                 raw = Path(command.argv[-1])
                 raw.mkdir(parents=True, exist_ok=True)
                 (raw / "dataset.jsonl").write_text("fixture\n", encoding="utf-8")
+            if command.description == "prefill-log-offset":
+                return "0\n"
+            if command.description == "formal-prefill-hit-log":
+                return "".join(
+                    f"Reqid: request-{index}, Total tokens 16384, "
+                    "kvpool hit tokens: 13312, need to load: 13312\n"
+                    for index in range(64)
+                )
             return ""
 
     def summarize(
@@ -687,7 +719,7 @@ def test_execute_point_replaces_dataset_copies_with_fixture_references(
     )
 
     raw_dirs = list(tmp_path.glob("points/**/attempt-1/raw"))
-    assert len(raw_dirs) == 2
+    assert len(raw_dirs) == 3
     for raw in raw_dirs:
         assert not (raw / "dataset.jsonl").exists()
         reference = json.loads((raw / "fixture-reference.json").read_text())
@@ -827,7 +859,7 @@ def test_variant_diagnostics_capture_complete_logs_once(tmp_path: Path) -> None:
 
 
 def test_attempt_cleanup_removes_keys_without_restarting_master() -> None:
-    point = WorkloadPoint("dp1", 4096, 1, "layerwise", 1)
+    point = WorkloadPoint("dp1", 16384, 1, "layerwise", 8)
 
     commands = runner._attempt_commands(
         point,
@@ -848,6 +880,83 @@ def test_attempt_cleanup_removes_keys_without_restarting_master() -> None:
     remove_all = commands[0]
     assert remove_all.mutates_server
     assert "api/v1/remove_all?force=true" in " ".join(remove_all.argv)
+
+
+def test_formal_commands_preserve_seeded_mooncake() -> None:
+    point = WorkloadPoint("dp1", 16384, 1, "layerwise", 8)
+
+    descriptions = [
+        command.description
+        for command in runner._attempt_commands(
+            point,
+            "formal-1",
+            64,
+            "remote-formal",
+            runner.RunEnvironment(),
+        )
+    ]
+
+    assert "remove-all-keys" not in descriptions
+    assert "assert-master-empty" not in descriptions
+    assert descriptions[0] == "assert-engine-reconnect"
+
+
+def test_parse_prefill_hit_log_requires_exact_per_request_hits() -> None:
+    text = "".join(
+        f"Reqid: request-{index}, Total tokens 16384, kvpool hit tokens: 13312, "
+        "need to load: 13312\n"
+        for index in range(64)
+    )
+
+    validation = runner.validate_prefill_hits(text)
+
+    assert validation["valid"] is True
+    assert validation["request_count"] == 64
+    assert validation["min_hit_tokens"] == 13312
+    assert validation["max_hit_tokens"] == 13312
+    assert validation["hit_rate"] == 0.8125
+    assert validation["min_need_to_load_tokens"] == 13312
+    assert validation["max_need_to_load_tokens"] == 13312
+    assert validation["local_hit_tokens"] == 0
+
+
+@pytest.mark.parametrize(
+    ("replacement", "error"),
+    (
+        (("kvpool hit tokens: 13312", "kvpool hit tokens: 0"), "unexpected hit tokens"),
+        (("request-63", "request-62"), "duplicate request ID"),
+        (("Total tokens 16384", "Total tokens 13312"), "unexpected total tokens"),
+    ),
+)
+def test_parse_prefill_hit_log_rejects_invalid_records(
+    replacement: str,
+    error: str,
+) -> None:
+    text = "".join(
+        f"Reqid: request-{index}, Total tokens 16384, kvpool hit tokens: 13312, "
+        "need to load: 13312\n"
+        for index in range(64)
+    )
+    before, after = replacement
+
+    validation = runner.validate_prefill_hits(text.replace(before, after, 1))
+
+    assert validation["valid"] is False
+    assert any(error in message for message in validation["errors"])
+
+
+def test_parse_prefill_hit_log_rejects_missing_record() -> None:
+    text = "".join(
+        f"Reqid: request-{index}, Total tokens 16384, kvpool hit tokens: 13312, "
+        "need to load: 13312\n"
+        for index in range(63)
+    )
+
+    validation = runner.validate_prefill_hits(text)
+
+    assert validation["valid"] is False
+    assert validation["request_count"] == 63
+    assert any("expected 64 hit records" in message for message in validation["errors"])
 
 
 def test_stop_engines_waits_for_idle_hbm_before_variant_switch() -> None:

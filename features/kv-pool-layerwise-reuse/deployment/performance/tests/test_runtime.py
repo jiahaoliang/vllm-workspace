@@ -121,6 +121,16 @@ def test_reuse3_changes_only_prefill_compute_buffers() -> None:
     assert decode_extra["consumer_is_to_load"] is True
 
 
+def test_all_variants_disable_local_prefix_caching() -> None:
+    for variant in ("bulk", "layerwise", "reuse3"):
+        for role in ("prefill", "decode"):
+            argv = runtime.server_argv(
+                role, WorkloadPoint("dp1", 16384, 1, variant, 8)
+            )
+            assert "--no-enable-prefix-caching" in argv
+            assert "--enable-prefix-caching" not in argv
+
+
 def test_unique_difference_rejects_hidden_runtime_drift() -> None:
     inputs = base_inputs()
     layerwise = runtime.render_resources(
