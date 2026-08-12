@@ -1369,6 +1369,41 @@ def _restore_pre_run_state(
     return errors
 
 
+def _finalize_run(
+    command_runner: Runner,
+    output_dir: Path,
+    environment: RunEnvironment,
+    configmaps: set[str],
+    run_contract: dict[str, object],
+    run_error: BaseException | None,
+) -> list[str]:
+    restoration_errors: list[str] = []
+    if run_error is None:
+        restoration_errors = _restore_pre_run_state(
+            command_runner,
+            output_dir,
+            environment,
+            configmaps,
+        )
+        _write_json(output_dir / "run-contract.json", run_contract)
+    else:
+        _write_json(
+            output_dir / "restoration.json",
+            {
+                "completed": False,
+                "errors": [
+                    "automatic restoration skipped to preserve failed serving "
+                    "Pods and logs for diagnosis"
+                ],
+                "engines_stopped": False,
+                "mooncake_empty": False,
+                "failed_environment_preserved": True,
+            },
+        )
+    _write_checksums(output_dir)
+    return restoration_errors
+
+
 def run(
     command_runner: Runner,
     state: handoff.HandoffState,
@@ -1475,10 +1510,14 @@ def run(
                 raise RuntimeError("; ".join(stop_errors))
     except BaseException as error:
         run_error = error
-    restoration_errors = _restore_pre_run_state(command_runner, output_dir, environment, performance_configmaps)
-    if run_error is None:
-        _write_json(output_dir / "run-contract.json", run_contract)
-    _write_checksums(output_dir)
+    restoration_errors = _finalize_run(
+        command_runner,
+        output_dir,
+        environment,
+        performance_configmaps,
+        run_contract,
+        run_error,
+    )
     if run_error is not None:
         raise run_error
     if restoration_errors:

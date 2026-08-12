@@ -61,6 +61,15 @@ def _pod_request(pod: dict[str, Any]) -> int:
     return max(regular, init) + overhead_request
 
 
+def _is_replaceable_engine(pod: dict[str, Any]) -> bool:
+    metadata = pod.get("metadata", {})
+    labels = metadata.get("labels", {}) if isinstance(metadata, dict) else {}
+    return isinstance(labels, dict) and labels.get("app") in {
+        "prefill",
+        "decode",
+    }
+
+
 def evaluate(
     nodes: dict[str, Any],
     pods: dict[str, Any],
@@ -92,7 +101,8 @@ def evaluate(
                 f"{expected_allocatable}, got {allocatable}"
             )
 
-    requested = 0
+    requested_by_replaceable_engines = 0
+    requested_by_other_pods = 0
     for pod in _items(pods):
         spec = pod.get("spec", {})
         status = pod.get("status", {})
@@ -100,11 +110,21 @@ def evaluate(
             continue
         if spec.get("nodeName") != node_name or status.get("phase") in TERMINAL_PHASES:
             continue
-        requested += _pod_request(pod)
+        request = _pod_request(pod)
+        if _is_replaceable_engine(pod):
+            requested_by_replaceable_engines += request
+        else:
+            requested_by_other_pods += request
+    requested = requested_by_replaceable_engines + requested_by_other_pods
     free = allocatable - requested
-    if free < required_free:
+    available_after_replacing_current_engines = (
+        allocatable - requested_by_other_pods
+    )
+    if available_after_replacing_current_engines < required_free:
         blockers.append(
-            f"{node_name} free {RESOURCE} must be at least {required_free}, got {free}"
+            f"{node_name} {RESOURCE} available after replacing current engines "
+            f"must be at least {required_free}, got "
+            f"{available_after_replacing_current_engines}"
         )
     return {
         "schema_version": 1,
@@ -115,7 +135,12 @@ def evaluate(
         "expected_allocatable": expected_allocatable,
         "allocatable": allocatable,
         "requested_by_non_terminal_pods": requested,
+        "requested_by_replaceable_engines": requested_by_replaceable_engines,
+        "requested_by_other_non_terminal_pods": requested_by_other_pods,
         "free": free,
+        "available_after_replacing_current_engines": (
+            available_after_replacing_current_engines
+        ),
         "required_free": required_free,
         "vnpu_number_ignored": True,
         "blockers": blockers,

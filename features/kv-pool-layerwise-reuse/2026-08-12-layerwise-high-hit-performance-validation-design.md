@@ -117,3 +117,8 @@ assign a performance PASS/FAIL threshold.
 - The evidence checker and both fixture/root checksum manifests replay.
 - Engines stop, the original Kubernetes resources are restored, and Mooncake
   returns empty.
+
+If startup or execution fails, this final cleanup gate does not run
+automatically. The runner records `failed_environment_preserved=true` and
+leaves the current Prefill/Decode Pods and logs intact for diagnosis. An
+operator performs cleanup only after inspecting the failure.

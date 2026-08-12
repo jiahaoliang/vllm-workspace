@@ -534,6 +534,37 @@ def test_point_failure_defers_restore_to_top_level_runner(tmp_path: Path) -> Non
     assert "restore-pre-run-state" not in descriptions
 
 
+def test_failed_run_finalization_preserves_serving_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    restored = False
+
+    def restore(*_: object) -> list[str]:
+        nonlocal restored
+        restored = True
+        return []
+
+    monkeypatch.setattr(runner, "_restore_pre_run_state", restore)
+
+    errors = runner._finalize_run(
+        FakeCommandRunner(),
+        tmp_path,
+        runner.RunEnvironment(),
+        {"performance-config"},
+        {"expected_points": []},
+        RuntimeError("startup failed"),
+    )
+
+    assert errors == []
+    assert restored is False
+    restoration = json.loads((tmp_path / "restoration.json").read_text())
+    assert restoration["failed_environment_preserved"] is True
+    assert restoration["completed"] is False
+    assert not (tmp_path / "run-contract.json").exists()
+    assert (tmp_path / "SHA256SUMS").is_file()
+
+
 def test_master_empty_probe_retries_service_startup() -> None:
     script = runner._master_empty_script()
 

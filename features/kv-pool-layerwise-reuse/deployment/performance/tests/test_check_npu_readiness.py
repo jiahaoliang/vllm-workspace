@@ -26,11 +26,21 @@ def node_inventory(physical: int, vnpu: int = 0) -> dict[str, object]:
     }
 
 
-def pod_inventory(*requests: int) -> dict[str, object]:
+def pod_inventory(
+    *requests: int,
+    apps: tuple[str | None, ...] = (),
+) -> dict[str, object]:
     return {
         "items": [
             {
-                "metadata": {"name": f"pod-{index}"},
+                "metadata": {
+                    "name": f"pod-{index}",
+                    "labels": (
+                        {"app": apps[index]}
+                        if index < len(apps) and apps[index]
+                        else {}
+                    ),
+                },
                 "spec": {
                     "nodeName": "m1",
                     "containers": [
@@ -59,6 +69,23 @@ def test_ready_requires_exactly_eight_physical_and_four_free() -> None:
     assert report["requested_by_non_terminal_pods"] == 4
     assert report["free"] == 4
     assert report["vnpu_number_ignored"] is True
+
+
+def test_current_engines_are_replaceable_but_diagnostic_fence_is_not() -> None:
+    pods = pod_inventory(
+        2,
+        2,
+        2,
+        apps=("prefill", "decode", "decode-failed-npu-isolation"),
+    )
+
+    report = readiness.evaluate(node_inventory(8), pods)
+
+    assert report["free"] == 2
+    assert report["requested_by_replaceable_engines"] == 4
+    assert report["requested_by_other_non_terminal_pods"] == 2
+    assert report["available_after_replacing_current_engines"] == 6
+    assert report["ready"] is True
 
 
 def test_vnpu_does_not_substitute_for_missing_physical_resources() -> None:

@@ -84,8 +84,10 @@ features/kv-pool-layerwise-reuse/deployment/performance/run-performance-test.sh 
 
 Before changing a blocked handoff to ready, run the read-only physical-resource
 gate. It requires node `m1`, exactly eight allocatable physical Ascend910
-resources, and at least four free after non-terminal Pod requests. It ignores
-`huawei.com/vnpu-number` and returns exit code 1 while blocked:
+resources, and at least four available after replacing the current Pods whose
+labels are exactly `app=prefill` or `app=decode`. Other NPU Pods, including the
+retained `app=decode-failed-npu-isolation` diagnostic fence, remain counted. It
+ignores `huawei.com/vnpu-number` and returns exit code 1 while blocked:
 
 ```bash
 python3 features/kv-pool-layerwise-reuse/deployment/performance/check-npu-readiness.py \
@@ -93,8 +95,12 @@ python3 features/kv-pool-layerwise-reuse/deployment/performance/check-npu-readin
   --output /tmp/layerwise-npu-readiness.json
 ```
 
-After the listener accepts the current ready handoff, execute the high-hit DP1 run
-in a new root. A failed root is retained as diagnostics and is never resumed.
+After the listener accepts the current ready handoff, execute the high-hit DP1
+run in a new root. A failed root is retained as diagnostics and is never
+resumed. On any run failure, automatic stop/restore/cleanup is skipped so the
+failed serving Pods and `/tmp/vllm-{prefill,decode}.log` remain available for
+diagnosis. Cleanup or restoration then requires an explicit follow-up after the
+failure is inspected.
 
 ```bash
 run_id=$(date -u +%Y%m%dT%H%M%SZ)
