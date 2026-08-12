@@ -3,14 +3,14 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 13
-updated_at: 2026-08-12T21:20:29+08:00
+generation: 14
+updated_at: 2026-08-12T21:30:36+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
 
 本文件是功能验证 session 与性能验证 session 之间的 fail-closed handoff。
-Generation 13 继承 generation 12 已验收的不可变源码、镜像、CPU/mock 和
+Generation 14 继承 generation 12 已验收的不可变源码、镜像、CPU/mock 和
 真实 NPU correctness，仅重新授权执行冻结的三点 DP1 high-hit performance
 run。它不把此前的 cold-cache 结果重新归因为高命中结果。
 
@@ -51,7 +51,7 @@ run。它不把此前的 cold-cache 结果重新归因为高命中结果。
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` generation-13 high-hit harness parent | `64aa6795bb134face29062891285279977c48e59` | high-hit harness parent pushed as `origin/kv-pool-layerwise-reuse=64aa6795bb134face29062891285279977c48e59` before this handoff-only transition |
+| control repo | `kv-pool-layerwise-reuse` generation-14 high-hit harness parent | `588a93199541039a21b85f3fd981b570137f86a6` | high-hit harness parent pushed as `origin/kv-pool-layerwise-reuse=588a93199541039a21b85f3fd981b570137f86a6` before this handoff-only transition |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -196,7 +196,7 @@ exactly eight physical Ascend910 resources on `m1`. Candidate run
 `20260812T023541Z` passed the required `kv_producer` and `kv_both` NPU
 correctness gates, and cleanup returned the node to eight free physical
 resources. The performance runner must recheck live capacity before traffic.
-Generation 13 authorizes a fresh high-hit performance root for candidate
+Generation 14 authorizes a fresh high-hit performance root for candidate
 `57d3c214e`; it does not reattribute any historical measurements.
 
 The earlier TP2 REUSE3 non-save-owner save-gate defect is preserved in the
@@ -219,12 +219,25 @@ requests, 64 formal requests, 128 GiB per serving rank, and requires a new
 performance run root. It does not authorize resuming or combining any
 generation-8 evidence root.
 
-## Generation 13 High-Hit Authorization
+## Generation 14 High-Hit Authorization
 
-The published high-hit harness parent is `64aa6795bb134face29062891285279977c48e59`.
-Its complete performance CPU/mock suite passed `105` tests in the CPU-only
+The published high-hit harness parent is `588a93199541039a21b85f3fd981b570137f86a6`.
+Its complete performance CPU/mock suite passed `107` tests in the CPU-only
 `liangjiahao/vllm-ascend-ut` Pod. All 20 performance Python files compiled in
 memory, both shell entrypoints passed `bash -n`, and `git diff --check` passed.
+
+The 2026-08-12 21:25+08:00 live preflight found eight allocatable physical
+Ascend910 devices on Ready node `m1`. The preserved diagnostic fence
+`decode-engine-deployment-676dbcb595-gl65k` holds NPU `0,7`; it is not
+replaceable. Current `app=prefill` and `app=decode` Pods hold four replaceable
+devices, leaving six available after replacement for the four-device DP1 run.
+The read-only checker returned `READY` with
+`available_after_replacing_current_engines=6`.
+
+If startup or execution fails, the runner skips automatic engine stop,
+Kubernetes restoration, ConfigMap deletion, and Mooncake reset. It records
+`failed_environment_preserved=true` so the failed Pods and logs remain in
+place until explicitly inspected and cleaned up.
 
 This generation requires a new root named
 `/tmp/layerwise-performance-high-hit-<run-id>`. It must execute `prepare` first
