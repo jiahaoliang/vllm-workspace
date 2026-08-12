@@ -1,0 +1,8 @@
+{
+  "concurrency": 8,
+  "image_digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "input_tokens": 16384,
+  "output_tokens": 1,
+  "topology": "dp1",
+  "variant": "layerwise"
+}

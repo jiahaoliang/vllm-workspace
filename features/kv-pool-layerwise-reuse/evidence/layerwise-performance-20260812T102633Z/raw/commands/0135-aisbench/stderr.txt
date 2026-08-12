@@ -1,0 +1,39 @@
+can not use command: npu-smi info
+[2026-08-12 10:57:12,227] [ais_bench] [[32mINFO[0m] Current exp folder: /client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700
+[2026-08-12 10:57:12,241] [ais_bench] [[32mINFO[0m] Starting inference tasks...
+[2026-08-12 10:57:12,242] [ais_bench] [[32mINFO[0m] Partitioned into 1 tasks.
+[2026-08-12 10:57:12,242] [ais_bench] [[32mINFO[0m] Merging datasets with the same model and inferencer...
+[2026-08-12 10:57:12,260] [ais_bench] [[33mWARNING[0m] Can't set cursor because of setupterm: could not find terminal, running in background mode
+[2026-08-12 10:57:12,260] [ais_bench] [[32mINFO[0m] Launch TasksMonitor, PID: 6389, Refresh interval: 0.5, Run in background: True
+
+Monitoring tasks progress:   0%|          | 0/1 [00:00<?, ?it/s][2026-08-12 10:57:12,262] [ais_bench] [[33mWARNING[0m] Failed to read status file '/client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700/status_tmp/tmp_layerwise_layerwise.json': [Errno 2] No such file or directory: '/client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700/status_tmp/tmp_layerwise_layerwise.json'. Attempting to clear and continuing.
+
+Monitoring tasks progress: 100%|██████████| 1/1 [04:05<00:00, 245.44s/it]
+Monitoring tasks progress: 100%|██████████| 1/1 [04:05<00:00, 245.44s/it]
+[2026-08-12 11:01:19,021] [ais_bench] [[32mINFO[0m] Inference tasks completed.
+[2026-08-12 11:01:19,022] [ais_bench] [[32mINFO[0m] Summarizing performance results...
+
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details:   0%|          | 0/64 [00:00<?, ?it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 63.61it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 57.84it/s]
+Calculating performance details: 100%|██████████| 64/64 [00:01<00:00, 57.83it/s]
+[2026-08-12 11:01:21,448] [ais_bench] [[32mINFO[0m] Request timeline and concurrency chart saved to /client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700/performances/layerwise/layerwise_plot.html
+[2026-08-12 11:01:21,449] [ais_bench] [[32mINFO[0m] The layerwise_plot has been saved in /client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700/performances/layerwise/layerwise_plot.html
+[2026-08-12 11:01:21,451] [ais_bench] [[32mINFO[0m] Converting performance results for stage...
+[2026-08-12 11:01:21,452] [ais_bench] [[32mINFO[0m] Performance results conversion completed!
+[2026-08-12 11:01:21,452] [ais_bench] [[32mINFO[0m] Starting metrics calculation...
+[2026-08-12 11:01:21,462] [ais_bench] [[32mINFO[0m] Starting common metrics calculation...
+[2026-08-12 11:01:21,462] [ais_bench] [[32mINFO[0m] Adding units to metrics...
+[2026-08-12 11:01:21,463] [ais_bench] [[32mINFO[0m] Performance data calculation completed!
+[2026-08-12 11:01:21,464] [ais_bench] [[32mINFO[0m] Performance Results of task [layerwise/layerwise]: 
+[2026-08-12 11:01:21,470] [ais_bench] [[32mINFO[0m] Performance Result files located in /client-tools/runs/dp1-16384-layerwise-o128-c8/formal-1/5fa2bec58a286109/aisbench-output/20260812_105700/performances/layerwise.

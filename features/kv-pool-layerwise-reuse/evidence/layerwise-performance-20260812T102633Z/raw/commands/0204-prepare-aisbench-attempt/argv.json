@@ -1,0 +1,16 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "sh",
+  "-c",
+  "set -eu; test ! -e \"$1\"; mkdir -p \"$1\"; cp \"$2\" \"$1/dataset.jsonl\"",
+  "sh",
+  "/performance-workspace/rootfs/client-tools/runs/dp1-16384-reuse3-o1-c8/formal-1/97b80ae030c2b2fe",
+  "/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c8/formal-1.jsonl"
+]

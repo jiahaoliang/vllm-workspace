@@ -1,0 +1,17 @@
+can not use command: npu-smi info
+[2026-08-12 11:16:09,912] [ais_bench] [[32mINFO[0m] Task [reuse3/reuse3]
+[2026-08-12 11:16:09,955] [ais_bench] [[32mINFO[0m] Zero Retriever initialized, returning empty shot case for all queries
+[2026-08-12 11:16:09,957] [ais_bench] [[32mINFO[0m] Apply ice template finished
+[2026-08-12 11:16:09,959] [ais_bench] [[32mINFO[0m] Using custom URL: [http://vllm-proxy-service:8000/], [host_ip: localhost] and [host_port: 8080] will be ignored
+[2026-08-12 11:16:09,960] [ais_bench] [[32mINFO[0m] Warmup size is 0, skip...
+[2026-08-12 11:16:09,961] [ais_bench] [[32mINFO[0m] Dataset needed memory size: 0.29731655 MB
+[2026-08-12 11:16:09,961] [ais_bench] [[32mINFO[0m] Memory usage check passed: 1.61% < 80% (Available: 1956.27 GB)
+[2026-08-12 11:16:09,962] [ais_bench] [[33mWARNING[0m] The request rate is below 0.1, resulting in an excessively long interval between two consecutive requests.
+[2026-08-12 11:16:09,962] [ais_bench] [[32mINFO[0m] Traffic request rate: 0 RPS with burstiness 1.0.
+[2026-08-12 11:16:09,962] [ais_bench] [[32mINFO[0m] Request rate (0.0) or ramp end rps (None) < 0.001, sending all requests simultaneously
+[2026-08-12 11:16:09,963] [ais_bench] [[32mINFO[0m] Total concurrency: 8, per worker concurrency: [8]
+[2026-08-12 11:16:09,963] [ais_bench] [[32mINFO[0m] Total data num: 8, per worker data num: [8]
+[2026-08-12 11:16:09,981] [ais_bench] [[32mINFO[0m] Using custom URL: [http://vllm-proxy-service:8000/], [host_ip: localhost] and [host_port: 8080] will be ignored
+[2026-08-12 11:16:10,079] [ais_bench] [[32mINFO[0m] All subprocesses have finished deserializing the first batch of data
+[2026-08-12 11:16:45,186] [ais_bench] [[32mINFO[0m] Api infer task time elapsed: 35.28s
+[2026-08-12 11:16:45,471] [ais_bench] [[32mINFO[0m] Task state is finish, exit loop

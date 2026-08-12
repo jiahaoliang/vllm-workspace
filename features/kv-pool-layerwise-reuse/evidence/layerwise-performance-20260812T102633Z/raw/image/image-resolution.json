@@ -1,0 +1,15 @@
+{
+  "base_digest": "BuildKit-resolved base is not used as the runtime identity; the derived manifest and config below are authoritative",
+  "base_reference": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
+  "digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "mode": "ready-image",
+  "patched_file": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+  "patched_file_sha256": "54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea",
+  "platform": "linux/arm64",
+  "reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+  "source_labels": {
+    "org.opencontainers.image.mooncake.commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "org.opencontainers.image.vllm-ascend.commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "org.opencontainers.image.vllm.commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5"
+  }
+}

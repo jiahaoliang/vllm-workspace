@@ -1,0 +1,12 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "cat",
+  "/performance-workspace/rootfs/.performance-image-config-digest"
+]

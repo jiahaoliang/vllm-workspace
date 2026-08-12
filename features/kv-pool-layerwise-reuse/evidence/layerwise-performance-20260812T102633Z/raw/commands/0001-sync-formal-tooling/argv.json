@@ -1,0 +1,5 @@
+[
+  "bash",
+  "-c",
+  "set -euo pipefail; tar --exclude='*/__pycache__' --exclude='*.pyc' -C '/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/deployment' -cf - performance | kubectl exec -i -n liangjiahao layerwise-performance-aisbench -c aisbench -- tar -C /performance-workspace/rootfs/client-tools/tooling -xf -"
+]

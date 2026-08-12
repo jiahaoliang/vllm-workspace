@@ -1,0 +1,59 @@
+{
+  "evidence_fields": {
+    "Client preflight SHA256SUMS digest": "f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873",
+    "Evidence root": "features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z",
+    "Fixture SHA256SUMS digest": "8848041c4f3cea186c016da8aed080327723e823e706c327991a1639aff05dfe",
+    "Functional validation report": "features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/REPORT.md",
+    "Independent evidence validator": "features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/validate-evidence.py",
+    "Root SHA256SUMS digest": "0c80987652db2189bd8cf7d91b7bd666622696353660b8f32d01eab3a95a3f96",
+    "Root SHA256SUMS path": "features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/SHA256SUMS",
+    "Validation config snapshot": "features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/validation-config.json"
+  },
+  "generation": 12,
+  "image_fields": {
+    "Base image reference": "quay.io/ascend/cann:9.0.1-910b-ubuntu22.04-py3.12",
+    "Base manifest digest": "BuildKit-resolved base is not used as the runtime identity; the derived manifest and config below are authoritative",
+    "Derived config digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+    "Derived image reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+    "Derived manifest digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+    "Derived-image/run ID": "20260811T145302Z",
+    "Image delivery mode": "ready-image",
+    "Mooncake source label": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "Patched file SHA256": "54e3198504a3745b21e172d8e66c4c7c217bbc7642498e3bb4cdbab557b8b6ea",
+    "Patched file path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+    "Patched source commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "Platform": "linux/arm64",
+    "vLLM source label": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vLLM-Ascend source label": "57d3c214e642cdbb529400f0742d1a98a8d38708"
+  },
+  "path": "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/performance-validation-handoff.md",
+  "ready": true,
+  "sha256": "66ff7a0d79d935017090e56487c02a2eb5b7632cddea664d4aa3db7adef91c83",
+  "source_rows": {
+    "control repo": {
+      "Branch / role": "kv-pool-layerwise-reuse generation-12 functional evidence parent",
+      "Commit": "de8890ea40bd5723c61f2f5b9258ac837cb4bd1e",
+      "Component": "control repo",
+      "Remote equality": "functional evidence parent pushed as origin/kv-pool-layerwise-reuse=de8890ea40bd5723c61f2f5b9258ac837cb4bd1e before this handoff-only transition"
+    },
+    "repos/Mooncake": {
+      "Branch / role": "read-only detached collaborator baseline",
+      "Commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+      "Component": "repos/Mooncake",
+      "Remote equality": "collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2"
+    },
+    "repos/vllm": {
+      "Branch / role": "frozen detached dependency",
+      "Commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+      "Component": "repos/vllm",
+      "Remote equality": "workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5; commit reachable from upstream/main"
+    },
+    "repos/vllm-ascend": {
+      "Branch / role": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
+      "Commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+      "Component": "repos/vllm-ascend",
+      "Remote equality": "origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708"
+    }
+  },
+  "status": "READY_FOR_PERFORMANCE_VALIDATION"
+}

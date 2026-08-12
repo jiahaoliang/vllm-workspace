@@ -1,0 +1,13 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "deployment/prefill-engine-deployment",
+  "-c",
+  "prefill-engine",
+  "--",
+  "sh",
+  "-c",
+  "for attempt in $(seq 1 300); do\n  if npu-smi info | python3 -c '\nimport re\nimport sys\n\nvalues = [int(value) for value in re.findall(r\"(\\d+)\\s*/\\s*32768\", sys.stdin.read())]\nsys.exit(0 if values and max(values) <= 4096 else 1)\n'; then\n    exit 0\n  fi\n  sleep 1\ndone\nnpu-smi info\nexit 1\n"
+]

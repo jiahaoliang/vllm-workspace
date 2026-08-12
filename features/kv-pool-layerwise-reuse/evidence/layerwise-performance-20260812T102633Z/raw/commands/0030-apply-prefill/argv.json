@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "apply",
+  "-n",
+  "liangjiahao",
+  "-f",
+  "/tmp/layerwise-performance-rapid-20260812T102633Z/rendered/dp1/16384/bulk/prefill-deployment.json"
+]

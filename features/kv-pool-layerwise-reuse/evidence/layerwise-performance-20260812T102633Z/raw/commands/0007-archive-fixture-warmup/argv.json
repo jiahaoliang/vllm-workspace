@@ -1,0 +1,10 @@
+[
+  "kubectl",
+  "cp",
+  "-n",
+  "liangjiahao",
+  "-c",
+  "aisbench",
+  "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c8/warmup.jsonl",
+  "/tmp/layerwise-performance-rapid-20260812T102633Z/fixtures/tokens-16384-c8/warmup.jsonl"
+]

@@ -1,0 +1,14 @@
+[
+  "nerdctl",
+  "--namespace",
+  "k8s.io",
+  "run",
+  "--rm",
+  "--net",
+  "none",
+  "--entrypoint",
+  "python3",
+  "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+  "-c",
+  "import hashlib\nimport json\nfrom pathlib import Path\n\npaths = tuple(Path(value).resolve() for value in ('/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py',))\nif len(paths) == 1:\n    digest = hashlib.sha256(paths[0].read_bytes()).hexdigest()\nelse:\n    rows = []\n    for path in paths:\n        file_digest = hashlib.sha256(path.read_bytes()).hexdigest()\n        parts = path.parts\n        package_index = parts.index(\"vllm_ascend\")\n        relative = Path(*parts[package_index:]).as_posix()\n        rows.append(f\"{file_digest}  {relative}\\n\")\n    digest = hashlib.sha256(\"\".join(rows).encode()).hexdigest()\nprint(json.dumps({\"path\": \",\".join(str(path) for path in paths), \"sha256\": digest}))\n"
+]

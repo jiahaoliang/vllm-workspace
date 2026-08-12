@@ -1,0 +1,1 @@
+{"logical_layers": 27, "logical_memory_factor": 1.0, "physical_slots": 27, "role": "decode", "vllm_ascend_source": "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"}

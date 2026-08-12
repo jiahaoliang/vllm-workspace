@@ -1,0 +1,10 @@
+[
+  "kubectl",
+  "get",
+  "-n",
+  "liangjiahao",
+  "configmap",
+  "layerwise-runtime-config",
+  "-o",
+  "json"
+]

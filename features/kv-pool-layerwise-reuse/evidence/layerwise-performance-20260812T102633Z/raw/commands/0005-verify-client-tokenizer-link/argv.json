@@ -1,0 +1,12 @@
+[
+  "kubectl",
+  "exec",
+  "-n",
+  "liangjiahao",
+  "layerwise-performance-aisbench",
+  "-c",
+  "aisbench",
+  "--",
+  "readlink",
+  "/performance-workspace/rootfs/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8"
+]

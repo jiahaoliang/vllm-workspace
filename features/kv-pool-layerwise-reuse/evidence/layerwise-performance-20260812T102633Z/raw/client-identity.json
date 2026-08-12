@@ -1,0 +1,209 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cni.projectcalico.org/containerID": "7daf353ea1faa69732cd30201cf6951b4299da8a765a75f5ed5856649e7b95d0",
+            "cni.projectcalico.org/podIP": "10.250.202.60/32",
+            "cni.projectcalico.org/podIPs": "10.250.202.60/32",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{\"performance.vllm.ai/config-digest\":\"sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd\",\"performance.vllm.ai/execution-mode\":\"exact-rootfs-chroot\",\"performance.vllm.ai/repo-digest\":\"sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3\",\"performance.vllm.ai/source-image\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z\"},\"labels\":{\"app\":\"layerwise-performance-aisbench\",\"purpose\":\"performance-client\"},\"name\":\"layerwise-performance-aisbench\",\"namespace\":\"liangjiahao\"},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"args\":[\"exec sleep infinity\"],\"command\":[\"/bin/bash\",\"-lc\"],\"env\":[{\"name\":\"PYTHONDONTWRITEBYTECODE\",\"value\":\"1\"},{\"name\":\"PYTHONUNBUFFERED\",\"value\":\"1\"},{\"name\":\"CLIENT_ROOTFS\",\"value\":\"/performance-workspace/rootfs\"}],\"image\":\"docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z\",\"imagePullPolicy\":\"Never\",\"name\":\"aisbench\",\"resources\":{\"limits\":{\"cpu\":\"8\",\"memory\":\"32Gi\"},\"requests\":{\"cpu\":\"4\",\"memory\":\"16Gi\"}},\"volumeMounts\":[{\"mountPath\":\"/performance-workspace\",\"name\":\"workspace\"}]}],\"enableServiceLinks\":false,\"nodeName\":\"m1\",\"restartPolicy\":\"Always\",\"terminationGracePeriodSeconds\":10,\"volumes\":[{\"emptyDir\":{\"sizeLimit\":\"50Gi\"},\"name\":\"workspace\"}]}}\n",
+            "performance.vllm.ai/config-digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+            "performance.vllm.ai/execution-mode": "exact-rootfs-chroot",
+            "performance.vllm.ai/repo-digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+            "performance.vllm.ai/source-image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z"
+        },
+        "creationTimestamp": "2026-08-11T16:19:21Z",
+        "generation": 1,
+        "labels": {
+            "app": "layerwise-performance-aisbench",
+            "purpose": "performance-client"
+        },
+        "name": "layerwise-performance-aisbench",
+        "namespace": "liangjiahao",
+        "resourceVersion": "363799",
+        "uid": "abc4ba22-bc90-4719-8384-5aab3ce02b49"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "exec sleep infinity"
+                ],
+                "command": [
+                    "/bin/bash",
+                    "-lc"
+                ],
+                "env": [
+                    {
+                        "name": "PYTHONDONTWRITEBYTECODE",
+                        "value": "1"
+                    },
+                    {
+                        "name": "PYTHONUNBUFFERED",
+                        "value": "1"
+                    },
+                    {
+                        "name": "CLIENT_ROOTFS",
+                        "value": "/performance-workspace/rootfs"
+                    }
+                ],
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+                "imagePullPolicy": "Never",
+                "name": "aisbench",
+                "resources": {
+                    "limits": {
+                        "cpu": "8",
+                        "memory": "32Gi"
+                    },
+                    "requests": {
+                        "cpu": "4",
+                        "memory": "16Gi"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/performance-workspace",
+                        "name": "workspace"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "nodeName": "m1",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 10,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 30
+            }
+        ],
+        "volumes": [
+            {
+                "emptyDir": {
+                    "sizeLimit": "50Gi"
+                },
+                "name": "workspace"
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-11T16:19:22Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-11T16:19:21Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-11T16:19:22Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-11T16:19:22Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-08-11T16:19:21Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "4",
+                    "memory": "16Gi"
+                },
+                "containerID": "containerd://b5c5ab97d9cee9012cf60cd14263a89a30343008880062d0018cd8efbdf77551",
+                "image": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+                "imageID": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+                "lastState": {},
+                "name": "aisbench",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "cpu": "8",
+                        "memory": "32Gi"
+                    },
+                    "requests": {
+                        "cpu": "4",
+                        "memory": "16Gi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-08-11T16:19:22Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 0,
+                        "supplementalGroups": [
+                            0
+                        ],
+                        "uid": 0
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/performance-workspace",
+                        "name": "workspace"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.200.27",
+        "hostIPs": [
+            {
+                "ip": "192.168.200.27"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.250.202.60",
+        "podIPs": [
+            {
+                "ip": "10.250.202.60"
+            }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-08-11T16:19:21Z"
+    }
+}

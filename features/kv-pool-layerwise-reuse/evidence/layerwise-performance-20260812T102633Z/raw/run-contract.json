@@ -1,0 +1,21 @@
+{
+  "calculator": "total",
+  "expected_points": [
+    "dp1-16384-bulk-o128-c8",
+    "dp1-16384-bulk-o1-c8",
+    "dp1-16384-layerwise-o128-c8",
+    "dp1-16384-layerwise-o1-c8",
+    "dp1-16384-reuse3-o1-c8"
+  ],
+  "formal_concurrency_waves": 8,
+  "formal_repetitions": 1,
+  "formal_request_count": 64,
+  "image_digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+  "npu_node": "m1",
+  "raw_characterization_only": true,
+  "single_wave": false,
+  "topologies": [
+    "dp1"
+  ],
+  "warmup_request_count": 8
+}

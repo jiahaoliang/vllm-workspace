@@ -1,0 +1,11 @@
+[
+  "kubectl",
+  "get",
+  "pods",
+  "-n",
+  "liangjiahao",
+  "-l",
+  "app=prefill",
+  "-o",
+  "name"
+]

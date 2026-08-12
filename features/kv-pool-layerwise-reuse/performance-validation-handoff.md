@@ -4,7 +4,7 @@ status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
 generation: 12
-updated_at: 2026-08-12T11:10:03+08:00
+updated_at: 2026-08-12T19:32:51+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
@@ -204,6 +204,57 @@ Generation 9 freezes the corrected rapid five-point contract, 8 warmup
 requests, 64 formal requests, 128 GiB per serving rank, and requires a new
 performance run root. It does not authorize resuming or combining any
 generation-8 evidence root.
+
+## Generation 12 Performance Acceptance
+
+Generation 12 authorized the immutable five-point run completed on 2026-08-12
+in `evidence/layerwise-performance-20260812T102633Z/raw`. The run used only
+the candidate image and source identities frozen above. It is a
+single-repetition raw characterization and must not be combined with another
+run root.
+
+Before the accepted run, Decode repeatedly failed during initialization on
+physical NPU `0,7` with `libcpu_kernels.so`, kernel `Log`, and runtime result
+`507018`. An otherwise identical Decode probe became Ready on NPU `4,5`.
+The accepted run therefore preserved the failed `0,7` Pod as a diagnostic NPU
+fence and ran every variant with Prefill on `1,2` and Decode on `4,5`. No
+accepted point used NPU `0,7`. The exact startup logs are preserved under
+`evidence/layerwise-performance-20260812T102633Z/deployment-diagnostics/`.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Exact five-point DP1 matrix | PASS | `evidence/layerwise-performance-20260812T102633Z/raw/run-contract.json` |
+| Formal requests | PASS | All five points are `valid: true` with `64/64` successful requests; `320/320` total |
+| Variant correctness canaries | PASS | `evidence/layerwise-performance-20260812T102633Z/raw/canaries/` |
+| REUSE3 runtime layout | PASS | `evidence/layerwise-performance-20260812T102633Z/raw/runtime-checks/dp1-16384-reuse3-prefill.json`: 27 logical layers, 5 physical slots, factor 5.4 |
+| Full report checker | PASS | `performance.report check --scope all` returned `{"scope":"all","valid":true,"errors":[]}` |
+| Raw checksum replay | PASS | `evidence/layerwise-performance-20260812T102633Z/raw/SHA256SUMS`; digest `e8ffb6975de785ce68797b7e7a18c572b27d7d74d4ef549242f0cb6bf9a4f0b6` |
+| Repository import checksum replay | PASS | `evidence/layerwise-performance-20260812T102633Z/SHA256SUMS`; digest `2b3da6262a81ef01cfc37f8f60e4f63bb07c541f40501458654f5c6ca02dc003` |
+| Runtime cleanup/restoration | PASS | `evidence/layerwise-performance-20260812T102633Z/raw/restoration.json`: completed, engines stopped, no errors, Mooncake empty |
+| Final live Mooncake cleanup | PASS | Master key count, allocated bytes, and active clients were all zero |
+| Raw report | PASS | `layerwise-performance-64-request-validation-2026-08-12.md`; SHA256 `3526d2e91aa02b4fe5a1eeade3d9d507d0273b5dc86c94223ccc2e93cde7548d` |
+
+| Variant | Output tokens | Request throughput | Formal duration | Successful requests |
+| --- | ---: | ---: | ---: | ---: |
+| BULK | 128 | 0.2943 req/s | 217.44 s | 64/64 |
+| BULK | 1 | 0.3187 req/s | 200.79 s | 64/64 |
+| LAYERWISE | 128 | 0.2788 req/s | 229.52 s | 64/64 |
+| LAYERWISE | 1 | 0.3017 req/s | 212.16 s | 64/64 |
+| REUSE3 | 1 | 0.2394 req/s | 267.33 s | 64/64 |
+
+For request throughput, LAYERWISE/BULK was `0.947333x` at o128 and
+`0.946658x` at o1. REUSE3/LAYERWISE at o1 was `0.793503x`, and
+REUSE3/BULK was `0.751177x`. These ratios are observations from one formal
+attempt, not statistical significance or a performance pass/fail threshold.
+The runner wall clock from its first captured command through final Mooncake
+empty proof was approximately 56 minutes 3 seconds.
+
+Reusable image for follow-up validation:
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`
+with manifest
+`sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3`
+and config digest
+`sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd`.
 
 ## Generation 10 Rerun Authorization
 

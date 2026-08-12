@@ -1,0 +1,8 @@
+[
+  "nerdctl",
+  "--namespace",
+  "k8s.io",
+  "image",
+  "inspect",
+  "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z"
+]

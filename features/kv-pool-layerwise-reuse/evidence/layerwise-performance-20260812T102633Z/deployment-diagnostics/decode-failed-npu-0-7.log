@@ -1,0 +1,430 @@
+INFO 08-12 09:13:57 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-12 09:13:57 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-12 09:13:57 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-12 09:13:57 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-12 09:13:57 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-12 09:14:13 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-12 09:14:13 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345] 
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345]        █     █     █▄   ▄█
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.1.dev1+g54503ecec
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345]   █▄█▀ █     █     █     █  model   /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:345] 
+(APIServer pid=89) INFO 08-12 09:14:13 [api_utils.py:273] non-default args: {'host': '0.0.0.0', 'port': 8200, 'model': '/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', 'trust_remote_code': True, 'max_model_len': 65536, 'quantization': 'ascend', 'enforce_eager': True, 'served_model_name': ['vllm-ascend/DeepSeek-V2-Lite-W8A8'], 'distributed_executor_backend': 'mp', 'tensor_parallel_size': 2, 'block_size': 128, 'gpu_memory_utilization': 0.9, 'enable_prefix_caching': False, 'enable_logging_iteration_details': True, 'max_num_batched_tokens': 1024, 'max_num_seqs': 64, 'enable_chunked_prefill': True, 'kv_transfer_config': KVTransferConfig(kv_connector='AscendStoreConnector', engine_id='965dd0fb-b334-4bd9-a6ac-2d103e4fdb46', kv_buffer_device='npu', kv_buffer_size=1000000000.0, kv_role='kv_consumer', kv_rank=None, kv_parallel_size=1, kv_ip='127.0.0.1', kv_port=14579, kv_connector_extra_config={'backend': 'mooncake', 'consumer_is_to_load': True, 'layerwise_prefetch_layers': 3, 'lookup_rpc_port': 0, 'use_layerwise': True}, kv_connector_module_path=None, enable_permute_local_kv=False, kv_load_failure_policy='fail')}
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_HOST
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PORT
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_PROTO
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP_ADDR
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_PORT_8000_TCP
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_PROXY_SERVICE_SERVICE_PORT_HTTP_API
+(APIServer pid=89) WARNING 08-12 09:14:13 [envs.py:2082] Unknown vLLM environment variable detected: VLLM_USE_V1
+(APIServer pid=89) INFO 08-12 09:14:13 [model.py:619] Resolved architecture: DeepseekV2ForCausalLM
+(APIServer pid=89) INFO 08-12 09:14:13 [model.py:1776] Using max model len 65536
+(APIServer pid=89) INFO 08-12 09:14:13 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=1024.
+(APIServer pid=89) INFO 08-12 09:14:14 [vllm.py:1090] Asynchronous scheduling is enabled.
+(APIServer pid=89) WARNING 08-12 09:14:14 [vllm.py:1144] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=89) WARNING 08-12 09:14:14 [vllm.py:1192] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=89) INFO 08-12 09:14:14 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=89) INFO 08-12 09:14:14 [vllm.py:1371] Cudagraph is disabled under eager mode
+(APIServer pid=89) WARNING 08-12 09:14:14 [platform.py:1045] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=89) INFO 08-12 09:14:14 [ascend_config.py:843] Dynamic EPLB is False
+(APIServer pid=89) INFO 08-12 09:14:14 [ascend_config.py:844] The number of redundant experts is 0
+(APIServer pid=89) INFO 08-12 09:14:14 [platform.py:486] Compilation disabled, using eager mode by default
+(APIServer pid=89) INFO 08-12 09:14:14 [platform.py:772] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=89) INFO 08-12 09:14:14 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+INFO 08-12 09:14:25 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-12 09:14:25 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-12 09:14:25 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-12 09:14:25 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-12 09:14:25 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(EngineCore pid=126) INFO 08-12 09:14:39 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+(EngineCore pid=126) INFO 08-12 09:14:39 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+(EngineCore pid=126) INFO 08-12 09:14:39 [core.py:114] Initializing a V1 LLM engine (v0.1.dev1+g54503ecec) with config: model='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', speculative_config=None, tokenizer='/root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=65536, download_dir=None, load_format=auto, tensor_parallel_size=2, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=ascend, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=npu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=True, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=vllm-ascend/DeepSeek-V2-Lite-W8A8, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'vllm_ascend.compilation.compiler_interface.AscendCompiler', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [1024], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=126) INFO 08-12 09:14:39 [multiproc_executor.py:140] DP group leader: node_rank=0, node_rank_within_dp=0, master_addr=127.0.0.1, mq_connect_ip=10.250.202.44 (local), world_size=2, local_world_size=2
+INFO 08-12 09:14:47 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-12 09:14:47 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-12 09:14:47 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-12 09:14:48 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-12 09:14:48 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 08-12 09:15:01 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-12 09:15:01 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 08-12 09:15:05 [ascend_config.py:843] Dynamic EPLB is False
+INFO 08-12 09:15:05 [ascend_config.py:844] The number of redundant experts is 0
+INFO 08-12 09:15:07 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-12 09:15:07 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-12 09:15:07 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-12 09:15:08 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-12 09:15:08 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+(Worker pid=158) INFO 08-12 09:15:08 [parallel_state.py:1607] world_size=2 rank=0 local_rank=0 distributed_init_method=tcp://127.0.0.1:46915 backend=hccl
+INFO 08-12 09:15:21 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-12 09:15:21 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+INFO 08-12 09:15:25 [ascend_config.py:843] Dynamic EPLB is False
+INFO 08-12 09:15:25 [ascend_config.py:844] The number of redundant experts is 0
+(Worker pid=193) INFO 08-12 09:15:28 [parallel_state.py:1607] world_size=2 rank=1 local_rank=1 distributed_init_method=tcp://127.0.0.1:46915 backend=hccl
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+[Gloo] Rank 1 is connected to 1 peer ranks. Expected number of connected peer ranks is : 1
+(Worker pid=158) INFO 08-12 09:15:28 [parallel_state.py:1942] rank 0 in world size 2 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+[Gloo] Rank [Gloo] Rank 10 is connected to  is connected to 11 peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : 11
+
+(Worker_TP1 pid=193) INFO 08-12 09:15:28 [model_runner_v1.py:3860] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_TP0 pid=158) INFO 08-12 09:15:28 [model_runner_v1.py:3860] Starting to load model /root/.cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8...
+(Worker_TP0 pid=158) INFO 08-12 09:15:29 [modelslim_config.py:478] Using the vLLM Ascend modelslim Quantization now!
+[rank0]:[W812 09:15:29.498048787 CopyKernelOpApi.cpp:58] Warning: E39999: Inner Error!
+E39999[PID: 158] 2026-08-12-09:15:29.265.475 (E39999):  The error from device(chipId:0, dieId:0), serial number is 5, an exception occurred during AICPU execution, stream_id:46, task_id:74, errcode:11002, msg:open so failed.[FUNC:ProcessStarsAicpuErrorInfo][FILE:device_error_proc.cc][LINE:1644]
+        TraceBack (most recent call last):
+       Kernel task happen error, retCode=0x2a, [aicpu exception].[FUNC:PreCheckTaskErr][FILE:davinci_kernel_task.cc][LINE:1729]
+       Aicpu kernel execute failed, device_id=0, stream_id=46, task_id=74, soName=libcpu_kernels.so, funcName=RunCpuKernel, kernelName=Log, errorCode=0x2a.[FUNC:PrintAicpuErrorInfo][FILE:davinci_kernel_task.cc][LINE:1435]
+       rtStreamSynchronize execution failed, reason=aicpu exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       synchronize stream failed, runtime result = 507018[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901] WorkerProc failed to start.
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901] Traceback (most recent call last):
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 868, in worker_main
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 637, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.worker.load_model()
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/worker/worker.py", line 730, in load_model
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.model_runner.load_model()
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/worker/model_runner_v1.py", line 3876, in load_model
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.model: nn.Module = get_model(vllm_config=self.vllm_config)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/__init__.py", line 140, in get_model
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return loader.load_model(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/base_loader.py", line 55, in load_model
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     model = initialize_model(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]             ^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/utils.py", line 63, in initialize_model
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     model = model_class(vllm_config=vllm_config, prefix=prefix)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1824, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.model = self.model_cls(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                  ^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/compilation/decorators.py", line 383, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     old_init(self, *args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1379, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.start_layer, self.end_layer, self.layers = make_layers(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                                                     ^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/utils.py", line 713, in make_layers
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     + get_offloader().wrap_modules(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/offloader/base.py", line 104, in wrap_modules
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return list(modules_generator)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/utils.py", line 714, in <genexpr>
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     layer_fn(prefix=f"{prefix}.{idx}") for idx in range(start_layer, end_layer)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1381, in <lambda>
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     lambda prefix: DeepseekV2DecoderLayer(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                    ^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1230, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.self_attn = attn_cls(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                      ^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/patch/worker/patch_deepseek_v2.py", line 173, in _deepseek_v2_mla_attention_init
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self.rotary_emb = get_rope(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                       ^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/layers/rotary_embedding/__init__.py", line 305, in get_rope
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     rotary_emb = cls(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                  ^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/ops/rotary_embedding.py", line 337, in __init__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     self._set_cos_sin_cache(self.max_seq_len, device=NPUPlatform.device_type, dtype=dtype)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/ops/rotary_embedding.py", line 428, in _set_cos_sin_cache
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     low, high = self._yarn_find_correction_range(
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/ops/rotary_embedding.py", line 369, in _yarn_find_correction_range
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     high = torch.ceil(self._yarn_find_correction_dim(high_rot, dim, base, max_position_embeddings))
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/ops/rotary_embedding.py", line 361, in _yarn_find_correction_dim
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return (dim * torch.log(torch.tensor(max_position_embeddings) / (num_rotations * 2 * torch.pi))) / (
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]   File "/usr/local/python3.12.13/lib/python3.12/site-packages/torch/utils/_device.py", line 109, in __torch_function__
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP0 pid=158) ERROR 08-12 09:15:30 [multiproc_executor.py:901] RuntimeError: ACL stream synchronize failed, error code:507018
+(EngineCore pid=126) INFO 08-12 09:15:30 [multiproc_executor.py:429] [shutdown] Executor: waiting for worker exit count=2
+[rank0]:[W812 09:15:30.505252745 NPUStream.cpp:596] Warning: NPU warning, error code is 507018[Error]: 
+[Error]: The aicpu execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 158] 2026-08-12-09:15:30.274.422 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=aicpu exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507018.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeUsedDevices)
+[W812 09:15:30.506302470 NPUStream.cpp:578] Warning: NPU warning, error code is 507018[Error]: 
+[Error]: The aicpu execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 158] 2026-08-12-09:15:30.275.988 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=aicpu exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507018.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W812 09:15:30.506664312 NPUStream.cpp:578] Warning: NPU warning, error code is 507018[Error]: 
+[Error]: The aicpu execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 158] 2026-08-12-09:15:30.276.508 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=aicpu exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507018.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[rank1]:[W812 09:15:33.322513002 TCPStore.cpp:138] [c10d] recvValueWithTimeout failed on SocketImpl(fd=24, addr=[::ffff:127.0.0.1]:58194, remote=[::ffff:127.0.0.1]:46915): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff736c5978 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x65dee84 (0xffff7996ee84 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::doWait(c10::ArrayRef<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::chrono::duration<long, std::ratio<1l, 1000l> >) + 0x1fc (0xffff799716dc in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::TCPStore::doGet(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x28 (0xffff79971d68 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: c10d::TCPStore::get(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0xe8 (0xffff79971ed8 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: c10d::PrefixStore::get(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x2fc (0xffff7991088c in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: c10d_npu::ProcessGroupHCCL::broadcastMasterID(HcclRootInfoDef*, bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int) + 0x250 (0xffff66d85500 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #7: c10d_npu::ProcessGroupHCCL::createHCCLCommOrigin(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<c10::Device, std::allocator<c10::Device> > const&, c10d_npu::HcclCommType, HcclCommConfigDef*, std::vector<std::shared_ptr<c10d_npu::HCCLComm>, std::allocator<std::shared_ptr<c10d_npu::HCCLComm> > >&, std::vector<c10_npu::NPUStream, std::allocator<c10_npu::NPUStream> >&, int) + 0xac (0xffff66d85aec in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #8: c10d_npu::ProcessGroupHCCL::createHCCLComm(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<c10::Device, std::allocator<c10::Device> > const&, c10d_npu::HcclCommType, HcclCommConfigDef*, int) + 0x934 (0xffff66d882c8 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #9: c10d_npu::ProcessGroupHCCL::getHcclCommName[abi:cxx11](int, bool) + 0x330 (0xffff66d8ae40 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #10: <unknown function> + 0x3881428 (0xffff66d11428 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #11: <unknown function> + 0x388ccc4 (0xffff66d1ccc4 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+frame #12: <unknown function> + 0xb4750c (0xffff63fd750c in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+<omitting python frames>
+
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] WorkerProc failed to start.
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] Traceback (most recent call last):
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 868, in worker_main
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 637, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.worker.load_model()
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/worker/worker.py", line 730, in load_model
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.model_runner.load_model()
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/worker/model_runner_v1.py", line 3876, in load_model
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.model: nn.Module = get_model(vllm_config=self.vllm_config)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/__init__.py", line 140, in get_model
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return loader.load_model(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/base_loader.py", line 55, in load_model
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     model = initialize_model(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]             ^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return func(*args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/model_loader/utils.py", line 63, in initialize_model
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     model = model_class(vllm_config=vllm_config, prefix=prefix)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1824, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.model = self.model_cls(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                  ^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/compilation/decorators.py", line 383, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     old_init(self, *args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1379, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.start_layer, self.end_layer, self.layers = make_layers(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                                                     ^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/utils.py", line 713, in make_layers
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     + get_offloader().wrap_modules(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/offloader/base.py", line 104, in wrap_modules
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return list(modules_generator)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/utils.py", line 714, in <genexpr>
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     layer_fn(prefix=f"{prefix}.{idx}") for idx in range(start_layer, end_layer)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1381, in <lambda>
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     lambda prefix: DeepseekV2DecoderLayer(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                    ^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 1249, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.mlp = DeepseekV2MoE(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                ^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/models/deepseek_v2.py", line 361, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.experts = FusedMoE(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                    ^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/patch/platform/patch_fused_moe.py", line 68, in _ascend_FusedMoE
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return _original_FusedMoE(*args, runner_cls=runner_cls, runner_args=runner_args, **kwargs)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/layers/fused_moe/layer.py", line 367, in FusedMoE
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     routed_experts = routed_experts_cls(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                      ^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/layers/fused_moe/routed_experts.py", line 118, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.quant_method = self._get_quant_method(
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                         ^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm/vllm/model_executor/layers/fused_moe/routed_experts.py", line 198, in _get_quant_method
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     quant_method = quant_config.get_quant_method(self, prefix)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/quantization/modelslim_config.py", line 695, in get_quant_method
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     scheme = create_scheme_for_layer(self.quant_description, prefix, "moe", self.packed_modules_mapping)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/quantization/modelslim_config.py", line 489, in create_scheme_for_layer
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     return scheme_cls()
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]            ^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]   File "/vllm-workspace/vllm-ascend/vllm_ascend/quantization/methods/w8a8_dynamic.py", line 177, in __init__
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]     self.moe_all_to_all_group_name = backend.get_hccl_comm_name(local_rank)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901]                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] RuntimeError: [1] is setting up HCCL communicator and retrieving hcclUniqueId from [0] via c10d key-value store by key '0', but store->get('0') got error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff736c5978 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libc10.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #1: <unknown function> + 0x65dee84 (0xffff7996ee84 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #2: c10d::TCPStore::doWait(c10::ArrayRef<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::chrono::duration<long, std::ratio<1l, 1000l> >) + 0x1fc (0xffff799716dc in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #3: c10d::TCPStore::doGet(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x28 (0xffff79971d68 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #4: c10d::TCPStore::get(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0xe8 (0xffff79971ed8 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #5: c10d::PrefixStore::get(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x2fc (0xffff7991088c in /usr/local/python3.12.13/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #6: c10d_npu::ProcessGroupHCCL::broadcastMasterID(HcclRootInfoDef*, bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int) + 0x250 (0xffff66d85500 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #7: c10d_npu::ProcessGroupHCCL::createHCCLCommOrigin(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<c10::Device, std::allocator<c10::Device> > const&, c10d_npu::HcclCommType, HcclCommConfigDef*, std::vector<std::shared_ptr<c10d_npu::HCCLComm>, std::allocator<std::shared_ptr<c10d_npu::HCCLComm> > >&, std::vector<c10_npu::NPUStream, std::allocator<c10_npu::NPUStream> >&, int) + 0xac (0xffff66d85aec in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #8: c10d_npu::ProcessGroupHCCL::createHCCLComm(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<c10::Device, std::allocator<c10::Device> > const&, c10d_npu::HcclCommType, HcclCommConfigDef*, int) + 0x934 (0xffff66d882c8 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #9: c10d_npu::ProcessGroupHCCL::getHcclCommName[abi:cxx11](int, bool) + 0x330 (0xffff66d8ae40 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #10: <unknown function> + 0x3881428 (0xffff66d11428 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #11: <unknown function> + 0x388ccc4 (0xffff66d1ccc4 in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] frame #12: <unknown function> + 0xb4750c (0xffff63fd750c in /usr/local/python3.12.13/lib/python3.12/site-packages/torch_npu/lib/libtorch_npu.so)
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] <omitting python frames>
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] . This may indicate a possible application crash on rank 0 or a network set up issue.
+(Worker_TP1 pid=193) ERROR 08-12 09:15:34 [multiproc_executor.py:901] [ERROR] 2026-08-12-09:15:33 (PID:193, Device:1, RankID:-1) ERR02005 DIST internal error
+(EngineCore pid=126) WARNING 08-12 09:15:35 [multiproc_executor.py:441] [shutdown] Executor: workers still running after grace period; sending SIGTERM count=2
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231] EngineCore failed to start.
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231] Traceback (most recent call last):
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1200, in run_engine_core
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     return func(*args, **kwargs)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 966, in __init__
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     super().__init__(
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 123, in __init__
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 108, in __init__
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     super().__init__(vllm_config)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     return func(*args, **kwargs)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/executor/abstract.py", line 109, in __init__
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     self._init_executor()
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 201, in _init_executor
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     self.workers = WorkerProc.wait_for_ready(unready_workers)
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 765, in wait_for_ready
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231]     raise e from None
+(EngineCore pid=126) ERROR 08-12 09:15:35 [core.py:1231] Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
+(EngineCore pid=126) Process EngineCore:
+(EngineCore pid=126) Traceback (most recent call last):
+(EngineCore pid=126)   File "/usr/local/python3.12.13/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=126)     self.run()
+(EngineCore pid=126)   File "/usr/local/python3.12.13/lib/python3.12/multiprocessing/process.py", line 108, in run
+(EngineCore pid=126)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=126)   File "/vllm-workspace/vllm-ascend/vllm_ascend/patch/platform/patch_balance_schedule.py", line 896, in _balance_run_engine_core
+(EngineCore pid=126)     return _OriginalRunEngineCore(*args, dp_rank=dp_rank, local_dp_rank=local_dp_rank, **kwargs)
+(EngineCore pid=126)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1235, in run_engine_core
+(EngineCore pid=126)     raise e
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1200, in run_engine_core
+(EngineCore pid=126)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=126)                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=126)     return func(*args, **kwargs)
+(EngineCore pid=126)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 966, in __init__
+(EngineCore pid=126)     super().__init__(
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 123, in __init__
+(EngineCore pid=126)     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=126)                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 108, in __init__
+(EngineCore pid=126)     super().__init__(vllm_config)
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=126)     return func(*args, **kwargs)
+(EngineCore pid=126)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/executor/abstract.py", line 109, in __init__
+(EngineCore pid=126)     self._init_executor()
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 201, in _init_executor
+(EngineCore pid=126)     self.workers = WorkerProc.wait_for_ready(unready_workers)
+(EngineCore pid=126)                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=126)   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 765, in wait_for_ready
+(EngineCore pid=126)     raise e from None
+(EngineCore pid=126) Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
+(APIServer pid=89) Traceback (most recent call last):
+(APIServer pid=89)   File "<frozen runpy>", line 198, in _run_module_as_main
+(APIServer pid=89)   File "<frozen runpy>", line 88, in _run_code
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/entrypoints/openai/api_server.py", line 799, in <module>
+(APIServer pid=89)     uvloop.run(run_server(args))
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/site-packages/uvloop/__init__.py", line 96, in run
+(APIServer pid=89)     return __asyncio.run(
+(APIServer pid=89)            ^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/asyncio/runners.py", line 195, in run
+(APIServer pid=89)     return runner.run(main)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/asyncio/runners.py", line 118, in run
+(APIServer pid=89)     return self._loop.run_until_complete(task)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=89)     return await main
+(APIServer pid=89)            ^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/entrypoints/openai/api_server.py", line 759, in run_server
+(APIServer pid=89)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/entrypoints/openai/api_server.py", line 773, in run_server_worker
+(APIServer pid=89)     async with build_async_engine_client(
+(APIServer pid=89)                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/contextlib.py", line 210, in __aenter__
+(APIServer pid=89)     return await anext(self.gen)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/entrypoints/openai/api_server.py", line 139, in build_async_engine_client
+(APIServer pid=89)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=89)                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/contextlib.py", line 210, in __aenter__
+(APIServer pid=89)     return await anext(self.gen)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/entrypoints/openai/api_server.py", line 175, in build_async_engine_client_from_engine_args
+(APIServer pid=89)     async_llm = AsyncLLM.from_vllm_config(
+(APIServer pid=89)                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/async_llm.py", line 217, in from_vllm_config
+(APIServer pid=89)     return cls(
+(APIServer pid=89)            ^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/async_llm.py", line 146, in __init__
+(APIServer pid=89)     self.engine_core = EngineCoreClient.make_async_mp_client(
+(APIServer pid=89)                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=89)     return func(*args, **kwargs)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/core_client.py", line 132, in make_async_mp_client
+(APIServer pid=89)     return AsyncMPClient(*client_args)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=89)     return func(*args, **kwargs)
+(APIServer pid=89)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/core_client.py", line 963, in __init__
+(APIServer pid=89)     super().__init__(
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/core_client.py", line 573, in __init__
+(APIServer pid=89)     with launch_core_engines(
+(APIServer pid=89)          ^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=89)   File "/usr/local/python3.12.13/lib/python3.12/contextlib.py", line 144, in __exit__
+(APIServer pid=89)     next(self.gen)
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/utils.py", line 1213, in launch_core_engines
+(APIServer pid=89)     wait_for_engine_startup(
+(APIServer pid=89)   File "/vllm-workspace/vllm/vllm/v1/engine/utils.py", line 1272, in wait_for_engine_startup
+(APIServer pid=89)     raise RuntimeError(
+(APIServer pid=89) RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
+(APIServer pid=89) [ERROR] 2026-08-12-09:15:38 (PID:89, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
