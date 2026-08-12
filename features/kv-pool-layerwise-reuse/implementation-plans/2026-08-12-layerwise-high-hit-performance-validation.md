@@ -52,7 +52,7 @@
 - [x] Add failing pairing, cardinality, checksum, and seed-config tests.
 - [x] Build formal prompts first and derive seed text from their exact token prefixes.
 - [x] Extend manifest and attempt-contract validation for `seed`.
-- [x] Run focused fixture tests; included in the complete `107 passed` suite.
+- [x] Run focused fixture tests; included in the complete `108 passed` suite.
 
 ### Task 3: Enforce The Seed-To-Formal Lifecycle
 
@@ -68,7 +68,7 @@
 - [x] Add failing lifecycle tests proving there is no cleanup between seed and formal.
 - [x] Add pure hit-log parsing tests for missing, duplicate, wrong-length, and wrong-hit records.
 - [x] Implement seed visibility probes and formal hit validation.
-- [x] Preserve failure diagnostics and run focused runner tests; included in the complete `107 passed` suite.
+- [x] Preserve failure diagnostics and run focused runner tests; included in the complete `108 passed` suite.
 
 ### Task 4: Make Evidence And Reports Fail Closed
 
@@ -86,7 +86,7 @@
 - [x] Add failing evidence-tree and report tests.
 - [x] Implement exact high-hit evidence validation and reporting.
 - [x] Update the executable runbook and approved design description.
-- [x] Run the complete CPU/mock performance test suite (`107 passed`) and `git diff --check`.
+- [x] Run the complete CPU/mock performance test suite (`108 passed`) and `git diff --check`.
 
 ### Task 5: Publish The Executable State
 

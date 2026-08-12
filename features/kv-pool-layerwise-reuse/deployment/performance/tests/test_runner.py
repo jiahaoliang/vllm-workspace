@@ -951,6 +951,12 @@ def test_parse_prefill_hit_log_requires_exact_per_request_hits() -> None:
     assert validation["local_hit_tokens"] == 0
 
 
+def test_control_runner_source_avoids_python_310_only_zip_strict() -> None:
+    source = Path(runner.__file__).read_text(encoding="utf-8")
+
+    assert "strict=True" not in source
+
+
 @pytest.mark.parametrize(
     ("replacement", "error"),
     (

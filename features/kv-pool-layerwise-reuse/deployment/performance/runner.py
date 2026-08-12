@@ -2119,7 +2119,7 @@ def validate_prefill_hits(text: str) -> dict[str, object]:
         "min_need_to_load_tokens": min(loads) if loads else None,
         "max_need_to_load_tokens": max(loads) if loads else None,
         "local_hit_tokens": (
-            max(hit - load for hit, load in zip(hits, loads, strict=True))
+            max(hit - load for hit, load in zip(hits, loads))
             if hits
             else None
         ),

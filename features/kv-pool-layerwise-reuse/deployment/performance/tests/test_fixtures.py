@@ -116,7 +116,11 @@ def test_seed_rows_are_exact_formal_prefixes(tmp_path: Path) -> None:
     assert fixture_manifest["formal_tokens"] == input_tokens
     assert fixture_manifest["expected_hit_rate"] == SEED_TOKENS / input_tokens
     assert len(fixture_manifest["seed_formal_pairs"]) == 64
-    for seed, formal, pair in zip(seed_rows, formal_rows, fixture_manifest["seed_formal_pairs"], strict=True):
+    for seed, formal, pair in zip(
+        seed_rows,
+        formal_rows,
+        fixture_manifest["seed_formal_pairs"],
+    ):
         seed_tokens = FakeTokenizer().encode(seed["question"])
         formal_tokens = FakeTokenizer().encode(formal["question"])
         assert len(seed_tokens) == SEED_TOKENS
