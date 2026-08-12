@@ -3,15 +3,16 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 12
-updated_at: 2026-08-12T19:32:51+08:00
+generation: 13
+updated_at: 2026-08-12T21:20:29+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
 
 本文件是功能验证 session 与性能验证 session 之间的 fail-closed handoff。
-Generation 12 已完成不可变源码、镜像、CPU/mock 和候选源码的真实 NPU
-correctness 验收，现授权执行冻结的五点 DP1 performance rerun。
+Generation 13 继承 generation 12 已验收的不可变源码、镜像、CPU/mock 和
+真实 NPU correctness，仅重新授权执行冻结的三点 DP1 high-hit performance
+run。它不把此前的 cold-cache 结果重新归因为高命中结果。
 
 ## Listener Contract
 
@@ -50,7 +51,7 @@ correctness 验收，现授权执行冻结的五点 DP1 performance rerun。
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` generation-12 functional evidence parent | `de8890ea40bd5723c61f2f5b9258ac837cb4bd1e` | functional evidence parent pushed as `origin/kv-pool-layerwise-reuse=de8890ea40bd5723c61f2f5b9258ac837cb4bd1e` before this handoff-only transition |
+| control repo | `kv-pool-layerwise-reuse` generation-13 high-hit harness parent | `64aa6795bb134face29062891285279977c48e59` | high-hit harness parent pushed as `origin/kv-pool-layerwise-reuse=64aa6795bb134face29062891285279977c48e59` before this handoff-only transition |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -89,7 +90,7 @@ correctness 验收，现授权执行冻结的五点 DP1 performance rerun。
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/npu/validate-functional.py`; `npu/summary.json`; no timeout, traceback, abort-drain failure, or response corruption |
 | Final Mooncake resource cleanup | PASS | PASS | per-case `final.metrics`; `post-cleanup-npu-readiness.json`: Master `0/0/0`, allocatable/free physical NPU `8/8` |
 | Candidate image static/runtime identity | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/image-identity.json`; native `linux/arm64`, exact imageID, embedded Git HEADs, labels, and patched-file hash |
-| CPU-only AISBench preparation | PASS | PASS | 8 warmup, 64 formal, 72 unique/disjoint IDs, and 72/72 exact 16384-token re-encodes; preparation manifest digest `4d032f8853afd36e34d2e62aace692c3ef96f0e1dad0fe6d59f07cc09aa67d7e` |
+| CPU-only AISBench preparation | PASS | PASS | Generation-12 client environment and tokenizer preparation passed; generation 13 requires a fresh `prepare` to replace its old fixtures with 8 warmup, 64 paired seed, and 64 paired formal rows before traffic |
 | Physical Ascend910 readiness on `m1` | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/pre-run-npu-readiness.json` and `post-cleanup-npu-readiness.json`: exactly 8 allocatable and at least 4 free; `vnpu-number` ignored |
 
 ## Evidence Identity
@@ -121,9 +122,20 @@ After this handoff becomes ready, performance validation may use only:
 - namespace `liangjiahao`;
 - the single physical node `m1`, selected explicitly with `--npu-node m1`;
 - model `vllm-ascend/DeepSeek-V2-Lite-W8A8`;
-- DP1 only, 16384 input tokens, concurrency 8;
-- exactly five points: BULK o128/o1, LAYERWISE o128/o1, and REUSE3 o1;
-- one 8-request warmup wave and one 64-request formal attempt per point;
+- DP1 only, 16384 input tokens, output 1, concurrency 8;
+- exactly three points: BULK o1, LAYERWISE o1, and REUSE3 o1;
+- `--no-enable-prefix-caching` on both Prefill and Decode for every variant;
+- one 8-request runtime warmup, one unmeasured 64-request seed attempt, and one
+  64-request formal attempt per point;
+- each 13312-token seed is the exact first 104 blocks of its paired 16384-token
+  formal prompt, and seed/formal token IDs plus digests must replay from the
+  shared fixture manifest and metadata;
+- clear Mooncake after warmup and before seed, but never between seed and
+  formal;
+- wait for exactly `master_key_count=6656` after seed publication;
+- require exactly 64 unique formal Prefill records with `Total tokens 16384`,
+  `kvpool hit tokens: 13312`, and `need to load: 13312`, proving 81.25 percent
+  external Prefix KV hits and zero local-prefix contribution;
 - exactly eight concurrency waves within each formal attempt;
 - `DefaultPerfMetricCalculator`, `total` stage, one formal repetition, and no
   automatic retry;
@@ -134,8 +146,8 @@ After this handoff becomes ready, performance validation may use only:
 - three server starts in BULK, LAYERWISE, REUSE3 order;
 - after each variant stop, wait until every visible NPU reports no more than
   4096 MB HBM usage before applying the next variant;
-- 10-second point telemetry, lightweight point diagnostics, and complete
-  Prefill/Decode logs once per variant;
+- 10-second point telemetry, per-request hit evidence, lightweight point
+  diagnostics, and complete Prefill/Decode logs once per variant;
 - no performance timeout; a valid slow point continues naturally;
 - hardware and namespace explicitly frozen by the final validation config
   snapshot.
@@ -156,6 +168,8 @@ This handoff does not authorize or claim coverage for:
 - Mooncake multi-group behavior unless the final handoff explicitly adds it;
 - any throughput, latency, scaling or capacity result before the performance
   session produces its own evidence.
+- any REUSE3 capacity benefit claim from this concurrency-8 run; that requires
+  a separate capacity-constrained matrix.
 
 ## Ready Transition
 
@@ -177,13 +191,13 @@ all unverified fields fail-closed.
 
 ## Blocker
 
-None. The administrator-restored device plugin exposes exactly eight physical
-Ascend910 resources on `m1`. Candidate run `20260812T023541Z` passed the
-required `kv_producer` and `kv_both` NPU correctness gates, and cleanup returned
-the node to eight free physical resources. Generation 10's NPU and performance
-results remain historical evidence for `535555917`; generation 12 authorizes a
-fresh performance root for candidate `57d3c214e` and does not reattribute those
-historical measurements.
+None at publication time. The administrator-restored device plugin exposed
+exactly eight physical Ascend910 resources on `m1`. Candidate run
+`20260812T023541Z` passed the required `kv_producer` and `kv_both` NPU
+correctness gates, and cleanup returned the node to eight free physical
+resources. The performance runner must recheck live capacity before traffic.
+Generation 13 authorizes a fresh high-hit performance root for candidate
+`57d3c214e`; it does not reattribute any historical measurements.
 
 The earlier TP2 REUSE3 non-save-owner save-gate defect is preserved in the
 diagnostic performance root `/tmp/layerwise-performance-20260809T010429Z` and
@@ -205,13 +219,32 @@ requests, 64 formal requests, 128 GiB per serving rank, and requires a new
 performance run root. It does not authorize resuming or combining any
 generation-8 evidence root.
 
-## Generation 12 Performance Acceptance
+## Generation 13 High-Hit Authorization
+
+The published high-hit harness parent is `64aa6795bb134face29062891285279977c48e59`.
+Its complete performance CPU/mock suite passed `105` tests in the CPU-only
+`liangjiahao/vllm-ascend-ut` Pod. All 20 performance Python files compiled in
+memory, both shell entrypoints passed `bash -n`, and `git diff --check` passed.
+
+This generation requires a new root named
+`/tmp/layerwise-performance-high-hit-<run-id>`. It must execute `prepare` first
+to generate exact paired fixtures, then run the three authorized points once.
+No old run root may be resumed, combined, or accepted under this generation.
+
+The generation-12 Prefill evidence directly contradicts the new hit contract:
+for example, the Layerwise `vllm-prefill.log` under
+`evidence/layerwise-performance-20260812T102633Z/raw/variants/layerwise/raw/`
+repeatedly records `hit_blocks=0/128` during formal traffic. Therefore
+generation 12 answers only the cold-cache save-path question and cannot be used
+as evidence for the 81.25-percent-hit comparison.
+
+## Historical Generation 12 Cold-Cache Acceptance
 
 Generation 12 authorized the immutable five-point run completed on 2026-08-12
 in `evidence/layerwise-performance-20260812T102633Z/raw`. The run used only
 the candidate image and source identities frozen above. It is a
-single-repetition raw characterization and must not be combined with another
-run root.
+single-repetition cold-cache raw characterization and must not be combined
+with another run root or presented as a high-hit comparison.
 
 Before the accepted run, Decode repeatedly failed during initialization on
 physical NPU `0,7` with `libcpu_kernels.so`, kernel `Log`, and runtime result
