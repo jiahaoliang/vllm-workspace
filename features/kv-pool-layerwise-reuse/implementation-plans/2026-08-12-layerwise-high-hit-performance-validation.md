@@ -97,8 +97,8 @@
 **Interfaces:**
 - Produces a committed control state whose handoff authorizes the high-hit three-point run with the unchanged validated server image.
 
-- [ ] Review exact diffs and source/image identities.
-- [ ] Commit and push only owned paths.
+- [x] Review exact diffs and source/image identities.
+- [x] Commit and push only owned paths; harness commit `dc52274` is published.
 - [ ] Advance the handoff generation without claiming new functional validation.
 - [ ] Run the handoff checker against the published commit.
 
