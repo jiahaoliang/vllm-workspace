@@ -3,16 +3,16 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 15
-updated_at: 2026-08-12T21:53:43+08:00
+generation: 16
+updated_at: 2026-08-12T22:57:19+08:00
 ---
 
 # Mooncake Layerwise Buffer Reuse Performance Validation Handoff
 
 本文件是功能验证 session 与性能验证 session 之间的 fail-closed handoff。
-Generation 15 继承 generation 12 已验收的不可变源码、镜像、CPU/mock 和
-真实 NPU correctness，仅重新授权执行冻结的三点 DP1 high-hit performance
-run。它不把此前的 cold-cache 结果重新归因为高命中结果。
+Generation 16 继承已验收的不可变源码、镜像、CPU/mock 和真实 NPU
+correctness，并接受 generation 15 授权的三点 DP1 high-hit performance run。
+此前的 generation 12 cold-cache 结果仍仅作为历史 characterization 保留。
 
 ## Listener Contract
 
@@ -51,7 +51,7 @@ run。它不把此前的 cold-cache 结果重新归因为高命中结果。
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` generation-15 high-hit harness parent | `6a5bfa785bbc9bc4a37684e4fc0fd643126279d1` | high-hit harness parent pushed as `origin/kv-pool-layerwise-reuse=6a5bfa785bbc9bc4a37684e4fc0fd643126279d1` before this handoff-only transition |
+| control repo | `kv-pool-layerwise-reuse` generation-16 high-hit acceptance parent | `647a63eae622dad1f5177e2327062248cf63e7a2` | high-hit evidence, report, and completed plan pushed as `origin/kv-pool-layerwise-reuse=647a63eae622dad1f5177e2327062248cf63e7a2` before this handoff-only transition |
 | `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | `workspace.lock=54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`; commit reachable from `upstream/main` |
 | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | `origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723=57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | `repos/Mooncake` | read-only detached collaborator baseline | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | `collaborator/feature/layerwise-kv-session=df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
@@ -90,21 +90,21 @@ run。它不把此前的 cold-cache 结果重新归因为高命中结果。
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/npu/validate-functional.py`; `npu/summary.json`; no timeout, traceback, abort-drain failure, or response corruption |
 | Final Mooncake resource cleanup | PASS | PASS | per-case `final.metrics`; `post-cleanup-npu-readiness.json`: Master `0/0/0`, allocatable/free physical NPU `8/8` |
 | Candidate image static/runtime identity | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/image-identity.json`; native `linux/arm64`, exact imageID, embedded Git HEADs, labels, and patched-file hash |
-| CPU-only AISBench preparation | PASS | PASS | Generation-12 client environment and tokenizer preparation passed; generation 13 requires a fresh `prepare` to replace its old fixtures with 8 warmup, 64 paired seed, and 64 paired formal rows before traffic |
+| CPU-only AISBench preparation | PASS | PASS | `evidence/layerwise-performance-high-hit-20260812T135700Z/raw/client-identity.json` and `raw/fixtures/tokens-16384-c8/`; 8 warmup, 64 paired seed, and 64 paired formal fixtures archived and replayed |
 | Physical Ascend910 readiness on `m1` | PASS | PASS | `evidence/shared-buffer-functional-20260812T023541Z/pre-run-npu-readiness.json` and `post-cleanup-npu-readiness.json`: exactly 8 allocatable and at least 4 free; `vnpu-number` ignored |
 
 ## Evidence Identity
 
 | Field | Value |
 | --- | --- |
-| Evidence root | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z` |
-| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/SHA256SUMS` |
-| Root `SHA256SUMS` digest | `0c80987652db2189bd8cf7d91b7bd666622696353660b8f32d01eab3a95a3f96` |
+| Evidence root | `features/kv-pool-layerwise-reuse/evidence/layerwise-performance-high-hit-20260812T135700Z` |
+| Root `SHA256SUMS` path | `features/kv-pool-layerwise-reuse/evidence/layerwise-performance-high-hit-20260812T135700Z/SHA256SUMS` |
+| Root `SHA256SUMS` digest | `b4dc6dcd5e494784ab2d47082d78b8ec8f8cc0017c9599f456355a8734446e7f` |
 | Functional validation report | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/REPORT.md` |
-| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/validation-config.json` |
-| Independent evidence validator | `features/kv-pool-layerwise-reuse/evidence/shared-buffer-functional-20260812T023541Z/validate-evidence.py` |
-| Fixture `SHA256SUMS` digest | `8848041c4f3cea186c016da8aed080327723e823e706c327991a1639aff05dfe` |
-| Client preflight `SHA256SUMS` digest | `f6142f68d2fd4f9a3eb65ce96f0b6ca172fb4c72eafe7bebae2406257383b873` |
+| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/layerwise-performance-high-hit-20260812T135700Z/raw/run-contract.json` |
+| Independent evidence validator | `features/kv-pool-layerwise-reuse/deployment/performance/report.py` |
+| Fixture `SHA256SUMS` digest | `5db2057b83d35871c1f39d5136ebf418eab8bd50d31eb5ed2d097589ab11d1e8` |
+| Client identity SHA256 | `f11c6ee5b068b72496d5b411eea1f8426db9ca7849d24bc0feff08ed7ce3d152` |
 
 ## Authorized Performance Scope
 
@@ -152,8 +152,9 @@ After this handoff becomes ready, performance validation may use only:
 - hardware and namespace explicitly frozen by the final validation config
   snapshot.
 
-Performance validation must create its own run ID, plan, thresholds, raw evidence
-and checksum manifest. Functional correctness evidence in this handoff is not a
+Generation 16 records the completed authorized comparison below. Any follow-up
+performance validation must create its own run ID, plan, raw evidence, and
+checksum manifest. Functional correctness evidence in this handoff is not a
 throughput or latency claim.
 
 ## Explicit Exclusions
@@ -166,8 +167,8 @@ This handoff does not authorize or claim coverage for:
 - unsupported CP, TP-mismatch or hybrid layouts;
 - FabricMem, A3, or hardware not named in the final config snapshot;
 - Mooncake multi-group behavior unless the final handoff explicitly adds it;
-- any throughput, latency, scaling or capacity result before the performance
-  session produces its own evidence.
+- any throughput, latency, scaling or capacity result outside the accepted
+  single-point high-hit matrix below;
 - any REUSE3 capacity benefit claim from this concurrency-8 run; that requires
   a separate capacity-constrained matrix.
 
@@ -196,7 +197,7 @@ exactly eight physical Ascend910 resources on `m1`. Candidate run
 `20260812T023541Z` passed the required `kv_producer` and `kv_both` NPU
 correctness gates, and cleanup returned the node to eight free physical
 resources. The performance runner must recheck live capacity before traffic.
-Generation 15 authorizes a fresh high-hit performance root for candidate
+Generation 16 accepts the complete high-hit performance root for candidate
 `57d3c214e`; it does not reattribute any historical measurements.
 
 The earlier TP2 REUSE3 non-save-owner save-gate defect is preserved in the
@@ -219,7 +220,55 @@ requests, 64 formal requests, 128 GiB per serving rank, and requires a new
 performance run root. It does not authorize resuming or combining any
 generation-8 evidence root.
 
-## Generation 15 High-Hit Authorization
+## Generation 16 High-Hit Performance Acceptance
+
+Generation 15 authorized the immutable run completed on 2026-08-12 in
+`evidence/layerwise-performance-high-hit-20260812T135700Z/raw`. It used the
+exact source, image, DP1/TP2, 16K/o1/c8, fixture, and lifecycle identities
+frozen above. The unmeasured seed phase and the measured formal phase both
+completed `64/64` requests for every variant.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Exact three-point DP1 matrix | PASS | `raw/run-contract.json`: BULK, LAYERWISE, and REUSE3 at 16K/o1/c8 |
+| Paired seed/formal fixtures | PASS | `raw/fixtures/tokens-16384-c8/manifest.json`; every 13,312-token seed is the exact prefix of its paired 16,384-token formal prompt |
+| Seed publication | PASS | All three `seed/attempt-1/raw/summary.json` files are `valid: true` with `64/64`; each `seeded-mooncake.metrics` reached 6,656 keys |
+| Formal requests | PASS | All three formal summaries are `valid: true` with `64/64`; `192/192` total |
+| External KV hit contract | PASS | All three `hit-validation.json` files record 64 requests, exact 13,312 hit tokens, 81.25 percent hit rate, zero inferred local hit tokens, and no errors |
+| Variant correctness canaries | PASS | `raw/canaries/` |
+| REUSE3 runtime layout | PASS | `raw/runtime-checks/dp1-16384-reuse3-prefill.json`: 27 logical layers, 5 physical slots, factor 5.4 |
+| Full report checker | PASS | `performance.report check --scope all` returned `{"scope":"all","valid":true,"errors":[]}` |
+| Raw checksum replay | PASS | `raw/SHA256SUMS`; digest `5fe2f5219d82fd33e4763c326df73bc9e5a1583a55aa396ed976b38b66882864` |
+| Repository import checksum replay | PASS | outer `SHA256SUMS`; digest `b4dc6dcd5e494784ab2d47082d78b8ec8f8cc0017c9599f456355a8734446e7f` |
+| Runtime cleanup/restoration | PASS | `raw/restoration.json`: completed, engines stopped, no errors, Mooncake empty |
+| Final Mooncake cleanup | PASS | `raw/final-mooncake-empty.metrics`: key count, allocated bytes, and active clients are zero |
+| Raw report | PASS | `layerwise-performance-high-hit-validation-2026-08-12.md`; SHA256 `d8fed3cf7f5fd33c6829fefaede5199eb9a965547d16e08d97ebc1f2f74412def` |
+
+| Variant | Request throughput | Input-token throughput | Median TTFT | P95 TTFT | AISBench duration |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BULK | 1.5476 req/s | 25,355.1 tok/s | 5,042.3 ms | 5,359.9 ms | 41.36 s |
+| LAYERWISE | 1.1747 req/s | 19,245.8 tok/s | 6,717.6 ms | 6,975.1 ms | 54.48 s |
+| REUSE3 | 1.0538 req/s | 17,264.6 tok/s | 7,344.5 ms | 8,546.3 ms | 60.74 s |
+
+Request-throughput ratios were `0.759046x` for LAYERWISE/BULK,
+`0.89708x` for REUSE3/LAYERWISE, and `0.680925x` for REUSE3/BULK. This is one
+formal repetition at DP1/16K/o1/c8 and exact 81.25-percent external KV hits.
+It is raw characterization, not statistical significance, a general scaling
+result, a capacity-benefit result, or a performance pass/fail threshold.
+
+The full command wall clock was approximately 45 minutes 48 seconds. Prefill
+used physical NPU 4,5 and Decode used 3,6 on `m1`. The run restored the prior
+Deployment and ConfigMap state, stopped both engines, and returned Mooncake to
+`0/0/0` key/byte/client state.
+
+Reusable image for follow-up validation:
+`docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z`
+with manifest
+`sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3`
+and config digest
+`sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd`.
+
+## Historical Generation 15 High-Hit Authorization
 
 The published high-hit harness parent is `6a5bfa785bbc9bc4a37684e4fc0fd643126279d1`.
 Its complete performance CPU/mock suite passed `108` tests in the CPU-only
