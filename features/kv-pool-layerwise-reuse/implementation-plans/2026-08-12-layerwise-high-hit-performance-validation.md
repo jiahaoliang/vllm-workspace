@@ -119,4 +119,8 @@
 - [x] Run the DP1 three-point benchmark once; accepted run root was `/tmp/layerwise-performance-high-hit-20260812T135700Z`.
 - [x] Validate the evidence tree, render the report, and independently replay SHA-256 checksums.
 - [x] Compare the three variants without extrapolating beyond 16K, c8, o1, one repetition, and 81.25 percent hits.
-- [ ] Import, commit, and push the immutable result artifacts; update the handoff with the usable image and report identity.
+- [x] Import, commit, and push the immutable result artifacts; evidence/report
+  commit `f4e6d681c1bf20e5f7bd83a82ef0d568f8555f45` is published.
+- [x] Prepare the final handoff update with the usable image and report identity;
+  generation 16 is delivered as the handoff-only direct child of this completed
+  plan state.
