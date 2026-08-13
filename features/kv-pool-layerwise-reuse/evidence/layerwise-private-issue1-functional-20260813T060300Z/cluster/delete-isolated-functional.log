@@ -1,0 +1,4 @@
+configmap "layerwise-issue1-functional-runtime-20260813t060300z" deleted from liangjiahao namespace
+service "layerwise-issue1-functional-master-20260813t060300z" deleted from liangjiahao namespace
+deployment.apps "layerwise-issue1-functional-master-20260813t060300z" deleted from liangjiahao namespace
+deployment.apps "layerwise-issue1-functional-prefill-20260813t060300z" deleted from liangjiahao namespace

@@ -1,0 +1,17 @@
+{
+  "allocatable": 8,
+  "available_after_replacing_current_engines": 8,
+  "blockers": [],
+  "expected_allocatable": 8,
+  "free": 4,
+  "node": "m1",
+  "ready": true,
+  "requested_by_non_terminal_pods": 4,
+  "requested_by_other_non_terminal_pods": 0,
+  "requested_by_replaceable_engines": 4,
+  "required_free": 4,
+  "resource": "huawei.com/Ascend910",
+  "schema_version": 1,
+  "status": "READY",
+  "vnpu_number_ignored": true
+}

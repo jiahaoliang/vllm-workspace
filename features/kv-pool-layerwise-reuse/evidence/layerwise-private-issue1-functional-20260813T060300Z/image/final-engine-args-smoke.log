@@ -1,0 +1,11 @@
+can not use command: npu-smi info
+INFO 08-13 06:00:51 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 08-13 06:00:51 [__init__.py:54] - ascend -> vllm_ascend:register
+INFO 08-13 06:00:51 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 08-13 06:00:51 [__init__.py:237] Platform plugin ascend is activated
+INFO 08-13 06:00:51 [platform.py:61] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+2026-08-13 06:00:59,787 - 72 - ServiceProfiler - INFO - VLLM_USE_V1 not set, auto-detected via vLLM 0.1.dev1+g54503ecec.empty: default 0
+INFO 08-13 06:01:03 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.netloader.netloader.ModelNetLoaderElastic'>` with load format `netloader`
+INFO 08-13 06:01:04 [__init__.py:112] Registered model loader `<class 'vllm_ascend.model_loader.rfork.rfork_loader.RForkModelLoader'>` with load format `rfork`
+8
+40

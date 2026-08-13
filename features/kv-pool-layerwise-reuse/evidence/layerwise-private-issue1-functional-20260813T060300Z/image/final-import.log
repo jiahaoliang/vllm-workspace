@@ -1,0 +1,3 @@
+docker.io/library/vllm ascend:layerwise 	saved	
+application/vnd.docker.distribution.manifest.v2+json sha256:dc042934aecc3ed96c4ecd0bcacd6212db6d582eefa14cf816271f3e64c18f87
+Importing	elapsed: 0.0 s	total:   0.0 B	(0.0 B/s)	
