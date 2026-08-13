@@ -3,13 +3,13 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 18
-updated_at: 2026-08-13T14:28:33+08:00
+generation: 19
+updated_at: 2026-08-13T14:51:00+08:00
 ---
 
 # Mooncake Layerwise Private Issue #1 Performance Handoff
 
-Generation 18 authorizes only the reviewed 32K four-point matrix. It uses the
+Generation 19 authorizes only the reviewed 32K four-point matrix. It uses the
 accepted native ARM64 base plus a byte-exact seven-file Python patch; it is not a
 full Dockerfile rebuild and does not inherit generation 16 traffic scope.
 
@@ -17,7 +17,7 @@ full Dockerfile rebuild and does not inherit generation 16 traffic scope.
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` preparation parent | `b902d4faa9b6c2f82aaa58b8ae1148ca8917172f` | local immutable preparation commit `b902d4faa9b6c2f82aaa58b8ae1148ca8917172f`; this handoff must be its handoff-only direct child |
+| control repo | `kv-pool-layerwise-reuse` preparation parent | `b82941c8ec27e403c686e6312a27bae9aebe999c` | local immutable preparation commit `b82941c8ec27e403c686e6312a27bae9aebe999c`; this handoff must be its handoff-only direct child |
 | `repos/vllm` | clean local partial-prefill candidate over frozen base | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` | reviewed local patch commit `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` and tree `10c69b4adfc3192a2f66bef19b575aa2fe151a0a`; no candidate push |
 | `repos/vllm-ascend` | clean local instrumentation candidate | `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` | reviewed plan explicitly uses local patch commit `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` without pushing the candidate |
 | `repos/Mooncake` | read-only collaborator dependency | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | collaborator baseline `df3f74ed8ebdb0c935554beea6299a9f11c723e2` remains frozen and unmodified |
@@ -30,7 +30,7 @@ full Dockerfile rebuild and does not inherit generation 16 traffic scope.
 | Base image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z` |
 | Base manifest digest | `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3` |
 | Base config digest | `sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd` |
-| Patched file path | `/vllm-workspace/vllm/vllm/engine/arg_utils.py` plus the six vLLM-Ascend paths recorded in `image/final-patch-files.sha256` |
+| Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/perf_metrics.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py,/vllm-workspace/vllm-ascend/vllm_ascend/envs.py,/vllm-workspace/vllm-ascend/vllm_ascend/platform.py,/vllm-workspace/vllm/vllm/engine/arg_utils.py` |
 | Patched file SHA256 | `ff6fed10f3f060a7b509625c00331182344deed6f61a10004cabdbf648c96d3d` |
 | Patched source commit | vLLM `baf481c7f0e84cd93705bcd4cdf42bcff03c3909`; vLLM-Ascend `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` |
 | vLLM patched source commit/tree | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` / `10c69b4adfc3192a2f66bef19b575aa2fe151a0a` |
