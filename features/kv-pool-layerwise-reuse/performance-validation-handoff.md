@@ -3,22 +3,22 @@ schema_version: 1
 status: READY_FOR_PERFORMANCE_VALIDATION
 ready: true
 placeholders_remaining: false
-generation: 17
-updated_at: 2026-08-13T13:28:00+08:00
+generation: 18
+updated_at: 2026-08-13T14:28:33+08:00
 ---
 
 # Mooncake Layerwise Private Issue #1 Performance Handoff
 
-Generation 17 authorizes only the reviewed 32K four-point matrix. It uses the
-accepted native ARM64 base plus a byte-exact six-file Python patch; it is not a
+Generation 18 authorizes only the reviewed 32K four-point matrix. It uses the
+accepted native ARM64 base plus a byte-exact seven-file Python patch; it is not a
 full Dockerfile rebuild and does not inherit generation 16 traffic scope.
 
 ## Source Identity
 
 | Component | Branch / role | Commit | Remote equality |
 | --- | --- | --- | --- |
-| control repo | `kv-pool-layerwise-reuse` preparation parent | `033a1b0e5a0e57e2bf06914539102d080e4d3fc0` | local immutable preparation commit `033a1b0e5a0e57e2bf06914539102d080e4d3fc0`; this handoff must be its handoff-only direct child |
-| `repos/vllm` | frozen detached dependency | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | frozen dependency commit `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5`, reachable from the configured upstream baseline |
+| control repo | `kv-pool-layerwise-reuse` preparation parent | `b902d4faa9b6c2f82aaa58b8ae1148ca8917172f` | local immutable preparation commit `b902d4faa9b6c2f82aaa58b8ae1148ca8917172f`; this handoff must be its handoff-only direct child |
+| `repos/vllm` | clean local partial-prefill candidate over frozen base | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` | reviewed local patch commit `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` and tree `10c69b4adfc3192a2f66bef19b575aa2fe151a0a`; no candidate push |
 | `repos/vllm-ascend` | clean local instrumentation candidate | `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` | reviewed plan explicitly uses local patch commit `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` without pushing the candidate |
 | `repos/Mooncake` | read-only collaborator dependency | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | collaborator baseline `df3f74ed8ebdb0c935554beea6299a9f11c723e2` remains frozen and unmodified |
 
@@ -30,24 +30,26 @@ full Dockerfile rebuild and does not inherit generation 16 traffic scope.
 | Base image reference | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z` |
 | Base manifest digest | `sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3` |
 | Base config digest | `sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd` |
-| Patched file path | `/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/perf_metrics.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py,/vllm-workspace/vllm-ascend/vllm_ascend/envs.py,/vllm-workspace/vllm-ascend/vllm_ascend/platform.py` |
-| Patched file SHA256 | `9a8d9ea0b560561b3093ab418eaf8f4a320362e8c21ad272b6168e9deebd897e` |
-| Patched source commit | `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` |
-| Patched source tree | `156a2ebe414aa82bc68102479a61fcca88f3332f` |
-| Derived image reference | `docker.io/library/vllm-ascend:layerwise-issue1-8653c6c5e-20260813T045514Z` |
+| Patched file path | `/vllm-workspace/vllm/vllm/engine/arg_utils.py` plus the six vLLM-Ascend paths recorded in `image/final-patch-files.sha256` |
+| Patched file SHA256 | `ff6fed10f3f060a7b509625c00331182344deed6f61a10004cabdbf648c96d3d` |
+| Patched source commit | vLLM `baf481c7f0e84cd93705bcd4cdf42bcff03c3909`; vLLM-Ascend `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` |
+| vLLM patched source commit/tree | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` / `10c69b4adfc3192a2f66bef19b575aa2fe151a0a` |
+| vLLM-Ascend patched source commit/tree | `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` / `156a2ebe414aa82bc68102479a61fcca88f3332f` |
+| Derived image reference | `docker.io/library/vllm-ascend:layerwise-issue1-baf481c7f-8653c6c5e-20260813T055752Z` |
 | Platform | `linux/arm64` |
-| Derived manifest digest | `sha256:8c9f462c2c59e5c3ca4f6d7e89691ac20ae0f94943c470a7b57f2b9590ea6495` |
-| Derived config digest | `sha256:f7aec20a062b9fcc18892b8639c707d9d89b7a29954aa2e23f31d77b0ab88de7` |
+| Derived manifest digest | `sha256:dc042934aecc3ed96c4ecd0bcacd6212db6d582eefa14cf816271f3e64c18f87` |
+| Derived config digest | `sha256:c93509f1ab0faa18935f6b55f88bf49ed5dead4004f8e52ea2d55a3f2dd02fc2` |
 | vLLM source label | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` |
 | vLLM-Ascend source label | `57d3c214e642cdbb529400f0742d1a98a8d38708` |
 | vLLM-Ascend patch label | `8653c6c5e3b554719c8347a0a36fe2109e6a36d9` |
 | Mooncake source label | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` |
-| Derived-image/run ID | `20260813T045514Z` |
+| vLLM patch label | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` |
+| Derived-image/run ID | `20260813T055752Z` |
 
 The final image has the same filesystem layer descriptors as the pre-metadata
 commit image and exactly one more layer than the base (21 to 22). Embedded Git
 HEADs and native shared objects remain at the base identities; the effective
-Python source is proven by the six-file aggregate manifest above.
+Python source is proven by the seven-file aggregate manifest above.
 
 ## Functional Acceptance
 
@@ -55,7 +57,7 @@ Python source is proven by the six-file aggregate manifest above.
 | --- | --- | --- | --- |
 | Focused CPU/mock UT | PASS | PASS | `cpu/focused-instrumentation.log`: 191 passed at clean patch source |
 | Complete AscendStore CPU/mock UT | PASS | PASS | `cpu/ascend-store.log`: 529 passed |
-| Ruff | PASS | PASS | `cpu/ruff-version.log` and `cpu/ruff-source.log`: Ruff 0.16.2, all checks passed |
+| Ruff | PASS | PASS | Image construction ran Ruff 0.16.2 successfully against the same byte-exact patch; repeat unavailable because current host and UT Pod lack Ruff |
 | Python compilation | PASS | PASS | `cpu/python-compile.log`: in-memory compilation without checkout bytecode |
 | `git diff --check` | PASS | PASS | `cpu/source-diff-check.log` and `cpu/control-diff-check.log` |
 | `kv_producer` Mooncake/NPU correctness | PASS | PASS | `npu/producer-reuse/`: response equals baseline, 27-layer ranged operations valid |
@@ -63,19 +65,19 @@ Python source is proven by the six-file aggregate manifest above.
 | Physical-slot/memory-factor proof | PASS | PASS | `npu/summary.json`: 27 logical layers, 5 physical slots, factor 5.4 |
 | Reuse-mate save-gate timeout/corruption check | PASS | PASS | independent raw-log validator found no timeout, abort-drain failure, traceback, 507018, or corruption |
 | Final Mooncake resource cleanup | PASS | PASS | every case ended at Master 0/0/0; isolated resources removed; 4 physical NPUs free |
-| Env and scheduler regression | PASS | PASS | `cpu/env-platform.log`: 53 passed, 1 skipped; no partial-prefill reset to one |
+| Env and scheduler regression | PASS | PASS | `cpu/env-platform.log`: 53 passed, 1 skipped; image `EngineArgs` c8/c40 probes passed the real API entry |
 | Performance harness | PASS | PASS | `cpu/performance-harness.log`: 183 passed |
-| Candidate image static/runtime identity | PASS | PASS | `image/`: platform, labels, layers, six-file hashes, imports and strict env parsing passed |
+| Candidate image static/runtime identity | PASS | PASS | `image/`: platform, labels, layers, seven-file hashes, imports, strict env parsing and c8/c40 probes passed |
 
 ## Evidence Identity
 
 | Field | Value |
 | --- | --- |
-| Evidence root | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T050200Z` |
-| Root SHA256SUMS path | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T050200Z/SHA256SUMS` |
-| Root SHA256SUMS digest | `3b0e34fe22830f8a3332f9cfcbbebe3ba806471547acbac5d1e4cb4edf9ef110` |
-| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T050200Z/functional-acceptance.json` |
-| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T050200Z/validation-config.json` |
+| Evidence root | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z` |
+| Root SHA256SUMS path | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/SHA256SUMS` |
+| Root SHA256SUMS digest | `5ec9f49f165094a21e13183d52e371d1cf323bf138fac160bb3796c790b913ae` |
+| Functional validation report | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/functional-acceptance.json` |
+| Validation config snapshot | `features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/validation-config.json` |
 
 ## Authorized Performance Scope
 
