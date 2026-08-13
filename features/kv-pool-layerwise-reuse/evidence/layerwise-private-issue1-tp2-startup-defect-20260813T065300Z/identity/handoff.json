@@ -1,0 +1,61 @@
+{
+  "evidence_fields": {
+    "Evidence root": "features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z",
+    "Functional validation report": "features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/functional-acceptance.json",
+    "Root SHA256SUMS digest": "5ec9f49f165094a21e13183d52e371d1cf323bf138fac160bb3796c790b913ae",
+    "Root SHA256SUMS path": "features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/SHA256SUMS",
+    "Validation config snapshot": "features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-functional-20260813T060300Z/validation-config.json"
+  },
+  "generation": 19,
+  "image_fields": {
+    "Base config digest": "sha256:ce20411d6043d3830be7601c654b2c9a1d41fb923395cad2ea2e7ba200ebbbbd",
+    "Base image reference": "docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z",
+    "Base manifest digest": "sha256:f8592141757f7e9976898858863e12ccd051ac4a3fd6ade7591f78d9769517e3",
+    "Derived config digest": "sha256:c93509f1ab0faa18935f6b55f88bf49ed5dead4004f8e52ea2d55a3f2dd02fc2",
+    "Derived image reference": "docker.io/library/vllm-ascend:layerwise-issue1-baf481c7f-8653c6c5e-20260813T055752Z",
+    "Derived manifest digest": "sha256:dc042934aecc3ed96c4ecd0bcacd6212db6d582eefa14cf816271f3e64c18f87",
+    "Derived-image/run ID": "20260813T055752Z",
+    "Image delivery mode": "ready-image",
+    "Mooncake source label": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "Patched file SHA256": "ff6fed10f3f060a7b509625c00331182344deed6f61a10004cabdbf648c96d3d",
+    "Patched file path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/backend/mooncake_backend.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/perf_metrics.py,/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py,/vllm-workspace/vllm-ascend/vllm_ascend/envs.py,/vllm-workspace/vllm-ascend/vllm_ascend/platform.py,/vllm-workspace/vllm/vllm/engine/arg_utils.py",
+    "Patched source commit": "vLLM baf481c7f0e84cd93705bcd4cdf42bcff03c3909; vLLM-Ascend 8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+    "Platform": "linux/arm64",
+    "vLLM patch label": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909",
+    "vLLM patched source commit/tree": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909 / 10c69b4adfc3192a2f66bef19b575aa2fe151a0a",
+    "vLLM source label": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
+    "vLLM-Ascend patch label": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+    "vLLM-Ascend patched source commit/tree": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9 / 156a2ebe414aa82bc68102479a61fcca88f3332f",
+    "vLLM-Ascend source label": "57d3c214e642cdbb529400f0742d1a98a8d38708"
+  },
+  "path": "/root/ljh/vllm-workspace/features/kv-pool-layerwise-reuse/performance-validation-handoff.md",
+  "ready": true,
+  "sha256": "328331023e38d687eee0217c56049d7532444577bc4ee765a9dedec2ec36d30a",
+  "source_rows": {
+    "control repo": {
+      "Branch / role": "kv-pool-layerwise-reuse preparation parent",
+      "Commit": "b82941c8ec27e403c686e6312a27bae9aebe999c",
+      "Component": "control repo",
+      "Remote equality": "local immutable preparation commit b82941c8ec27e403c686e6312a27bae9aebe999c; this handoff must be its handoff-only direct child"
+    },
+    "repos/Mooncake": {
+      "Branch / role": "read-only collaborator dependency",
+      "Commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+      "Component": "repos/Mooncake",
+      "Remote equality": "collaborator baseline df3f74ed8ebdb0c935554beea6299a9f11c723e2 remains frozen and unmodified"
+    },
+    "repos/vllm": {
+      "Branch / role": "clean local partial-prefill candidate over frozen base",
+      "Commit": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909",
+      "Component": "repos/vllm",
+      "Remote equality": "reviewed local patch commit baf481c7f0e84cd93705bcd4cdf42bcff03c3909 and tree 10c69b4adfc3192a2f66bef19b575aa2fe151a0a; no candidate push"
+    },
+    "repos/vllm-ascend": {
+      "Branch / role": "clean local instrumentation candidate",
+      "Commit": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+      "Component": "repos/vllm-ascend",
+      "Remote equality": "reviewed plan explicitly uses local patch commit 8653c6c5e3b554719c8347a0a36fe2109e6a36d9 without pushing the candidate"
+    }
+  },
+  "status": "READY_FOR_PERFORMANCE_VALIDATION"
+}

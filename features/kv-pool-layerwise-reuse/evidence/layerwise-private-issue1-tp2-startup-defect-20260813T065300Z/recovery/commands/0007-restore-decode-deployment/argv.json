@@ -1,0 +1,8 @@
+[
+  "kubectl",
+  "apply",
+  "-n",
+  "liangjiahao",
+  "-f",
+  "/tmp/layerwise-private-issue1-20260813T065300Z/pre-run-state/decode-deployment.json"
+]

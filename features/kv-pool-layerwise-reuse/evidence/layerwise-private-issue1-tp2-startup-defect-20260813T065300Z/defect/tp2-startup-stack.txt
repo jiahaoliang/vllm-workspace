@@ -1,0 +1,16 @@
+Observed in the live Prefill TP2 Pod before recovery:
+
+  MooncakeBackend.__init__
+    -> _configure_perf_metric_labels
+    -> vllm_ascend.distributed.parallel_state.get_global_rank
+    -> vllm.distributed.parallel_state.get_world_group
+    -> AssertionError: world group is not initialized
+
+The failure occurred while EngineCore constructed the scheduler-side
+AscendStore connector. The API server then reported:
+
+  RuntimeError: Engine core initialization failed. See root cause above.
+
+The runner did not archive /tmp/vllm-prefill.log before its readiness gate, and
+the failed Pod was deleted during the authorized restoration. Therefore this is
+an observation excerpt, not a byte-exact raw-log artifact.

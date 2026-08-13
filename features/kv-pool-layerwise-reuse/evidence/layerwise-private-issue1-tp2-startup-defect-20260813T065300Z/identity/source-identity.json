@@ -1,0 +1,47 @@
+{
+  "control repo": {
+    "commit": "f7f98fcbd06ef0a9673a2fe4b9c11f681b147d39",
+    "dirty": [
+      "?? deployment_yaml/",
+      "?? dockerfile.vllm23"
+    ]
+  },
+  "handoff": {
+    "control repo": {
+      "Branch / role": "kv-pool-layerwise-reuse preparation parent",
+      "Commit": "b82941c8ec27e403c686e6312a27bae9aebe999c",
+      "Component": "control repo",
+      "Remote equality": "local immutable preparation commit b82941c8ec27e403c686e6312a27bae9aebe999c; this handoff must be its handoff-only direct child"
+    },
+    "repos/Mooncake": {
+      "Branch / role": "read-only collaborator dependency",
+      "Commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+      "Component": "repos/Mooncake",
+      "Remote equality": "collaborator baseline df3f74ed8ebdb0c935554beea6299a9f11c723e2 remains frozen and unmodified"
+    },
+    "repos/vllm": {
+      "Branch / role": "clean local partial-prefill candidate over frozen base",
+      "Commit": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909",
+      "Component": "repos/vllm",
+      "Remote equality": "reviewed local patch commit baf481c7f0e84cd93705bcd4cdf42bcff03c3909 and tree 10c69b4adfc3192a2f66bef19b575aa2fe151a0a; no candidate push"
+    },
+    "repos/vllm-ascend": {
+      "Branch / role": "clean local instrumentation candidate",
+      "Commit": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+      "Component": "repos/vllm-ascend",
+      "Remote equality": "reviewed plan explicitly uses local patch commit 8653c6c5e3b554719c8347a0a36fe2109e6a36d9 without pushing the candidate"
+    }
+  },
+  "repos/Mooncake": {
+    "commit": "df3f74ed8ebdb0c935554beea6299a9f11c723e2",
+    "dirty": []
+  },
+  "repos/vllm": {
+    "commit": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909",
+    "dirty": []
+  },
+  "repos/vllm-ascend": {
+    "commit": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+    "dirty": []
+  }
+}

@@ -1,0 +1,9 @@
+[
+  "kubectl",
+  "delete",
+  "configmap",
+  "-n",
+  "liangjiahao",
+  "layerwise-issue1-test1-bulk-c8",
+  "--ignore-not-found=true"
+]

@@ -1,0 +1,11 @@
+{
+  "expected_points": [
+    "test1-dp1-32000-bulk-o128-c8",
+    "test1-dp1-32000-layerwise-o128-c8",
+    "test2-dp1-32000-bulk-o1-c40",
+    "test2-dp1-32000-reuse3-o1-c40"
+  ],
+  "handoff_sha256": "328331023e38d687eee0217c56049d7532444577bc4ee765a9dedec2ec36d30a",
+  "image_digest": "sha256:dc042934aecc3ed96c4ecd0bcacd6212db6d582eefa14cf816271f3e64c18f87",
+  "npu_node": "m1"
+}

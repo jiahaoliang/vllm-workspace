@@ -1,17 +1,18 @@
 ---
 schema_version: 1
-status: READY_FOR_PERFORMANCE_VALIDATION
-ready: true
+status: BLOCKED
+ready: false
 placeholders_remaining: false
-generation: 19
-updated_at: 2026-08-13T14:51:00+08:00
+generation: 20
+updated_at: 2026-08-13T15:15:00+08:00
 ---
 
 # Mooncake Layerwise Private Issue #1 Performance Handoff
 
-Generation 19 authorizes only the reviewed 32K four-point matrix. It uses the
-accepted native ARM64 base plus a byte-exact seven-file Python patch; it is not a
-full Dockerfile rebuild and does not inherit generation 16 traffic scope.
+Generation 20 is fail-closed. Generation 19 reached the first Prefill TP2
+startup but sent no warmup, seed, admission-canary, or formal traffic. The
+accepted seven-file image has a production-source TP2 initialization defect and
+must not be used for performance traffic.
 
 ## Source Identity
 
@@ -117,7 +118,21 @@ Python source is proven by the seven-file aggregate manifest above.
 
 ## Blocker
 
-None. The functional lane passed and restored all isolated resources. The
-performance runner must still recheck exact image content, live physical NPU
-capacity, admission/capacity prerequisites, and evidence checksums before
-sending traffic.
+`MooncakeBackend.__init__()` configures performance metric labels before the
+scheduler-side vLLM distributed world group is initialized. With the required
+TP2 topology, `_configure_perf_metric_labels()` calls `get_global_rank()`, which
+calls `get_world_group()` and raises `AssertionError: world group is not
+initialized`. EngineCore startup fails before any inference traffic.
+
+Evidence is under
+`features/kv-pool-layerwise-reuse/evidence/layerwise-private-issue1-tp2-startup-defect-20260813T065300Z/`.
+The cluster has been restored to the base Prefill/Decode image and
+`layerwise-runtime-config`; Mooncake Master is `0/0/0`, the wrappers have no
+engine process, and `m1` has four free physical Ascend910 devices.
+
+Re-entry requires all of the following: fix the production rank-label
+initialization ordering, add a TP2 startup regression gate without mocking away
+the world-group lifecycle, fix wrapper zombie-PID detection, build a new derived
+image, repeat functional acceptance with TP2 coverage, and publish a new
+preparation plus handoff-only generation. Generation 20 authorizes no server,
+NPU, or performance traffic.
