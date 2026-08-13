@@ -44,6 +44,13 @@
 - UT Pod 只提供执行环境，不得隐式运行默认 test suite；调用者必须在命令行显式指定 pytest target 或其他测试命令，并禁用会污染同步源码的 bytecode 和 pytest cache。
 - UT 完成后默认保留长期运行 Pod。需要清理时只能删除明确命名的 UT Pod，不得删除 `liangjiahao` namespace。
 
+## 测试镜像复用
+
+- 默认优先复用已有且 native 依赖兼容的测试镜像，不要仅因 vLLM 或 vLLM-Ascend 的 Python 源码变化就重新构建镜像。镜像构建通常耗时较长，只有复用路径不能满足测试身份或运行要求时才执行。
+- Mooncake 源码、native library、CANN/torch_npu 等二进制依赖未变化时，应使用包含对应 Mooncake/native 版本的已有镜像，并在目标 Pod 启动服务前，通过显式 `-n liangjiahao` 的 `kubectl cp` 或 tar + `kubectl exec` 覆盖修改后的 Python 文件。
+- Python 覆盖必须限定为本次需要的文件；覆盖后、启动流量前必须记录基础镜像 reference/digest、对应 native/Mooncake 源码身份、Python 源 commit、覆盖文件列表，并逐文件校验 Pod 内 SHA256。不得把 Python 覆盖描述为完整镜像重建。
+- 只有 Mooncake/native 源码或二进制依赖更新、目标镜像缺少必要运行依赖、Python 覆盖无法在服务启动前生效，或用户明确要求新镜像时，才构建或派生新镜像；执行前应说明不能复用已有镜像的具体原因。
+
 ## 公共内容更新流程
 
 - 修改公共内容时，必须先切到 `main`，在 `main` 上完成修改、验证、提交并推送。
