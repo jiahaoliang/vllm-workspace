@@ -99,18 +99,27 @@ def test_ready_image_avoids_materialization(tmp_path: Path) -> None:
 def test_ready_image_verifies_multiple_patched_files_as_one_aggregate(
     tmp_path: Path,
 ) -> None:
-    package = tmp_path / "vllm_ascend"
-    package.mkdir()
-    first = package / "x.py"
-    second = package / "y.py"
+    workspace = tmp_path / "vllm-workspace"
+    first = workspace / "vllm" / "vllm" / "engine" / "arg_utils.py"
+    second = workspace / "vllm-ascend" / "vllm_ascend" / "envs.py"
+    first.parent.mkdir(parents=True)
+    second.parent.mkdir(parents=True)
     first.write_text("x = 1\n", encoding="utf-8")
     second.write_text("y = 2\n", encoding="utf-8")
+    manifest = "".join(
+        (
+            f"{hashlib.sha256(second.read_bytes()).hexdigest()}  "
+            "vllm-ascend/vllm_ascend/envs.py\n",
+            f"{hashlib.sha256(first.read_bytes()).hexdigest()}  "
+            "vllm/vllm/engine/arg_utils.py\n",
+        )
+    )
     state = ready_state(tmp_path)
     fields = dict(state.image_fields)
     fields.update(
         {
-            "Patched file path": f"{first},{second}",
-            "Patched file SHA256": ("8e0af3e1bf5cd0e5d87e0f5b616d73acbbb9ee9db93c3da122b3ba4ce359f65a"),
+            "Patched file path": f"{second},{first}",
+            "Patched file SHA256": hashlib.sha256(manifest.encode()).hexdigest(),
         }
     )
 
@@ -123,7 +132,7 @@ def test_ready_image_verifies_multiple_patched_files_as_one_aggregate(
 
     identity = image.resolve_server_image(replace(state, image_fields=fields), LocalProbeRunner(), tmp_path)
 
-    assert identity.patched_file == f"{first},{second}"
+    assert identity.patched_file == f"{second},{first}"
     assert identity.patched_file_sha256 == fields["Patched file SHA256"]
 
 

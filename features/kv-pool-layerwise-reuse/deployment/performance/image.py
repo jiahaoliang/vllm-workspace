@@ -67,8 +67,8 @@ else:
     for path in paths:
         file_digest = hashlib.sha256(path.read_bytes()).hexdigest()
         parts = path.parts
-        package_index = parts.index("vllm_ascend")
-        relative = Path(*parts[package_index:]).as_posix()
+        workspace_index = parts.index("vllm-workspace")
+        relative = Path(*parts[workspace_index + 1 :]).as_posix()
         rows.append(f"{{file_digest}}  {{relative}}\\n")
     digest = hashlib.sha256("".join(rows).encode()).hexdigest()
 print(json.dumps({{"path": ",".join(str(path) for path in paths), "sha256": digest}}))
