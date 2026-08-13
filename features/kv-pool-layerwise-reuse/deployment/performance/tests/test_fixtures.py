@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from performance import fixtures
 from performance.contract import SEED_TOKENS, WorkloadPoint
 
@@ -137,6 +136,138 @@ def test_seed_rows_are_exact_formal_prefixes(tmp_path: Path) -> None:
         assert pair["seed_token_ids_sha256"] == seed_digest
         assert pair["formal_prefix_token_ids_sha256"] == seed_digest
         assert pair["formal_token_ids_sha256"] == formal_digest
+
+
+def test_private_issue_fixture_supports_32k_90_percent_and_custom_counts(
+    tmp_path: Path,
+) -> None:
+    manifest = fixtures.write_fixture(
+        FakeTokenizer(),
+        32000,
+        40,
+        1023,
+        tmp_path,
+        seed_tokens=28800,
+        warmup_count=8,
+        formal_count=100,
+        seed_request_count=100,
+    )
+    payload = json.loads(manifest.manifest_file.read_text(encoding="utf-8"))
+
+    assert len(manifest.warmup_ids) == 8
+    assert len(manifest.seed_ids) == 100
+    assert len(manifest.formal_ids) == 1
+    assert len(manifest.formal_ids[0]) == 100
+    assert payload["formal_tokens"] == 32000
+    assert payload["seed_tokens"] == 28800
+    assert payload["expected_hit_rate"] == 0.9
+    assert payload["concurrency"] == 40
+    assert len(payload["seed_formal_pairs"]) == 100
+    assert fixtures.replay_fixture(manifest) == []
+
+
+def test_private_issue_shared_prefix_fixture_uses_one_seed_for_all_requests(
+    tmp_path: Path,
+) -> None:
+    manifest = fixtures.write_fixture(
+        FakeTokenizer(),
+        32000,
+        40,
+        1023,
+        tmp_path,
+        seed_tokens=28800,
+        warmup_count=8,
+        formal_count=100,
+        seed_request_count=1,
+        admission_count=40,
+        shared_prefix=True,
+    )
+    payload = json.loads(manifest.manifest_file.read_text(encoding="utf-8"))
+    seed_rows = [
+        json.loads(line)
+        for line in manifest.partition_files["seed"]
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    formal_rows = [
+        json.loads(line)
+        for line in manifest.partition_files["formal-1"]
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    admission_rows = [
+        json.loads(line)
+        for line in manifest.partition_files["admission"]
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+
+    assert payload["prefix_mode"] == "shared"
+    assert len(seed_rows) == len(manifest.seed_ids) == 1
+    assert len(formal_rows) == len(manifest.formal_ids[0]) == 100
+    assert len(admission_rows) == len(payload["admission_ids"]) == 40
+    seed_tokens = FakeTokenizer().encode(seed_rows[0]["question"])
+    assert len(seed_tokens) == 28800
+    for row in (*formal_rows, *admission_rows):
+        tokens = FakeTokenizer().encode(row["question"])
+        assert len(tokens) == 32000
+        assert tokens[:28800] == seed_tokens
+    ids = {
+        *(row["request_id"] for row in seed_rows),
+        *(row["request_id"] for row in formal_rows),
+        *(row["request_id"] for row in admission_rows),
+    }
+    assert len(ids) == 141
+    assert {pair["seed_request_id"] for pair in payload["seed_formal_pairs"]} == {
+        seed_rows[0]["request_id"]
+    }
+    assert fixtures.replay_fixture(manifest) == []
+
+
+def test_admission_attempt_contract_uses_shared_partition(tmp_path: Path) -> None:
+    manifest = fixtures.write_fixture(
+        FakeTokenizer(),
+        256,
+        8,
+        1023,
+        tmp_path,
+        seed_tokens=128,
+        warmup_count=8,
+        formal_count=16,
+        seed_request_count=1,
+        admission_count=8,
+        shared_prefix=True,
+    )
+    point = WorkloadPoint("dp1", 256, 1, "bulk", 8)
+
+    attempt = fixtures.build_attempt_contract(
+        point,
+        "admission",
+        manifest.partition_files["admission"],
+        manifest.manifest_file,
+        8,
+    )
+
+    assert attempt["phase"] == "admission"
+    assert attempt["input_tokens"] == 256
+    assert attempt["request_count"] == 8
+
+
+def test_paired_fixture_rejects_mismatched_seed_and_formal_counts(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="seed count to match formal count"):
+        fixtures.write_fixture(
+            FakeTokenizer(),
+            256,
+            8,
+            1023,
+            tmp_path,
+            seed_tokens=128,
+            warmup_count=8,
+            formal_count=100,
+            seed_request_count=99,
+        )
 
 
 def test_seed_attempt_contract_uses_seed_length(tmp_path: Path) -> None:

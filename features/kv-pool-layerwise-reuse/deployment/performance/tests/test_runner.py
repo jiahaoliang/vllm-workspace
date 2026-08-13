@@ -5,7 +5,6 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-
 from performance import handoff, image, runner, runtime
 from performance.contract import FORMAL_REQUEST_COUNT, SEED_TOKENS, WorkloadPoint
 
@@ -930,6 +929,21 @@ def test_formal_commands_preserve_seeded_mooncake() -> None:
     assert "remove-all-keys" not in descriptions
     assert "assert-master-empty" not in descriptions
     assert descriptions[0] == "assert-engine-reconnect"
+
+
+def test_master_key_count_script_has_bounded_publication_wait() -> None:
+    script = runner._master_key_count_script(225)
+
+    assert "time.monotonic() + 600" in script
+    assert "did not reach 225 within" in script
+    assert "while True" not in script
+
+
+def test_master_key_count_script_rejects_invalid_bounds() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        runner._master_key_count_script(-1)
+    with pytest.raises(ValueError, match="timeout must be positive"):
+        runner._master_key_count_script(1, timeout_seconds=0)
 
 
 def test_parse_prefill_hit_log_requires_exact_per_request_hits() -> None:

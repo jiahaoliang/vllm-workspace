@@ -10,7 +10,6 @@ from typing import Any
 
 from performance.contract import (
     INPUT_TOKENS,
-    SEED_REQUEST_COUNT,
     SEED_TOKENS,
     WorkloadPoint,
     point_id,
@@ -143,6 +142,47 @@ def _token_ids_digest(token_ids: list[int] | tuple[int, ...]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _record_from_token_ids(
+    tokenizer: Any,
+    token_ids: list[int],
+    request_id: str,
+    seed: int,
+) -> PromptRecord:
+    text = _decode(tokenizer, token_ids)
+    if _encode(tokenizer, text) != token_ids:
+        raise ValueError("decoded prompt does not round-trip to the exact token sequence")
+    first_block = json.dumps(token_ids[:BLOCK_SIZE], separators=(",", ":"))
+    return PromptRecord(
+        request_id=request_id,
+        seed=seed,
+        input_tokens=len(token_ids),
+        text=text,
+        token_ids=tuple(token_ids),
+        tokenizer_identity=str(
+            getattr(tokenizer, "name_or_path", type(tokenizer).__name__)
+        ),
+        prompt_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        first_block_sha256=hashlib.sha256(first_block.encode("ascii")).hexdigest(),
+    )
+
+
+def _shared_suffix(
+    stable: tuple[int, ...],
+    length: int,
+    request_index: int,
+    seed: int,
+) -> list[int]:
+    if length < 16:
+        raise ValueError("shared-prefix suffix must contain at least 16 tokens")
+    token_ids = _index_prefix(request_index, stable)
+    randomizer = random.Random(f"shared:{seed}:{length}:{request_index}")
+    token_ids.extend(
+        stable[randomizer.randrange(len(stable))]
+        for _ in range(length - len(token_ids))
+    )
+    return token_ids
+
+
 def write_fixture(
     tokenizer: Any,
     input_tokens: int,
@@ -151,10 +191,36 @@ def write_fixture(
     output_dir: Path,
     stable_tokens: tuple[int, ...] | None = None,
     seed_tokens: int = SEED_TOKENS,
+    warmup_count: int | None = None,
+    formal_count: int | None = None,
+    seed_request_count: int | None = None,
+    admission_count: int = 0,
+    shared_prefix: bool = False,
+    repetitions: int | None = None,
 ) -> FixtureManifest:
-    warmup_count, formal_count, repetitions = sample_counts(concurrency)
-    if formal_count != SEED_REQUEST_COUNT or repetitions != 1:
-        raise ValueError("high-hit fixture requires one formal partition matching the seed count")
+    if warmup_count is None or formal_count is None:
+        default_warmup, default_formal, default_repetitions = sample_counts(
+            concurrency
+        )
+        warmup_count = default_warmup if warmup_count is None else warmup_count
+        formal_count = default_formal if formal_count is None else formal_count
+    else:
+        default_repetitions = 1
+    repetitions = default_repetitions if repetitions is None else repetitions
+    seed_request_count = formal_count if seed_request_count is None else seed_request_count
+    if (
+        warmup_count <= 0
+        or formal_count <= 0
+        or seed_request_count <= 0
+        or admission_count < 0
+    ):
+        raise ValueError("fixture request counts must be positive")
+    if repetitions != 1:
+        raise ValueError("paired-prefix fixture requires exactly one formal partition")
+    if shared_prefix and seed_request_count != 1:
+        raise ValueError("shared-prefix fixture requires exactly one seed request")
+    if not shared_prefix and seed_request_count != formal_count:
+        raise ValueError("paired-prefix fixture requires seed count to match formal count")
     if seed_tokens < BLOCK_SIZE or seed_tokens % BLOCK_SIZE:
         raise ValueError(f"seed_tokens must be a positive multiple of {BLOCK_SIZE}")
     if input_tokens <= seed_tokens:
@@ -212,71 +278,177 @@ def write_fixture(
         partition_ids["warmup"] = tuple(warmup_ids)
 
         seed_path = root / "seed.jsonl"
+        admission_path = root / "admission.jsonl"
         formal_path = root / "formal-1.jsonl"
         seed_ids: list[str] = []
         formal_ids: list[str] = []
         seed_formal_pairs: list[dict[str, str]] = []
-        with (
-            seed_path.open("x", encoding="utf-8") as seed_stream,
-            formal_path.open("x", encoding="utf-8") as formal_stream,
-        ):
-            for _ in range(formal_count):
-                formal = build_prompt(
+        with seed_path.open("x", encoding="utf-8") as seed_stream, formal_path.open(
+            "x", encoding="utf-8"
+        ) as formal_stream:
+            if shared_prefix:
+                shared = build_prompt(
                     tokenizer,
-                    input_tokens,
+                    seed_tokens,
                     request_index,
                     seed,
                     stable_tokens=stable,
                 )
                 request_index += 1
-                seed_token_ids = list(formal.token_ids[:seed_tokens])
-                seed_text = _decode(tokenizer, seed_token_ids)
-                if _encode(tokenizer, seed_text) != seed_token_ids:
-                    raise ValueError("seed prefix does not round-trip to the exact token sequence")
-                seed_request_id = f"seed-{formal.request_id}"
-                first_block = json.dumps(seed_token_ids[:BLOCK_SIZE], separators=(",", ":"))
-                seed_record = PromptRecord(
-                    request_id=seed_request_id,
-                    seed=seed,
-                    input_tokens=seed_tokens,
-                    text=seed_text,
-                    token_ids=tuple(seed_token_ids),
-                    tokenizer_identity=formal.tokenizer_identity,
-                    prompt_sha256=hashlib.sha256(seed_text.encode("utf-8")).hexdigest(),
-                    first_block_sha256=hashlib.sha256(first_block.encode("ascii")).hexdigest(),
+                shared = _record_from_token_ids(
+                    tokenizer,
+                    list(shared.token_ids),
+                    f"shared-seed-{shared.request_id}",
+                    seed,
                 )
-                seed_ids.append(seed_record.request_id)
-                formal_ids.append(formal.request_id)
-                seed_formal_pairs.append(
-                    {
-                        "seed_request_id": seed_record.request_id,
-                        "formal_request_id": formal.request_id,
-                        "seed_token_ids_sha256": _token_ids_digest(
-                            seed_record.token_ids
-                        ),
-                        "formal_prefix_token_ids_sha256": _token_ids_digest(
-                            formal.token_ids[:seed_tokens]
-                        ),
-                        "formal_token_ids_sha256": _token_ids_digest(
-                            formal.token_ids
-                        ),
-                    }
+                seed_ids.append(shared.request_id)
+                seed_stream.write(
+                    json.dumps(
+                        {
+                            "question": shared.text,
+                            "answer": "",
+                            "request_id": shared.request_id,
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    )
+                    + "\n"
                 )
-                for stream, record in ((seed_stream, seed_record), (formal_stream, formal)):
-                    stream.write(
+                write_metadata(shared, "seed")
+                shared_digest = _token_ids_digest(shared.token_ids)
+                for formal_index in range(formal_count):
+                    suffix = _shared_suffix(
+                        stable,
+                        input_tokens - seed_tokens,
+                        formal_index + 1,
+                        seed,
+                    )
+                    formal = _record_from_token_ids(
+                        tokenizer,
+                        [*shared.token_ids, *suffix],
+                        f"formal-p{input_tokens}-s{seed}-r{formal_index:06d}",
+                        seed,
+                    )
+                    formal_ids.append(formal.request_id)
+                    seed_formal_pairs.append(
+                        {
+                            "seed_request_id": shared.request_id,
+                            "formal_request_id": formal.request_id,
+                            "seed_token_ids_sha256": shared_digest,
+                            "formal_prefix_token_ids_sha256": _token_ids_digest(
+                                formal.token_ids[:seed_tokens]
+                            ),
+                            "formal_token_ids_sha256": _token_ids_digest(
+                                formal.token_ids
+                            ),
+                        }
+                    )
+                    formal_stream.write(
                         json.dumps(
-                            {"question": record.text, "answer": "", "request_id": record.request_id},
+                            {
+                                "question": formal.text,
+                                "answer": "",
+                                "request_id": formal.request_id,
+                            },
                             ensure_ascii=False,
                             sort_keys=True,
                         )
                         + "\n"
                     )
-                write_metadata(seed_record, "seed")
-                write_metadata(formal, "formal-1")
+                    write_metadata(formal, "formal-1")
+            else:
+                for _ in range(seed_request_count):
+                    formal = build_prompt(
+                        tokenizer,
+                        input_tokens,
+                        request_index,
+                        seed,
+                        stable_tokens=stable,
+                    )
+                    request_index += 1
+                    seed_token_ids = list(formal.token_ids[:seed_tokens])
+                    seed_text = _decode(tokenizer, seed_token_ids)
+                    if _encode(tokenizer, seed_text) != seed_token_ids:
+                        raise ValueError(
+                            "seed prefix does not round-trip to the exact token sequence"
+                        )
+                    seed_request_id = f"seed-{formal.request_id}"
+                    seed_record = _record_from_token_ids(
+                        tokenizer, seed_token_ids, seed_request_id, seed
+                    )
+                    seed_ids.append(seed_record.request_id)
+                    formal_ids.append(formal.request_id)
+                    seed_formal_pairs.append(
+                        {
+                            "seed_request_id": seed_record.request_id,
+                            "formal_request_id": formal.request_id,
+                            "seed_token_ids_sha256": _token_ids_digest(
+                                seed_record.token_ids
+                            ),
+                            "formal_prefix_token_ids_sha256": _token_ids_digest(
+                                formal.token_ids[:seed_tokens]
+                            ),
+                            "formal_token_ids_sha256": _token_ids_digest(
+                                formal.token_ids
+                            ),
+                        }
+                    )
+                    for stream, record in (
+                        (seed_stream, seed_record),
+                        (formal_stream, formal),
+                    ):
+                        stream.write(
+                            json.dumps(
+                                {
+                                    "question": record.text,
+                                    "answer": "",
+                                    "request_id": record.request_id,
+                                },
+                                ensure_ascii=False,
+                                sort_keys=True,
+                            )
+                            + "\n"
+                        )
+                    write_metadata(seed_record, "seed")
+                    write_metadata(formal, "formal-1")
         partition_files["seed"] = seed_path
         partition_files["formal-1"] = formal_path
         partition_ids["seed"] = tuple(seed_ids)
         partition_ids["formal-1"] = tuple(formal_ids)
+        if admission_count:
+            admission_ids: list[str] = []
+            if not shared_prefix:
+                raise ValueError("admission partition requires a shared-prefix fixture")
+            with admission_path.open("x", encoding="utf-8") as admission_stream:
+                for admission_index in range(admission_count):
+                    suffix = _shared_suffix(
+                        stable,
+                        input_tokens - seed_tokens,
+                        formal_count + admission_index + 1,
+                        seed,
+                    )
+                    admission = _record_from_token_ids(
+                        tokenizer,
+                        [*shared.token_ids, *suffix],
+                        f"admission-p{input_tokens}-s{seed}-r{admission_index:06d}",
+                        seed,
+                    )
+                    admission_ids.append(admission.request_id)
+                    admission_stream.write(
+                        json.dumps(
+                            {
+                                "question": admission.text,
+                                "answer": "",
+                                "request_id": admission.request_id,
+                            },
+                            ensure_ascii=False,
+                            sort_keys=True,
+                        )
+                        + "\n"
+                    )
+                    write_metadata(admission, "admission")
+            partition_files["admission"] = admission_path
+            partition_ids["admission"] = tuple(admission_ids)
     checksum_paths = [*partition_files.values(), metadata_file]
     checksums = {path.name: _digest(path) for path in checksum_paths}
     manifest_file = root / "manifest.json"
@@ -288,11 +460,13 @@ def write_fixture(
                 "formal_tokens": input_tokens,
                 "seed_tokens": seed_tokens,
                 "expected_hit_rate": seed_tokens / input_tokens,
+                "prefix_mode": "shared" if shared_prefix else "paired",
                 "concurrency": concurrency,
                 "seed": seed,
                 "tokenizer_identity": str(getattr(tokenizer, "name_or_path", type(tokenizer).__name__)),
                 "warmup_ids": partition_ids["warmup"],
                 "seed_ids": partition_ids["seed"],
+                "admission_ids": partition_ids.get("admission", ()),
                 "formal_ids": [partition_ids[f"formal-{index}"] for index in range(1, repetitions + 1)],
                 "seed_formal_pairs": seed_formal_pairs,
                 "artifact_checksums": checksums,
@@ -353,7 +527,7 @@ def build_attempt_contract(
 ) -> dict[str, object]:
     if request_count <= 0:
         raise ValueError("request_count must be positive")
-    if phase not in {"warmup", "seed", "formal-1"}:
+    if phase not in {"warmup", "seed", "admission", "formal-1"}:
         raise ValueError(f"unsupported attempt phase: {phase}")
     if not dataset_path.is_file():
         raise FileNotFoundError(dataset_path)
@@ -377,6 +551,8 @@ def build_attempt_contract(
         expected_ids = manifest.get("warmup_ids")
     elif phase == "seed":
         expected_ids = manifest.get("seed_ids")
+    elif phase == "admission":
+        expected_ids = manifest.get("admission_ids")
     else:
         formal_ids = manifest.get("formal_ids")
         expected_ids = (
@@ -550,6 +726,13 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--output", type=Path, required=True)
     generate.add_argument("--concurrency", type=int, default=64)
     generate.add_argument("--seed", type=int, default=20260808)
+    generate.add_argument("--input-tokens", type=int, action="append")
+    generate.add_argument("--seed-tokens", type=int)
+    generate.add_argument("--warmup-count", type=int)
+    generate.add_argument("--formal-count", type=int)
+    generate.add_argument("--seed-request-count", type=int)
+    generate.add_argument("--admission-count", type=int, default=0)
+    generate.add_argument("--shared-prefix", action="store_true")
     config = subparsers.add_parser("config")
     config.add_argument("--topology", choices=("dp1", "dp2"), required=True)
     config.add_argument("--input-tokens", type=int, required=True)
@@ -558,7 +741,11 @@ def _parser() -> argparse.ArgumentParser:
     config.add_argument("--concurrency", type=int, required=True)
     config.add_argument("--dataset", type=Path, required=True)
     config.add_argument("--request-count", type=int, required=True)
-    config.add_argument("--phase", choices=("warmup", "seed", "formal-1"), required=True)
+    config.add_argument(
+        "--phase",
+        choices=("warmup", "seed", "admission", "formal-1"),
+        required=True,
+    )
     config.add_argument("--fixture-manifest", type=Path, required=True)
     config.add_argument("--output", type=Path, required=True)
     return parser
@@ -605,7 +792,8 @@ def main(argv: list[str] | None = None) -> int:
         + "\n",
         encoding="utf-8",
     )
-    for input_tokens in INPUT_TOKENS:
+    input_lengths = tuple(args.input_tokens) if args.input_tokens else INPUT_TOKENS
+    for input_tokens in input_lengths:
         write_fixture(
             tokenizer,
             input_tokens,
@@ -613,6 +801,12 @@ def main(argv: list[str] | None = None) -> int:
             args.seed,
             args.output,
             stable_tokens=stable_tokens,
+            seed_tokens=args.seed_tokens if args.seed_tokens is not None else SEED_TOKENS,
+            warmup_count=args.warmup_count,
+            formal_count=args.formal_count,
+            seed_request_count=args.seed_request_count,
+            admission_count=args.admission_count,
+            shared_prefix=args.shared_prefix,
         )
     return 0
 

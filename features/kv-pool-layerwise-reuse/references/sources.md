@@ -40,6 +40,9 @@
 
 ## Local Snapshots
 
+- Private Issue #1 performance test samples:
+  - Source: <https://github.com/jiahaoliang/vllm-private/issues/1>
+  - Snapshot: `snapshots/private-issue-1-performance-test-sample-2026-08-12.md`
 - Workspace Issue #1 performance requirement:
   - Source: <https://github.com/jiahaoliang/vllm-workspace/issues/1>
   - Snapshot: `snapshots/issue-1-performance-validation-2026-08-08.md`

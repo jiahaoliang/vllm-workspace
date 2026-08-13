@@ -33,6 +33,109 @@ reporting contract in the approved
 
 ## Commands
 
+The commands below document the completed generation-16 high-hit lane. The
+private Issue #1 four-point lane is intentionally separate because it changes
+the workload, scheduler profile, source image, functional handoff, and evidence
+contract.
+
+### Private Issue #1 Four-Point Lane
+
+The dedicated entrypoint freezes the reviewed matrix:
+
+- Test 1: BULK versus LAYERWISE, 32,000 input, one shared 28,800-token external
+  prefix, output 128, c8, 125 formal requests;
+- Test 2: BULK versus REUSE3, the same input/prefix, output 1, c40, 100 formal
+  requests;
+- Test 1 uses `long_prefill_token_threshold=4096`; Test 2 uses `768`, with
+  explicit partial-Prefill limits `8/8` and `40/40` respectively;
+- each point runs warmup, one shared seed, one admission canary, a clean reseed,
+  and one formal attempt. Formal traffic is rejected unless server iteration
+  logs and Prometheus prove the required contexts actually ran;
+- aggregated `KVPOOL_PERF_METRICS`, Mooncake Transfer Engine metrics, Prefill and
+  Decode scheduler metrics, exact hit records, and request metrics are required.
+  KVPool metric schema v2 reports both inclusive `sum_ms` and nested-safe
+  `exclusive_sum_ms`, plus event counts. Metrics use a one-second interval and
+  two-interval flushes around each measured phase so admission/reseed events
+  cannot contaminate formal timing;
+- REUSE3 capacity conversion requires improved sustained running, capacity
+  waiting, or preemption. A momentary higher peak context count is recorded but
+  cannot pass the capacity gate by itself;
+- timing is retained separately for Prefill and Decode. A slower result is
+  publishable only when its diagnosis is `resolved=true`; otherwise the formal
+  points remain valid raw evidence and trigger one automatic targeted short
+  diagnostic, not another 100/125-request run. Test 1 uses BULK/LAYERWISE c8;
+  Test 2 uses BULK/LAYERWISE/REUSE3 c40 so `LAYERWISE/BULK` isolates ordinary
+  layerwise cost and `REUSE3/LAYERWISE` isolates buffer-reuse cost. Every
+  diagnostic variant sends exactly one concurrency wave;
+- background-thread transfer/gate rank-time cannot by itself explain end-to-end
+  slowdown. It becomes causal only when the same role also shows a material
+  main-thread `critical.*` wait/tail delta; otherwise the result remains
+  unresolved;
+- private-Issue servers use model seed `1024`; fixture generation uses seed
+  `1023`. Formal and short-diagnostic outputs are fingerprinted per `data_id`
+  and must match BULK exactly before performance attribution;
+- the final report recomputes prediction fingerprints, server admission,
+  Prometheus scheduler metrics, KVPool schema/events, and Transfer Engine
+  metrics from raw AISBench details and server artifacts. It does not trust
+  `diagnostic-summary.json` or `diagnosis.json` as authoritative evidence;
+- Test 2 is not publishable unless REUSE3 converts its larger startup KV
+  capacity into higher sustained running, less capacity waiting, or fewer
+  preemptions. A larger capacity or momentary peak alone is insufficient.
+
+Prepare only the CPU client and both c8/c40 shared-prefix fixtures:
+
+```bash
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+python3 -m performance.issue1_runner prepare \
+  --output "/tmp/layerwise-private-issue1-prepare-${prepare_id}" \
+  --image "${CANDIDATE_IMAGE}" \
+  --manifest-digest "${CANDIDATE_MANIFEST_DIGEST}" \
+  --config-digest "${CANDIDATE_CONFIG_DIGEST}" \
+  --tokenizer-source /home/llm_cache/modelscope/vllm-ascend/DeepSeek-V2-Lite-W8A8
+```
+
+Before building an image, tar-sync the exact clean instrumented candidate into
+the CPU-only UT Pod and run these explicit targets:
+
+```bash
+features/kv-pool-layerwise-reuse/deployment/performance/run-issue1-source-ut.sh -- \
+  python3 -m pytest -q \
+  tests/ut/distributed/ascend_store/test_perf_metrics.py \
+  tests/ut/distributed/ascend_store/test_backend.py \
+  tests/ut/distributed/ascend_store/test_kv_transfer.py \
+  tests/ut/test_envs.py
+
+features/kv-pool-layerwise-reuse/deployment/performance/run-issue1-source-ut.sh -- \
+  python3 -m pytest -q tests/ut/distributed/ascend_store
+
+features/kv-pool-layerwise-reuse/deployment/performance/run-issue1-source-ut.sh -- \
+  python3 -m pytest -q tests/ut/test_envs.py
+```
+
+The helper accepts only clean source HEAD
+`8653c6c5e3b554719c8347a0a36fe2109e6a36d9`, records its Git tree identity,
+and fails before cluster access on any source drift. It does not request an NPU
+and does not use a `hostPath`.
+
+After a new handoff explicitly authorizes this source/image/matrix, execute:
+
+```bash
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+python3 -m performance.issue1_runner run \
+  --output "/tmp/layerwise-private-issue1-${run_id}" \
+  --npu-node m1
+
+PYTHONPATH=features/kv-pool-layerwise-reuse/deployment \
+python3 -m performance.issue1_report \
+  --root "/tmp/layerwise-private-issue1-${run_id}" \
+  --output features/kv-pool-layerwise-reuse/layerwise-private-issue1-validation-2026-08-13.md
+```
+
+The report refuses incomplete evidence and refuses any slower LAYERWISE or
+REUSE3 result whose causal classification remains unresolved.
+
+### Generation 16 High-Hit Lane
+
 Run all CPU-only tooling tests:
 
 ```bash

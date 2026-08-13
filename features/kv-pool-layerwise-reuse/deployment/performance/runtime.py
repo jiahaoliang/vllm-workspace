@@ -7,8 +7,14 @@ from dataclasses import dataclass
 from typing import Any
 
 from performance.contract import RUNTIME_CONSTANTS, TOPOLOGIES, VARIANTS, WorkloadPoint
+from performance.issue1_contract import (
+    SERVER_SEED,
+    Issue1Point,
+    long_prefill_token_threshold,
+)
 
 MOONCAKE_GLOBAL_SEGMENT_SIZE = "128GB"
+KVPOOL_PERF_METRICS_INTERVAL_SECONDS = 1
 
 
 @dataclass(frozen=True)
@@ -38,6 +44,55 @@ class RenderedResources:
         )
 
 
+@dataclass(frozen=True)
+class RuntimeProfile:
+    name: str
+    max_model_len: int
+    max_num_batched_tokens: int
+    max_num_seqs: int
+    gpu_memory_utilization: float
+    async_scheduling: bool = False
+    max_num_partial_prefills: int = 1
+    max_long_partial_prefills: int = 1
+    long_prefill_token_threshold: int | None = None
+    enable_per_request_metrics: bool = False
+    enable_kvpool_perf_metrics: bool = False
+    enable_range_debug: bool = False
+    server_seed: int | None = None
+
+
+def issue1_runtime_profile(
+    point: Issue1Point, *, diagnostic: bool = False
+) -> RuntimeProfile:
+    threshold = long_prefill_token_threshold(point.concurrency)
+    suffix = "-diagnostic" if diagnostic else ""
+    return RuntimeProfile(
+        name=f"private-issue1-{point.test}{suffix}",
+        max_model_len=32768,
+        max_num_batched_tokens=32768,
+        max_num_seqs=point.concurrency,
+        gpu_memory_utilization=0.95,
+        async_scheduling=True,
+        max_num_partial_prefills=point.concurrency,
+        max_long_partial_prefills=point.concurrency,
+        long_prefill_token_threshold=threshold,
+        enable_per_request_metrics=True,
+        enable_kvpool_perf_metrics=True,
+        enable_range_debug=diagnostic,
+        server_seed=SERVER_SEED,
+    )
+
+
+def _default_profile() -> RuntimeProfile:
+    return RuntimeProfile(
+        name="high-hit-generation16",
+        max_model_len=int(RUNTIME_CONSTANTS["max_model_len"]),
+        max_num_batched_tokens=int(RUNTIME_CONSTANTS["max_num_batched_tokens"]),
+        max_num_seqs=int(RUNTIME_CONSTANTS["max_num_seqs"]),
+        gpu_memory_utilization=float(RUNTIME_CONSTANTS["gpu_memory_utilization"]),
+    )
+
+
 def _render_deployment(
     source: dict[str, Any],
     image: str,
@@ -46,6 +101,10 @@ def _render_deployment(
     node_name: str,
 ) -> dict[str, Any]:
     deployment = deepcopy(source)
+    # The runner starts vLLM explicitly after the replacement Pod is Running.
+    # Recreate is required so a non-Ready sleep wrapper cannot deadlock a
+    # RollingUpdate while the runner waits for the old Pod to disappear.
+    deployment.setdefault("spec", {})["strategy"] = {"type": "Recreate"}
     pod_spec = deployment["spec"]["template"]["spec"]
     container = pod_spec["containers"][0]
     pod_spec["nodeName"] = node_name
@@ -82,7 +141,12 @@ def _kv_transfer_config(role: str, point: WorkloadPoint) -> dict[str, Any]:
     }
 
 
-def server_argv(role: str, point: WorkloadPoint) -> tuple[str, ...]:
+def server_argv(
+    role: str,
+    point: WorkloadPoint,
+    profile: RuntimeProfile | None = None,
+) -> tuple[str, ...]:
+    profile = profile or _default_profile()
     topology = TOPOLOGIES[point.topology]
     data_parallel = topology.prefill_dp if role == "prefill" else topology.decode_dp
     port = "8100" if role == "prefill" else "8200"
@@ -125,26 +189,58 @@ def server_argv(role: str, point: WorkloadPoint) -> tuple[str, ...]:
             str(RUNTIME_CONSTANTS["block_size"]),
             "--enable-chunked-prefill",
             "--max-model-len",
-            str(RUNTIME_CONSTANTS["max_model_len"]),
+            str(profile.max_model_len),
             "--max-num-batched-tokens",
-            str(RUNTIME_CONSTANTS["max_num_batched_tokens"]),
+            str(profile.max_num_batched_tokens),
             "--max-num-seqs",
-            str(RUNTIME_CONSTANTS["max_num_seqs"]),
+            str(profile.max_num_seqs),
             "--no-enable-prefix-caching",
             "--enable-logging-iteration-details",
             "--gpu-memory-utilization",
-            str(RUNTIME_CONSTANTS["gpu_memory_utilization"]),
+            str(profile.gpu_memory_utilization),
             "--kv-transfer-config",
             json.dumps(
                 _kv_transfer_config(role, point), separators=(",", ":"), sort_keys=True
             ),
         )
     )
+    if profile.async_scheduling:
+        argv.append("--async-scheduling")
+    if profile.server_seed is not None:
+        argv.extend(("--seed", str(profile.server_seed)))
+    if (
+        profile.max_num_partial_prefills != 1
+        or profile.max_long_partial_prefills != 1
+    ):
+        argv.extend(
+            (
+                "--max-num-partial-prefills",
+                str(profile.max_num_partial_prefills),
+                "--max-long-partial-prefills",
+                str(profile.max_long_partial_prefills),
+            )
+        )
+    if profile.long_prefill_token_threshold is not None:
+        argv.extend(
+            (
+                "--long-prefill-token-threshold",
+                str(profile.long_prefill_token_threshold),
+            )
+        )
+    if profile.enable_per_request_metrics:
+        argv.append("--enable-per-request-metrics")
     return tuple(argv)
 
 
-def _start_script(role: str, point: WorkloadPoint) -> str:
-    command = shlex.join(server_argv(role, point))
+def _start_script(
+    role: str,
+    point: WorkloadPoint,
+    profile: RuntimeProfile | None = None,
+) -> str:
+    profile = profile or _default_profile()
+    command = shlex.join(server_argv(role, point, profile))
+    metrics_enabled = "1" if profile.enable_kvpool_perf_metrics else "0"
+    range_debug_enabled = "1" if profile.enable_range_debug else "0"
     return f"""#!/usr/bin/env bash
 set -euo pipefail
 pid_file=/tmp/vllm-{role}.pid
@@ -156,12 +252,21 @@ fi
 : >"${{log_file}}"
 nohup env VLLM_USE_V1=1 PYTHONHASHSEED=0 PYTHONUNBUFFERED=1 \\
   MOONCAKE_GLOBAL_SEGMENT_SIZE={MOONCAKE_GLOBAL_SEGMENT_SIZE} \\
+  MC_TE_METRIC={metrics_enabled} MC_TE_METRIC_INTERVAL_SECONDS=1 \\
+  VLLM_ASCEND_KVPOOL_PERF_METRICS={metrics_enabled} \\
+  VLLM_ASCEND_KVPOOL_PERF_METRICS_INTERVAL_SECONDS={KVPOOL_PERF_METRICS_INTERVAL_SECONDS} \\
+  VLLM_ASCEND_KVPOOL_RANGE_DEBUG={range_debug_enabled} \\
   {command} >"${{log_file}}" 2>&1 </dev/null &
 echo "$!" >"${{pid_file}}"
 """
 
 
-def _runtime_identity(point: WorkloadPoint, image: str) -> dict[str, Any]:
+def _runtime_identity(
+    point: WorkloadPoint,
+    image: str,
+    profile: RuntimeProfile | None = None,
+) -> dict[str, Any]:
+    profile = profile or _default_profile()
     topology = TOPOLOGIES[point.topology]
     prefill_slots = 5 if point.variant == "reuse3" else 27
     return {
@@ -179,6 +284,21 @@ def _runtime_identity(point: WorkloadPoint, image: str) -> dict[str, Any]:
         "decode_physical_slots": 27,
         "decode_logical_memory_factor": 1.0,
         "mooncake_global_segment_size": MOONCAKE_GLOBAL_SEGMENT_SIZE,
+        "runtime_profile": {
+            "name": profile.name,
+            "max_model_len": profile.max_model_len,
+            "max_num_batched_tokens": profile.max_num_batched_tokens,
+            "max_num_seqs": profile.max_num_seqs,
+            "gpu_memory_utilization": profile.gpu_memory_utilization,
+            "async_scheduling": profile.async_scheduling,
+            "max_num_partial_prefills": profile.max_num_partial_prefills,
+            "max_long_partial_prefills": profile.max_long_partial_prefills,
+            "long_prefill_token_threshold": profile.long_prefill_token_threshold,
+            "enable_per_request_metrics": profile.enable_per_request_metrics,
+            "enable_kvpool_perf_metrics": profile.enable_kvpool_perf_metrics,
+            "enable_range_debug": profile.enable_range_debug,
+            "server_seed": profile.server_seed,
+        },
         "prefill_kv": _kv_transfer_config("prefill", point),
         "decode_kv": _kv_transfer_config("decode", point),
     }
@@ -196,8 +316,49 @@ parser.add_argument(
     type=Path,
     default=Path("/opt/vllm-layerwise/runtime-identity.json"),
 )
+parser.add_argument("--cmdline", type=Path)
+parser.add_argument("--log-file", type=Path)
 args = parser.parse_args()
 identity = json.loads(args.identity.read_text())
+pid_file = Path(f"/tmp/vllm-{args.role}.pid")
+if args.cmdline is None:
+    pid = int(pid_file.read_text().strip())
+    cmdline_path = Path(f"/proc/{pid}/cmdline")
+else:
+    cmdline_path = args.cmdline
+log_file = args.log_file or Path(f"/tmp/vllm-{args.role}.log")
+argv = [value.decode() for value in cmdline_path.read_bytes().split(b"\\0") if value]
+
+def require_option(name, expected):
+    assert name in argv, (name, argv)
+    index = argv.index(name)
+    assert index + 1 < len(argv), (name, argv)
+    actual = argv[index + 1]
+    assert actual == str(expected), (name, expected, actual)
+
+profile = identity["runtime_profile"]
+require_option("--max-model-len", profile["max_model_len"])
+require_option("--max-num-batched-tokens", profile["max_num_batched_tokens"])
+require_option("--max-num-seqs", profile["max_num_seqs"])
+if profile["max_num_partial_prefills"] > 1:
+    require_option(
+        "--max-num-partial-prefills", profile["max_num_partial_prefills"]
+    )
+    require_option(
+        "--max-long-partial-prefills", profile["max_long_partial_prefills"]
+    )
+    require_option(
+        "--long-prefill-token-threshold",
+        profile["long_prefill_token_threshold"],
+    )
+if profile["server_seed"] is not None:
+    require_option("--seed", profile["server_seed"])
+log_text = log_file.read_text(errors="replace")
+assert not (
+    "parameter=max_num_partial_prefills" in log_text
+    and "resetting to default (1)" in log_text
+), "Ascend reset concurrent partial-prefill scheduling to one context"
+
 logical_layers = identity["logical_layers"]
 extra = identity[f"{args.role}_kv"]["kv_connector_extra_config"]
 shared_value = extra.get("layerwise_num_shared_buffers")
@@ -235,6 +396,14 @@ print(json.dumps({
     "logical_layers": logical_layers,
     "physical_slots": slots,
     "logical_memory_factor": factor,
+    "scheduler": {
+        "max_num_seqs": profile["max_num_seqs"],
+        "max_num_partial_prefills": profile["max_num_partial_prefills"],
+        "max_long_partial_prefills": profile["max_long_partial_prefills"],
+        "long_prefill_token_threshold": profile[
+            "long_prefill_token_threshold"
+        ],
+    },
     "vllm_ascend_source": str(Path(
         "/vllm-workspace/vllm-ascend/vllm_ascend/__init__.py"
     )),
@@ -247,18 +416,26 @@ def render_resources(
     point: WorkloadPoint,
     image: str,
     node_name: str = "n1",
+    profile: RuntimeProfile | None = None,
 ) -> RenderedResources:
+    profile = profile or _default_profile()
     topology = TOPOLOGIES[point.topology]
-    configmap_name = (
-        f"layerwise-performance-{point.topology}-{point.input_tokens}-{point.variant}"
-    )
+    if profile.name.startswith("private-issue1-"):
+        test_name = profile.name.removeprefix("private-issue1-")
+        configmap_name = (
+            f"layerwise-issue1-{test_name}-{point.variant}-c{profile.max_num_seqs}"
+        )
+    else:
+        configmap_name = (
+            f"layerwise-performance-{point.topology}-{point.input_tokens}-{point.variant}"
+        )
     configmap = deepcopy(inputs.runtime_configmap)
     configmap["metadata"]["name"] = configmap_name
     data = configmap.setdefault("data", {})
-    data["start-prefill.sh"] = _start_script("prefill", point)
-    data["start-decode.sh"] = _start_script("decode", point)
+    data["start-prefill.sh"] = _start_script("prefill", point, profile)
+    data["start-decode.sh"] = _start_script("decode", point, profile)
     data["runtime-identity.json"] = (
-        json.dumps(_runtime_identity(point, image), indent=2, sort_keys=True) + "\n"
+        json.dumps(_runtime_identity(point, image, profile), indent=2, sort_keys=True) + "\n"
     )
     data["check-runtime.py"] = _check_runtime_script()
     prefill = _render_deployment(

@@ -1,0 +1,2 @@
+21:    "VLLM_ASCEND_KVPOOL_PERF_METRICS_INTERVAL_SECONDS": lambda: _positive_integer_env(
+25:ValueError: VLLM_ASCEND_KVPOOL_PERF_METRICS_INTERVAL_SECONDS must be a positive integer, got 'bad'

@@ -7,6 +7,7 @@ import os
 import re
 import shlex
 import subprocess
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
@@ -15,7 +16,6 @@ from typing import Protocol
 
 from performance import handoff, image, report, runtime
 from performance.contract import (
-    EXPECTED_HIT_RATE,
     FORMAL_REQUEST_COUNT,
     SEED_BLOCKS,
     SEED_REQUEST_COUNT,
@@ -783,17 +783,35 @@ def _sync_client_tooling(
 
 
 def _archive_shared_fixtures(command_runner: Runner, output_dir: Path) -> None:
-    destination = output_dir / "fixtures" / "tokens-16384-c8"
+    _archive_fixture(command_runner, output_dir, 16384, 8)
+
+
+def _archive_fixture(
+    command_runner: Runner,
+    output_dir: Path,
+    input_tokens: int,
+    concurrency: int,
+    *,
+    include_admission: bool = False,
+) -> None:
+    fixture_name = f"tokens-{input_tokens}-c{concurrency}"
+    destination = output_dir / "fixtures" / fixture_name
     destination.mkdir(parents=True, exist_ok=False)
-    source = "layerwise-performance-aisbench:/performance-workspace/rootfs/client-tools/fixtures/tokens-16384-c8"
-    for filename in (
+    source = (
+        "layerwise-performance-aisbench:"
+        f"/performance-workspace/rootfs/client-tools/fixtures/{fixture_name}"
+    )
+    filenames = [
         "manifest.json",
         "metadata.jsonl",
         "SHA256SUMS",
         "warmup.jsonl",
         "seed.jsonl",
         "formal-1.jsonl",
-    ):
+    ]
+    if include_admission:
+        filenames.append("admission.jsonl")
+    for filename in filenames:
         command_runner.run(
             Command(
                 (
@@ -973,13 +991,19 @@ def _write_rendered_block(
     image_reference: str,
     output_dir: Path,
     node_name: str = "n1",
+    profile: runtime.RuntimeProfile | None = None,
 ) -> tuple[runtime.RenderedResources, tuple[Path, Path, Path]]:
     rendered = runtime.render_resources(
-        inputs, point, image_reference, node_name=node_name
+        inputs,
+        point,
+        image_reference,
+        node_name=node_name,
+        profile=profile,
     )
-    block = (
-        output_dir / "rendered" / point.topology / str(point.input_tokens) / point.variant
-    )
+    block = output_dir / "rendered"
+    if profile is not None:
+        block /= profile.name
+    block = block / point.topology / str(point.input_tokens) / point.variant
     paths = (
         block / "runtime-configmap.json",
         block / "prefill-deployment.json",
@@ -1627,11 +1651,16 @@ print(json.dumps(body, sort_keys=True))
 """
 
 
-def _master_key_count_script(expected: int) -> str:
+def _master_key_count_script(expected: int, timeout_seconds: int = 600) -> str:
+    if expected < 0:
+        raise ValueError("expected master key count must be non-negative")
+    if timeout_seconds <= 0:
+        raise ValueError("master key count timeout must be positive")
     return f"""import time
 from urllib.request import urlopen
 
-while True:
+deadline = time.monotonic() + {timeout_seconds}
+while time.monotonic() < deadline:
     text = urlopen(
         "http://mooncake-master-service:9003/metrics", timeout=10
     ).read().decode()
@@ -1650,6 +1679,11 @@ while True:
     if actual is not None and actual > {expected}:
         raise AssertionError(values)
     time.sleep(1)
+else:
+    raise TimeoutError(
+        "Mooncake key publication did not reach {expected} within "
+        "{timeout_seconds} seconds: " + repr(values)
+    )
 """
 
 
@@ -1797,16 +1831,21 @@ def _attempt_commands(
     request_count: int,
     remote_attempt: str,
     environment: RunEnvironment,
+    *,
+    fixture_concurrency: int = 8,
+    sampled_command: Callable[[tuple[str, ...], RunEnvironment], Command] | None = None,
 ) -> tuple[Command, ...]:
     namespace = environment.namespace
     rootfs = "/performance-workspace/rootfs"
     chroot_attempt = f"/client-tools/runs/{remote_attempt}"
     host_attempt = f"{rootfs}{chroot_attempt}"
     fixture = (
-        f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}-c8/{phase}.jsonl"
+        f"{rootfs}/client-tools/fixtures/tokens-{point.input_tokens}"
+        f"-c{fixture_concurrency}/{phase}.jsonl"
     )
     fixture_manifest = (
-        f"/client-tools/fixtures/tokens-{point.input_tokens}-c8/manifest.json"
+        f"/client-tools/fixtures/tokens-{point.input_tokens}"
+        f"-c{fixture_concurrency}/manifest.json"
     )
     prepare_script = (
         'set -eu; test ! -e "$1"; mkdir -p "$1"; cp "$2" "$1/dataset.jsonl"'
@@ -1882,6 +1921,7 @@ def _attempt_commands(
             ),
         )
     )
+    sample = sampled_command or _sampled_aisbench_command
     return (
         *lifecycle_commands,
         Command(
@@ -1904,7 +1944,7 @@ def _attempt_commands(
             description="prepare-aisbench-attempt",
         ),
         Command(config_argv, description="render-aisbench-config"),
-        _sampled_aisbench_command(aisbench_argv, environment),
+        sample(aisbench_argv, environment),
         Command(
             (
                 "kubectl",
@@ -2047,14 +2087,22 @@ def _capture_variant_diagnostics(
             _capture(command_runner, command, destination, filename)
 
 
-def _replace_attempt_fixture(raw: Path, input_tokens: int, phase: str) -> None:
+def _replace_attempt_fixture(
+    raw: Path,
+    input_tokens: int,
+    phase: str,
+    fixture_concurrency: int = 8,
+) -> None:
     dataset = raw / "dataset.jsonl"
     if not dataset.is_file():
         return
     _write_json(
         raw / "fixture-reference.json",
         {
-            "path": f"fixtures/tokens-{input_tokens}-c8/{phase}.jsonl",
+            "path": (
+                f"fixtures/tokens-{input_tokens}-c{fixture_concurrency}/"
+                f"{phase}.jsonl"
+            ),
             "sha256": hashlib.sha256(dataset.read_bytes()).hexdigest(),
         },
     )
@@ -2067,7 +2115,13 @@ _HIT_PATTERN = re.compile(
 )
 
 
-def validate_prefill_hits(text: str) -> dict[str, object]:
+def validate_prefill_hits(
+    text: str,
+    *,
+    expected_request_count: int = FORMAL_REQUEST_COUNT,
+    expected_total_tokens: int = 16384,
+    expected_hit_tokens: int = SEED_TOKENS,
+) -> dict[str, object]:
     records = [
         {
             "request_id": match.group("request"),
@@ -2078,25 +2132,25 @@ def validate_prefill_hits(text: str) -> dict[str, object]:
         for match in _HIT_PATTERN.finditer(text)
     ]
     errors: list[str] = []
-    if len(records) != FORMAL_REQUEST_COUNT:
+    if len(records) != expected_request_count:
         errors.append(
-            f"expected {FORMAL_REQUEST_COUNT} hit records, got {len(records)}"
+            f"expected {expected_request_count} hit records, got {len(records)}"
         )
     request_ids = [str(record["request_id"]) for record in records]
     if len(set(request_ids)) != len(request_ids):
         errors.append("duplicate request ID in Prefill hit records")
     for record in records:
-        if record["total_tokens"] != 16384:
+        if record["total_tokens"] != expected_total_tokens:
             errors.append(
                 f"unexpected total tokens for {record['request_id']}: "
                 f"{record['total_tokens']}"
             )
-        if record["hit_tokens"] != SEED_TOKENS:
+        if record["hit_tokens"] != expected_hit_tokens:
             errors.append(
                 f"unexpected hit tokens for {record['request_id']}: "
                 f"{record['hit_tokens']}"
             )
-        if record["need_to_load"] != SEED_TOKENS:
+        if record["need_to_load"] != expected_hit_tokens:
             errors.append(
                 f"unexpected load tokens for {record['request_id']}: "
                 f"{record['need_to_load']}"
@@ -2108,14 +2162,14 @@ def validate_prefill_hits(text: str) -> dict[str, object]:
         "valid": not errors,
         "errors": errors,
         "request_count": len(records),
-        "expected_request_count": FORMAL_REQUEST_COUNT,
-        "expected_total_tokens": 16384,
-        "expected_hit_tokens": SEED_TOKENS,
-        "expected_hit_rate": EXPECTED_HIT_RATE,
+        "expected_request_count": expected_request_count,
+        "expected_total_tokens": expected_total_tokens,
+        "expected_hit_tokens": expected_hit_tokens,
+        "expected_hit_rate": expected_hit_tokens / expected_total_tokens,
         "min_hit_tokens": min(hits) if hits else None,
         "max_hit_tokens": max(hits) if hits else None,
-        "hit_rate": (min(hits) / 16384) if hits else None,
-        "expected_need_to_load_tokens": SEED_TOKENS,
+        "hit_rate": (min(hits) / expected_total_tokens) if hits else None,
+        "expected_need_to_load_tokens": expected_hit_tokens,
         "min_need_to_load_tokens": min(loads) if loads else None,
         "max_need_to_load_tokens": max(loads) if loads else None,
         "local_hit_tokens": (

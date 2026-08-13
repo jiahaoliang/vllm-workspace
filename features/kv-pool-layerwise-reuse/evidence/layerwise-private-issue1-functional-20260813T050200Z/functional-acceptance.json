@@ -1,0 +1,301 @@
+{
+  "cleanup": {
+    "allocatable_physical_npus": 8,
+    "free_physical_npus": 4,
+    "isolated_resources_remaining": 0,
+    "master_empty_each_case": true,
+    "original_serving_specs_unchanged": true
+  },
+  "cpu": {
+    "ascend_store": 529,
+    "bash_syntax": "passed",
+    "diff_check": "passed",
+    "env_platform_passed": 53,
+    "env_platform_skipped": 1,
+    "focused": 191,
+    "performance_harness": 183,
+    "python_compile": "passed",
+    "ruff": "0.16.2 passed"
+  },
+  "errors": [],
+  "image": {
+    "config": "sha256:f7aec20a062b9fcc18892b8639c707d9d89b7a29954aa2e23f31d77b0ab88de7",
+    "manifest": "sha256:8c9f462c2c59e5c3ca4f6d7e89691ac20ae0f94943c470a7b57f2b9590ea6495",
+    "patch_manifest_sha256": "9a8d9ea0b560561b3093ab418eaf8f4a320362e8c21ad272b6168e9deebd897e"
+  },
+  "npu": {
+    "cases": {
+      "baseline": {
+        "commit": {
+          "all_results_zero": true,
+          "event_count": 1,
+          "key_count_distribution": {
+            "4": 1
+          }
+        },
+        "load": null,
+        "post_metrics": {
+          "master_active_clients": 1.0,
+          "master_allocated_bytes": 15925248.0,
+          "master_key_count": 4.0
+        },
+        "requests": 1,
+        "save": {
+          "event_count": 27,
+          "key_count_distribution": {
+            "4": 27
+          },
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        },
+        "whole_key_calls": 0
+      },
+      "both-reuse": {
+        "commit": {
+          "all_results_zero": true,
+          "event_count": 32,
+          "key_count_distribution": {
+            "1": 31,
+            "5": 1
+          }
+        },
+        "load": {
+          "event_count": 837,
+          "group_count": 31,
+          "independent_decode_key_count": 1,
+          "independent_layers": [
+            0,
+            26
+          ],
+          "key_count_distribution": {
+            "1": 60,
+            "4": 27,
+            "5": 750
+          },
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "shared_decode_key_count": 5,
+          "warm_prefix_key_count": 4
+        },
+        "post_metrics": {
+          "master_active_clients": 1.0,
+          "master_allocated_bytes": 143327232.0,
+          "master_key_count": 36.0
+        },
+        "requests": 2,
+        "save": {
+          "event_count": 864,
+          "key_count_distribution": {
+            "1": 837,
+            "5": 27
+          },
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        },
+        "whole_key_calls": 0
+      },
+      "producer-reuse": {
+        "commit": {
+          "all_results_zero": true,
+          "event_count": 16,
+          "key_count_distribution": {
+            "1": 15,
+            "5": 1
+          }
+        },
+        "load": {
+          "event_count": 405,
+          "group_count": 15,
+          "independent_decode_key_count": 1,
+          "independent_layers": [
+            0,
+            26
+          ],
+          "key_count_distribution": {
+            "1": 30,
+            "5": 375
+          },
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "shared_decode_key_count": 5,
+          "warm_prefix_key_count": null
+        },
+        "post_metrics": {
+          "master_active_clients": 1.0,
+          "master_allocated_bytes": 79626240.0,
+          "master_key_count": 20.0
+        },
+        "requests": 1,
+        "save": {
+          "event_count": 432,
+          "key_count_distribution": {
+            "1": 405,
+            "5": 27
+          },
+          "layers": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ]
+        },
+        "whole_key_calls": 0
+      }
+    },
+    "errors": [],
+    "final_master_empty_each_case": true,
+    "memory_factor": 5.4,
+    "num_layers": 27,
+    "physical_slots": 5,
+    "response_equality": true,
+    "roles": [
+      "kv_producer",
+      "kv_both"
+    ],
+    "run_id": "20260813T050200Z",
+    "schema_version": 1,
+    "shared_buffers": 3,
+    "status": "passed",
+    "validated": true
+  },
+  "run_id": "20260813T050200Z",
+  "schema_version": 1,
+  "source": {
+    "base": "57d3c214e642cdbb529400f0742d1a98a8d38708",
+    "patch": "8653c6c5e3b554719c8347a0a36fe2109e6a36d9",
+    "tree": "156a2ebe414aa82bc68102479a61fcca88f3332f"
+  },
+  "status": "passed",
+  "validated": true
+}
