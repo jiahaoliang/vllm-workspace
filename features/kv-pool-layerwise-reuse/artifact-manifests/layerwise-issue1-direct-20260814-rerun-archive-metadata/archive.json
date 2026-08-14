@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "layerwise-issue1-direct-20260814-rerun",
+  "staging_path": "/tmp/layerwise-issue1-direct-20260814-rerun",
+  "file_count": 107,
+  "payload_bytes": 721923136,
+  "raw_manifest": "RAW-SHA256SUMS",
+  "raw_manifest_sha256": "85d60b3ffcde0593ca648f572d9833745aab523b3f07bf0abc62aef579603994",
+  "staging_replay": {
+    "status": "passed",
+    "verified_at": "2026-08-14T14:55:10+08:00"
+  },
+  "persistent_archive": {
+    "status": "pending_user_selected_destination",
+    "path": null,
+    "replay_status": "not_run",
+    "verified_at": null
+  }
+}

@@ -51,16 +51,32 @@ Prefill, async scheduling, and one 28,800-token shared-prefix seed. Neither
 
 ## Commands
 
-The run used one-shot helper scripts under `/tmp`. These scripts implemented
-the deployment, vLLM, Mooncake clear, AISBench, sampling and capture commands
-documented in the linked plan. The server lifecycle for each point was:
+The run used one-shot helper scripts under `/tmp`. Their byte-identical
+snapshots are now archived under
+[`deployment/performance/direct/`](deployment/performance/direct/README.md).
+The commands below use the archived host paths. Before launching a point, copy
+the Pod-side vLLM entry script into both serving Pods:
 
 ```bash
-bash /tmp/direct-stop-vllm.sh
-bash /tmp/direct-clear-mooncake.sh
-bash /tmp/direct-launch-point.sh VARIANT MAX_NUM_SEQS THRESHOLD
-bash /tmp/direct-wait-ready.sh
-bash /tmp/direct-start-samplers.sh
+DIRECT_DIR=features/kv-pool-layerwise-reuse/deployment/performance/direct
+PREFILL_POD=$(kubectl get pod -n liangjiahao -l app=prefill \
+  --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')
+DECODE_POD=$(kubectl get pod -n liangjiahao -l app=decode \
+  --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')
+
+kubectl cp -n liangjiahao -c prefill-engine \
+  "${DIRECT_DIR}/direct-start-vllm.sh" \
+  "${PREFILL_POD}:/tmp/direct-start-vllm.sh"
+kubectl cp -n liangjiahao -c decode-engine \
+  "${DIRECT_DIR}/direct-start-vllm.sh" \
+  "${DECODE_POD}:/tmp/direct-start-vllm.sh"
+
+bash "${DIRECT_DIR}/direct-stop-vllm.sh"
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
+bash "${DIRECT_DIR}/direct-launch-point.sh" \
+  VARIANT MAX_NUM_SEQS THRESHOLD
+bash "${DIRECT_DIR}/direct-wait-ready.sh"
+bash "${DIRECT_DIR}/direct-start-samplers.sh"
 ```
 
 `direct-launch-point.sh` started both Prefill and Decode with the common vLLM
@@ -88,21 +104,26 @@ kubectl exec -n liangjiahao layerwise-performance-aisbench -c aisbench -- \
 The exact phase wrapper form was:
 
 ```bash
-bash /tmp/direct-aisbench-phase.sh \
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
   POINT VARIANT CONCURRENCY OUTPUT PHASE REQUESTS FIXTURE_CONCURRENCY
 ```
 
 Test 2 BULK used:
 
 ```bash
-bash /tmp/direct-aisbench-phase.sh rerun-test2-bulk bulk 40 1 warmup 8 40
-bash /tmp/direct-clear-mooncake.sh
-bash /tmp/direct-aisbench-phase.sh rerun-test2-bulk bulk 40 1 seed 1 40
-bash /tmp/direct-aisbench-phase.sh rerun-test2-bulk bulk 40 1 admission 40 40
-bash /tmp/direct-clear-mooncake.sh
-bash /tmp/direct-aisbench-phase.sh rerun-test2-bulk bulk 40 1 seed 1 40
-bash /tmp/direct-capture-before.sh rerun-test2-bulk
-bash /tmp/direct-aisbench-phase.sh rerun-test2-bulk bulk 40 1 formal-1 100 40
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test2-bulk bulk 40 1 warmup 8 40
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test2-bulk bulk 40 1 seed 1 40
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test2-bulk bulk 40 1 admission 40 40
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test2-bulk bulk 40 1 seed 1 40
+bash "${DIRECT_DIR}/direct-capture-before.sh" rerun-test2-bulk
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test2-bulk bulk 40 1 formal-1 100 40
 ```
 
 Test 2 REUSE3 used the same sequence and parameters, replacing point and
@@ -111,14 +132,19 @@ variant with `rerun-test2-reuse3 reuse3`.
 Test 1 BULK used:
 
 ```bash
-bash /tmp/direct-aisbench-phase.sh rerun-test1-bulk bulk 8 128 warmup 8 8
-bash /tmp/direct-clear-mooncake.sh
-bash /tmp/direct-aisbench-phase.sh rerun-test1-bulk bulk 8 128 seed 1 8
-bash /tmp/direct-aisbench-phase.sh rerun-test1-bulk bulk 8 128 admission 8 8
-bash /tmp/direct-clear-mooncake.sh
-bash /tmp/direct-aisbench-phase.sh rerun-test1-bulk bulk 8 128 seed 1 8
-bash /tmp/direct-capture-before.sh rerun-test1-bulk
-bash /tmp/direct-aisbench-phase.sh rerun-test1-bulk bulk 8 128 formal-1 125 8
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test1-bulk bulk 8 128 warmup 8 8
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test1-bulk bulk 8 128 seed 1 8
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test1-bulk bulk 8 128 admission 8 8
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test1-bulk bulk 8 128 seed 1 8
+bash "${DIRECT_DIR}/direct-capture-before.sh" rerun-test1-bulk
+bash "${DIRECT_DIR}/direct-aisbench-phase.sh" \
+  rerun-test1-bulk bulk 8 128 formal-1 125 8
 ```
 
 Test 1 LAYERWISE used the same sequence and parameters, replacing point and
@@ -127,9 +153,9 @@ variant with `rerun-test1-layerwise layerwise`.
 After each formal run, sampling stopped and the artifacts were copied out:
 
 ```bash
-bash /tmp/direct-stop-samplers.sh
+bash "${DIRECT_DIR}/direct-stop-samplers.sh"
 DIRECT_EVIDENCE_ROOT=/tmp/layerwise-issue1-direct-20260814-rerun \
-  bash /tmp/direct-capture-after.sh POINT
+  bash "${DIRECT_DIR}/direct-capture-after.sh" POINT
 ```
 
 ## Formal Results
@@ -211,11 +237,18 @@ Mooncake before/after and time-series metrics, NPU time series, before/after
 HBM state, and actual server argv. The machine-readable committed summary is
 [`lightweight-reuse3-npu-performance-results-2026-08-14.csv`](lightweight-reuse3-npu-performance-results-2026-08-14.csv).
 
+The raw staging root contains 107 files and 721,923,136 payload bytes. Its
+complete checksum manifest replayed successfully. The committed manifest,
+manifest digest and archive status are under
+[`artifact-manifests/layerwise-issue1-direct-20260814-rerun-archive-metadata/`](artifact-manifests/layerwise-issue1-direct-20260814-rerun-archive-metadata/README.md).
+The large payload is not in Git. Its persistent external copy is still pending
+selection of a workspace-external destination.
+
 Cleanup used:
 
 ```bash
-bash /tmp/direct-stop-vllm.sh
-bash /tmp/direct-clear-mooncake.sh
+bash "${DIRECT_DIR}/direct-stop-vllm.sh"
+bash "${DIRECT_DIR}/direct-clear-mooncake.sh"
 kubectl scale deployment -n liangjiahao \
   prefill-engine-deployment decode-engine-deployment --replicas=0
 kubectl delete pod -n liangjiahao \
