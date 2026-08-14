@@ -1,0 +1,5 @@
+test,variant,input_tokens,output_tokens,client_concurrency,max_num_seqs,long_prefill_token_threshold,formal_requests,success_requests,request_throughput_req_s,benchmark_duration_ms,avg_ttft_ms,avg_tpot_ms,avg_itl_ms,avg_e2e_ms,throughput_ratio_to_bulk,admission_max_running,admission_max_waiting
+Test 2,BULK,32000,1,40,40,128,100,100,0.2292,436269.8064,156011.6,,0.1,156011.7,1.0000,21,21
+Test 2,REUSE3,32000,1,40,40,128,100,100,0.0870,1149474.9463,413351.2,,0.1,413351.3,0.3796,40,0
+Test 1,BULK,32000,128,8,8,1024,125,125,0.2718,459819.4032,10494.3,146.0,144.9,29041.2,1.0000,8,0
+Test 1,LAYERWISE,32000,128,8,8,1024,125,125,0.3606,346599.1327,4560.3,134.4,133.4,21632.8,1.3267,8,0

@@ -1,5 +1,8 @@
 # REUSE3 NPU Direct Reproduction Commands And Results
 
+Latest unified four-point rerun commands and results:
+[`lightweight-reuse3-npu-performance-results-2026-08-14.md`](lightweight-reuse3-npu-performance-results-2026-08-14.md).
+
 ## Identity
 
 - Namespace: `liangjiahao`.
