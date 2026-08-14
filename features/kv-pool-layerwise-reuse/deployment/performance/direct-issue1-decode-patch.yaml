@@ -1,0 +1,23 @@
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      nodeName: m1
+      containers:
+        - name: decode-engine
+          image: docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-57d3c214e-df3f74ed-20260811T145302Z
+          imagePullPolicy: Never
+          command: ["/bin/bash", "-lc"]
+          args: ["exec sleep infinity"]
+          resources:
+            requests:
+              huawei.com/Ascend910: "2"
+            limits:
+              huawei.com/Ascend910: "2"
+      volumes:
+        - name: runtime-config
+          configMap:
+            name: layerwise-runtime-config
+            defaultMode: 365
