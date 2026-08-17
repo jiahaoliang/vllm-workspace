@@ -11,9 +11,10 @@
     "verified_at": "2026-08-14T14:55:10+08:00"
   },
   "persistent_archive": {
-    "status": "pending_user_selected_destination",
+    "status": "not_persisted_by_user_decision",
     "path": null,
-    "replay_status": "not_run",
-    "verified_at": null
+    "replay_status": "not_applicable",
+    "verified_at": null,
+    "decision_recorded_at": "2026-08-17T11:54:15+08:00"
   }
 }

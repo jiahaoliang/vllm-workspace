@@ -241,8 +241,9 @@ The raw staging root contains 107 files and 721,923,136 payload bytes. Its
 complete checksum manifest replayed successfully. The committed manifest,
 manifest digest and archive status are under
 [`artifact-manifests/layerwise-issue1-direct-20260814-rerun-archive-metadata/`](artifact-manifests/layerwise-issue1-direct-20260814-rerun-archive-metadata/README.md).
-The large payload is not in Git. Its persistent external copy is still pending
-selection of a workspace-external destination.
+The large payload is not in Git. On 2026-08-17, the user explicitly decided
+not to create a persistent external copy. It remains available only while the
+`/tmp` staging directory exists.
 
 Cleanup used:
 

@@ -15,15 +15,14 @@ The manifest itself has SHA256:
 85d60b3ffcde0593ca648f572d9833745aab523b3f07bf0abc62aef579603994
 ```
 
-The raw 689 MiB payload is intentionally not committed to Git. Repository
-policy requires it to be copied to a user-selected persistent path outside the
-workspace and replayed there. `archive.json` records that the external copy is
-pending because no persistent destination has been selected yet.
+The raw 689 MiB payload is intentionally not committed to Git. On 2026-08-17,
+the user explicitly decided not to create a persistent external copy.
+`archive.json` records that terminal retention decision. The payload remains
+available only while the `/tmp` staging directory exists and is not recoverable
+from Git after that directory is removed.
 
-After copying the payload, verify it from the destination root with:
+While the staging directory exists, verify it from that root with:
 
 ```bash
 sha256sum -c RAW-SHA256SUMS
 ```
-
-Then update `archive.json` with the persistent path, replay time and result.
