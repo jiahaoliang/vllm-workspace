@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "layerwise-issue1-threshold0-20260817T095300Z",
+  "run_status": "failed-incomplete",
+  "staging_path": "/tmp/layerwise-issue1-threshold0-20260817T095300Z",
+  "file_count": 15,
+  "payload_bytes": 5745189,
+  "raw_manifest": "RAW-SHA256SUMS",
+  "raw_manifest_sha256": "5d061c675173d1299fea818319ab483ce637ad67ab45d8d6a8acfd285e3b8edc",
+  "staging_replay": {
+    "status": "passed",
+    "verified_at": "2026-08-19T18:16:01+08:00"
+  },
+  "git_archived_products": [
+    "README.md",
+    "failure-excerpt.log",
+    "prefill-bulk-argv.txt",
+    "decode-bulk-argv.txt",
+    "vllm-head.txt",
+    "vllm-ascend-head.txt",
+    "overlay.sha256",
+    "pod-overlay-sha256.txt"
+  ],
+  "persistent_archive": {
+    "status": "not_persisted_by_user_decision",
+    "path": null,
+    "replay_status": "not_applicable",
+    "verified_at": null,
+    "decision_recorded_at": "2026-08-19T18:16:01+08:00"
+  }
+}

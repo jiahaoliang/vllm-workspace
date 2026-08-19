@@ -15,6 +15,7 @@
 | 运行 lease-expiry validation | [lease-expiry validation report 与完整 runbook](lease-expiry-validation-2026-07-27.md) |
 | 代码或依赖变化后执行完整 validation | [Reusable full validation guide](implementation-plans/full-validation-guide.md) |
 | 查看正式结果和校验 checksum | [evidence/README.md](evidence/README.md) |
+| 查看 Test 2 REUSE3 load-timing 诊断 | [2026-08-17 diagnosis](layerwise-reuse3-load-timing-diagnosis-2026-08-17.md) |
 | 构建或检查 feature image | [nerdctl-build.md](nerdctl-build.md) |
 | 阅读设计、RFC 和外部实现快照 | [references/sources.md](references/sources.md) |
 
@@ -164,6 +165,21 @@ smoke 与 stress S1-S3 全部通过，最终 Master 为 `0/0/0`。
   [lease-expiry-validation-2026-08-07.md](lease-expiry-validation-2026-08-07.md)
 - Driver: [deployment/lease-expiry-test.py](deployment/lease-expiry-test.py)
 - Evidence index: [evidence/README.md](evidence/README.md)
+
+### REUSE3 Performance 与诊断
+
+- 2026-08-14 direct four-point result:
+  [lightweight-reuse3-npu-performance-results-2026-08-14.md](lightweight-reuse3-npu-performance-results-2026-08-14.md)
+- 2026-08-17 accepted `max_num_seqs=40`,
+  `long_prefill_token_threshold=128` load-timing diagnosis:
+  [layerwise-reuse3-load-timing-diagnosis-2026-08-17.md](layerwise-reuse3-load-timing-diagnosis-2026-08-17.md)
+- 2026-08-17 symmetric threshold-0, `max_num_seqs=6` failed attempt:
+  [evidence/layerwise-issue1-threshold0-partial-20260817T095300Z/](evidence/layerwise-issue1-threshold0-partial-20260817T095300Z/README.md)
+- Large transient raw artifact inventories:
+  [artifact-manifests/](artifact-manifests/README.md)
+
+threshold-0 失败尝试没有产生正式 throughput 或 REUSE3 ratio；后续
+load-timing diagnosis 是不同 server contract 下的诊断结果，两者不得混用。
 
 ## 设计、Review 与实施记录
 

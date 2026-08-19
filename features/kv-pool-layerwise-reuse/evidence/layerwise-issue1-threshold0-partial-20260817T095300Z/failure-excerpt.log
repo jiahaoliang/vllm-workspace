@@ -1,0 +1,57 @@
+(EngineCore pid=280) ERROR 08-17 10:06:29 [dump_input.py:81] Dumping scheduler stats: SchedulerStats(num_running_reqs=6, num_waiting_reqs=3, num_skipped_waiting_reqs=0, step_counter=0, current_wave=0, kv_cache_usage=0.35692433204160723, prefix_cache_stats=PrefixCacheStats(reset=False, requests=0, queries=0, hits=0, preempted_requests=0, preempted_queries=0, preempted_hits=0), connector_prefix_cache_stats=PrefixCacheStats(reset=False, requests=0, queries=0, hits=0, preempted_requests=0, preempted_queries=0, preempted_hits=0), kv_cache_eviction_events=[], spec_decoding_stats=None, kv_connector_stats=None, waiting_lora_adapters={}, running_lora_adapters={}, cudagraph_stats=None, perf_stats=None)
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] EngineCore encountered a fatal error.
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] Traceback (most recent call last):
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 390, in get_response
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     status, result = mq.dequeue(timeout=dequeue_timeout)
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/distributed/device_communicators/shm_broadcast.py", line 779, in dequeue
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     with self.acquire_read(timeout, indefinite) as buf:
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/usr/local/python3.12.13/lib/python3.12/contextlib.py", line 137, in __enter__
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     return next(self.gen)
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]            ^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/distributed/device_communicators/shm_broadcast.py", line 698, in acquire_read
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     self._spin_condition.wait(timeout_ms=read_timeout.timeout_ms())
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/distributed/device_communicators/shm_broadcast.py", line 647, in timeout_ms
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     raise TimeoutError
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] TimeoutError
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] The above exception was the direct cause of the following exception:
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] Traceback (most recent call last):
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1224, in run_engine_core
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     engine_core.run_busy_loop()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1265, in run_busy_loop
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     self._process_engine_step()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 1304, in _process_engine_step
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     outputs, model_executed = self.step_fn()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]                               ^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/engine/core.py", line 595, in step_with_batch_queue
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     model_output = future.result()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]                    ^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 91, in result
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     return super().result()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]            ^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/usr/local/python3.12.13/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     return self.__get_result()
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]            ^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/usr/local/python3.12.13/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     raise self._exception
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 95, in _wait_for_response
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     response = self.aggregate(self.get_response())
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]                               ^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]   File "/vllm-workspace/vllm/vllm/v1/executor/multiproc_executor.py", line 392, in get_response
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233]     raise TimeoutError(f"RPC call to {method} timed out.") from e
+(EngineCore pid=280) ERROR 08-17 10:06:29 [core.py:1233] TimeoutError: RPC call to sample_tokens timed out.
+(EngineCore pid=280) INFO 08-17 10:06:29 [multiproc_executor.py:429] [shutdown] Executor: waiting for worker exit count=2
+(Worker_TP0 pid=346) INFO 08-17 10:06:29 [multiproc_executor.py:793] Parent process exited, terminating worker queues
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704] AsyncLLM output_handler failed.
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704] Traceback (most recent call last):
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704]   File "/vllm-workspace/vllm/vllm/v1/engine/async_llm.py", line 660, in output_handler
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704]     outputs = await engine_core.get_output_async()
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704]               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704]   File "/vllm-workspace/vllm/vllm/v1/engine/core_client.py", line 1061, in get_output_async
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704]     raise self._format_exception(outputs) from None
+(APIServer pid=194) ERROR 08-17 10:06:29 [async_llm.py:704] vllm.v1.engine.exceptions.EngineDeadError: EngineCore encountered an issue. See stack trace (above) for the root cause.
+(APIServer pid=194) INFO:     10.250.202.7:52174 - "POST /v1/completions HTTP/1.1" 500 Internal Server Error

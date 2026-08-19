@@ -1,0 +1,15 @@
+860f8d7e317495d65b5a5819613fca41e64c1903e86514bed885fd0b84db6248  ./failed-bulk/decode-full.log
+0d3d7d7aa53130613aefd85e6bf4206d87539d815b93affe9b50d2eaf0dee99e  ./failed-bulk/prefill-full.log
+fbf3632ef756f3ca74239f1e636934b6b3bb7027fd07c7fb30934593e4a2a997  ./identity/decode-bulk-argv.txt
+9795e4b1962e08cb71f797a573f497d8339198cf91a4bb268d894fe500076af4  ./identity/image-inspect.json
+5e3e2db410d609df2d84bb23810ff6e282a9dfa7a792526e0337bd56ebe65182  ./identity/npu-allocation.json
+2c0bfda0c8b5cb99cd099f4395770f72c1efd8a6e17eada7caf71e77ded19306  ./identity/overlay.sha256
+fb35dc4027a5ec14436d984a95e50beeffff2ed899caedc59e754bd1501d729d  ./identity/pod-overlay-sha256.txt
+cac81b2350030958138cc7865a1595358338e65705389bd0a42a17481de49b3a  ./identity/prefill-bulk-argv.txt
+73c145e61f856f5cf6378fd2abab2ef8c8e9777a20140d98985f724767de7c69  ./identity/root-git-status.txt
+1ba9b06850c0fafd8508c683ecf7f364b91326f142541febbace1f3049a05ef0  ./identity/vllm-ascend-git-status.txt
+8af821a2bb8cde430244980552ee9006fbe52cbab44ec6dc2a8767621fbdc804  ./identity/vllm-ascend-head.txt
+6eff3584dee7741b4ed26849676f8fd0a7ecbf26f4affedbe8f66beb0860ea7b  ./identity/vllm-git-status.txt
+053e49446f9953e134953b55ea666714efaa03ed1f5d17a989020c8925701f54  ./identity/vllm-head.txt
+986958f1026d3ebcc1dd9c3fdffa24d6050790df8423ddde617526dd372044b7  ./pre-run-state/configmap.yaml
+03fa06a8b8259e863a81758dc3873dd4acc736a342e22ca9c88306d4d282fcee  ./pre-run-state/deployments.yaml

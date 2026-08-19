@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "run_id": "layerwise-issue1-load-timing-20260817T181503+0800",
+  "staging_path": "/tmp/layerwise-issue1-load-timing-20260817T181503+0800",
+  "file_count": 72,
+  "payload_bytes": 757195693,
+  "raw_manifest": "RAW-SHA256SUMS",
+  "raw_manifest_sha256": "9c425b20e6616eb3032eabb1804c304bed2c4f89c9498c7e3dd0fcc21eca627a",
+  "staging_replay": {
+    "status": "passed",
+    "verified_at": "2026-08-19T18:16:01+08:00"
+  },
+  "git_archived_products": [
+    "layerwise-reuse3-load-timing-diagnosis-2026-08-17.md",
+    "RUN-IDENTITY.md",
+    "load-timing-summary.md",
+    "load-timing-summary.json",
+    "analyze_load_timing.py",
+    "vllm-ascend-load-timing-instrumentation.patch"
+  ],
+  "persistent_archive": {
+    "status": "not_persisted_by_user_decision",
+    "path": null,
+    "replay_status": "not_applicable",
+    "verified_at": null,
+    "decision_recorded_at": "2026-08-19T18:16:01+08:00"
+  }
+}

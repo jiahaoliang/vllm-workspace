@@ -1,8 +1,8 @@
 # KVPool Validation Evidence
 
-This directory contains immutable evidence captured by the ranged API,
-Multi-DP/TP stress, and lease-expiry validation runs. The files were imported
-byte-for-byte from their verified workspace-external archives.
+This directory contains immutable evidence captured by validation and
+diagnostic runs. Unless an entry explicitly states otherwise, the files were
+imported byte-for-byte from verified workspace-external archives.
 
 Use the current runbooks linked from the feature
 [README](../README.md). Commands and script copies inside archived run
@@ -14,6 +14,21 @@ The current high-hit formal import follows the three-point design in
 The older five-point imports remain accepted cold-cache characterizations, but
 they do not answer the external Prefix KV high-hit comparison. No diagnostic
 performance root is indexed as accepted performance evidence.
+
+## Threshold-0 Test 2 Partial Run 20260817T095300Z
+
+- Evidence:
+  [layerwise-issue1-threshold0-partial-20260817T095300Z](layerwise-issue1-threshold0-partial-20260817T095300Z/README.md)
+- Result: FAILED/INCOMPLETE. The BULK Prefill `EngineCore` ended with
+  `TimeoutError: RPC call to sample_tokens timed out`; no formal BULK result,
+  REUSE3 point, ratio, or cleanup proof was produced.
+- Contract: DP1/TP2, 32,000 input tokens, 28,800-token shared prefix, output
+  1, concurrency 40, `max_num_seqs=6`, `max_num_batched_tokens=32768`, and
+  omitted `--long-prefill-token-threshold`.
+- Retention: Git contains a focused failure excerpt, expanded argv, source and
+  overlay identity, and a complete checksum inventory. The 5,745,189-byte raw
+  staging tree remains transient in `/tmp` and is not committed. This failure
+  evidence is not accepted performance evidence.
 
 ## Layerwise High-Hit Performance Characterization 20260812T135700Z
 
