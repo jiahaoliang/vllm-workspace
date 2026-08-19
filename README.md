@@ -6,7 +6,9 @@
 
 - `AGENTS.md`: Codex 和其他 agent 的 workspace 运作规范。
 - `workspace.lock.json`: 三个源码仓库的 remote、branch 和精确 commit 锁定。
-- `docs/`: 通用 workspace 说明、Git 工作流和仓库地图。
+- `docs/`: 通用 workspace 说明、Git 工作流和仓库地图；其中
+  [vLLM-Ascend Profiling 使用指南](docs/vllm-ascend-profiling.md) 说明当前版本的
+  profiler 配置、采集、解析和 Timeline 阅读方法。
 - `features/`: 特性分支中的特性资料目录；`main` 只保留公共信息。
 - `repos/`: 本地源码仓库位置，包含 `vllm`、`vllm-ascend`、`Mooncake`。
 - `scripts/`: 初始化、恢复、锁定、同步和状态检查脚本。
