@@ -1,0 +1,90 @@
+{
+  "phase": "warmup",
+  "count": 8,
+  "expected_prompt_tokens": 32000,
+  "elapsed_ms": 559724.2771559395,
+  "valid": true,
+  "errors": [],
+  "results": [
+    {
+      "fixture_request_id": "p32000-s1023-r000000",
+      "response_id": "cmpl-1ef5954e-9e60-4670-bc8c-27fd7afd1d25",
+      "status_code": 200,
+      "elapsed_ms": 559565.933409147,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000001",
+      "response_id": "cmpl-0a3a1aa8-02d3-418a-905a-b022cbcea376",
+      "status_code": 200,
+      "elapsed_ms": 557933.182049077,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000002",
+      "response_id": "cmpl-32b95698-569a-44e9-8fc6-2af9f67cc214",
+      "status_code": 200,
+      "elapsed_ms": 550866.7385308072,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000003",
+      "response_id": "cmpl-98d736c1-c356-4b9b-bd8d-b2b1ad170252",
+      "status_code": 200,
+      "elapsed_ms": 558085.5381917208,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000004",
+      "response_id": "cmpl-a538d3b0-32bc-41bd-986a-b9e2a03e110f",
+      "status_code": 200,
+      "elapsed_ms": 558245.8642879501,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000005",
+      "response_id": "cmpl-1c5b231e-ae86-4704-9edc-59f15859d48c",
+      "status_code": 200,
+      "elapsed_ms": 557773.0374387465,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000006",
+      "response_id": "cmpl-00568d02-d0d2-4d19-95d5-20cf1d452bcd",
+      "status_code": 200,
+      "elapsed_ms": 559233.5243341513,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "p32000-s1023-r000007",
+      "response_id": "cmpl-7a10a1d7-7a35-4141-b253-ad9610cd494c",
+      "status_code": 200,
+      "elapsed_ms": 559074.0706208162,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    }
+  ]
+}

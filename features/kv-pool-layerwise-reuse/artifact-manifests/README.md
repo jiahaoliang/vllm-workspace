@@ -12,3 +12,6 @@ that case the manifest is only an inventory of the transient staging data.
 - `layerwise-issue1-load-timing-20260817T181503+0800/`: compact archived
   load-timing analysis products plus the transient 723 MiB raw evidence
   inventory.
+- `layerwise-issue1-profile-mstx-20260819T184617+0800/`: compact MSTX/Ascend
+  profiler diagnosis, stable-c20 correction, per-layer timelines, request
+  evidence, and the transient 17 GB raw trace inventory.

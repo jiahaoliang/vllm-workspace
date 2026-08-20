@@ -1,0 +1,123 @@
+{
+  "cleanup": {
+    "deployment_spec_equal_pre_run": {
+      "decode": true,
+      "prefill": true
+    },
+    "master_active_clients": 0,
+    "master_allocated_bytes": 0,
+    "master_key_count": 0,
+    "physical_npu_requests": [],
+    "reserve_pod_deleted": true,
+    "runtime_configmap_diff": false
+  },
+  "delay3_pilot": {
+    "reason": "profiled ramp-up at approximately 5, 8, and 20 calls per layer",
+    "status": "excluded_from_stable_comparison"
+  },
+  "formal_request_evidence_rows": 42,
+  "primary_points": {
+    "bulk-c1": {
+      "analyse_done_count": 2,
+      "completion_1_count": 1,
+      "elapsed_ms": 9395.881414879113,
+      "exact_initial_external_hit_28800_count": 1,
+      "http_200_count": 1,
+      "prompt_32000_count": 1,
+      "request_count": 1,
+      "trace_rank_count": 2,
+      "wave_valid": true
+    },
+    "bulk-c20-stable": {
+      "analyse_done_count": 2,
+      "completion_1_count": 20,
+      "elapsed_ms": 91662.73693693802,
+      "exact_initial_external_hit_28800_count": 20,
+      "http_200_count": 20,
+      "prompt_32000_count": 20,
+      "request_count": 20,
+      "trace_rank_count": 2,
+      "wave_valid": true
+    },
+    "reuse3-c1": {
+      "analyse_done_count": 2,
+      "completion_1_count": 1,
+      "elapsed_ms": 24414.41746102646,
+      "exact_initial_external_hit_28800_count": 1,
+      "http_200_count": 1,
+      "prompt_32000_count": 1,
+      "request_count": 1,
+      "trace_rank_count": 2,
+      "wave_valid": true
+    },
+    "reuse3-c20-stable": {
+      "analyse_done_count": 2,
+      "completion_1_count": 20,
+      "elapsed_ms": 242833.73925602064,
+      "exact_initial_external_hit_28800_count": 20,
+      "http_200_count": 20,
+      "prompt_32000_count": 20,
+      "request_count": 20,
+      "trace_rank_count": 2,
+      "wave_valid": true
+    }
+  },
+  "run_id": "layerwise-issue1-profile-mstx-20260819T184617+0800",
+  "schema_version": 1,
+  "stable_c20_comparison": {
+    "bulk_compute_us_rank_mean": 5818847.794499992,
+    "bulk_free_pct_rank_mean": 12.568057558980637,
+    "bulk_free_us_rank_mean": 1272347.1840000288,
+    "bulk_wall_ms": 91662.73693693802,
+    "reuse3_compute_us_rank_mean": 5821401.010000019,
+    "reuse3_free_pct_rank_mean": 56.415996268652364,
+    "reuse3_free_us_rank_mean": 16171550.343499124,
+    "reuse3_over_bulk": 2.6492089083384562,
+    "reuse3_wall_ms": 242833.73925602064
+  },
+  "stable_c20_gate": {
+    "profile_delay_iterations": 6,
+    "ranks": {
+      "0": {
+        "485": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        },
+        "486": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        },
+        "487": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        }
+      },
+      "1": {
+        "485": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        },
+        "486": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        },
+        "487": {
+          "layer_task_count": 25,
+          "request_call_count_max": 20,
+          "request_call_count_min": 20
+        }
+      }
+    },
+    "steps": [
+      485,
+      486,
+      487
+    ]
+  },
+  "status": "passed"
+}

@@ -1,0 +1,20 @@
+{
+  "phase": "wave",
+  "count": 1,
+  "expected_prompt_tokens": 32000,
+  "elapsed_ms": 24414.41746102646,
+  "valid": true,
+  "errors": [],
+  "results": [
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000000",
+      "response_id": "cmpl-80281cc7-9350-4041-975a-4656ee214cb7",
+      "status_code": 200,
+      "elapsed_ms": 24254.33758692816,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    }
+  ]
+}

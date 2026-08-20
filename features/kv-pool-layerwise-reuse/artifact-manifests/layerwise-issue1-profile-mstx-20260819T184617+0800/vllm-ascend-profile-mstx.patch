@@ -1,0 +1,839 @@
+diff --git a/tests/ut/distributed/ascend_store/test_range_debug.py b/tests/ut/distributed/ascend_store/test_range_debug.py
+index 8b66a5395..c16cce89c 100644
+--- a/tests/ut/distributed/ascend_store/test_range_debug.py
++++ b/tests/ut/distributed/ascend_store/test_range_debug.py
+@@ -17,8 +17,9 @@
+
+ import json
+ import os
++import sys
+ import unittest
+-from unittest.mock import patch
++from unittest.mock import MagicMock, patch
+
+ import tests.ut.distributed.ascend_store._mock_deps  # noqa: F401, E402
+ from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store import range_debug
+@@ -105,6 +106,99 @@ class TestRangeDebug(unittest.TestCase):
+
+         self.assertEqual(log_info.call_count, 3)
+
++    def test_mstx_range_contains_identity_and_closes_on_failure(self):
++        mstx = MagicMock()
++        mstx.range_start.return_value = 17
++        torch_npu = MagicMock()
++        torch_npu.npu.mstx = mstx
++
++        with (
++            patch.dict(
++                os.environ,
++                {
++                    "VLLM_ASCEND_KVPOOL_MSTX_DEBUG": "1",
++                    "VLLM_ASCEND_KVPOOL_MSTX_REQUEST_SCOPES": "1",
++                },
++            ),
++            patch.dict(sys.modules, {"torch_npu": torch_npu}),
++            self.assertRaisesRegex(RuntimeError, "load failed"),
++        ):
++            with range_debug.mstx_load_range(
++                "batch_copy_get",
++                step_id=7,
++                layer_id=3,
++                tp_rank=1,
++                request_id="request-9",
++                request_scoped=True,
++            ):
++                raise RuntimeError("load failed")
++
++        mstx.range_start.assert_called_once_with(
++            "domain=kvpool_load stage=batch_copy_get step_id=7 layer_id=3 "
++            "tp_rank=1 request_id=request-9",
++            domain="kvpool_load",
++        )
++        mstx.range_end.assert_called_once_with(17, domain="kvpool_load")
++
++    def test_request_scopes_and_global_switch_default_to_disabled(self):
++        mstx = MagicMock()
++        torch_npu = MagicMock()
++        torch_npu.npu.mstx = mstx
++
++        with (
++            patch.dict(os.environ, {}, clear=True),
++            patch.dict(sys.modules, {"torch_npu": torch_npu}),
++        ):
++            with range_debug.mstx_load_range(
++                "model_wait", step_id=1, layer_id=2, tp_rank=0
++            ):
++                pass
++
++        with (
++            patch.dict(
++                os.environ,
++                {"VLLM_ASCEND_KVPOOL_MSTX_DEBUG": "1"},
++                clear=True,
++            ),
++            patch.dict(sys.modules, {"torch_npu": torch_npu}),
++        ):
++            with range_debug.mstx_load_range(
++                "batch_copy_get",
++                step_id=1,
++                layer_id=2,
++                tp_rank=0,
++                request_id="request-1",
++                request_scoped=True,
++            ):
++                pass
++
++        mstx.range_start.assert_not_called()
++        mstx.range_end.assert_not_called()
++
++    def test_mstx_mark_is_best_effort(self):
++        mstx = MagicMock()
++        mstx.mark.side_effect = RuntimeError("mstx unavailable")
++        torch_npu = MagicMock()
++        torch_npu.npu.mstx = mstx
++
++        with (
++            patch.dict(os.environ, {"VLLM_ASCEND_KVPOOL_MSTX_DEBUG": "1"}),
++            patch.dict(sys.modules, {"torch_npu": torch_npu}),
++        ):
++            range_debug.emit_mstx_load_mark(
++                "dequeue",
++                step_id=5,
++                layer_id=4,
++                tp_rank=1,
++                queue_wait_us=123,
++            )
++
++        mstx.mark.assert_called_once_with(
++            "domain=kvpool_load stage=dequeue step_id=5 layer_id=4 "
++            "tp_rank=1 queue_wait_us=123",
++            domain="kvpool_load",
++        )
++
+
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/tests/ut/profiler/test_torch_npu_profiler.py b/tests/ut/profiler/test_torch_npu_profiler.py
+index fc9d70cbf..f54d9f396 100644
+--- a/tests/ut/profiler/test_torch_npu_profiler.py
++++ b/tests/ut/profiler/test_torch_npu_profiler.py
+@@ -1,3 +1,4 @@
++import os
+ from unittest.mock import MagicMock, patch
+
+ from vllm.config import ProfilerConfig
+@@ -117,6 +118,35 @@ class TestTorchNPUProfilerWrapper(TestBase):
+         self.assertEqual(profile_kwargs["on_trace_ready"], mock_trace_handler_instance)
+         self.assertEqual(result, mock_profiler_instance)
+
++    @patch("vllm_ascend.profiler.torch_npu_profiler.envs_ascend")
++    @patch("vllm_ascend.profiler.torch_npu_profiler.get_ascend_config")
++    @patch("torch_npu.profiler._ExperimentalConfig")
++    @patch("torch_npu.profiler.profile")
++    def test_mstx_profiler_export_is_opt_in(
++        self,
++        mock_profile,
++        mock_experimental_config,
++        mock_get_ascend_config,
++        mock_envs_ascend,
++    ):
++        from vllm_ascend.profiler.torch_npu_profiler import TorchNPUProfilerWrapper
++
++        mock_envs_ascend.MSMONITOR_USE_DAEMON = 0
++        mock_get_ascend_config.side_effect = RuntimeError("not initialized")
++        profiler_config = ProfilerConfig(
++            profiler="torch",
++            torch_profiler_dir="/path/to/traces",
++        )
++
++        with patch.dict(
++            os.environ,
++            {"VLLM_ASCEND_KVPOOL_MSTX_DEBUG": "1"},
++        ):
++            TorchNPUProfilerWrapper._create_profiler(profiler_config, "trace")
++
++        self.assertTrue(mock_experimental_config.call_args.kwargs["msprof_tx"])
++        mock_profile.assert_called_once()
++
+     def test_create_profiler_disabled(self):
+         from vllm_ascend.profiler.torch_npu_profiler import TorchNPUProfilerWrapper
+
+diff --git a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+index c21604e2f..e6435338b 100644
+--- a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
++++ b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/kv_transfer.py
+@@ -47,8 +47,13 @@ from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.mooncake_session_t
+     MooncakeSessionTracker,
+ )
+ from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.range_debug import (
++    emit_mstx_load_mark,
+     emit_commit_event,
++    emit_load_timing_event,
+     emit_range_event,
++    end_mstx_load_range,
++    mstx_load_range,
++    start_mstx_load_range,
+ )
+
+ _H2D_STAGGER_SPIN_US = 50
+@@ -2030,6 +2035,8 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+     def add_request(  # type: ignore[override]
+         self, req_meta: LayerLoadTask | LayerwisePreparation
+     ) -> torch.Tensor:
++        if isinstance(req_meta, LayerLoadTask):
++            setattr(req_meta, "debug_enqueued_at_ns", time.perf_counter_ns())
+         self.request_queue.put(req_meta)
+
+     def _get_h2d_stagger_delay_us(self, layer_id: int) -> int:
+@@ -2077,8 +2084,13 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+         self,
+         req_meta: LayerRangeReqMeta,
+         shared: SharedBlockData,
+-    ) -> None:
++        step_id: int,
++    ) -> dict[str, int]:
+         layer_id = req_meta.layer_id
++        call_durations_us: list[int] = []
++        requested_bytes = 0
++        request_call_count = 0
++        key_count = 0
+         if layer_id == 0:
+             self._inactive_load_rows.clear()
+         row_identities = [(row.req_id, row.block_id, row.key) for row in req_meta.rows]
+@@ -2099,17 +2111,33 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+             for req_id, request_indices in indices_by_request.items():
+                 request_rows = [req_meta.rows[index] for index in request_indices]
+                 request_keys = [row.key for row in request_rows]
++                request_call_count += 1
++                key_count += len(request_keys)
++                requested_bytes += sum(
++                    int(size)
++                    for row in request_rows
++                    for size in row.sizes
++                )
++                call_started_ns = time.perf_counter_ns()
+                 try:
+-                    request_results = require_aligned_batch_results(
++                    with mstx_load_range(
+                         "batch_copy_get",
+-                        request_keys,
+-                        self.m_store.batch_copy_get(
++                        step_id=step_id,
++                        layer_id=layer_id,
++                        tp_rank=self.tp_rank,
++                        request_id=req_id,
++                        request_scoped=True,
++                    ):
++                        request_results = require_aligned_batch_results(
++                            "batch_copy_get",
+                             request_keys,
+-                            [list(row.buffers) for row in request_rows],
+-                            [list(row.sizes) for row in request_rows],
+-                            [list(row.offsets) for row in request_rows],
+-                        ),
+-                    )
++                            self.m_store.batch_copy_get(
++                                request_keys,
++                                [list(row.buffers) for row in request_rows],
++                                [list(row.sizes) for row in request_rows],
++                                [list(row.offsets) for row in request_rows],
++                            ),
++                        )
+                 except Exception as exc:
+                     logger.error(
+                         "Layerwise load request range failed layer=%d request=%s error=%s",
+@@ -2120,6 +2148,10 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+                     self._mark_invalid_range_indices(req_meta, request_indices)
+                     self._inactive_load_rows.update(row_identities[index] for index in request_indices)
+                     continue
++                finally:
++                    call_durations_us.append(
++                        (time.perf_counter_ns() - call_started_ns) // 1_000
++                    )
+                 results_by_index.update(zip(request_indices, request_results, strict=True))
+
+             returned_indices = [index for index in active_indices if index in results_by_index]
+@@ -2143,6 +2175,23 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+                 if is_last_chunk:
+                     self.set_finished_request(req_id)
+             self._inactive_load_rows.clear()
++        sorted_durations = sorted(call_durations_us)
++
++        def percentile(percent: int) -> int:
++            if not sorted_durations:
++                return 0
++            index = max(0, (len(sorted_durations) * percent - 1) // 100)
++            return sorted_durations[index]
++
++        return {
++            "requested_bytes": requested_bytes,
++            "request_call_count": request_call_count,
++            "key_count": key_count,
++            "batch_copy_get_us": sum(call_durations_us),
++            "call_p50_us": percentile(50),
++            "call_p95_us": percentile(95),
++            "call_max_us": sorted_durations[-1] if sorted_durations else 0,
++        }
+
+     def _finish_layer_load_task(
+         self,
+@@ -2168,6 +2217,28 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+                 self.request_queue.task_done()
+             return
+         layer_id = data.layer_id
++        handler_started_ns = time.perf_counter_ns()
++        step_id = int(getattr(data, "debug_step_id", -1))
++        enqueued_at_ns = int(getattr(data, "debug_enqueued_at_ns", handler_started_ns))
++        queue_wait_us = max(0, (handler_started_ns - enqueued_at_ns) // 1_000)
++        layer_task_range_id = start_mstx_load_range(
++            "layer_task_total",
++            step_id=step_id,
++            layer_id=layer_id,
++            tp_rank=self.tp_rank,
++        )
++        emit_mstx_load_mark(
++            "dequeue",
++            step_id=step_id,
++            layer_id=layer_id,
++            tp_rank=self.tp_rank,
++            queue_wait_us=queue_wait_us,
++        )
++        preparation_us = 0
++        address_build_us = 0
++        save_gate_us = 0
++        attention_gate_us = 0
++        transfer_stats: dict[str, int] = {}
+         succeeded = False
+         transfer_tasks = data.transfer_tasks
+         use_key_major_ranges = bool(transfer_tasks) and any(task.use_key_major_ranges for task in transfer_tasks)
+@@ -2176,14 +2247,28 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+             attention_start_gate = data.attention_start_gate
+
+             if data.preparation is not None:
+-                data.preparation.ensure_ready()
++                started_ns = time.perf_counter_ns()
++                with mstx_load_range(
++                    "preparation",
++                    step_id=step_id,
++                    layer_id=layer_id,
++                    tp_rank=self.tp_rank,
++                ):
++                    data.preparation.ensure_ready()
++                preparation_us = (time.perf_counter_ns() - started_ns) // 1_000
+
+             if len(transfer_tasks) == 0:
+                 if wait_for_save is not None:
+-                    while not self.layer_save_finished_events[wait_for_save].wait(timeout=10):
+-                        logger.info("Layerwise %d save wait timed out, keep waiting before load", wait_for_save)
+-                    logger.debug("Layer save event cleared: layer %d", wait_for_save)
+-                    self.layer_save_finished_events[wait_for_save].clear()
++                    with mstx_load_range(
++                        "save_gate",
++                        step_id=step_id,
++                        layer_id=layer_id,
++                        tp_rank=self.tp_rank,
++                    ):
++                        while not self.layer_save_finished_events[wait_for_save].wait(timeout=10):
++                            logger.info("Layerwise %d save wait timed out, keep waiting before load", wait_for_save)
++                        logger.debug("Layer save event cleared: layer %d", wait_for_save)
++                        self.layer_save_finished_events[wait_for_save].clear()
+                 succeeded = True
+                 return
+
+@@ -2191,56 +2276,86 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+             range_shared: SharedBlockData | None = None
+             task_arrays: list[tuple[LayerTransferTask, LayerTransferArrays]] = []
+             if use_key_major_ranges:
+-                if len(transfer_tasks) != 1 or not all(task.use_key_major_ranges for task in transfer_tasks):
+-                    raise ValueError(f"Expected one Mooncake range task, got {len(transfer_tasks)}")
+-                task = transfer_tasks[0]
+-                range_shared = task.shared_block_data
+-                if range_shared is None:
+-                    raise RuntimeError(f"Mooncake range metadata was not prepared for layer {layer_id}")
+-                if self.group_builders is None:
+-                    raise RuntimeError("Mooncake layer batch builders are not configured")
+-                builder = self.group_builders[task.group_id]
+-                req_meta = builder.build_addrs(range_shared, task.layer_id)
+-                if not isinstance(req_meta, LayerRangeReqMeta):
+-                    raise TypeError(f"Expected Mooncake range metadata, got {type(req_meta).__name__}")
+-                range_meta = req_meta
++                started_ns = time.perf_counter_ns()
++                with mstx_load_range(
++                    "address_build",
++                    step_id=step_id,
++                    layer_id=layer_id,
++                    tp_rank=self.tp_rank,
++                ):
++                    if len(transfer_tasks) != 1 or not all(task.use_key_major_ranges for task in transfer_tasks):
++                        raise ValueError(f"Expected one Mooncake range task, got {len(transfer_tasks)}")
++                    task = transfer_tasks[0]
++                    range_shared = task.shared_block_data
++                    if range_shared is None:
++                        raise RuntimeError(f"Mooncake range metadata was not prepared for layer {layer_id}")
++                    if self.group_builders is None:
++                        raise RuntimeError("Mooncake layer batch builders are not configured")
++                    builder = self.group_builders[task.group_id]
++                    req_meta = builder.build_addrs(range_shared, task.layer_id)
++                    if not isinstance(req_meta, LayerRangeReqMeta):
++                        raise TypeError(f"Expected Mooncake range metadata, got {type(req_meta).__name__}")
++                    range_meta = req_meta
++                address_build_us = (time.perf_counter_ns() - started_ns) // 1_000
+             else:
+                 # Expand each group's block IDs and base GVAs into this layer's
+                 # copy arrays before waiting on the preceding save layer.
+-                for task in transfer_tasks:
+-                    transfer_data = task.transfer_data
+-                    builder = (
+-                        self.group_array_builders[task.group_id]
+-                        if self.group_array_builders
+-                        else self.transfer_array_builder
+-                    )
+-                    if transfer_data is None or task.completion is None:
+-                        raise RuntimeError(
+-                            f"Layerwise load metadata was not prepared for layer {layer_id}, group {task.group_id}"
++                with mstx_load_range(
++                    "address_build",
++                    step_id=step_id,
++                    layer_id=layer_id,
++                    tp_rank=self.tp_rank,
++                ):
++                    for task in transfer_tasks:
++                        transfer_data = task.transfer_data
++                        builder = (
++                            self.group_array_builders[task.group_id]
++                            if self.group_array_builders
++                            else self.transfer_array_builder
+                         )
+-                    arrays = builder.build_addrs(
+-                        transfer_data,
+-                        task.layer_idx_in_group,
+-                    )
+-                    task_arrays.append((task, arrays))
++                        if transfer_data is None or task.completion is None:
++                            raise RuntimeError(
++                                f"Layerwise load metadata was not prepared for layer {layer_id}, group {task.group_id}"
++                            )
++                        arrays = builder.build_addrs(
++                            transfer_data,
++                            task.layer_idx_in_group,
++                        )
++                        task_arrays.append((task, arrays))
+
+                 if not task_arrays:
+                     succeeded = True
+                     return
+
+             if wait_for_save is not None:
+-                while not self.layer_save_finished_events[wait_for_save].wait(timeout=10):
+-                    logger.info("Layerwise %d save wait timed out, keep waiting before load", wait_for_save)
+-                logger.debug("Layer save event cleared: layer %d", wait_for_save)
+-                self.layer_save_finished_events[wait_for_save].clear()
++                started_ns = time.perf_counter_ns()
++                with mstx_load_range(
++                    "save_gate",
++                    step_id=step_id,
++                    layer_id=layer_id,
++                    tp_rank=self.tp_rank,
++                ):
++                    while not self.layer_save_finished_events[wait_for_save].wait(timeout=10):
++                        logger.info("Layerwise %d save wait timed out, keep waiting before load", wait_for_save)
++                    logger.debug("Layer save event cleared: layer %d", wait_for_save)
++                    self.layer_save_finished_events[wait_for_save].clear()
++                save_gate_us = (time.perf_counter_ns() - started_ns) // 1_000
+
+             if attention_start_gate is not None:
+-                while not attention_start_gate.wait(timeout=10):
+-                    logger.info("Layerwise %d load waits for attention compute start", layer_id)
++                started_ns = time.perf_counter_ns()
++                with mstx_load_range(
++                    "attention_gate",
++                    step_id=step_id,
++                    layer_id=layer_id,
++                    tp_rank=self.tp_rank,
++                ):
++                    while not attention_start_gate.wait(timeout=10):
++                        logger.info("Layerwise %d load waits for attention compute start", layer_id)
++                attention_gate_us = (time.perf_counter_ns() - started_ns) // 1_000
+
+             if range_meta is not None:
+                 assert range_shared is not None
+-                self._handle_range_request(range_meta, range_shared)
++                transfer_stats = self._handle_range_request(range_meta, range_shared, step_id)
+                 succeeded = True
+                 return
+
+@@ -2295,6 +2410,24 @@ class KVCacheStoreLayerRecvingThread(KVTransferThread):
+             else:
+                 raise
+         finally:
++            emit_load_timing_event(
++                "layer_task",
++                step_id=step_id,
++                layer_id=layer_id,
++                tp_rank=self.tp_rank,
++                duration_us=(time.perf_counter_ns() - handler_started_ns) // 1_000,
++                details={
++                    "queue_wait_us": queue_wait_us,
++                    "preparation_us": preparation_us,
++                    "address_build_us": address_build_us,
++                    "save_gate_us": save_gate_us,
++                    "attention_gate_us": attention_gate_us,
++                    "transfer_task_count": len(transfer_tasks),
++                    "wait_for_save_layer": data.wait_for_save_layer,
++                    **transfer_stats,
++                },
++            )
++            end_mstx_load_range(layer_task_range_id)
+             self._finish_layer_load_task(data, layer_id, succeeded)
+
+
+diff --git a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+index 15ed1b7c8..9ec60a2c4 100644
+--- a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
++++ b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py
+@@ -3,6 +3,7 @@ from __future__ import annotations
+ import importlib
+ import math
+ import threading
++import time
+ from collections.abc import Callable
+
+ import torch
+@@ -77,6 +78,10 @@ from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.layerwise_transfer
+ from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.mooncake_session_tracker import (
+     MooncakeSessionTracker,
+ )
++from vllm_ascend.distributed.kv_transfer.kv_pool.ascend_store.range_debug import (
++    emit_load_timing_event,
++    mstx_load_range,
++)
+ from vllm_ascend.distributed.utils import (
+     get_decode_context_model_parallel_rank,
+     get_decode_context_model_parallel_world_size,
+@@ -362,6 +367,7 @@ class KVPoolWorker:
+         self._mooncake_session_tracker = MooncakeSessionTracker()
+         self._current_mooncake_request_ids: set[str] = set()
+         self._current_mooncake_last_chunk_req_ids: set[str] = set()
++        self._debug_load_step_id = 0
+
+     def _init_layerwise_config(self) -> None:
+         # Build mapping: physical_layer -> [(group_id, layer_idx_in_group), ...]
+@@ -943,6 +949,7 @@ class KVPoolWorker:
+         logger.debug("KV pool worker start_load_kv requests=%d", len(metadata.requests))
+         if len(metadata.requests) == 0:
+             return
++        self._debug_load_step_id = getattr(self, "_debug_load_step_id", 0) + 1
+         if self.use_layerwise:
+             self.process_layer_data(metadata.requests)
+             return
+@@ -1029,7 +1036,26 @@ class KVPoolWorker:
+                 len(key_list_c),
+                 key_list_c[:3],
+             )
++            get_started_ns = time.perf_counter_ns()
+             ret = self.m_store.get(key_list_c, addr_list_c, size_list_c)
++            get_duration_us = (time.perf_counter_ns() - get_started_ns) // 1_000
++            emit_load_timing_event(
++                "bulk_get",
++                step_id=getattr(self, "_debug_load_step_id", 0),
++                layer_id=-1,
++                tp_rank=self.tp_rank,
++                duration_us=get_duration_us,
++                details={
++                    "request_id": request.req_id,
++                    "key_count": len(key_list_c),
++                    "requested_bytes": sum(
++                        int(size)
++                        for key_sizes in size_list_c
++                        for size in key_sizes
++                    ),
++                    "token_len": int(token_len),
++                },
++            )
+             if ret is not None and any(r != 0 for r in ret):
+                 missing_block_ids = record_failed_blocks(
+                     block_id_list_c,
+@@ -1677,15 +1703,15 @@ class KVPoolWorker:
+                     # transfer. Binding layer_id's own gate would serialize the copy
+                     # against layer_id's attention and leave no overlap.
+                     attention_start_gate = get_attention_compute_start_gate(reuse_mate + 1)
+-            recv_thread.add_request(
+-                LayerLoadTask(  # type: ignore[arg-type]
+-                    wait_for_save_layer=reuse_mate,
+-                    transfer_tasks=self.layer_load_tasks[layer_id],
+-                    layer_id=layer_id,
+-                    attention_start_gate=attention_start_gate,
+-                    preparation=self._layer_load_preparation,
+-                )
++            load_task = LayerLoadTask(  # type: ignore[arg-type]
++                wait_for_save_layer=reuse_mate,
++                transfer_tasks=self.layer_load_tasks[layer_id],
++                layer_id=layer_id,
++                attention_start_gate=attention_start_gate,
++                preparation=self._layer_load_preparation,
+             )
++            setattr(load_task, "debug_step_id", getattr(self, "_debug_load_step_id", 0))
++            recv_thread.add_request(load_task)
+             return True
+
+         submit_count = self.num_prefetch_layers if self.current_layer == 0 else 1
+@@ -1699,6 +1725,17 @@ class KVPoolWorker:
+     def wait_for_layer_load(self) -> None:
+         if self.current_layer >= self.num_layers:
+             return
++        with mstx_load_range(
++            "model_wait",
++            step_id=getattr(self, "_debug_load_step_id", 0),
++            layer_id=self.current_layer,
++            tp_rank=self.tp_rank,
++        ):
++            self._wait_for_layer_load_impl()
++
++    def _wait_for_layer_load_impl(self) -> None:
++        wait_started_ns = time.perf_counter_ns()
++        layer_id = self.current_layer
+         assert self.layer_load_finished_events is not None
+         assert self.kv_recv_thread is not None
+         self.kv_recv_thread.raise_if_failed()
+@@ -1717,6 +1754,18 @@ class KVPoolWorker:
+                 # Pure consumers have no save hook to advance the shared
+                 # attention-layer cursor after this load step.
+                 self.current_layer += 1
++            emit_load_timing_event(
++                "model_wait",
++                step_id=getattr(self, "_debug_load_step_id", 0),
++                layer_id=layer_id,
++                tp_rank=self.tp_rank,
++                duration_us=(time.perf_counter_ns() - wait_started_ns) // 1_000,
++                details={
++                    "should_wait": False,
++                    "transfer_task_count": 0,
++                    "reuse_source_layer": self.prefetch_layer_map.get(layer_id),
++                },
++            )
+             return
+         if self.backend_name == "mooncake":
+             is_finish = self.layer_load_finished_events[self.current_layer].wait(timeout=10)
+@@ -1744,6 +1793,18 @@ class KVPoolWorker:
+             self._finish_current_mooncake_load_sessions()
+         if not is_kv_save_role(self.kv_role, self.consumer_is_to_put):
+             self.current_layer += 1
++        emit_load_timing_event(
++            "model_wait",
++            step_id=getattr(self, "_debug_load_step_id", 0),
++            layer_id=layer_id,
++            tp_rank=self.tp_rank,
++            duration_us=(time.perf_counter_ns() - wait_started_ns) // 1_000,
++            details={
++                "should_wait": True,
++                "transfer_task_count": len(self.layer_load_tasks[layer_id]),
++                "reuse_source_layer": self.prefetch_layer_map.get(layer_id),
++            },
++        )
+
+     def get_block_ids_with_load_errors(self) -> set[int]:
+         with self._invalid_block_ids_lock:
+diff --git a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
+index e66126a21..515f30c87 100644
+--- a/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
++++ b/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/range_debug.py
+@@ -1,13 +1,18 @@
+ from __future__ import annotations
+
+ import json
++import os
+ from collections.abc import Callable
++from contextlib import contextmanager
++from typing import Iterator
+
+ from vllm.logger import logger
+
+ from vllm_ascend import envs
+
+ RANGE_DEBUG_PREFIX = "[KVPOOL_RANGE_DEBUG]"
++LOAD_TIMING_DEBUG_PREFIX = "[DEBUG-REUSE3-LOAD]"
++MSTX_DOMAIN = "kvpool_load"
+
+
+ def _emit(payload_factory: Callable[[], dict[str, object]]) -> None:
+@@ -72,3 +77,159 @@ def emit_whole_key_event(direction: str, key_count: int) -> None:
+             "key_count": int(key_count),
+         }
+     )
++
++
++def emit_load_timing_event(
++    stage: str,
++    *,
++    step_id: int,
++    layer_id: int,
++    tp_rank: int,
++    duration_us: int,
++    details: dict[str, object] | None = None,
++) -> None:
++    """Emit opt-in timing for one layer-load boundary."""
++    try:
++        if os.getenv("VLLM_ASCEND_KVPOOL_LOAD_TIMING_DEBUG", "0") != "1":
++            return
++        payload: dict[str, object] = {
++            "event": "load_timing",
++            "stage": stage,
++            "step_id": int(step_id),
++            "layer_id": int(layer_id),
++            "tp_rank": int(tp_rank),
++            "duration_us": int(duration_us),
++        }
++        if details:
++            payload.update(details)
++        logger.info(
++            "%s %s",
++            LOAD_TIMING_DEBUG_PREFIX,
++            json.dumps(payload, separators=(",", ":")),
++        )
++    except Exception:
++        pass
++
++
++def _mstx_enabled(*, request_scoped: bool = False) -> bool:
++    if os.getenv("VLLM_ASCEND_KVPOOL_MSTX_DEBUG", "0") != "1":
++        return False
++    return not request_scoped or os.getenv(
++        "VLLM_ASCEND_KVPOOL_MSTX_REQUEST_SCOPES", "0"
++    ) == "1"
++
++
++def _mstx_message(
++    stage: str,
++    *,
++    step_id: int,
++    layer_id: int,
++    tp_rank: int,
++    request_id: str | None = None,
++    queue_wait_us: int | None = None,
++) -> str:
++    fields = [
++        f"domain={MSTX_DOMAIN}",
++        f"stage={stage}",
++        f"step_id={int(step_id)}",
++        f"layer_id={int(layer_id)}",
++        f"tp_rank={int(tp_rank)}",
++    ]
++    if request_id is not None:
++        fields.append(f"request_id={request_id}")
++    if queue_wait_us is not None:
++        fields.append(f"queue_wait_us={int(queue_wait_us)}")
++    return " ".join(fields)
++
++
++def start_mstx_load_range(
++    stage: str,
++    *,
++    step_id: int,
++    layer_id: int,
++    tp_rank: int,
++    request_id: str | None = None,
++    request_scoped: bool = False,
++) -> int | None:
++    """Start an opt-in Host range without affecting the load path on failure."""
++    try:
++        if not _mstx_enabled(request_scoped=request_scoped):
++            return None
++        import torch_npu
++
++        return torch_npu.npu.mstx.range_start(
++            _mstx_message(
++                stage,
++                step_id=step_id,
++                layer_id=layer_id,
++                tp_rank=tp_rank,
++                request_id=request_id,
++            ),
++            domain=MSTX_DOMAIN,
++        )
++    except Exception:
++        return None
++
++
++def end_mstx_load_range(range_id: int | None) -> None:
++    """End a Host range; diagnostic failures must never affect inference."""
++    try:
++        if range_id is None:
++            return
++        import torch_npu
++
++        torch_npu.npu.mstx.range_end(range_id, domain=MSTX_DOMAIN)
++    except Exception:
++        pass
++
++
++@contextmanager
++def mstx_load_range(
++    stage: str,
++    *,
++    step_id: int,
++    layer_id: int,
++    tp_rank: int,
++    request_id: str | None = None,
++    request_scoped: bool = False,
++) -> Iterator[None]:
++    range_id = start_mstx_load_range(
++        stage,
++        step_id=step_id,
++        layer_id=layer_id,
++        tp_rank=tp_rank,
++        request_id=request_id,
++        request_scoped=request_scoped,
++    )
++    try:
++        yield
++    finally:
++        end_mstx_load_range(range_id)
++
++
++def emit_mstx_load_mark(
++    stage: str,
++    *,
++    step_id: int,
++    layer_id: int,
++    tp_rank: int,
++    queue_wait_us: int | None = None,
++) -> None:
++    """Emit an opt-in Host mark without affecting the load path on failure."""
++    try:
++        if not _mstx_enabled():
++            return
++        import torch_npu
++
++        torch_npu.npu.mstx.mark(
++            _mstx_message(
++                stage,
++                step_id=step_id,
++                layer_id=layer_id,
++                tp_rank=tp_rank,
++                queue_wait_us=queue_wait_us,
++            ),
++            domain=MSTX_DOMAIN,
++        )
++    except Exception:
++        pass
+diff --git a/vllm_ascend/profiler/torch_npu_profiler.py b/vllm_ascend/profiler/torch_npu_profiler.py
+index e84d817c4..b715be9bd 100644
+--- a/vllm_ascend/profiler/torch_npu_profiler.py
++++ b/vllm_ascend/profiler/torch_npu_profiler.py
+@@ -16,6 +16,7 @@
+ # This file is a part of the vllm-ascend project.
+ #
+
++import os
+ from contextlib import suppress
+ from typing import Any
+
+@@ -49,7 +50,7 @@ class TorchNPUProfilerWrapper(WorkerProfiler):
+         experimental_config = torch_npu.profiler._ExperimentalConfig(
+             export_type=torch_npu.profiler.ExportType.Text,
+             profiler_level=torch_npu.profiler.ProfilerLevel.Level1,
+-            msprof_tx=False,
++            msprof_tx=os.getenv("VLLM_ASCEND_KVPOOL_MSTX_DEBUG", "0") == "1",
+             aic_metrics=torch_npu.profiler.AiCMetrics.PipeUtilization,
+             l2_cache=False,
+             op_attr=False,

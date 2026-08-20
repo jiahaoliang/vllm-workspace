@@ -1,0 +1,20 @@
+{
+  "phase": "seed",
+  "count": 1,
+  "expected_prompt_tokens": 28800,
+  "elapsed_ms": 73900.31730988994,
+  "valid": true,
+  "errors": [],
+  "results": [
+    {
+      "fixture_request_id": "shared-seed-p28800-s1023-r000008",
+      "response_id": "cmpl-b82e96c5-8282-4a80-ade0-1a8ad3dc32b9",
+      "status_code": 200,
+      "elapsed_ms": 73745.32656511292,
+      "prompt_tokens": 28800,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    }
+  ]
+}

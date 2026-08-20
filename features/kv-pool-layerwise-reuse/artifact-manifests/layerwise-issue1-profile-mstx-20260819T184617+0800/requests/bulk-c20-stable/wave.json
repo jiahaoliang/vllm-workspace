@@ -1,0 +1,210 @@
+{
+  "phase": "wave",
+  "count": 20,
+  "expected_prompt_tokens": 32000,
+  "elapsed_ms": 91662.73693693802,
+  "valid": true,
+  "errors": [],
+  "results": [
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000000",
+      "response_id": "cmpl-9bf63bea-b867-4370-ae1f-866cbc61dcae",
+      "status_code": 200,
+      "elapsed_ms": 84144.18196631595,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000001",
+      "response_id": "cmpl-8c8d7a63-9a67-4a16-935e-bd1f2b69e6eb",
+      "status_code": 200,
+      "elapsed_ms": 75005.05852187052,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000002",
+      "response_id": "cmpl-a8ee9a1c-e908-4637-a8fe-ce0b551d8e46",
+      "status_code": 200,
+      "elapsed_ms": 81906.08303900808,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000003",
+      "response_id": "cmpl-dffd16cc-98a9-4be6-95cc-9d2a6fb13922",
+      "status_code": 200,
+      "elapsed_ms": 81903.8811083883,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000004",
+      "response_id": "cmpl-8a36c581-8cc1-4294-9daf-02dc0642aec6",
+      "status_code": 200,
+      "elapsed_ms": 81046.91511206329,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000005",
+      "response_id": "cmpl-31e082d0-7af9-43b7-ae39-f0c7c3b39830",
+      "status_code": 200,
+      "elapsed_ms": 91129.81765484437,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000006",
+      "response_id": "cmpl-ca783c12-a6ec-4f6d-ab24-760ee93798c2",
+      "status_code": 200,
+      "elapsed_ms": 83674.14316115901,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000007",
+      "response_id": "cmpl-1e078907-2873-4735-b3c0-ef687c4ee675",
+      "status_code": 200,
+      "elapsed_ms": 87715.05086310208,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000008",
+      "response_id": "cmpl-dbdd4f5f-eec5-48a4-8870-638c7f4cd425",
+      "status_code": 200,
+      "elapsed_ms": 86467.47348923236,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000009",
+      "response_id": "cmpl-83edbae1-8dfd-48ac-a64a-41586cf04fff",
+      "status_code": 200,
+      "elapsed_ms": 91137.01263209805,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000010",
+      "response_id": "cmpl-ee4e9bd9-bfba-46a1-b4c7-dd14cd80fdea",
+      "status_code": 200,
+      "elapsed_ms": 91136.9781321846,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000011",
+      "response_id": "cmpl-54564d40-d38a-4c0c-a0d2-fbdd4f11f530",
+      "status_code": 200,
+      "elapsed_ms": 87710.49634926021,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000012",
+      "response_id": "cmpl-1a6b5470-fb10-4b5c-9fe7-75c30d80e30b",
+      "status_code": 200,
+      "elapsed_ms": 91137.27621268481,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000013",
+      "response_id": "cmpl-e27cd829-a1b9-4cb3-a016-9e5fb256816c",
+      "status_code": 200,
+      "elapsed_ms": 91128.76309920102,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000014",
+      "response_id": "cmpl-38924dfc-0c1c-49f2-844f-25ca13bb2c65",
+      "status_code": 200,
+      "elapsed_ms": 91128.76845896244,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000015",
+      "response_id": "cmpl-dc5ce80d-ae17-4ee1-94ef-fa9654bc86f5",
+      "status_code": 200,
+      "elapsed_ms": 91134.47864865884,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000016",
+      "response_id": "cmpl-cbb64e4a-c793-4979-ad7d-b10a4c13ef15",
+      "status_code": 200,
+      "elapsed_ms": 87709.55833420157,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000017",
+      "response_id": "cmpl-0ab9cc85-68f4-47e8-bdd0-930f5d203650",
+      "status_code": 200,
+      "elapsed_ms": 91125.44858222827,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000018",
+      "response_id": "cmpl-20ab4f14-0b71-4277-9154-a6a5534d3480",
+      "status_code": 200,
+      "elapsed_ms": 91486.65152769536,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    },
+    {
+      "fixture_request_id": "formal-p32000-s1023-r000019",
+      "response_id": "cmpl-3fd274fd-8ad2-4ccf-819d-e8ff942b9372",
+      "status_code": 200,
+      "elapsed_ms": 91126.21163530275,
+      "prompt_tokens": 32000,
+      "completion_tokens": 1,
+      "choice_count": 1,
+      "error": null
+    }
+  ]
+}

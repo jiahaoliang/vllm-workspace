@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "layerwise-issue1-profile-mstx-20260819T184617+0800",
+  "staging_path": "/tmp/layerwise-issue1-profile-mstx-20260819T184617+0800",
+  "file_count": 5388,
+  "payload_bytes": 17506000331,
+  "raw_manifest": "RAW-SHA256SUMS",
+  "raw_manifest_sha256": "0e86f334fb7d99882784f3d95680c4d7fe81d8f3d1b58f81623cd08f9edc6124",
+  "staging_replay": {
+    "status": "passed",
+    "verified_at": "2026-08-20T12:05:13+08:00"
+  },
+  "git_archived_products": [
+    "layerwise-reuse3-profile-mstx-diagnosis-2026-08-20.md",
+    "RUN-IDENTITY.md",
+    "ACCEPTANCE.json",
+    "formal-request-evidence.jsonl",
+    "profile-mstx-summary.json",
+    "reuse3-c1-layer-timeline.csv",
+    "reuse3-c20-stable-layer-timeline.csv",
+    "analyze.py",
+    "vllm-ascend-profile-mstx.patch",
+    "requests/"
+  ],
+  "persistent_archive": {
+    "status": "not_persisted_in_this_publication",
+    "path": null,
+    "replay_status": "not_applicable",
+    "verified_at": null
+  }
+}
