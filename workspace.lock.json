@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-11T17:30:22+08:00",
+  "updated_at": "2026-08-21T17:35:52+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -9,9 +9,9 @@
         "upstream": "https://github.com/vllm-project/vllm.git",
         "collaborator": "https://github.com/zhangsicheng5/vllm.git"
       },
-      "branch": "detached:54503ecec",
-      "commit": "54503ecec0f3ac31e5ecfc5f28652e4cc42307b5",
-      "purpose": "Frozen main-verified validation dependency; the corrected lane passed startup and cold concurrent controls in run 20260731T064607Z"
+      "branch": "wip/issue1-concurrent-partial-prefill",
+      "commit": "baf481c7f0e84cd93705bcd4cdf42bcff03c3909",
+      "purpose": "Test 2 scheduler source with concurrent partial prefill enabled; pushed to the matching origin WIP branch"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
@@ -21,8 +21,8 @@
         "collaborator": "https://github.com/ader47/vllm-ascend.git"
       },
       "branch": "feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723",
-      "commit": "57d3c214e642cdbb529400f0742d1a98a8d38708",
-      "purpose": "Mooncake layerwise KVPool shared-buffer reuse with TP non-save-owner gate preservation"
+      "commit": "c97cef309713dcf6c86412efd9c882b8425e28ce",
+      "purpose": "Test 2 layerwise KVPool source after reverting temporary metrics; tree-equivalent to 57d3c214e, with MSTX retained as a separate diagnostic overlay"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

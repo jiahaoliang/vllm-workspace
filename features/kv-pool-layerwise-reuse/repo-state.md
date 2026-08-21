@@ -1,12 +1,36 @@
 # kv-pool-layerwise-reuse Repo State
 
-Captured At: 2026-08-12T00:51:50+08:00
+Captured At: 2026-08-21T17:35:52+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
-| vllm | `repos/vllm` | `detached:54503ecec` | `54503ecec0f3ac31e5ecfc5f28652e4cc42307b5` | false | Frozen main-verified validation dependency; the corrected lane passed startup and cold concurrent controls in run 20260731T064607Z |
-| vllm-ascend | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `57d3c214e642cdbb529400f0742d1a98a8d38708` | false | Mooncake layerwise KVPool shared-buffer reuse with TP non-save-owner gate preservation |
+| vllm | `repos/vllm` | `wip/issue1-concurrent-partial-prefill` | `baf481c7f0e84cd93705bcd4cdf42bcff03c3909` | false | Test 2 scheduler source with concurrent partial prefill enabled; pushed to the matching origin WIP branch |
+| vllm-ascend | `repos/vllm-ascend` | `feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723` | `c97cef309713dcf6c86412efd9c882b8425e28ce` | false | Test 2 layerwise KVPool source after reverting temporary metrics; tree-equivalent to `57d3c214e`, with MSTX retained as a separate diagnostic overlay |
 | Mooncake | `repos/Mooncake` | `detached:df3f74ed` | `df3f74ed8ebdb0c935554beea6299a9f11c723e2` | false | Read-only detached checkout of the frozen Mooncake collaborator session/range implementation with retryable local revoke ownership |
+
+## Current Test 2 Source And Image Freeze
+
+The vLLM source commit `baf481c7f0e84cd93705bcd4cdf42bcff03c3909`
+is published at `origin/wip/issue1-concurrent-partial-prefill`. The vLLM-Ascend
+source commit `c97cef309713dcf6c86412efd9c882b8425e28ce` is published at
+`origin/feature/mooncake-layerwise-kv-pool-merge-kv_offload_0723`. Its two
+commits after `57d3c214e` add and then revert opt-in metrics, so the endpoint
+tree is identical to `57d3c214e`; the distinct commit identity is retained for
+exact Test 2 provenance.
+
+The Test 2 MSTX/timing instrumentation remains a diagnostic-only Python
+overlay. It is archived as a patch and checksummed source snapshot under
+`artifact-manifests/layerwise-issue1-profile-mstx-20260819T184617+0800/` and
+is not committed into the production vLLM-Ascend source branch.
+
+The derived `linux/arm64` runtime image is
+`docker.io/library/vllm-ascend:kv-pool-issue1-baf481c7-c97cef309-df3f74ed-mstx-20260821T095839`
+with manifest
+`sha256:47a4ea30ce0e113669921723c044262f3ac98a24974da8b27b71efecf982f6d1`.
+Its local OCI archive and verification details are recorded in
+`artifact-manifests/current-runtime-image-20260821T095839+0800/`. The archive
+is intentionally stored outside Git at `/root/ljh`; it was reloaded in an
+isolated containerd namespace and all six embedded overlay checksums passed.
 
 The initial Mooncake shared-buffer policy change is confined to
 `layerwise_config.py`. Follow-up fixes cover decode-only gating, partial snapshot

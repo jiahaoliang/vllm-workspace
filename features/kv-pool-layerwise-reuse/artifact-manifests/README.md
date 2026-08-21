@@ -15,3 +15,6 @@ that case the manifest is only an inventory of the transient staging data.
 - `layerwise-issue1-profile-mstx-20260819T184617+0800/`: compact MSTX/Ascend
   profiler diagnosis, stable-c20 correction, per-layer timelines, request
   evidence, and the transient 17 GB raw trace inventory.
+- `current-runtime-image-20260821T095839+0800/`: source identity, OCI digest,
+  local archive checksum, and reload verification for the derived Test 2
+  profiling runtime image.
