@@ -1,51 +1,44 @@
 # Domain Docs
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+How engineering skills should consume this control repo's domain documentation when exploring a feature or its nested source repositories.
 
-## Before exploring, read these
+## Before exploring, locate the feature context
 
-- **`CONTEXT.md`** at the repo root, or
-- **`CONTEXT-MAP.md`** at the repo root if it exists -- it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`** -- read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+Feature-specific domain documentation lives under `features/<feature>/`. Determine the active feature from the path named in the task and the checked-out control-repo branch, then read:
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+- **`features/<feature>/CONTEXT.md`** for the feature glossary and domain boundaries;
+- **`features/<feature>/docs/adr/`** for accepted, rejected, and superseded decisions that affect the task.
+
+If the task names a feature path, that explicit path defines the document scope. If the checked-out branch points at a different feature, report the mismatch instead of silently reading another feature's documents. Do not substitute root-level `docs/adr/` for the feature ADR directory.
+
+Root-level `CONTEXT.md` and `docs/adr/` are optional and apply only to workspace-wide concepts or decisions. When changing code in `repos/*`, also follow that nested repository's own `AGENTS.md` and domain documentation when present; the control repo's feature context still defines the cross-repository feature contract.
+
+If the relevant context or ADR directory does not exist, proceed without inventing one. The `domain-modeling` skill creates domain artifacts lazily when terminology or decisions are actually resolved.
 
 ## File structure
 
-Single-context repo (most repos):
-
-```
+```text
 /
-|- CONTEXT.md
-|- docs/adr/
-|  |- 0001-event-sourced-orders.md
-|  `- 0002-postgres-for-write-model.md
-`- src/
+|- CONTEXT.md                         # optional workspace-wide glossary
+|- docs/adr/                          # optional workspace-wide decisions
+|- features/
+|  `- <feature>/
+|     |- CONTEXT.md                   # feature glossary and boundaries
+|     `- docs/adr/                    # feature decisions
+`- repos/
+   `- <source-repo>/                  # independent Git repository
 ```
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
-
-```
-/
-|- CONTEXT-MAP.md
-|- docs/adr/                          <- system-wide decisions
-`- src/
-   |- ordering/
-   |  |- CONTEXT.md
-   |  `- docs/adr/                    <- context-specific decisions
-   `- billing/
-      |- CONTEXT.md
-      `- docs/adr/
-```
+Each feature directory is one domain-documentation context. Do not create `CONTEXT-MAP.md` merely to enumerate feature folders; the control repo's `features/` layout already provides that mapping.
 
 ## Use the glossary's vocabulary
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
+When output names a domain concept in an issue title, design, refactor proposal, hypothesis, or test name, use the term from the active feature's `CONTEXT.md`. Do not drift to synonyms that its glossary explicitly avoids.
 
-If the concept you need isn't in the glossary yet, that's a signal -- either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
+If the required concept is absent, first reconsider whether the term belongs to the feature. Record a genuine terminology gap through `domain-modeling` rather than silently defining competing language in an issue or design.
 
 ## Flag ADR conflicts
 
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
+If output contradicts an applicable ADR, surface the conflict instead of silently overriding it. Follow explicit ADR status and replacement links; do not infer that a higher ADR number automatically supersedes an earlier decision. If two accepted ADRs conflict without a recorded replacement relationship, report the decision as unresolved before updating downstream spec, design, or issues.
 
-> _Contradicts ADR-0007 (event-sourced orders) -- but worth reopening because..._
+> _Contradicts feature ADR-0007 (event-sourced orders); no superseding relationship is recorded._
