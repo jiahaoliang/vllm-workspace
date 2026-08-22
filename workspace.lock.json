@@ -7,14 +7,15 @@
       "remotes": {
         "origin": "https://github.com/vllm-project/vllm.git"
       },
-      "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
+      "branch": "tag:v0.23.0",
       "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
       "purpose": "upstream vLLM baseline"
     },
     "vllm-ascend": {
       "path": "repos/vllm-ascend",
       "remotes": {
-        "origin": "https://github.com/vllm-project/vllm-ascend.git"
+        "origin": "https://gitcode.com/gzliangjiahao/vllm-ascend.git",
+        "collaborator": "https://gitcode.com/shichangzhang064/vllm-ascend.git"
       },
       "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
       "commit": "0d6dd0d26ab69219f861c9b312329f4c60fe36f2",
