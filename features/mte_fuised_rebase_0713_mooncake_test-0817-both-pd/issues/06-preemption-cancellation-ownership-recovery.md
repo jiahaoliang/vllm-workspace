@@ -8,17 +8,23 @@
 
 **Blocked by:** 05 — 完成全 TP transfer-failure recovery.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Request tracker 区分跨 preemption 保留的 Main reservation state 与绑定当前运行的 execution epoch state。
-- [ ] Preemption retire 旧 epoch、清除旧 Indexer/temporary Main binding与 pending result，并在 resume 时绑定 core 新分配的 Indexer HBM IDs，不重新从 Prefill pull。
-- [ ] Resume 从 token 0 执行 Decode full-sequence compute replay以重建 Indexer；Main reservation跨 epoch 保持，已确认且 ownership/layout 连续的 Main prefix不重复 D2H。
-- [ ] 无法证明 Main ownership、layout或 validity 连续时，preserved boundary保守降为0并在 replay 中重写完整 Main。
-- [ ] Preemption evidence记录 replay token数、复用 Main token数、跳过的 D2H bytes和恢复耗时，不与正常 PD transfer指标混淆。
-- [ ] Admission 前 cancellation 可立即结束；admission 后进入 cancel-pending、禁止新的 receive/replay/D2H并继续隔离 Main reservation与 delayed NPU blocks。
-- [ ] Worker drain 当前 Indexer D2D、Main D2RH或 fused D2H，按 active `(request_id, execution_epoch)` 拒绝 stale/duplicate completion并清理 request/epoch binding；调用 cancel API 本身不能视为 Quiesced，且不产生 typed `QUIESCED` result。
-- [ ] 每个 worker 达到 Quiesced 后，先向自己实际读取且尚未通知完成的 Prefill leader endpoint best-effort 发送一次现有 `DONE_RECVING_MSG`，再把 request ID 放入普通 `finished_recving` set一次；普通 receive 已通知的 endpoint不重发，通知失败由 Prefill hard TTL兜底。
-- [ ] Scheduler 只在 vLLM expected-worker-count aggregation 产生 ordinary all-worker completion 后 release-once Main reservation，并按现有 completion顺序释放 delayed NPU blocks；重复 cancel/ack和 late completion均为 no-op。
-- [ ] 无法产生 quiesced ack的 operation无限期保持 ownership隔离，不增加 watchdog、可靠 native cancel或 timeout后强制释放。
-- [ ] Admission 前或尚未向 worker 绑定 Prefill endpoint的 cancellation不保证主动source-release notification，由hard TTL回收；unquiesced operation不发送伪`DONE_RECVING_MSG`或普通completion。
-- [ ] Focused tests覆盖 preemption rebind/Main reuse/fallback、各 lifecycle cancellation时点、in-flight drain、worker-local once guard、Prefill notification ordering/failure、ordinary all-worker aggregation、release ordering与 idempotency。
+- [x] Request tracker 区分跨 preemption 保留的 Main reservation state 与绑定当前运行的 execution epoch state。
+- [x] Preemption retire 旧 epoch、清除旧 Indexer/temporary Main binding与 pending result，并在 resume 时绑定 core 新分配的 Indexer HBM IDs，不重新从 Prefill pull。
+- [x] Resume 从 token 0 执行 Decode full-sequence compute replay以重建 Indexer；Main reservation跨 epoch 保持，已确认且 ownership/layout 连续的 Main prefix不重复 D2H。
+- [x] 无法证明 Main ownership、layout或 validity 连续时，preserved boundary保守降为0并在 replay 中重写完整 Main。
+- [x] Preemption evidence记录 replay token数、复用 Main token数、跳过的 D2H bytes和恢复耗时，不与正常 PD transfer指标混淆。
+- [x] Admission 前 cancellation 可立即结束；admission 后进入 cancel-pending、禁止新的 receive/replay/D2H并继续隔离 Main reservation与 delayed NPU blocks。
+- [x] Worker drain 当前 Indexer D2D、Main D2RH或 fused D2H，按 active `(request_id, execution_epoch)` 拒绝 stale/duplicate completion并清理 request/epoch binding；调用 cancel API 本身不能视为 Quiesced，且不产生 typed `QUIESCED` result。
+- [x] 每个 worker 达到 Quiesced 后，先向自己实际读取且尚未通知完成的 Prefill leader endpoint best-effort 发送一次现有 `DONE_RECVING_MSG`，再把 request ID 放入普通 `finished_recving` set一次；普通 receive 已通知的 endpoint不重发，通知失败由 Prefill hard TTL兜底。
+- [x] Scheduler 只在 vLLM expected-worker-count aggregation 产生 ordinary all-worker completion 后 release-once Main reservation，并按现有 completion顺序释放 delayed NPU blocks；重复 cancel/ack和 late completion均为 no-op。
+- [x] 无法产生 quiesced ack的 operation无限期保持 ownership隔离，不增加 watchdog、可靠 native cancel或 timeout后强制释放。
+- [x] Admission 前或尚未向 worker 绑定 Prefill endpoint的 cancellation不保证主动source-release notification，由hard TTL回收；unquiesced operation不发送伪`DONE_RECVING_MSG`或普通completion。
+- [x] Focused tests覆盖 preemption rebind/Main reuse/fallback、各 lifecycle cancellation时点、in-flight drain、worker-local once guard、Prefill notification ordering/failure、ordinary all-worker aggregation、release ordering与 idempotency。
+
+## Answer
+
+`mooncake_dsa_scheduler.py` 分离 lifetime reservation 与 execution epoch，支持 preemption rebind、Main reuse proof/fallback、cancel-pending 和 ordinary all-worker ack 后 release-once。只读 `DsaPreemptionEvidence` 记录 full replay token 数、复用 Main token 数、按真实 Main `page_size_bytes` 计算的 skipped D2H bytes，以及从 preemption 到 exact `REPLAY_READY` 的 monotonic recovery duration。`mooncake_dsa_worker.py`、`mooncake_dsa_worker_adapter.py` 与 `mooncake_dsa_decode_runtime.py` 实现 drain、stale/duplicate guard、DONE-before-finished ordering 和 worker-local once guard；`QUIESCE` 不产生 typed result。
+
+Preemption/cancellation 的所有 lifecycle timing、notification failure、aggregation、release ordering 与幂等性均在 Phase B 中通过，详见 [验证报告](../cpu-mock-validation-report.md)。NPU 恢复耗时等 runtime 指标仍待 NPU case 实测，不由 CPU/mock 结果推断。

@@ -8,15 +8,21 @@
 
 **Blocked by:** 06 — 完成 preemption 与 cancellation ownership recovery.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Phase B 覆盖 lifetime reservation、HOL admission、等待期间 ownership、release-once和多请求交错。
-- [ ] Phase B 覆盖 transfer failure、exact TP typed terminal barrier、all-TP replay、preemption epoch rebind/Main reuse、cancellation drain-and-ack、`DONE_RECVING_MSG` ordering、ordinary all-worker completion及 fused D2H validity/fail-fast。
-- [ ] Phase B 覆盖 duplicate/conflict/stale/future/illegal/missing typed result和cancellation duplicate/stale ordinary ack，并验证无 outer retry、无 source TTL check、无 unquiesced completion/Prefill notification 和无 connector-side positional compatibility claim等 negative contracts。
-- [ ] DSA matrix完成后重新运行普通 V1 metadata、scheduler、transfer和 completion regression，证明 opt-in isolation。
-- [ ] Phase A和 Phase B 都在 `liangjiahao` namespace 的专用长期运行 CPU-only UT Pod 中执行；使用 tar加显式 namespace的 `kubectl exec` 同步源码，不使用hostPath、serving Pod或NPU资源。
-- [ ] 验证报告分别记录 Phase A/Phase B 的 source identity、显式命令、结果、修复和最终 rerun；仅在两阶段都通过后声明 `CPU/mock validated`。
-- [ ] NPU plan把 P/D immutable image digest、dependency revisions、model/configuration fingerprint、positional ABI、topology、leader replica、Host capacity和 registration写成可执行preflight及证据要求，任一不匹配时对应case禁止发流量；该计划不声称已实现production admission gate。
-- [ ] NPU plan覆盖 happy path、partial/multi-block、并发/reservation pressure、ordering/failure injection、preemption、cancellation、default V1 isolation和 cleanup。
-- [ ] 每个 NPU case包含 prerequisite、命令或 manifest、输入、baseline output与 cache checksum或等价 tensor oracle、成功条件、失败证据和显式资源 cleanup。
-- [ ] 所有未真实执行的 NPU case标记 `planned / not run`；static、CPU/mock和 NPU runtime状态分别报告，不把计划或 mock结果提升为 `NPU runtime validated`。
+- [x] Phase B 覆盖 lifetime reservation、HOL admission、等待期间 ownership、release-once和多请求交错。
+- [x] Phase B 覆盖 transfer failure、exact TP typed terminal barrier、all-TP replay、preemption epoch rebind/Main reuse、cancellation drain-and-ack、`DONE_RECVING_MSG` ordering、ordinary all-worker completion及 fused D2H validity/fail-fast。
+- [x] Phase B 覆盖 duplicate/conflict/stale/future/illegal/missing typed result和cancellation duplicate/stale ordinary ack，并验证无 outer retry、无 source TTL check、无 unquiesced completion/Prefill notification 和无 connector-side positional compatibility claim等 negative contracts。
+- [x] DSA matrix完成后重新运行普通 V1 metadata、scheduler、transfer和 completion regression，证明 opt-in isolation。
+- [x] Phase A和 Phase B 都在 `liangjiahao` namespace 的专用长期运行 CPU-only UT Pod 中执行；使用 tar加显式 namespace的 `kubectl exec` 同步源码，不使用hostPath、serving Pod或NPU资源。
+- [x] 验证报告分别记录 Phase A/Phase B 的 source identity、显式命令、结果、修复和最终 rerun；仅在两阶段都通过后声明 `CPU/mock validated`。
+- [x] NPU plan把 P/D immutable image digest、dependency revisions、model/configuration fingerprint、positional ABI、topology、leader replica、Host capacity和 registration写成可执行preflight及证据要求，任一不匹配时对应case禁止发流量；该计划不声称已实现production admission gate。
+- [x] NPU plan覆盖 happy path、partial/multi-block、并发/reservation pressure、ordering/failure injection、preemption、cancellation、default V1 isolation和 cleanup。
+- [x] 每个 NPU case包含 prerequisite、命令或 manifest、输入、baseline output与 cache checksum或等价 tensor oracle、成功条件、失败证据和显式资源 cleanup。
+- [x] 所有未真实执行的 NPU case标记 `planned / not run`；static、CPU/mock和 NPU runtime状态分别报告，不把计划或 mock结果提升为 `NPU runtime validated`。
+
+## Answer
+
+Phase A、Phase B 与 DSA 后普通 V1 regression 已在规定的 CPU-only UT Pod 完成，最终分别为 `306 passed in 16.65s`、`355 passed in 17.14s` 和 `93 passed, 14 warnings in 19.31s`，因此状态为 `CPU/mock validated`。Source/Pod identity、完整命令、初始 collection failures、修复和最终 rerun 均保存在 [CPU/mock validation report](../cpu-mock-validation-report.md)。
+
+[NPU E2E test plan](../npu-e2e-test-plan.md) 提供 preflight、oracle、8 个 mandatory case、证据 schema 和 cleanup。未执行 NPU workload；8 个 case 全部保持 `planned / not run`，不得据此声明 `NPU runtime validated`。

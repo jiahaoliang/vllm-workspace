@@ -8,13 +8,19 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 配置关闭时继续构造和执行普通 V1 scheduler、metadata、worker 与 completion path，不构造或接受 DSA lifecycle metadata。
-- [ ] 配置开启时只接受 Prefill `kv_producer`、Decode `kv_consumer`、Decode `fused_overlap` 与 Mooncake SFA backend 的受支持组合，其他 role/mode 组合在启动时 fail closed。
-- [ ] 启动时拒绝 `P_TP < D_TP`、`P_TP % D_TP != 0`、Decode PP 大于 1 或 Decode `DCP * PCP != 1`，且不把 `P TP8/DP2 -> D TP2/DP8` 硬编码为唯一拓扑。
-- [ ] Decode scheduler-to-worker contract 使用 immutable request envelope，并将 remote source、destination ownership 和 lifecycle command 分成强类型 value objects。
-- [ ] Worker-to-scheduler typed contract 对 receive、fused D2H、replay 和 transfer failure 使用带 request、execution epoch、command sequence 和 local TP rank identity 的 terminal result，并实现合法的 action/result/failure-phase matrix；cancellation 不定义 typed `QUIESCED`。
-- [ ] Contract 只包含可跨进程传输的值，并通过集中 factory/validator 拒绝缺失字段、非法组合、冲突 command 和 mode/type mismatch。
-- [ ] 跨 P/D image、configuration、tuple ABI 和 leader replica compatibility 只记录为 feature deployment preconditions；本票不实现 manifest generator、release gate 或 admission controller。
-- [ ] Focused tests 覆盖 contract serialization、validator、同一步 duplicate/conflict typed aggregation、startup constraints 和 default V1 isolation。
+- [x] 配置关闭时继续构造和执行普通 V1 scheduler、metadata、worker 与 completion path，不构造或接受 DSA lifecycle metadata。
+- [x] 配置开启时只接受 Prefill `kv_producer`、Decode `kv_consumer`、Decode `fused_overlap` 与 Mooncake SFA backend 的受支持组合，其他 role/mode 组合在启动时 fail closed。
+- [x] 启动时拒绝 `P_TP < D_TP`、`P_TP % D_TP != 0`、Decode PP 大于 1 或 Decode `DCP * PCP != 1`，且不把 `P TP8/DP2 -> D TP2/DP8` 硬编码为唯一拓扑。
+- [x] Decode scheduler-to-worker contract 使用 immutable request envelope，并将 remote source、destination ownership 和 lifecycle command 分成强类型 value objects。
+- [x] Worker-to-scheduler typed contract 对 receive、fused D2H、replay 和 transfer failure 使用带 request、execution epoch、command sequence 和 local TP rank identity 的 terminal result，并实现合法的 action/result/failure-phase matrix；cancellation 不定义 typed `QUIESCED`。
+- [x] Contract 只包含可跨进程传输的值，并通过集中 factory/validator 拒绝缺失字段、非法组合、冲突 command 和 mode/type mismatch。
+- [x] 跨 P/D image、configuration、tuple ABI 和 leader replica compatibility 只记录为 feature deployment preconditions；本票不实现 manifest generator、release gate 或 admission controller。
+- [x] Focused tests 覆盖 contract serialization、validator、同一步 duplicate/conflict typed aggregation、startup constraints 和 default V1 isolation。
+
+## Answer
+
+已在 vLLM-Ascend commit `f826ea3f354f87cdf95895addbdaaad6ca92dd7c` 中完成。`mooncake_dsa_config.py`、`mooncake_dsa_metadata.py` 和 `mooncake_dsa_lifecycle.py` 定义并校验 opt-in configuration、immutable command/result contract 与合法 matrix；`mooncake_connector.py` 只在 flag 开启时构造 DSA scheduler/worker，并在普通与 DSA metadata 边界 fail closed。
+
+Default V1 isolation、startup constraints、serialization 和 aggregation 已由 `test_mooncake_dsa_config.py`、`test_mooncake_dsa_metadata.py`、`test_mooncake_dsa_connector.py` 及普通 `test_mooncake_connector.py` 覆盖。完整证据见 [CPU/mock validation report](../cpu-mock-validation-report.md)。

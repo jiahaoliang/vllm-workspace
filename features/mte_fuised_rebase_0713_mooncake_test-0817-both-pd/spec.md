@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: implemented; CPU/mock validated; NPU planned / not run
 
 ## Problem Statement
 

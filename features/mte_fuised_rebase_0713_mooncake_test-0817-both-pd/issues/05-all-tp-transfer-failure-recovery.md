@@ -8,13 +8,19 @@
 
 **Blocked by:** 04 — 完成 exact TP lifecycle 与 fused D2H validity.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Scheduler 在当前 `RECEIVE_REMOTE` 获得完整 TP terminal coverage 后解释 mixed success/failure，并向所有 TP 下发新的 `PREPARE_REPLAY` command。
-- [ ] Failure transition 保留 Main reservation identity 和 block IDs，但同时把 scheduler-side 与所有 worker-local `preserved_main_tokens` 统一降为 0。
-- [ ] 每个 TP 在 `PREPARE_REPLAY` 中 retire/drain 旧 operation、拒绝 stale completion并产生 `REPLAY_READY`；局部 ready 不得提前恢复请求。
-- [ ] Exact TP `REPLAY_READY` 后，scheduler 先建立 replay state并把 `num_computed_tokens` 置为 0，再通过现有 completion 顺序让请求进入 Decode full-sequence compute replay。
-- [ ] Replay 从 token 0 重建完整 Indexer并重写完整 Main；failure 前成功 TP 的 Main 内容不能作为 preserved prefix 使用。
-- [ ] Indexer/Main 每个 phase 仍只有一次 Python-level transfer 调用，不增加 connector retry；发起前只检查 local cancellation、execution epoch 和 destination ownership，不检查 Prefill source age或 remaining TTL。
-- [ ] 不返回或无法证明 quiesced 的 operation 保持 request 和 destination pending/隔离，不启动 replay、不伪造 completion，也不通过 timeout 强制释放。
-- [ ] Focused tests 覆盖任一 TP failure、完整 terminal barrier、all-TP validity reset、reservation identity保留、stale generation rejection和 full rewrite。
+- [x] Scheduler 在当前 `RECEIVE_REMOTE` 获得完整 TP terminal coverage 后解释 mixed success/failure，并向所有 TP 下发新的 `PREPARE_REPLAY` command。
+- [x] Failure transition 保留 Main reservation identity 和 block IDs，但同时把 scheduler-side 与所有 worker-local `preserved_main_tokens` 统一降为 0。
+- [x] 每个 TP 在 `PREPARE_REPLAY` 中 retire/drain 旧 operation、拒绝 stale completion并产生 `REPLAY_READY`；局部 ready 不得提前恢复请求。
+- [x] Exact TP `REPLAY_READY` 后，scheduler 先建立 replay state并把 `num_computed_tokens` 置为 0，再通过现有 completion 顺序让请求进入 Decode full-sequence compute replay。
+- [x] Replay 从 token 0 重建完整 Indexer并重写完整 Main；failure 前成功 TP 的 Main 内容不能作为 preserved prefix 使用。
+- [x] Indexer/Main 每个 phase 仍只有一次 Python-level transfer 调用，不增加 connector retry；发起前只检查 local cancellation、execution epoch 和 destination ownership，不检查 Prefill source age或 remaining TTL。
+- [x] 不返回或无法证明 quiesced 的 operation 保持 request 和 destination pending/隔离，不启动 replay、不伪造 completion，也不通过 timeout 强制释放。
+- [x] Focused tests 覆盖任一 TP failure、完整 terminal barrier、all-TP validity reset、reservation identity保留、stale generation rejection和 full rewrite。
+
+## Answer
+
+`mooncake_dsa_scheduler.py` 在完整 receive terminal coverage 后统一解释 mixed outcomes，保留 reservation identity、将 all-TP Main validity 清零并发布新 `PREPARE_REPLAY`；exact `REPLAY_READY` 后才把请求从 token 0 恢复。`mooncake_dsa_worker.py`/`mooncake_dsa_decode_runtime.py` retire 旧 operation、拒绝 stale generation，并且不增加 watchdog、connector retry 或 source TTL check。
+
+任一 TP failure、terminal barrier、all-TP reset、identity preservation 与 full rewrite 均由 Phase B focused tests 覆盖，证据见 [验证报告](../cpu-mock-validation-report.md)。
