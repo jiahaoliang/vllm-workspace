@@ -79,7 +79,7 @@
 
 ### Issue tracker
 
-Issues and PRDs are tracked in GitHub Issues. See `docs/agents/issue-tracker.md`.
+Issues and PRDs are tracked as local Markdown under `features/<feature>/`. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
