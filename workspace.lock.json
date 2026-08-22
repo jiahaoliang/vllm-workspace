@@ -1,14 +1,14 @@
-﻿{
+{
   "version": 1,
-  "updated_at": "2026-07-02T18:01:32+08:00",
+  "updated_at": "2026-08-22T09:01:27+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
       "remotes": {
         "origin": "https://github.com/vllm-project/vllm.git"
       },
-      "branch": "main",
-      "commit": "25fcb65d51deef0026aa34e6067703da4a91f956",
+      "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
+      "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
       "purpose": "upstream vLLM baseline"
     },
     "vllm-ascend": {
@@ -16,8 +16,8 @@
       "remotes": {
         "origin": "https://github.com/vllm-project/vllm-ascend.git"
       },
-      "branch": "main",
-      "commit": "4839937339b704fbabb6b92514a7be06672c73cc",
+      "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
+      "commit": "0d6dd0d26ab69219f861c9b312329f4c60fe36f2",
       "purpose": "upstream vLLM Ascend baseline"
     },
     "Mooncake": {
@@ -25,8 +25,8 @@
       "remotes": {
         "origin": "https://github.com/kvcache-ai/Mooncake.git"
       },
-      "branch": "main",
-      "commit": "b1d30f2e62675610c1fe7a805b6a27b518a48979",
+      "branch": "tag:v0.3.12.post1",
+      "commit": "6041a609a8c3af35e778f70db344f145c2914980",
       "purpose": "dependency reading and validation"
     }
   }
