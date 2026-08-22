@@ -2,6 +2,10 @@
 
 **What to build:** 为完整 Blockwise DSA 实现建立可复核的 release evidence：在规定的 CPU-only UT Pod 中执行 contract-complete Phase B matrix，并发布一个以 `P TP8/DP2 -> D TP2/DP8` 为起点、包含 deployment preflight、correctness oracle 和 cleanup 的 NPU E2E 计划；未执行的 runtime case 始终明确标记为计划。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0001 — 使用 per-Decode-TP local Swapped Main pool](../docs/adr/0001-use-per-decode-tp-local-swapped-main-pools.md)、[ADR 0004 — 使用固定 TP leader 作为完整 replica source](../docs/adr/0004-use-fixed-tp-leaders-as-complete-replica-sources.md)、[ADR 0015 — Transfer 前不检查 Prefill source TTL](../docs/adr/0015-do-not-check-prefill-source-ttl-before-transfer.md)、[ADR 0016 — 不为 Unquiesced operation 增加 watchdog](../docs/adr/0016-do-not-watchdog-unquiesced-operations.md)、[ADR 0022 — 沿用穿刺 positional handshake ABI](../docs/adr/0022-use-the-puncture-positional-handshake-abi.md)、[ADR 0023 — 使用 Phase A 后 Phase B 的分阶段验证](../docs/adr/0023-use-staged-phase-a-then-phase-b-validation.md)
+
 **Blocked by:** 06 — 完成 preemption 与 cancellation ownership recovery.
 
 **Status:** ready-for-agent

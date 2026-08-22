@@ -2,6 +2,10 @@
 
 **What to build:** 让已经 admission 的 Blockwise DSA 请求在 preemption 或 cancellation 下保持可证明的 destination ownership：preemption 使用新 execution epoch 重建 Indexer并尽可能复用有效 Main，cancellation 则在 worker 全部 quiesced 前禁止复用任何 reservation 地址。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0006 — 为请求完整生命周期预留 Main capacity](../docs/adr/0006-reserve-main-capacity-for-the-request-lifetime.md)、[ADR 0009 — Preemption 后 full compute replay 并复用 Main](../docs/adr/0009-replay-preempted-requests-locally-on-decode.md)、[ADR 0010 — Cancellation 使用两阶段 drain-and-ack](../docs/adr/0010-use-two-phase-cancellation-drain-and-ack.md)、[ADR 0013 — Transfer-failure replay 统一失效所有 TP 的 Main](../docs/adr/0013-invalidate-main-on-all-tps-for-transfer-failure-replay.md)、[ADR 0016 — 不为 Unquiesced operation 增加 watchdog](../docs/adr/0016-do-not-watchdog-unquiesced-operations.md)、[ADR 0019 — 使用显式最小完备的 DSA step fields](../docs/adr/0019-use-minimal-complete-dsa-step-fields.md)、[ADR 0020 — 使用 lifecycle action 和 terminal local result](../docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)、[ADR 0021 — 使用精确 TP coverage 和跨 step result 累积](../docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)
+
 **Blocked by:** 05 — 完成全 TP transfer-failure recovery.
 
 **Status:** ready-for-agent

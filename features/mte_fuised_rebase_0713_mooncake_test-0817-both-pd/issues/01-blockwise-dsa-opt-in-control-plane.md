@@ -2,6 +2,10 @@
 
 **What to build:** 让部署工程师可以通过 `dsa_pd_offload=true` 在 `MooncakeConnectorV1` 内显式启用独立的 Blockwise DSA control plane，同时保证配置关闭时普通 V1 的 scheduler、metadata、worker、transfer 和 completion 行为不变。新 control plane 使用强类型 lifecycle command/result contract，并在启动或 metadata 边界拒绝 unsupported configuration 和 mode/type mismatch。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0002 — 保留 Decode pull 并使用 SFA Decode scheduler](../docs/adr/0002-retain-decode-pull-with-an-sfa-decode-scheduler.md)、[ADR 0017 — 使用独立的强类型 DSA metadata family](../docs/adr/0017-use-a-separate-typed-dsa-metadata-family.md)、[ADR 0018 — 使用嵌套 value object 组织 DSA step request](../docs/adr/0018-use-nested-value-objects-for-dsa-step-requests.md)、[ADR 0019 — 使用显式最小完备的 DSA step fields](../docs/adr/0019-use-minimal-complete-dsa-step-fields.md)、[ADR 0020 — 使用 lifecycle action 和 terminal local result](../docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)、[ADR 0021 — 使用精确 TP coverage 和跨 step result 累积](../docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)
+
 **Blocked by:** None — can start immediately.
 
 **Status:** ready-for-agent

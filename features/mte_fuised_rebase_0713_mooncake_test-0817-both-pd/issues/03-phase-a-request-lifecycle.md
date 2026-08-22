@@ -2,6 +2,10 @@
 
 **What to build:** 打通一个可观察的 Blockwise DSA request tracer：从 matched-token/admission、destination allocation 和 metadata 发布开始，经 fixed leader source、Indexer D2D、Main D2RH、worker result 与 scheduler output consumption，最终进入 receive-complete；基本 transfer failure 能安全进入 Decode replay，terminal cleanup 能 release-once。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0004 — 使用固定 TP leader 作为完整 replica source](../docs/adr/0004-use-fixed-tp-leaders-as-complete-replica-sources.md)、[ADR 0005 — 将 partial block 按完整物理 block 传输](../docs/adr/0005-transfer-partial-blocks-as-full-physical-blocks.md)、[ADR 0011 — Indexer 传输失败时不启动 Main](../docs/adr/0011-stop-before-main-when-indexer-transfer-fails.md)、[ADR 0012 — Transfer 最终失败后由 Decode replay](../docs/adr/0012-retry-transfer-then-replay-on-decode.md)、[ADR 0014 — 仅依赖 Mooncake 内部 retry](../docs/adr/0014-rely-only-on-mooncake-internal-retry.md)、[ADR 0020 — 使用 lifecycle action 和 terminal local result](../docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)、[ADR 0023 — 使用 Phase A 后 Phase B 的分阶段验证](../docs/adr/0023-use-staged-phase-a-then-phase-b-validation.md)
+
 **Blocked by:** 02 — 建立 positional data plane 与 Main lifetime reservation.
 
 **Status:** ready-for-agent

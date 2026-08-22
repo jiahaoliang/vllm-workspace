@@ -2,6 +2,10 @@
 
 **What to build:** 让合法的 Blockwise DSA 请求在 remote receive 前获得可寻址且容量有保证的 Decode destination：Prefill 暴露 positional source layout，Decode 为每个 TP 注册 Indexer HBM 和 local Swapped Main pool，并为请求完整生命周期建立 Main reservation；容量暂时不足时请求安全留在 waiting queue。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0001 — 使用 per-Decode-TP local Swapped Main pool](../docs/adr/0001-use-per-decode-tp-local-swapped-main-pools.md)、[ADR 0005 — 将 partial block 按完整物理 block 传输](../docs/adr/0005-transfer-partial-blocks-as-full-physical-blocks.md)、[ADR 0006 — 为请求完整生命周期预留 Main capacity](../docs/adr/0006-reserve-main-capacity-for-the-request-lifetime.md)、[ADR 0008 — 按 scheduling step 对 Main reservation 实施队首阻塞](../docs/adr/0008-use-per-step-head-of-line-reservation-admission.md)、[ADR 0022 — 沿用穿刺 positional handshake ABI](../docs/adr/0022-use-the-puncture-positional-handshake-abi.md)
+
 **Blocked by:** 01 — 建立 Blockwise DSA opt-in control plane.
 
 **Status:** ready-for-agent

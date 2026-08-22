@@ -2,6 +2,10 @@
 
 **What to build:** 让任一 Decode TP 的 initial Indexer/Main transfer 最终失败都能在所有 TP 当前 operation 已返回后，把整个请求安全转入 Decode full-sequence replay；reservation 地址保持隔离，但所有 TP 放弃复用远端 Main 内容并确定性重建完整 cache。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0011 — Indexer 传输失败时不启动 Main](../docs/adr/0011-stop-before-main-when-indexer-transfer-fails.md)、[ADR 0012 — Transfer 最终失败后由 Decode replay](../docs/adr/0012-retry-transfer-then-replay-on-decode.md)、[ADR 0013 — Transfer-failure replay 统一失效所有 TP 的 Main](../docs/adr/0013-invalidate-main-on-all-tps-for-transfer-failure-replay.md)、[ADR 0014 — 仅依赖 Mooncake 内部 retry](../docs/adr/0014-rely-only-on-mooncake-internal-retry.md)、[ADR 0015 — Transfer 前不检查 Prefill source TTL](../docs/adr/0015-do-not-check-prefill-source-ttl-before-transfer.md)、[ADR 0016 — 不为 Unquiesced operation 增加 watchdog](../docs/adr/0016-do-not-watchdog-unquiesced-operations.md)、[ADR 0020 — 使用 lifecycle action 和 terminal local result](../docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)、[ADR 0021 — 使用精确 TP coverage 和跨 step result 累积](../docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)
+
 **Blocked by:** 04 — 完成 exact TP lifecycle 与 fused D2H validity.
 
 **Status:** ready-for-agent

@@ -2,6 +2,10 @@
 
 **What to build:** 让 Blockwise DSA lifecycle 在真实的多 TP Decode replica 内只依据精确、rank-aware 的 terminal facts 前进，并把成功的 fused D2H 纳入 Main validity：局部成功、重复 result 或匿名完成计数都不能提前恢复请求或释放 ownership。
 
+**Spec:** [Blockwise DSA PD offload spec](../spec.md)
+
+**Decision basis:** [ADR 0016 — 不为 Unquiesced operation 增加 watchdog](../docs/adr/0016-do-not-watchdog-unquiesced-operations.md)、[ADR 0019 — 使用显式最小完备的 DSA step fields](../docs/adr/0019-use-minimal-complete-dsa-step-fields.md)、[ADR 0020 — 使用 lifecycle action 和 terminal local result](../docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)、[ADR 0021 — 使用精确 TP coverage 和跨 step result 累积](../docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)、[ADR 0023 — 使用 Phase A 后 Phase B 的分阶段验证](../docs/adr/0023-use-staged-phase-a-then-phase-b-validation.md)
+
 **Blocked by:** 03 — 打通并验证 Phase A request lifecycle.
 
 **Status:** ready-for-agent
