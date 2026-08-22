@@ -2,7 +2,7 @@
 
 状态：已接受
 
-Blockwise DSA 的 Decode scheduler-to-worker request envelope 使用显式、最小完备的字段集。静态 topology、tensor layout、block/page geometry 和 rank endpoint mapping 属于已经严格校验的 handshake session；完整 Main lifetime reservation block list 属于 scheduler ownership state。Per-step metadata 只携带 worker 执行当前 command、绑定 destination 和拒绝 stale state 必须知道的信息。
+Blockwise DSA 的 Decode scheduler-to-worker request envelope 使用显式、最小完备的字段集。静态 topology、tensor layout 和 block/page geometry 属于文档化部署前置条件与 local configuration；handshake session 只提供 positional address arrays 和 endpoint mapping，不证明跨端 compatibility。完整 Main lifetime reservation block list 属于 scheduler ownership state。Per-step metadata 只携带 worker 执行当前 command、绑定 destination 和拒绝 stale state 必须知道的信息。本 feature 不实现 deployment admission controller，也不在每个 request 重复这些静态条件。
 
 本决策采用 immutable、process-independent values；示例中的 class/field names 是目标实现名称，若编码时因 repo naming convention 做机械调整，语义和边界不得变化：
 
@@ -74,7 +74,7 @@ Blockwise DSA 继续从普通 V1 `kv_transfer_params` 读取 remote rendezvous/s
 - `remote_engine_id`、`remote_host` 和 `remote_port` 必须命中一个已经 ready 的 DSA handshake session；
 - `remote_request_id` 是 Prefill source ownership 使用的 request identity，不假定与 Decode local `request_id` 相同；
 - `indexer_block_ids` 和 `main_block_ids` 在 Decode step metadata 内继续使用 semantic names；Main K/V 共用 Main block list，可选 Indexer scale 与 Indexer 共用 Indexer block list。按照 ADR 0022，从这些 block IDs 到 remote/local layer address arrays 的解析使用跨端 positional ABI；
-- source TP leader 和 P TP/PCP/DCP 从 local configuration 与普通 V1 rendezvous 计算，multi-node rank endpoint 命中 positional handshake session；block size、page ratio 和 tensor layout compatibility 由 deployment gate 保证，不在每个 request 重复；
+- source TP leader 和 P TP/PCP/DCP 从 local configuration 与普通 V1 rendezvous 计算，multi-node rank endpoint 命中 positional handshake session；block size、page ratio 和 tensor layout compatibility 必须满足文档化部署前置条件，不在每个 request 重复，也不由本 feature 的部署代码校验；
 - 不携带 raw address、source generation、source expiry、remaining TTL 或 launch grant。
 
 ## DestinationOwnership
@@ -120,8 +120,8 @@ Envelope factory/validator 至少执行以下检查：
 
 - Scheduler 独占完整 Main reservation block list 和 release ownership；worker 不能释放 reservation，也不需要接收 future reserved block IDs。
 - Worker 只绑定当前 command 可访问的 Main prefix。新 block 在 sequence 增长时由 scheduler append 到 bound prefix，尚未 bound 的 future suffix 不能被寻址或写入。
-- Worker-to-scheduler result identity 至少包含 `request_id`、`execution_epoch`、`command_seq` 和 local TP rank；exact result enum 由 ADR 0020 确定，exact TP coverage 和跨 step accumulation 由 [ADR 0021](0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md) 确定。
-- Static topology/layout 不在 per-request metadata 重复；remote engine/host/port 解析 source endpoint 后使用 ADR 0022 的 positional handshake arrays，P/D layout compatibility 由 deployment gate 保证。
+- Worker-to-scheduler typed result identity 至少包含 `request_id`、`execution_epoch`、`command_seq` 和 local TP rank；exact result enum 由 ADR 0020 确定，exact TP coverage 和跨 step accumulation 由 [ADR 0021](0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md) 确定。Cancellation 的普通 `finished_recving` ack 不属于该 typed result schema。
+- Static topology/layout 不在 per-request metadata 重复；remote engine/host/port 解析 source endpoint 后使用 ADR 0022 的 positional handshake arrays，P/D layout compatibility 仅作为文档化部署前置条件。
 - 普通 V1 metadata 和非 DSA path 保持不变。
 
 ## 预计实现影响

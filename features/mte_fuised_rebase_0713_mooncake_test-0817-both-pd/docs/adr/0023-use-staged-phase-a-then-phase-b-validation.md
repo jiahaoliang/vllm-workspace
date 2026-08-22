@@ -43,7 +43,7 @@ Phase A 全部通过后，Phase B 在相同实现上补齐 contract-complete CPU
 
 - reservation/admission：完整 request-lifetime capacity、per-step head-of-line blocking、等待期间不泄漏 ownership、release-once 和重复 cleanup；
 - preemption：旧 epoch retire、新 Indexer IDs rebind、Main reservation 跨 epoch 保留、confirmed Main prefix 不重复 D2H；
-- cancellation：各 lifecycle 阶段下发 `QUIESCE`、operation drain 前保持隔离、完整 TP `QUIESCED` 后按顺序释放 Main 和 delayed NPU blocks；
+- cancellation：各 lifecycle 阶段下发 `QUIESCE`、operation drain 前保持隔离、每个 worker 达到 Quiesced 后先尝试 Prefill source-release notification 并上报一次普通 `finished_recving`、all-worker completion 后按顺序释放 Main 和 delayed NPU blocks；
 - transfer failure：Indexer/Main phase 分类、任一 TP failure 后等待完整 terminal coverage、所有 TP `preserved_main_tokens=0`、full-sequence replay；
 - aggregation：同一步 merge、跨 step exact rank coverage、相同 result duplicate 幂等、conflict/future/非法 rank fail closed、stale result 忽略、missing rank 无限期 pending；
 - fused offload：`FUSED_D2H` range、preserved boundary、`D2H_COMPLETE` validity 推进、stale epoch/command rejection 和 D2H failure fail fast；
@@ -67,11 +67,11 @@ Phase A 和 Phase B 必须按照 workspace `AGENTS.md` 在 `liangjiahao` namespa
 
 当前只生成计划，不部署或执行 `P TP8/DP2 -> D TP2/DP8`。计划至少包含：
 
-1. Preflight：核对 P/D immutable image digest、vLLM/vLLM-Ascend/Mooncake revisions、model/configuration fingerprint、topology、leader replica 假设、Host pool capacity 和 memory registration；任一不匹配时不得发流量。
+1. Preflight：测试计划按文档化部署前置条件核对 P/D immutable image digest、vLLM/vLLM-Ascend/Mooncake revisions、model/configuration fingerprint、topology、leader replica 假设、Host pool capacity 和 memory registration；任一不匹配时该 case 不得发流量。该检查属于测试执行步骤，不代表本 feature 实现 production deployment gate。
 2. Happy path：短 partial-block prompt、多 block prompt、并发请求和持续 Decode，确认 Indexer destination 位于 Decode HBM、Main destination 位于每个 Decode TP local Swapped Host pool。
 3. Correctness oracle：固定 prompts 与非分离 baseline 对比 output tokens 和约定的数值容差；选定 layer/block 使用 source/destination checksum 或等价 tensor oracle，避免仅靠最终文本掩盖 cache 错位。
 4. Ordering/failure：通过可控 fault injection 证明 Indexer failure 不启动 Main，Main failure 不形成 receive-complete，并在所有 Decode TP terminal 后进入 full replay。
-5. Lifecycle：reservation pressure 和 HOL、preemption 后 Main prefix reuse、cancellation drain-and-ack，以及 unquiesced operation 的 ownership 隔离。
+5. Lifecycle：reservation pressure 和 HOL、preemption 后 Main prefix reuse、cancellation drain-and-ack、`DONE_RECVING_MSG` best-effort Prefill source release，以及 unquiesced operation 的 ownership 隔离。
 6. Isolation：同一配对 image 上关闭 `dsa_pd_offload`，执行普通 `MooncakeConnectorV1` PD regression。
 7. Cleanup：请求完成或取消后，Main reservation、delayed NPU blocks、worker command state 和 scheduler trackers 回到基线；所有测试 workload 和 NPU allocation 按明确资源名清理。
 
@@ -95,14 +95,14 @@ NPU runtime validated
   = 未来真实执行全部 mandatory NPU cases 并保存证据
 ```
 
-即使 Phase B 已通过，在 NPU plan 未真实执行前也不能声称实际 D2D/D2RH、NPU-addressable Host registration、fused kernel、leader replica ownership 或端到端数值正确性已经验证。Deployment compatibility gate 仍由部署系统负责；测试计划只能规定并核对其证据，不能替代生产 admission gate。
+即使 Phase B 已通过，在 NPU plan 未真实执行前也不能声称实际 D2D/D2RH、NPU-addressable Host registration、fused kernel、leader replica ownership 或端到端数值正确性已经验证。本 feature 只维护 deployment compatibility preconditions 和测试证据要求，不实现或替代 production admission gate。
 
 ## 预计涉及文件
 
-- `tests/ut/kv_offload/test_mooncake_dsa_metadata.py`：typed envelope、action/result validation 和 exact TP aggregation；
+- `tests/ut/kv_offload/test_mooncake_dsa_metadata.py`：typed envelope、action/result validation 和 receive/replay/fused-D2H exact TP aggregation；
 - `tests/ut/kv_offload/test_mooncake_dsa_connector.py`：opt-in/default isolation、positional mapping、ordering、failure、reservation 和 lifecycle；
 - `tests/ut/kv_offload/test_sfa_kv_offload_scheduler.py`：admission、preemption 和 cleanup；
-- `tests/ut/kv_offload/test_sfa_pd_cpu_offload_single_rank.py` 或新的 focused worker test：Swapped Main binding、fused D2H、epoch/command 和 quiesce；
+- `tests/ut/kv_offload/test_sfa_pd_cpu_offload_single_rank.py` 或新的 focused worker test：Swapped Main binding、fused D2H、epoch/command、worker-local quiesce 和 ordinary cancellation completion；
 - feature-local NPU E2E test plan：只生成计划和 success criteria，不保存虚构的 run result。
 
 测试文件名可在实现时按现有 test ownership 调整，但不应把大量 DSA state-machine cases 继续堆入已经较大的普通 V1 test class。

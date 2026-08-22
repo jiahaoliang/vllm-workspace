@@ -39,7 +39,7 @@ class DsaStepRequest:
 
 ## Value object 边界
 
-`RemoteSource` 只描述 Decode scheduler 从普通 V1 `kv_transfer_params` 解析的 remote request、source blocks 和 endpoint/topology，并按 local configuration 计算固定 leader mapping。它不携带每请求 raw address；worker 使用 ADR 0022 的 positional handshake arrays 和 process-local registration 解析地址。P/D topology、leader replica 和 tuple layout 的跨端一致性由 deployment gate 保证，不由该 value object 证明。Replay、cancel 或仅更新 local lifecycle 的 command 可以没有 remote source。
+`RemoteSource` 只描述 Decode scheduler 从普通 V1 `kv_transfer_params` 解析的 remote request、source blocks 和 endpoint/topology，并按 local configuration 计算固定 leader mapping。它不携带每请求 raw address；worker 使用 ADR 0022 的 positional handshake arrays 和 process-local registration 解析地址。P/D topology、leader replica 和 tuple layout 的跨端一致性属于文档化部署前置条件，不由该 value object 证明，也不由本 feature 实现 deployment gate。Replay、cancel 或仅更新 local lifecycle 的 command 可以没有 remote source。
 
 `DestinationOwnership` 只描述 Decode 当前持有的 destination/reservation identity：当前 execution epoch 的 Indexer HBM ownership、跨 epoch 的 Main lifetime reservation，以及 active 与尚未有效的 reserved Main 范围。它不能混入 remote endpoint 或 action-specific status。
 

@@ -2,7 +2,7 @@
 
 状态：已接受
 
-Blockwise DSA PD offload 的 P/D worker handshake 沿用穿刺 connector 的 positional ABI，不再建立 semantic tensor map，也不在 connector 内跨端校验 shape、dtype、memory kind、tuple role 或 layout compatibility。P/D 一致性由部署系统保证；违反部署前置条件属于 unsupported configuration，可能显式失败，也可能产生无法由 connector 检测的 silent corruption。
+Blockwise DSA PD offload 的 P/D worker handshake 沿用穿刺 connector 的 positional ABI，不再建立 semantic tensor map，也不在 connector 内跨端校验 shape、dtype、memory kind、tuple role 或 layout compatibility。P/D 配对要求只作为部署文档中的 compatibility preconditions；本 feature 不实现 deployment admission controller。违反这些前置条件属于 unsupported configuration，可能显式失败，也可能产生无法由 connector 检测的 silent corruption。
 
 本 ADR 取代 [ADR 0003](0003-advertise-semantic-tensor-map-in-handshake.md)，并取代 [ADR 0017](0017-use-a-separate-typed-dsa-metadata-family.md) 中“独立 versioned semantic handshake metadata”部分。ADR 0017 对 Decode scheduler-to-worker step metadata 和 worker-to-scheduler result metadata 的独立强类型要求继续有效。
 
@@ -56,9 +56,9 @@ Handshake 不增加：
 
 Local worker 仍可检查本进程能够直接证明的事实，例如数组等长、地址非零、block length/scale 为正、tensor registration 成功，以及 Decode Swapped Main pool 的容量、连续性和 NPU-addressable registration。Local check 不能被表述为跨 P/D compatibility validation。
 
-## 部署前置条件
+## 文档化部署前置条件
 
-部署系统必须在流量进入前保证：
+部署和测试文档规定，配对的 P/D 运行环境在流量进入前必须满足：
 
 - Prefill 和 Decode 使用同一个 immutable image digest，而不是只使用相同 mutable tag；
 - image 内的 vLLM、vLLM Ascend、Mooncake native library 和 positional tuple adapter 来自同一组已验证 revision；
@@ -69,7 +69,7 @@ Local worker 仍可检查本进程能够直接证明的事实，例如数组等�
 - 不进行 P/D mixed-version rolling upgrade；升级必须同时替换配对的 P/D deployment，或者先停止流量再切换；
 - 部署记录或测试计划保存 image digest 和影响 ABI 的配置 fingerprint，作为一致性证据。
 
-这些条件不是 connector handshake 校验项。当前 workspace 尚未实现一个跨 P/D deployment admission controller；实现与验证阶段必须明确由现有部署流程、manifest generation 或发布检查中的哪一层承担上述 gate，不能只把它写成操作者应当记住的约定。
+这些条件不是 connector handshake 校验项，也不是本 feature 的 production code 或 deployment deliverable。本工作只负责把条件、检查方法和所需证据写入 feature 文档与 NPU test plan；实际部署系统、manifest generator、release check 或 admission controller 的实现和选择均在范围外。缺少外部执行证据时只能声明 deployment compatibility 未验证，不能把文档约束描述成已实施的 gate。
 
 ## Failure boundary
 
@@ -83,8 +83,8 @@ Decode 仍在首次使用某个 remote endpoint 时通过普通 Mooncake flow �
 ## 考虑过的方案
 
 - 完整 versioned semantic tensor map：能够在 transfer 前 fail closed，但增加 wire schema、adapter 和兼容矩阵；已由本 ADR 否决。
-- 穿刺 positional ABI，并由部署系统保证完全同构：代码量较少，符合当前受控穿刺分支的使用方式，但保留 silent corruption 风险；采用。
-- 在 positional payload 外增加 compatibility hash：可以检测部分版本错配，但仍需定义稳定 canonical input 和 rollout contract，且用户选择由部署系统承担一致性；首版不采用。
+- 穿刺 positional ABI，并把完全同构写成部署前置约束：代码量较少，符合当前受控穿刺分支的使用方式，但约束执行在本 feature 范围外，并保留 silent corruption 风险；采用。
+- 在 positional payload 外增加 compatibility hash：可以检测部分版本错配，但仍需定义稳定 canonical input 和 rollout contract；首版只记录部署前置约束，不采用。
 
 ## 结果
 
@@ -92,7 +92,7 @@ Decode 仍在首次使用某个 remote endpoint 时通过普通 Mooncake flow �
 - Handshake schema 不再是 self-describing semantic protocol，也不提供 wire-level version negotiation。
 - Default `MooncakeConnectorV1` metadata 不增加 DSA optional semantic fields。
 - Decode step metadata 仍使用 `main_block_ids` 和 `indexer_block_ids` 等强类型业务名称；只有从 block IDs 到 layer address arrays 的解析依赖 positional handshake ABI。
-- 本 feature 的正确部署必须保存 image/config identity；缺少这些证据时不能声称 P/D layout compatibility 已验证。
+- 文档要求正确部署保存 image/config identity；本 feature 不生成或强制执行 production gate，缺少外部证据时不能声称 P/D layout compatibility 已验证。
 
 ## 预计实现影响
 
@@ -101,4 +101,4 @@ Decode 仍在首次使用某个 remote endpoint 时通过普通 Mooncake flow �
 - `vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_connector.py`：构造和消费 DSA positional layer metadata，复用 endpoint routing；
 - `vllm_ascend/distributed/kv_transfer/sfa_kv_offload/sfa_kv_offload_worker.py`：提供本地 Swapped Main binding 和 registration，保持 local safety checks；
 - `tests/ut/kv_offload/test_mooncake_connector.py`：位置映射、数组长度、缺失 layer、Main/Indexer transfer list 和默认 V1 isolation；
-- deployment manifest/runbook 或后续测试计划：记录并核对配对 P/D image digest 与配置 fingerprint。
+- feature deployment constraints 文档或后续测试计划：规定配对 P/D image digest 与配置 fingerprint 的核对方法和证据；不实现 deployment system。

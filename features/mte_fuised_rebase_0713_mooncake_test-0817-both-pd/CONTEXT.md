@@ -37,12 +37,12 @@ Decode 启动或继续读取时，Prefill source 已超过 hard TTL、原 reques
 _避免使用_: 必然 transfer failure、可自动 replay、仍受 source ownership 保护
 
 **Positional tensor ABI**:
-P/D 使用相同 layer-keyed address arrays 和 cache tuple/list position 解释 Main、Indexer 与可选 scale 的跨端约定。Wire metadata 不携带 semantic role、dtype、shape 或 memory kind；一致性由配对 image digest 和配置 fingerprint 的部署 gate 保证。
+P/D 使用相同 layer-keyed address arrays 和 cache tuple/list position 解释 Main、Indexer 与可选 scale 的跨端约定。Wire metadata 不携带 semantic role、dtype、shape 或 memory kind；配对环境必须满足文档化的 image、配置和 layout compatibility preconditions。
 _避免使用_: Semantic tensor map、自描述 layout、connector 已证明 P/D compatibility
 
-**Deployment compatibility gate**:
-流量进入前由部署系统确认 P/D 使用同一个 immutable image digest、模型/configuration fingerprint 和 positional ABI，并禁止 mixed-version rolling upgrade。缺少该 gate 时，合法地址上的错误 tensor transfer 可能 silent success。
-_避免使用_: Handshake version negotiation、运行时 semantic validation、操作者口头约定
+**Deployment compatibility preconditions**:
+部署文档规定的 P/D 配对前置条件，包括 immutable image identity、模型/configuration fingerprint、positional ABI、topology、memory placement 和禁止 mixed-version rolling upgrade。本 feature 不实现 deployment admission controller；违反这些条件时，合法地址上的错误 tensor transfer 可能 silent success。
+_避免使用_: Feature 内建 deployment gate、handshake version negotiation、运行时 semantic validation
 
 **Phase A quick validation**:
 Blockwise DSA 实现的快速迭代门禁，覆盖 opt-in/default isolation、startup/configuration、positional block mapping、单请求 Indexer 后 Main 的基本传输线、主要 transfer failure 和最小 reservation/replay/cleanup。Phase A 通过只表示可以继续扩展 Phase B，不表示 CPU/mock 已完整验收。
@@ -77,11 +77,11 @@ Scheduler 下发给 worker 的 request-lifecycle command。首版只有 `RECEIVE
 _避免使用_: 每次底层 API 调用、`PULL_INDEXER`/`PULL_MAIN` scheduler round、generic `EXECUTE`
 
 **DSA local result**:
-一个 Decode TP worker 对指定 request、execution epoch 和 command sequence 产生的 terminal command outcome：`RECEIVE_COMPLETE`、`D2H_COMPLETE`、`REPLAY_READY`、`QUIESCED` 或带 Indexer/Main phase 的 `TRANSFER_FAILED`。它必须先由 connector scheduler 解释，不能直接等同于 `finished_recving`。
-_避免使用_: Bool done、普通 `finished_recving`、Indexer 中间成功
+一个 Decode TP worker 对指定 request、execution epoch 和 command sequence 产生的 terminal command outcome：`RECEIVE_COMPLETE`、`D2H_COMPLETE`、`REPLAY_READY` 或带 Indexer/Main phase 的 `TRANSFER_FAILED`。Cancellation 达到 Quiesced 后复用普通 `finished_recving`，不产生 DSA local result。
+_避免使用_: Bool done、typed `QUIESCED`、Indexer 中间成功
 
 **DSA TP result coverage**:
-一个 command 在当前 routed Decode DP replica 内收到精确 Decode TP rank 集合的 terminal local results。Worker metadata 只合并同一步事实，connector scheduler 按 `(request_id, execution_epoch, command_seq)` 跨 step 累积；匿名完成计数、局部 TP 成功或重复 TP result 都不能替代完整 coverage。
+一个产生 DSA local result 的 command 在当前 routed Decode DP replica 内收到精确 Decode TP rank 集合的 terminal local results。Worker metadata 只合并同一步事实，connector scheduler 按 `(request_id, execution_epoch, command_seq)` 跨 step 累积；该 contract 不用于 cancellation 的普通 `finished_recving` ack。
 _避免使用_: `count >= D_TP`、全局 DP coverage、任一 TP 完成即 request complete
 
 **TP leader group**:
@@ -117,12 +117,16 @@ Transfer-failure replay 开始前的安全边界：所有 Decode TP 都已停止
 _避免使用_: Receive-complete、Quiesced、Main-valid
 
 **Cancellation drain-and-ack**:
-一种两阶段取消协议：取消意图产生后，仍可能被传输任务访问的 destination ownership 保持隔离；收到 Quiesced 确认后，相关 ownership 才可释放和复用。
+一种两阶段取消协议：取消意图产生后，仍可能被传输任务访问的 destination ownership 保持隔离；各 worker 达到 Quiesced 并上报普通 `finished_recving` 后，相关 ownership 才可释放和复用。
 _避免使用_: Cancellation 立即释放、收到 cancel 即等于传输已停止
 
 **Quiesced**:
-请求的终态安全边界：已经证明当前及旧 Execution epoch 都不会再访问该请求的 Indexer/Main destination，因此这些 destination ownership 可以安全释放和复用。
-_避免使用_: 已调用 cancel API、已收到 cancellation、receive-complete
+请求的终态安全边界：已经证明当前及旧 Execution epoch 都不会再访问该请求的 Indexer/Main destination，因此这些 destination ownership 可以安全释放和复用。它是 worker 内部安全状态，不是 typed result kind。
+_避免使用_: typed `QUIESCED`、已调用 cancel API、receive-complete
+
+**Prefill source-release notification**:
+Decode worker 在不再读取某个尚未通知完成的 Prefill source 后发送的一次性 best-effort release 通知，用于让 Prefill 在 hard TTL 前回收 source ownership；它与 Decode 本地 `finished_recving` ack 是不同通道。
+_避免使用_: 把 `finished_recving` 发送给 Prefill、cancellation reason message、可靠 lease release
 
 **Unquiesced operation**:
 已经启动、但尚未返回 completion，且无法证明不会继续访问 source 或 destination 的 Indexer D2D、Main D2RH 或 fused D2H operation。首版沿用普通 `MooncakeConnectorV1`，不增加 watchdog、可靠 cancel 或自动 fail-stop；D ownership 保持隔离，直到 operation 返回、worker/process 退出或外部重启。超过 Prefill source TTL 后的晚到成功仍属于 Source TTL overrun，不能据此证明 KV 内容正确。

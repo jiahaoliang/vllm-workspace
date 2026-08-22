@@ -64,7 +64,7 @@ kv_offload_mode=fused_overlap
 kv_connector_extra_config.sfa_kv_offload_backend=mooncake
 ```
 
-该 mode 要求 P/D 配对部署。按照 [ADR 0022](docs/adr/0022-use-the-puncture-positional-handshake-abi.md)，connector 不再通过自描述 handshake 证明双方的 mode、版本和 tensor layout 一致；这些一致性由流量进入前的 deployment compatibility gate 保证。Local role 或 offload 配置可以在各自进程初始化时校验，但 P/D 跨端错配属于 unsupported configuration，可能显式失败，也可能 silent corruption。首版 connector 不实现 production deployment admission controller；现有部署流程、manifest generation 或发布检查必须在 connector 外承担 compatibility gate，并保存 image digest 与配置 fingerprint 证据。
+该 mode 要求 P/D 配对部署。按照 [ADR 0022](docs/adr/0022-use-the-puncture-positional-handshake-abi.md)，connector 不再通过自描述 handshake 证明双方的 mode、版本和 tensor layout 一致；这些一致性被记录为流量进入前必须满足的 deployment compatibility preconditions。Local role 或 offload 配置可以在各自进程初始化时校验，但 P/D 跨端错配属于 unsupported configuration，可能显式失败，也可能 silent corruption。本 feature 只提供前置约束、检查方法和证据要求，不实现或选择 production deployment system、manifest generator、release gate 或 admission controller。
 
 ## Handshake 与 tensor layout
 
@@ -72,14 +72,14 @@ P/D 双方沿用穿刺 connector 的 positional ABI。Handshake 按 layer name �
 
 Connector 只检查本地能够直接证明的结构和 registration 事实，例如数组等长、地址与 block geometry 可用、Swapped Main pool 容量与注册成功。Connector 不跨端校验 protocol version、mode、dtype、shape、memory kind、page ratio、leader replica coverage 或 tuple ordering，也不提供 compatibility hash。
 
-部署系统必须在流量进入前保证 P/D 使用同一个 immutable image digest、相同 model/configuration fingerprint 和 positional ABI，并禁止 mixed-version rolling upgrade。违反该前置条件时，transfer 可能在合法地址上成功但写入错误 tensor；此类 silent corruption 不会触发 transfer-failure replay。
+Feature 部署文档规定，配对 P/D 在流量进入前必须使用同一个 immutable image digest、相同 model/configuration fingerprint 和 positional ABI，并禁止 mixed-version rolling upgrade。实际执行这些检查的外部部署系统不在本开发范围内。违反该前置条件时，transfer 可能在合法地址上成功但写入错误 tensor；此类 silent corruption 不会触发 transfer-failure replay。
 
 首版的 block/page compatibility 明确为：
 
 - Main K/V 的 P/D token block size 和每 block 字节数必须分别相等；
 - Indexer 允许一个 Decode page 容纳整数个 Prefill page，Decode page 的 token capacity 和字节数必须按同一个正整数比例放大；
 - 不支持 Prefill Indexer page 大于 Decode page、非整数 page ratio，或需要 Main block 拆分、拼接和重排的 layout；
-- 上述静态关系由 deployment compatibility gate 保证，不由 connector handshake 跨端证明；request-level token 范围与实际 block list 的一致性仍在请求进入传输前校验。
+- 上述静态关系属于文档化 deployment compatibility preconditions，不由 connector handshake 跨端证明，也不由本 feature 实现 production gate；request-level token 范围与实际 block list 的一致性仍在请求进入传输前校验。
 
 Tuple/list position 是首版 P/D 共享 ABI。任何位置、可选项或 layer mapping 变化都要求配对 P/D 同时升级 image，并刷新部署配置 fingerprint。
 
@@ -127,7 +127,7 @@ P0 is the payload source for D0; P1-P3 send no payload.
 P4 is the payload source for D1; P5-P7 send no payload.
 ```
 
-非 leader rank 可以参与既有控制与完成协调，但不能写入 Indexer HBM 或 Main Host destination。该规则避免同组多个 P rank 覆盖同一 D block，并明确假定 leader 持有目标 D TP 所需的完整 Main 与 Indexer replica。按照 ADR 0022，该 placement 由部署系统保证，handshake 不证明完整 replica；首版遇到需要多 P shard 拼装的 layout 属于可能 silent corruption 的 unsupported configuration。
+非 leader rank 可以参与既有控制与完成协调，但不能写入 Indexer HBM 或 Main Host destination。该规则避免同组多个 P rank 覆盖同一 D block，并明确假定 leader 持有目标 D TP 所需的完整 Main 与 Indexer replica。按照 ADR 0022，该 placement 是文档化部署前置条件，handshake 不证明完整 replica，本 feature 也不实现跨 deployment 校验；首版遇到需要多 P shard 拼装的 layout 属于可能 silent corruption 的 unsupported configuration。
 
 DP 不参与同一份 tensor 的拼装。每个 request 只从实际处理该 request 的 P DP replica 内选择 TP leader，不跨 P DP replica 混合 block ID 或 memory address。
 
@@ -259,13 +259,13 @@ Tracker 使用两个生命周期：`MainReservationState` 跨 preemption 保留 
 
 ## Cancellation cleanup
 
-首版采用 [ADR 0010](docs/adr/0010-use-two-phase-cancellation-drain-and-ack.md) 的两阶段 cancellation。已经取得 Main reservation 的请求被取消时，scheduler 只将其标记为 `CANCEL_PENDING`，禁止新的 receive、replay 和 D2H，并从 `request_finished_all_groups()` 返回 `delay_free_blocks=True`；它不能立即归还 Main block IDs。Worker retire 对应 execution epoch，并等待已提交的 Indexer D2D、Main D2RH 或 fused D2H 不再访问 destination。Worker 清理 request/destination/pending state 后，为当前 `(request_id, execution_epoch, command_seq, tp_rank)` 产生 typed `QUIESCED` local result。
+首版采用 [ADR 0010](docs/adr/0010-use-two-phase-cancellation-drain-and-ack.md) 的两阶段 cancellation。已经取得 Main reservation 的请求被取消时，scheduler 只将其标记为 `CANCEL_PENDING`，禁止新的 receive、replay 和 D2H，并从 `request_finished_all_groups()` 返回 `delay_free_blocks=True`；它不能立即归还 Main block IDs。Worker retire 对应 execution epoch，并等待已提交的 Indexer D2D、Main D2RH 或 fused D2H 不再访问 destination。Worker 先按 active `(request_id, execution_epoch)` 过滤 stale/duplicate completion，清理 request/destination/pending state并达到 worker-local Quiesced；cancellation 不产生 typed `QUIESCED` local result。
 
-按照 [ADR 0020](docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md) 和 [ADR 0021](docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，`KVConnectorWorkerMetadata.aggregate()` 只合并同一 engine step 的 `QUIESCED` facts；scheduler connector 按 command identity 跨 step 累积，并等待精确 Decode TP rank 集合全部上报 `QUIESCED`。只有此后，`update_connector_output()` 才能 release-once Main reservation，并允许 terminal cleanup path 产生普通 `finished_recving`，供 vLLM core 释放 delayed NPU blocks。ADR 0010 中“通过 `finished_recving` 上报 quiesced”是对既有 core hook 的早期简写；ADR 0020/0021 细化了 ack carrier 和聚合层级，不改变 ADR 0010 的 ownership 与释放顺序。`finished_recving` 对 terminal request 不能把请求重新放回可运行状态。
+按照 [ADR 0020](docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md) 和 [ADR 0021](docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，每个 worker 达到 Quiesced 后先向自己实际读取、且尚未通知完成的 Prefill leader endpoint best-effort 发送一次现有 `DONE_RECVING_MSG`，再把 request ID 放入普通 `finished_recving` set 一次；普通 receive 已通知的 endpoint 不重发。vLLM `KVOutputAggregator` 按 expected worker count 跨 step 汇聚；aggregated request ID 到达 scheduler 后，`update_connector_output()` 才能 release-once Main reservation，随后 core 释放 delayed NPU blocks。普通 signal 只携带 request ID，因此 worker 必须在上报前完成 epoch 和 duplicate guard。`finished_recving` 对 terminal request 不能把请求重新放回可运行状态。
 
-Cancellation 的阶段规则为：admission 前没有 reservation，立即完成；admission 后统一进入两阶段 cleanup；`WAITING_FOR_REMOTE_KVS` 停止启动后续 transfer phase，已经进入的底层同步 phase drain 或可靠取消；`RUNNING` 先 drain 当前 fused D2H/save barrier；`PREEMPTED` 或 `REPLAY_PENDING` retire 当前 epoch，并在 worker quiesced 后释放仍保留的 Main reservation。重复 cancellation、重复 ack 和旧 epoch completion 都必须是幂等 no-op。
+Cancellation 的阶段规则为：admission 前没有 reservation，立即完成；admission 后统一进入两阶段 cleanup；`WAITING_FOR_REMOTE_KVS` 停止启动后续 transfer phase，已经进入的底层同步 phase 必须 drain 到返回，首版不增加 reliable/native cancel；`RUNNING` 先 drain 当前 fused D2H/save barrier；`PREEMPTED` 或 `REPLAY_PENDING` retire 当前 epoch，并在 worker Quiesced 后释放仍保留的 Main reservation。重复 cancellation、重复 ack 和旧 epoch completion 都必须是幂等 no-op。
 
-D worker quiesced 后向 P 发送 terminal notification 以提前释放 source；通知丢失时由现有 Prefill source TTL 兜底。如果 worker 无法进入 quiesced，按照 [ADR 0016](docs/adr/0016-do-not-watchdog-unquiesced-operations.md) 沿用普通 `MooncakeConnectorV1`：D Main reservation 和 delayed NPU blocks 在 live process 中无限期保持隔离，不增加 drain watchdog、fatal latch 或自动 fail-stop，也不能为了回收容量而强制复用。恢复依赖 operation 最终返回、已有 process failure 或外部重启。
+`DONE_RECVING_MSG` 是 Prefill source-release notification，不是 cancellation reason，也不是 Decode 本地 ack。目标 cancellation path 必须先尝试该通知，再暴露普通 `finished_recving`；通知发送或 ACK 失败时由现有 Prefill source TTL 兜底，不阻止已经 Quiesced 的 Decode 释放本地 ownership。如果 worker 无法进入 quiesced，按照 [ADR 0016](docs/adr/0016-do-not-watchdog-unquiesced-operations.md) 沿用普通 `MooncakeConnectorV1`：D Main reservation 和 delayed NPU blocks 在 live process 中无限期保持隔离，不发送伪通知，不增加 drain watchdog、fatal latch 或自动 fail-stop，也不能为了回收容量而强制复用。恢复依赖 operation 最终返回、已有 process failure 或外部重启。
 
 ## Transfer phase failure ordering
 
@@ -273,7 +273,7 @@ D worker quiesced 后向 P 发送 terminal notification 以提前释放 source�
 
 该语义不同于穿刺代码。穿刺的 Indexer leg 失败只会把 request 加入 `failed_reqs`，控制流仍继续调用 Main leg，并继续后续 layer，最后才统一上报失败；它也没有可证明 Main validity 的 per-leg 状态。目标 blockwise Decode-pull 实现沿用普通 `MooncakeConnectorV1` 的 fail-fast 方向，不复制这项 best-effort 行为。
 
-Local gate 不增加跨 TP barrier。其他 Decode TP 如果已经通过各自的 Indexer gate，可以继续或已经完成 local Main；但跨 TP 的局部成功不能单独形成 request-level receive-complete。独立的 DSA worker result metadata 通过 `KVConnectorWorkerMetadata.aggregate()` 只合并当前 engine step 内的 local phase facts；scheduler connector 再按 `(request_id, execution_epoch, command_seq)` 跨 step 累积，并用 exact Decode TP rank coverage 决定 request-level transition。普通 `finished_recving` 不能单独决定 receive、replay 或 cancellation 语义。
+Local gate 不增加跨 TP barrier。其他 Decode TP 如果已经通过各自的 Indexer gate，可以继续或已经完成 local Main；但跨 TP 的局部成功不能单独形成 request-level receive-complete。独立的 DSA worker result metadata 通过 `KVConnectorWorkerMetadata.aggregate()` 只合并当前 engine step 内的 local phase facts；scheduler connector 再按 `(request_id, execution_epoch, command_seq)` 跨 step 累积，并用 exact Decode TP rank coverage 决定 receive、failure、replay 和 fused-D2H transition。普通 `finished_recving` 不能单独决定这些语义，只在 scheduler 已知 request terminal 的 cancellation path 作为 all-worker Quiesced ack复用。
 
 Indexer failure 发生后，Main lifetime reservation 在 failure handling 完成前仍保持隔离；Main 尚未开始不等于 reservation 可以立即释放。按照 [ADR 0014](docs/adr/0014-rely-only-on-mooncake-internal-retry.md)，Indexer 和 Main phase 在 Python connector 层都只发起一次同步 transfer 调用，依赖 Mooncake binding 的 internal retry；binding 最终返回失败时，按 [ADR 0012](docs/adr/0012-retry-transfer-then-replay-on-decode.md) 将整个 request 转入 D-side full-sequence replay。按照 ADR 0015，transfer 前不证明 P source 可靠。
 
@@ -291,27 +291,27 @@ Worker 只有在同步 transfer 已返回、所有 local transfer task 都停止
 
 ## Metadata boundaries
 
-首版按照 [ADR 0017](docs/adr/0017-use-a-separate-typed-dsa-metadata-family.md) 使用独立、强类型、按通信方向分离的 Decode step/result metadata。Prefill scheduler-to-worker 继续使用普通 `MooncakeConnectorMetadata`；Decode scheduler-to-worker 使用 DSA step metadata；Decode worker-to-scheduler 使用可跨 TP 聚合的 DSA result metadata。按照 ADR 0022，P/D worker layout 使用穿刺 positional handshake ABI，不属于 semantic metadata family。普通 V1 `ReqMeta`、`MooncakeConnectorMetadata` 和非 DSA request 路径不增加 optional DSA fields。
+首版按照 [ADR 0017](docs/adr/0017-use-a-separate-typed-dsa-metadata-family.md) 使用独立、强类型、按通信方向分离的 Decode step/result metadata。Prefill scheduler-to-worker 继续使用普通 `MooncakeConnectorMetadata`；Decode scheduler-to-worker 使用 DSA step metadata；Decode worker-to-scheduler 对 receive、failure、replay 和 fused D2H 使用可跨 TP 聚合的 DSA result metadata，cancellation 则复用普通 `KVConnectorOutput.finished_recving`。按照 ADR 0022，P/D worker layout 使用穿刺 positional handshake ABI，不属于 semantic metadata family。普通 V1 `ReqMeta`、`MooncakeConnectorMetadata` 和非 DSA request 路径不增加 optional DSA fields。
 
-Scheduler/worker metadata 只携带 process-independent typed values 和 block IDs，不携带 tensor、event、thread 或每请求 raw address。Positional handshake 继续使用 MessagePack-compatible layer/address arrays，但不提供 semantic compatibility validation；普通 V1 `kv_transfer_params` 继续作为 JSON-compatible rendezvous/source input，由 Decode scheduler 转换成 DSA request metadata。Worker result identity 至少覆盖 request、execution epoch、command sequence 和 TP rank；冲突重复结果 fail closed，不能 last-writer-wins。
+Scheduler/worker metadata 只携带 process-independent typed values 和 block IDs，不携带 tensor、event、thread 或每请求 raw address。Positional handshake 继续使用 MessagePack-compatible layer/address arrays，但不提供 semantic compatibility validation；普通 V1 `kv_transfer_params` 继续作为 JSON-compatible rendezvous/source input，由 Decode scheduler 转换成 DSA request metadata。Typed worker result identity 至少覆盖 request、execution epoch、command sequence 和 TP rank；冲突重复结果 fail closed，不能 last-writer-wins。Cancellation ordinary completion只携带 request ID，epoch和duplicate由worker-local guard在上报前处理。
 
-`finished_recving` 仍复用 vLLM 的现有 transition hook，但 scheduler 必须先在 `update_connector_output()` 消费匹配 epoch 和完整 TP coverage 的 DSA result，再允许 core 将同一步 completion 解释为 receive-complete、replay-ready 或 terminal quiesced。
+`finished_recving` 仍复用 vLLM 的现有 transition hook。Receive-complete 和 replay-ready 路径中，scheduler 必须先在 `update_connector_output()` 消费匹配 epoch 和完整 TP coverage 的 typed DSA result；cancellation 路径不生成 typed result，aggregated ordinary completion直接表示所有 worker已通过本地Quiesced guard。
 
 按照 [ADR 0018](docs/adr/0018-use-nested-value-objects-for-dsa-step-requests.md)，Decode scheduler-to-worker 的每个 request 使用一个强类型 envelope，并把 remote source、Decode destination ownership 和 per-step lifecycle command 拆成嵌套 value object。Request identity 位于 envelope 顶层，组合通过集中 factory/validator 校验；普通 V1 `ReqMeta` 保持扁平结构。
 
-按照 [ADR 0019](docs/adr/0019-use-minimal-complete-dsa-step-fields.md)，step request 使用显式最小完备 fields：source 只携带 remote engine/request/endpoint 和 semantic Indexer/Main block IDs；destination 只携带 stable Main reservation identity/capacity、当前 command 可访问的 bound Host prefix 和当前 epoch Indexer IDs；lifecycle 携带 execution epoch、per-epoch command sequence、现有 external/computed token state、preserved Main boundary 和 Decode fused D2H range。完整 future reservation block IDs 只由 scheduler tracker 持有，不发送给 worker；static topology 来自 local configuration 和普通 V1 rendezvous，layer address layout 来自 positional handshake，跨端一致性由 deployment gate 保证。
+按照 [ADR 0019](docs/adr/0019-use-minimal-complete-dsa-step-fields.md)，step request 使用显式最小完备 fields：source 只携带 remote engine/request/endpoint 和 semantic Indexer/Main block IDs；destination 只携带 stable Main reservation identity/capacity、当前 command 可访问的 bound Host prefix 和当前 epoch Indexer IDs；lifecycle 携带 execution epoch、per-epoch command sequence、现有 external/computed token state、preserved Main boundary 和 Decode fused D2H range。完整 future reservation block IDs 只由 scheduler tracker 持有，不发送给 worker；static topology 来自 local configuration 和普通 V1 rendezvous，layer address layout 来自 positional handshake，跨端一致性只作为文档化部署前置条件。
 
-按照 [ADR 0020](docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)，scheduler actions 为 `RECEIVE_REMOTE`、`FUSED_D2H`、`PREPARE_REPLAY` 和 `QUIESCE`；local result kinds 为 `RECEIVE_COMPLETE`、`D2H_COMPLETE`、`REPLAY_READY`、`QUIESCED` 和 `TRANSFER_FAILED`。只有 `TRANSFER_FAILED` 携带 `INDEXER_D2D` 或 `MAIN_D2RH` failure phase。Indexer/Main 是一个 receive command 内的 worker-local serial phases，不拆成 scheduler actions。
+按照 [ADR 0020](docs/adr/0020-use-lifecycle-actions-and-terminal-local-results.md)，scheduler actions 为 `RECEIVE_REMOTE`、`FUSED_D2H`、`PREPARE_REPLAY` 和 `QUIESCE`；typed local result kinds 为 `RECEIVE_COMPLETE`、`D2H_COMPLETE`、`REPLAY_READY` 和 `TRANSFER_FAILED`。只有 `TRANSFER_FAILED` 携带 `INDEXER_D2D` 或 `MAIN_D2RH` failure phase。`QUIESCE` 达到 worker-local Quiesced 后直接进入普通 completion channel，不产生 typed result。Indexer/Main 是一个 receive command 内的 worker-local serial phases，不拆成 scheduler actions。
 
 `FUSED_D2H` 只有在当前 command 获得 exact TP `D2H_COMPLETE` coverage 后，才推进 confirmed Main valid prefix；该 transition 从不生成 `finished_recving`。Fused D2H 的同步调用或 TP status check 失败时沿用 SFA worker 的 fail-fast `RuntimeError`，不伪造 `TRANSFER_FAILED`、`D2H_COMPLETE` 或 connector completion。
 
-按照 [ADR 0021](docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，DSA worker metadata 的 `aggregate()` 只合并当前 engine step 的 rank-aware local results；Decode scheduler connector 按 `(request_id, execution_epoch, command_seq)` 跨 step 累积。Expected coverage 是当前 routed Decode DP replica 内的精确 TP rank 集合 `set(range(D_TP))`，不包含其他 DP replica 或 Prefill ranks。相同完整 result 重复时幂等，冲突或 impossible future result fail closed，stale result 只记录并忽略。缺失 TP result 时保持 pending；任一 initial receive failure 也必须等待完整 TP terminal coverage 后才能向所有 TP 下发 `PREPARE_REPLAY`。
+按照 [ADR 0021](docs/adr/0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，DSA worker metadata 的 `aggregate()` 只合并当前 engine step 的 rank-aware typed local results；Decode scheduler connector 按 `(request_id, execution_epoch, command_seq)` 跨 step 累积。Expected coverage 是当前 routed Decode DP replica 内的精确 TP rank 集合 `set(range(D_TP))`，不包含其他 DP replica 或 Prefill ranks。相同完整 result 重复时幂等，冲突或 impossible future result fail closed，stale result 只记录并忽略。缺失 TP result 时保持 pending；任一 initial receive failure 也必须等待完整 TP terminal coverage 后才能向所有 TP 下发 `PREPARE_REPLAY`。Cancellation 是窄例外，只使用ordinary expected-worker-count aggregation。
 
 ## 预计源码改动
 
 实现预计集中在以下文件：
 
-- `vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_connector.py`：opt-in mode、Decode scheduler 选择、blockwise metadata/handshake，以及 D2D/D2RH receive logic；
+- `vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_connector.py`：opt-in mode、Decode scheduler 选择、blockwise metadata/handshake、D2D/D2RH receive logic、cancellation ordinary completion和`DONE_RECVING_MSG` ordering；
 - `vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_dsa_metadata.py` 或同等隔离的 feature-local module：DSA step 和 worker result strong types；positional handshake layer metadata 可以放在该 module 或 `mooncake_connector.py`，但不构成 semantic contract；
 - `vllm_ascend/distributed/kv_transfer/sfa_kv_offload/sfa_kv_offload_worker.py`：绑定、寻址、消费和释放 local swapped Main pool 所需的 interface；
 - `vllm_ascend/worker/model_runner_v1.py`：优先复用现有 runner-owned swapped allocation 与 `bind_runner_host_main` 路径，仅在现有 contract 无法被 connector 使用时修改；
@@ -332,14 +332,14 @@ Scheduler/worker metadata 只携带 process-independent typed values 和 block I
 - Transfer 前不检查 Prefill source TTL 或 ownership；TTL overrun 属于 unsupported operating region，显式 transfer failure 可以 replay，但成功读取已复用地址不能被检测；
 - Transfer-failure replay 保留 Main reservation ownership，但统一令所有 TP 的 `preserved_main_tokens=0` 并完整重写 Main；
 - Preemption 后首版在 Decode 本地执行 full-sequence compute replay、重建 Indexer 并复用已确认有效的 Main prefix；不重新从 Prefill 拉取，并将 compute replay 明确视为潜在性能退化路径；
-- Admission 后 cancellation 采用两阶段 drain-and-ack，worker quiesced 前不得释放或复用 Main reservation；
+- Admission 后 cancellation 采用两阶段 drain-and-ack，worker Quiesced 前不得释放或复用 Main reservation；Quiesced 是 worker-local state，不是 typed result；
 - Unquiesced operation 不增加 watchdog、fatal latch、reliable cancel 或自动 restart contract；D ownership 在 live process 中保持隔离，P source 仍可能在 hard TTL 后复用，有限时间自动恢复和 TTL 后晚到成功的内容正确性均不属于首版保证。
-- Blockwise DSA 使用独立、强类型、按方向拆分的 metadata family；普通 V1 metadata 不增加 DSA optional fields。`KVConnectorWorkerMetadata.aggregate()` 只合并同一 engine step 的 rank-aware facts，Decode scheduler connector 负责按 command identity 跨 step 累积并检查 exact TP coverage。
+- Blockwise DSA 使用独立、强类型、按方向拆分的 metadata family；普通 V1 metadata 不增加 DSA optional fields。`KVConnectorWorkerMetadata.aggregate()` 只合并同一 engine step 的 receive/replay/fused-D2H rank-aware facts，Decode scheduler connector 负责按 command identity 跨 step 累积并检查 exact TP coverage；cancellation复用普通completion。
 - Decode scheduler-to-worker request 使用嵌套 `source`、`destination ownership` 和 `lifecycle` value object，并集中校验跨对象不变量；不使用扁平 optional-field envelope 或 per-action request union。
 - Step fields 使用显式最小完备 schema；scheduler 独占完整 future Main reservation IDs，worker 只接收 reservation identity/capacity 和当前 command 可访问的 bound prefix，并以 `(request, execution epoch, command sequence)` 拒绝 stale command。
 - DSA 使用 lifecycle-oriented actions 和 command-terminal local results；Indexer/Main failure 可触发 request-level replay，running request 的 fused D2H failure 首版继续 fail-fast，不伪造 connector completion。
-- Worker result 使用 exact Decode TP rank coverage 和 scheduler-side 跨 step accumulation；匿名 count、重复 rank 或局部 TP success 不能形成 request-level completion。
-- P/D positional ABI、dtype、memory kind、page ratio 或 leader coverage 错配不保证被 connector 检测；部署系统必须用 image digest 和配置 fingerprint 阻止不兼容组合进入流量。
+- Typed worker result 使用 exact Decode TP rank coverage 和 scheduler-side 跨 step accumulation；匿名 count、重复 rank 或局部 TP success 不能形成 receive、failure、replay或D2H request-level transition。Cancellation只在terminal path复用ordinary count。
+- P/D positional ABI、dtype、memory kind、page ratio 或 leader coverage 错配不保证被 connector 检测；feature文档要求外部部署流程核对image digest和配置fingerprint，但本开发不实现该流程。
 
 Preemption recovery、Main ownership、execution-epoch 边界、cancellation cleanup、retry 层级、source TTL handling、unquiesced operation handling、metadata type boundary、worker-result aggregation 和 positional handshake ABI 已经确定。
 
@@ -348,7 +348,7 @@ Preemption recovery、Main ownership、execution-epoch 边界、cancellation cle
 按照 [ADR 0023](docs/adr/0023-use-staged-phase-a-then-phase-b-validation.md)，后续实现采用 Phase A 后 Phase B 的分阶段测试门禁：
 
 - Phase A 先运行 opt-in/default isolation、startup/configuration、positional block mapping、单请求 Indexer D2D -> Main D2RH ordering、Indexer/Main failure 和最小 reservation/replay/cleanup tests，快速验证基本功能线；
-- Phase A 全绿后必须继续 Phase B，覆盖完整 lifetime reservation、HOL admission、preemption、drain-and-ack、transfer-failure full replay、exact TP cross-step aggregation、fused D2H boundary、多请求交错和 default V1 regression；
+- Phase A 全绿后必须继续 Phase B，覆盖完整 lifetime reservation、HOL admission、preemption、drain-and-ack、Prefill source-release notification、ordinary all-worker cancellation completion、transfer-failure full replay、exact TP cross-step aggregation、fused D2H boundary、多请求交错和 default V1 regression；
 - Phase A 只是快速反馈检查点，不能标记为 `CPU/mock validated`；只有 Phase A 和 Phase B 都通过才具有该状态；
 - static、CPU/mock 和 NPU runtime evidence 分开记录，不能用 mock address calculation 证明真实 D2D/D2RH、NPU-addressable Host registration 或 fused kernel 正确性；
 - 首版以 deterministic Phase A/Phase B matrix 作为 CPU/mock 门禁，不采用 property/model-based lifecycle testing；后者只作为后续增强候选。
@@ -356,12 +356,12 @@ Preemption recovery、Main ownership、execution-epoch 边界、cancellation cle
 测试按 ADR 0023 的 ownership 分为一个主 seam 和两个支持 seam：
 
 - 主 seam 是 `MooncakeConnectorV1` public connector lifecycle，覆盖 opt-in/default isolation，以及从 admission、allocation、metadata、worker result 到 scheduler output consumption 和 request finish 的完整 request lifecycle；
-- DSA metadata contract seam 直接验证 typed envelope、validator、action/result matrix、serialization-safe values、same-step `aggregate()` 和 scheduler-side cross-step exact TP accumulation；
+- DSA metadata contract seam 直接验证 typed envelope、validator、action/result matrix、serialization-safe values、same-step `aggregate()` 和 scheduler-side cross-step exact TP accumulation；cancellation ordinary completion 在主 lifecycle seam验证；
 - SFA memory-binding/data-plane seam 使用 fake tensor/address 和现有 registration、runner Host Main binding、fused-save interface，验证 Indexer HBM、Main Host、positional mapping、bound prefix 和 D2H range。
 
 CPU/mock unit tests 必须在 `liangjiahao` namespace 的专用长期运行 CPU-only UT Pod 中执行，显式指定 test target，并通过 tar 同步当前 checkout。执行报告分别保存 Phase A 和 Phase B 的源码身份、命令与结果。
 
-当前环境只生成以 `P TP8/DP2 -> D TP2/DP8` 为起点的 NPU end-to-end 测试计划。计划必须覆盖 deployment compatibility preflight、happy path、partial/multi-block、correctness oracle、ordering/failure injection、reservation pressure、preemption、cancellation、default V1 isolation 和 cleanup，并统一标记 `planned / not run`。在未来真实执行全部 mandatory cases 前，不得声称 `NPU runtime validated`。
+当前环境只生成以 `P TP8/DP2 -> D TP2/DP8` 为起点的 NPU end-to-end 测试计划。计划必须覆盖文档化 compatibility preconditions 的preflight、happy path、partial/multi-block、correctness oracle、ordering/failure injection、reservation pressure、preemption、cancellation、default V1 isolation 和 cleanup，并统一标记 `planned / not run`。Preflight是测试执行步骤，不是本feature实现production deployment system。在未来真实执行全部 mandatory cases 前，不得声称 `NPU runtime validated`。
 
 ## 决策闭环与下一阶段
 

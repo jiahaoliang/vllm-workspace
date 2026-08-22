@@ -2,7 +2,7 @@
 
 状态：已被 ADR 0022 取代
 
-后续决策改为沿用穿刺 positional ABI，并由部署系统保证 P/D image、配置和 tuple layout 一致，见 [ADR 0022](0022-use-the-puncture-positional-handshake-abi.md)。本 ADR 保留为被否决方案的历史记录。
+后续决策改为沿用穿刺 positional ABI，并把 P/D image、配置和 tuple layout 一致性记录为文档化部署前置条件；本 feature 不实现 deployment gate，见 [ADR 0022](0022-use-the-puncture-positional-handshake-abi.md)。本 ADR 保留为被否决方案的历史记录。
 
 Blockwise DSA PD offload 在 P/D handshake 中显式发布 Main K、Main V、Indexer 和可选 Indexer scale 的 semantic tensor map，并在 ready 前严格校验双方的 role、layer coverage、tensor layout 和 memory kind。Cache tuple 下标只作为 worker 内部适配细节，不构成跨端协议，从而避免 `model_runner_v1` layout 或 P/D 配置差异把正确下标静默解释为错误 tensor。
 

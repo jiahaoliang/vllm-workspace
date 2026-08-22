@@ -1,6 +1,6 @@
 # 04 — 完成 exact TP lifecycle 与 fused D2H validity
 
-**What to build:** 让 Blockwise DSA lifecycle 在真实的多 TP Decode replica 内只依据精确、rank-aware 的 terminal facts 前进，并把成功的 fused D2H 纳入 Main validity：局部成功、重复 result 或匿名完成计数都不能提前恢复请求或释放 ownership。
+**What to build:** 让 Blockwise DSA 的 receive、failure、replay 和 fused-D2H lifecycle 在真实的多 TP Decode replica 内只依据精确、rank-aware 的 typed terminal facts 前进，并把成功的 fused D2H 纳入 Main validity：局部成功、重复 result 或匿名完成计数都不能提前恢复请求或推进 Main validity。Cancellation 的 ordinary all-worker ack由 issue 06 实现，不属于本票 typed result coverage。
 
 **Spec:** [Blockwise DSA PD offload spec](../spec.md)
 
@@ -18,4 +18,5 @@
 - [ ] 任一 TP 报告 transfer failure 时，当前 command 先等待其他 TP 的 terminal coverage，不与尚未结束的 destination operation 并发启动 replay。
 - [ ] `FUSED_D2H` 只能写入 current bound Main prefix 中从 confirmed boundary 开始的连续 range；exact TP `D2H_COMPLETE` 后推进 confirmed Main valid prefix，且不生成 `finished_recving`。
 - [ ] Fused D2H failure 保持 worker/engine fail-fast，不伪造 `TRANSFER_FAILED`、`D2H_COMPLETE` 或 request-local recovery。
+- [ ] `QUIESCE` 不产生 typed `QUIESCED`，也不进入 `results_by_tp`；本票不能把 cancellation 的 ordinary completion扩展到 receive、failure、replay 或 D2H。
 - [ ] Focused tests 覆盖跨 step coverage、duplicate/conflict/stale/future/missing、mixed TP outcomes、D2H range/validity 和 default V1 completion isolation。

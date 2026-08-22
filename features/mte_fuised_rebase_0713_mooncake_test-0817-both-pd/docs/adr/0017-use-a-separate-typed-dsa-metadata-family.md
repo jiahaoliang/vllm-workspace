@@ -10,7 +10,7 @@ Blockwise DSA PD offload 为 `dsa_pd_offload=true` 建立独立、强类型、�
 
 穿刺 Decode scheduler 直接返回 `SFAKVOffloadConnectorMetadata`，并复用 `sfa_kv_offload.config_data.ReqMeta`。该 `ReqMeta` 的 `block_ids_npu` 在 PD 路径中实际被重解释为 Main HBM IDs，`block_ids_cpu` 表示 Main Host IDs，另加 `block_ids_indexer` 表示 Indexer HBM IDs；同时保留 legacy `num_full`、`partial_hbm_bid` 和 per-step offload range。Worker 通过大量 `getattr()` 同时兼容 SFA、layerwise 和 Mooncake shape。
 
-P 侧则使用另一套 layerwise `SfaPDProducerMetadata`。D 侧 completion 主要依赖 done/failed sets，没有 `(request_id, execution_epoch, tp_rank)` worker result，也不能在 scheduler 侧区分 receive-complete、replay-ready、cancellation quiesced 和 stale completion。
+P 侧则使用另一套 layerwise `SfaPDProducerMetadata`。D 侧 completion 主要依赖 done/failed sets，没有 `(request_id, execution_epoch, tp_rank)` worker result，也不能在 scheduler 侧区分 receive-complete、replay-ready 和 stale completion。Cancellation quiesce 不需要增加新的 typed result；目标实现由 worker 内部 epoch guard 决定何时安全进入普通 `finished_recving`。
 
 这种复用减少了穿刺代码量，但同一个字段在不同路径代表不同 memory role，无法为 blockwise DSA 的 reservation、epoch、phase gate 和跨 TP replay 提供稳定 contract，目标实现不沿用。
 
@@ -45,13 +45,16 @@ Decode scheduler -> Decode workers
 Decode workers -> Decode scheduler
   Blockwise DSA worker result metadata
     local TP phase result
-    quiesced/replay-ready/receive-complete evidence
+    replay-ready/receive-complete/fused-D2H evidence
     aggregate() across worker outputs
+
+  existing KVConnectorOutput.finished_recving
+    cancellation quiesced ack after worker-local epoch guard
 
 Prefill workers <-> Decode workers
   puncture-compatible positional handshake metadata
     layer key + parallel address/length/scale arrays
-    compatibility guaranteed by deployment gate
+    compatibility required by documented deployment preconditions
 ```
 
 Scheduler-to-worker 和 worker-to-scheduler metadata 使用当前 vLLM RPC 可传输的 Python strong types，只允许 process-independent data，例如 scalar、enum、tuple/list、dict with typed values 和 block IDs；不能携带 `torch.Tensor`、NPU event、thread object 或依赖某个 process address space 的对象。P/D handshake 使用 MessagePack-compatible positional arrays，不提供 semantic role 或 version compatibility validation。
@@ -60,9 +63,9 @@ Scheduler-to-worker 和 worker-to-scheduler metadata 使用当前 vLLM RPC 可�
 
 ## Worker result aggregation
 
-DSA worker result 必须继承 `KVConnectorWorkerMetadata` 并实现 `aggregate()`，复用 vLLM 现有 `KVOutputAggregator`，不修改 upstream core。按照 ADR 0019，每个 local result 的 identity 至少覆盖 request、execution epoch、command sequence 和 TP rank。按照 [ADR 0021](0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，`aggregate()` 只合并同一个 engine step 的 rank-aware facts；scheduler connector 按 command identity 跨 step 累积，并要求当前 routed Decode DP replica 的精确 TP rank coverage。同一 identity 的相同完整 result 是幂等的，冲突内容必须 fail closed，不能 last-writer-wins。
+DSA worker result 必须继承 `KVConnectorWorkerMetadata` 并实现 `aggregate()`，复用 vLLM 现有 `KVOutputAggregator`，不修改 upstream core。按照 ADR 0019，每个 typed local result 的 identity 至少覆盖 request、execution epoch、command sequence 和 TP rank。按照 [ADR 0021](0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md)，`aggregate()` 只合并同一个 engine step 的 rank-aware facts；scheduler connector 按 command identity 跨 step 累积，并要求当前 routed Decode DP replica 的精确 TP rank coverage。同一 identity 的相同完整 result 是幂等的，冲突内容必须 fail closed，不能 last-writer-wins。
 
-`finished_recving` 仍用于触发 vLLM 已有 request transition，但不再单独承担语义判定。Scheduler `update_connector_output()` 必须先消费聚合后的 DSA worker result，再让 core 处理同一步的 `finished_recving`：只有匹配 epoch、满足预期 TP coverage 且 result kind 与 request lifecycle 一致时，才能把 completion 解释为 receive-complete、replay-ready 或 terminal quiesced。缺失或冲突 result 时不能恢复、release 或标记 cache hit。
+`finished_recving` 仍用于触发 vLLM 已有 request transition。Receive-complete 和 replay-ready 路径不能单独依赖它：scheduler `update_connector_output()` 必须先消费匹配 epoch、满足精确 TP coverage 的 typed DSA result，再让 core 处理同一步 completion。Cancellation 是显式例外：worker 达到 Quiesced 后直接复用普通 `finished_recving`，由现有 expected-worker-count 聚合触发 terminal release，不生成 typed `QUIESCED`。Worker 必须在放入普通 request-ID set 前过滤 stale epoch 和重复 ack。
 
 ## 不进入 metadata 的内容
 
@@ -71,16 +74,16 @@ DSA worker result 必须继承 `KVConnectorWorkerMetadata` 并实现 `aggregate(
 - `valid_token_count`、`transfer_token_start` 或 `transfer_token_count` 形式的第二套 prompt transfer boundary；
 - source expiry、remaining TTL、source generation 或 launch grant；
 - connector retry attempts、backoff 或 NIC selection；
-- 每请求 raw source/destination address；address 由 positional handshake arrays 和 process-local registered pool 结合 block IDs 解析，P/D layout compatibility 由 deployment gate 保证；
+- 每请求 raw source/destination address；address 由 positional handshake arrays 和 process-local registered pool 结合 block IDs 解析，P/D layout compatibility 属于文档化部署前置条件；
 - 测试拓扑 `P TP8/DP2 -> D TP2/DP8` 的硬编码字段。
 
 ## 结果
 
 - 普通 `MooncakeConnectorMetadata`、普通 `ReqMeta` 和非 DSA worker path 保持源码与行为兼容；`dsa_pd_offload=false` 不构造或接受 DSA metadata。
-- DSA mode 收到普通 scheduler/worker lifecycle metadata、或普通 mode 收到 DSA lifecycle metadata 时仍 fail closed；P/D handshake type/version/mode 一致性改由部署系统保证，不再属于 connector contract。
+- DSA mode 收到普通 scheduler lifecycle metadata、或普通 mode 收到 DSA lifecycle metadata 时仍 fail closed；P/D handshake type/version/mode 一致性属于文档化部署前置条件，不由本 feature 实现跨 deployment gate。
 - Prefill scheduler 继续普通 V1 flow；Decode scheduler 构造 DSA step metadata；P/D workers 通过 positional handshake arrays 暴露地址和 block geometry。
 - `SFAKVOffloadConnectorMetadata` 和现有 `ReqMeta` 可以作为 worker 内部 adapter 的输入参考，但不再是 blockwise DSA 的跨组件 contract。
-- Request envelope、exact fields、action/local-result/transfer-phase enums 和 aggregation completeness rules 已分别由 ADR 0018-0021 确定。
+- Request envelope、exact fields、action/local-result/transfer-phase enums 和 typed result aggregation completeness rules 已分别由 ADR 0018-0021 确定；cancellation 普通 completion 由 ADR 0010 单独规定。
 
 ## 预计实现影响
 

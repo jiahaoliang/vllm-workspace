@@ -1,6 +1,6 @@
 # 06 — 完成 preemption 与 cancellation ownership recovery
 
-**What to build:** 让已经 admission 的 Blockwise DSA 请求在 preemption 或 cancellation 下保持可证明的 destination ownership：preemption 使用新 execution epoch 重建 Indexer并尽可能复用有效 Main，cancellation 则在 worker 全部 quiesced 前禁止复用任何 reservation 地址。
+**What to build:** 让已经 admission 的 Blockwise DSA 请求在 preemption 或 cancellation 下保持可证明的 destination ownership：preemption 使用新 execution epoch 重建 Indexer并尽可能复用有效 Main；cancellation 在 worker 全部 Quiesced 前禁止复用任何 reservation 地址，并复用普通 `finished_recving` 与现有 `DONE_RECVING_MSG` 完成本地 ack 和 Prefill source release。
 
 **Spec:** [Blockwise DSA PD offload spec](../spec.md)
 
@@ -16,7 +16,9 @@
 - [ ] 无法证明 Main ownership、layout或 validity 连续时，preserved boundary保守降为0并在 replay 中重写完整 Main。
 - [ ] Preemption evidence记录 replay token数、复用 Main token数、跳过的 D2H bytes和恢复耗时，不与正常 PD transfer指标混淆。
 - [ ] Admission 前 cancellation 可立即结束；admission 后进入 cancel-pending、禁止新的 receive/replay/D2H并继续隔离 Main reservation与 delayed NPU blocks。
-- [ ] Worker drain 当前 Indexer D2D、Main D2RH或 fused D2H，清理 request/epoch binding后产生 `QUIESCED`；调用 cancel API 本身不能视为 quiesced。
-- [ ] Scheduler 只在 exact TP `QUIESCED` 后 release-once Main reservation，并按现有 completion顺序释放 delayed NPU blocks；重复 cancel/ack和 late completion均为 no-op。
+- [ ] Worker drain 当前 Indexer D2D、Main D2RH或 fused D2H，按 active `(request_id, execution_epoch)` 拒绝 stale/duplicate completion并清理 request/epoch binding；调用 cancel API 本身不能视为 Quiesced，且不产生 typed `QUIESCED` result。
+- [ ] 每个 worker 达到 Quiesced 后，先向自己实际读取且尚未通知完成的 Prefill leader endpoint best-effort 发送一次现有 `DONE_RECVING_MSG`，再把 request ID 放入普通 `finished_recving` set一次；普通 receive 已通知的 endpoint不重发，通知失败由 Prefill hard TTL兜底。
+- [ ] Scheduler 只在 vLLM expected-worker-count aggregation 产生 ordinary all-worker completion 后 release-once Main reservation，并按现有 completion顺序释放 delayed NPU blocks；重复 cancel/ack和 late completion均为 no-op。
 - [ ] 无法产生 quiesced ack的 operation无限期保持 ownership隔离，不增加 watchdog、可靠 native cancel或 timeout后强制释放。
-- [ ] Focused tests覆盖 preemption rebind/Main reuse/fallback、各 lifecycle cancellation时点、in-flight drain、exact TP quiesce、release ordering与 idempotency。
+- [ ] Admission 前或尚未向 worker 绑定 Prefill endpoint的 cancellation不保证主动source-release notification，由hard TTL回收；unquiesced operation不发送伪`DONE_RECVING_MSG`或普通completion。
+- [ ] Focused tests覆盖 preemption rebind/Main reuse/fallback、各 lifecycle cancellation时点、in-flight drain、worker-local once guard、Prefill notification ordering/failure、ordinary all-worker aggregation、release ordering与 idempotency。

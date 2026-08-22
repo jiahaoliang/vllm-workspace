@@ -7,7 +7,7 @@ Blockwise DSA PD offload 沿用穿刺 connector 的 TP coverage：要求 `P_TP %
 ## 结果
 
 - `ratio = P_TP / D_TP`，`source(D_j) = P_(j * ratio)`。
-- 按 [ADR 0022](0022-use-the-puncture-positional-handshake-abi.md)，connector handshake 不再验证 leader coverage 和完整 replica placement；部署系统必须保证该 placement，不支持的 sharded layout 属于可能 silent corruption 的 unsupported configuration。
+- 按 [ADR 0022](0022-use-the-puncture-positional-handshake-abi.md)，connector handshake 不再验证 leader coverage 和完整 replica placement；该 placement 是文档化部署前置条件，执行它的 deployment system 不在本 feature 范围内。不支持的 sharded layout 属于可能 silent corruption 的 unsupported configuration。
 - 不使用普通 Mooncake 的 request-hash replica selection，source leader 对同一拓扑是确定的。
 - 每个 request 只使用实际处理它的 P DP replica，不跨 P DP 混合 tensor。
 - 未来若支持非整除拓扑、动态 replica selection 或多 P shard 拼装，需要重新审视本 ADR。
