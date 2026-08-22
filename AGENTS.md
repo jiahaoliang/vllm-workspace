@@ -74,3 +74,17 @@
 - 每个快照文件头必须包含 `Source`, `Captured At`, `Notes`。
 - 原始链接索引维护在对应 feature branch 的 `features/<feature>/references/sources.md`。
 - 遇到 `mooncake-learning` 相关资料时，只引用必要概念或路径，不直接迁移整个学习仓库内容。
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default triage label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use the single-context domain documentation layout. See `docs/agents/domain.md`.
