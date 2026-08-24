@@ -23,6 +23,6 @@
 
 ## Answer
 
-`mooncake_dsa_metadata.py` 只聚合同一 worker step 的 typed facts；`mooncake_dsa_scheduler.py` 按 request/epoch/sequence 跨 step 累积 exact TP coverage，并实现 duplicate/conflict/stale/future/missing 的约定。`mooncake_dsa_decode_runtime.py` 将 fused D2H completion 延迟到 SFA `save_current_kv_tokens()` 与 `wait_for_save()` 成功之后，失败保持 fail-fast。
+`mooncake_dsa_metadata.py` 只聚合同一 worker step 的 typed facts；`mooncake_connector.py` 中的 private Decode scheduler按request/epoch/sequence跨step累计exact TP coverage，并实现duplicate/conflict/future/illegal/missing fail-closed及stale bounded warning。Worker直接组合现有SFA worker，使`FUSED_D2H`只在`save_current_kv_tokens()`与`wait_for_save()`成功后产生`D2H_COMPLETE`，failure保持fail-fast。
 
-Phase B 的 lifecycle、scheduler、runtime 与 connector tests 覆盖上述 positive/negative contracts；结果见 [CPU/mock validation report](../cpu-mock-validation-report.md)。
+Public connector、real Scheduler mock lifecycle和typed negative tests覆盖上述边界；结果见 [replacement CPU/mock validation report](../cpu-mock-validation-report.md)。

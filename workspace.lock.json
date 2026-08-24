@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-23T02:54:10+08:00",
+  "updated_at": "2026-08-24T22:58:32+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -17,9 +17,9 @@
         "origin": "https://gitcode.com/gzliangjiahao/vllm-ascend.git",
         "collaborator": "https://gitcode.com/shichangzhang064/vllm-ascend.git"
       },
-      "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
-      "commit": "f826ea3f354f87cdf95895addbdaaad6ca92dd7c",
-      "purpose": "upstream vLLM Ascend baseline"
+      "branch": "feature/blockwise-dsa-mooncake-v1-reimplementation",
+      "commit": "7401ae79c11d6ec0033ea3ac39085379a0bb81ef",
+      "purpose": "Blockwise DSA MooncakeV1 replacement source"
     },
     "Mooncake": {
       "path": "repos/Mooncake",

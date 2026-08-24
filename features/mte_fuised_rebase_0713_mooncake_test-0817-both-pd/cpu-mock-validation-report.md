@@ -1,188 +1,134 @@
-# Blockwise DSA CPU/Mock Validation Report
+# Blockwise DSA Replacement CPU/Mock Validation Report
 
-Validated At: 2026-08-23T02:54:10+08:00
+Validated At: 2026-08-24
 
 ## 结论
 
-- Static：`PASS`。
-- Phase A：`PASS`，`306 passed in 16.65s`。
-- Phase B：`PASS`，`355 passed in 17.14s`。
-- DSA 后普通 Mooncake V1 regression：`PASS`，`93 passed, 14 warnings in 19.31s`。
-- Standalone scheduler/connector rerun：`PASS`，`43 passed in 15.27s`。
-- 综合状态：`CPU/mock validated`。
-- NPU runtime：`planned / not run`。本报告不提供 NPU correctness、performance、memory placement 或真实 Mooncake transfer 结论。
+- Replacement source：vLLM-Ascend `7401ae79c11d6ec0033ea3ac39085379a0bb81ef`。
+- Static：compile 和 `git diff --check` 通过；当前 delta 没有新增 ruff failure。
+- Focused DSA/SFA：`47 passed`。
+- 完整 `test_mooncake_connector.py`：`111 passed`。
+- Broad CPU/mock regression：排除一个已知 baseline-broken 文件后 `221 passed`。
+- 完整 CPU/mock root：`241 passed / 5 failed`；五项均为 pre-existing baseline test defect。
+- NPU runtime：`planned / not run`。
+
+这份报告替代 `f826ea3f` standalone subsystem 的旧验证记录。旧实现只保留为 behavior reference，不能作为当前 production、lock 或 issue closure evidence。
 
 ## Source Identity
 
 | Item | Identity |
 | --- | --- |
 | Control branch | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` |
-| vLLM-Ascend branch | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` |
+| vLLM-Ascend branch | `feature/blockwise-dsa-mooncake-v1-reimplementation` |
 | vLLM-Ascend base | `0d6dd0d26ab69219f861c9b312329f4c60fe36f2` |
-| Validated vLLM-Ascend tree/commit | `f826ea3f354f87cdf95895addbdaaad6ca92dd7c` |
-| Locked vLLM checkout | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` (`v0.23.0`) |
+| Validated/published HEAD | `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` |
+| Locked vLLM checkout | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` |
 | Locked Mooncake checkout | `6041a609a8c3af35e778f70db344f145c2914980` (`v0.3.12.post1`) |
-| Source sync directory | `/workspace/dsa-final-4rjqdZ` |
-| Changed Python files | 28 |
-| Host/Pod aggregate SHA256 | `d0e39a7ea0c4f6d07c144206df8c4ef8228eb8179c9453c34c9196b949717b07` |
 
-测试通过 tar 同步 vLLM-Ascend 当前 tree，最终同步内容与 commit `f826ea3f3` 相同。Pod 使用镜像内兼容的 vLLM Python runtime；没有把 locked vLLM checkout 的 Python tree tar 到测试目录，因此本报告不声称 locked vLLM tree 已直接执行。Mooncake native library、CANN 或 `torch_npu` runtime 未改变，也未在本 CPU-only Pod 中验证真实设备路径。
+Published source range：
 
-## Pod Identity
+| Commit | Purpose |
+| --- | --- |
+| `4cd51781` | typed Blockwise DSA metadata |
+| `341641d9` | parameterized SFA CPU offload capacity |
+| `9612b18d` | `MooncakeConnectorV1` Blockwise DSA lifecycle |
+| `3a22c5a6` | public replay/preemption tests |
+| `7401ae79` | ordering、receiver queue、reservation cap 与 stale observation hardening |
+
+五个 commit 均带 `Signed-off-by`。验证收尾后 replacement worktree clean；GitCode remote branch在 control update 前实时核对为同一 `7401ae79` SHA。
+
+## Architecture And Budget
+
+相对 base `0d6dd0d26` 的 production 变化只有：
+
+- `mooncake_connector.py`：在既有 public connector/sender/receiver/worker 中加入 opt-in lifecycle；
+- `mooncake_dsa_metadata.py`：唯一新增 production module，只承载 typed cross-process contract；
+- `sfa_pd_cpu_offload/scheduler.py`：thin Host block capacity 参数化。
+
+没有引入旧 `60eb76e` 的 standalone scheduler、runtime、worker、transport、rendezvous、memory 或 data-plane subsystem。
+
+| Scope | Additions | Deletions | Approved stop line |
+| --- | ---: | ---: | ---: |
+| Production | 1,704 | 41 | 1,770 additions |
+| Focused tests | 1,478 | 43 | 1,500 additions |
+
+## CPU/Mock Environment
+
+验证记录使用 `liangjiahao/vllm-ascend-ut` 专用 CPU-only Pod：
 
 | Item | Value |
 | --- | --- |
-| Kubernetes context | `bke-cluster-kubernetes-admin@bke-cluster` |
 | Namespace | `liangjiahao` |
 | Pod | `vllm-ascend-ut` |
-| Phase / Ready | `Running` / `true` |
 | Image | `docker.io/library/vllm-ascend:kv-pool-layerwise-main-54503ece-a2-14beaf16-20260731T064607Z-r1` |
-| Requests | CPU `1`, memory `4Gi` |
-| Limits | CPU `16`, memory `32Gi` |
-| Source volume | `emptyDir` mounted at `/workspace` |
+| Image ID | `sha256:c30f98cf41591582bdb78dde264074a834b68137c5c9254e886cb1347f88bf57` |
 | NPU resource request | none |
-| NPU device/driver/model-cache mount | none |
+| Synced workspace | `/workspace/dsa-budgetA-20260824/` |
 
-该 Pod 是长期运行 CPU/mock UT Pod，不是 Prefill/Decode serving Pod。验证未申请 `huawei.com/Ascend910` 或 `huawei.com/vnpu-number`，未挂载 hostPath、NPU device、driver、`npu-smi` 或模型缓存。
+当前 vLLM/vLLM-Ascend checkout通过 tar 同步到 Pod 的临时 workspace，没有使用 hostPath。`deepseekv4_tool_parser.py`、`mooncake_connector.py` 和 `test_mooncake_connector.py` 的 Host/Pod SHA256逐项一致。
 
-## Sync 与 Identity Commands
+Pinned vLLM需要`gguf==0.18.0`并依赖`VLLM_VERSION=0.23.0`选择正确patch branch。CPU conftest的fake `torch_npu`缺少`__file__`且full collection会触发C++ JIT loader；验证使用repo外临时pytest bootstrap补齐该属性并stub `torch.utils.cpp_extension.load`。这些环境适配没有修改checkout，也没有加载NPU library。
 
-最终覆盖 changed Python files：
+## Test Results
 
-```bash
-tar -cf - $(git diff 0d6dd0d26ab69219f861c9b312329f4c60fe36f2 --name-only -- '*.py') | kubectl exec -i -n liangjiahao vllm-ascend-ut -- tar -xf - -C /workspace/dsa-final-4rjqdZ
-```
+### Focused DSA/SFA
 
-Host aggregate checksum：
-
-```bash
-sha256sum $(git diff 0d6dd0d26ab69219f861c9b312329f4c60fe36f2 --name-only -- '*.py') | sort -k2 | sha256sum
-```
-
-Pod aggregate checksum：
-
-```bash
-git diff 0d6dd0d26ab69219f861c9b312329f4c60fe36f2 --name-only -z -- '*.py' | kubectl exec -i -n liangjiahao vllm-ascend-ut -- sh -c 'cd /workspace/dsa-final-4rjqdZ && xargs -0 sha256sum | sort -k2 | sha256sum'
-```
-
-两侧均返回：
+Metadata、real `vllm.v1.core.sched.Scheduler` A2 lifecycle、affected SFA scheduler和single-rank boundary target group：
 
 ```text
-d0e39a7ea0c4f6d07c144206df8c4ef8228eb8179c9453c34c9196b949717b07  -
+47 passed, 14 warnings
 ```
 
-## Static Gates
+该组包含：
 
-| Gate | Result |
-| --- | --- |
-| Compile 28 changed Python files with built-in `compile()` | `PASS` |
-| Non-ASCII scan over changed Python files | `PASS`，无输出 |
-| Added-line 88-column scan | `PASS`，无输出 |
-| `git diff --check` / staged diff check | `PASS`，无输出 |
-| Ruff | `NOT AVAILABLE`；Host 无 `ruff` executable，Pod 返回 `No module named ruff` |
+- transfer-failure token-0 replay；
+- real Scheduler preemption和新的 Indexer block table；
+- stable Main reservation和suffix-only fused D2H；
+- nonzero exact-TP `skipped_d2h_bytes` aggregation；
+- reservation snapshot、stale/future result、worker ordering和cancellation boundaries。
 
-Compile command：
+### Connector And Default V1
 
-```bash
-mapfile -t dsa_python_files < <(git diff 0d6dd0d26ab69219f861c9b312329f4c60fe36f2 --name-only -- '*.py')
-python3 -c 'import pathlib,sys; [compile(pathlib.Path(raw).read_text(), raw, "exec") for raw in sys.argv[1:]]; print(f"compiled {len(sys.argv) - 1} changed Python files")' "${dsa_python_files[@]}"
-```
-
-输出：
+完整 `tests/ut/kv_offload/test_mooncake_connector.py`：
 
 ```text
-compiled 28 changed Python files
+111 passed, 14 warnings
 ```
 
-Added-line length command：
+其中 ordering/cancellation focused selection单独复跑为`5 passed`。该target同时覆盖opt-in behavior和`dsa_pd_offload=false` default V1 isolation。
 
-```bash
-git diff 0d6dd0d26ab69219f861c9b312329f4c60fe36f2 --unified=0 -- '*.py' | awk '/^\+\+\+ b\// { file=substr($0, 7); next } /^@@ / { h=$0; sub(/^.*\+/, "", h); sub(/[, ].*$/, "", h); line=h-1; next } /^\+[^+]/ { line++; text=substr($0, 2); if (length(text) > 88) print file ":" line ":" length(text) ":" text; next } /^-/ { next } { line++ }'
-```
+### Broad Regression
 
-## Phase A
-
-Phase A 覆盖 config、typed metadata、positional data plane、transport、memory registration、worker/adapter、Prefill adapter、rendezvous、Decode runtime 与 central connector public hooks；不包含完整 cross-step scheduler/lifecycle matrix。
-
-```bash
-kubectl exec -n liangjiahao vllm-ascend-ut -- env PYTHONPATH=/workspace/dsa-final-4rjqdZ PYTHONDONTWRITEBYTECODE=1 VLLM_PLUGINS= python3 -m pytest -p no:cacheprovider --confcutdir=/workspace/dsa-final-4rjqdZ/tests/ut/kv_offload /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_config.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_metadata.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_data_plane.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_transport.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_memory.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_worker.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_worker_adapter.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_prefill_worker_adapter.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_rendezvous.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_decode_runtime.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_connector.py -q
-```
+完整CPU/mock root（显式排除`a2` NPU目录）：
 
 ```text
-306 passed in 16.65s
+241 passed, 5 failed, 14 warnings
 ```
 
-## Phase B
+五个failure全部来自相对replacement base零diff的`test_mooncake_to_dram_asymmetric_push.py`。该测试调用以下helpers但未import：
 
-Phase B 在 Phase A targets 上增加完整 lifecycle 与 scheduler matrix，覆盖 lifetime reservation、HOL、exact TP aggregation、failure/replay、preemption、cancellation、fused D2H、stale/duplicate/conflict/future/missing result 及 release ordering。
+- `map_locals_to_indexer_pages`；
+- `mooncake_to_dram_chunk_send_window`；
+- `align_indexer_ids_to_local_window`。
 
-```bash
-kubectl exec -n liangjiahao vllm-ascend-ut -- env PYTHONPATH=/workspace/dsa-final-4rjqdZ PYTHONDONTWRITEBYTECODE=1 VLLM_PLUGINS= python3 -m pytest -p no:cacheprovider --confcutdir=/workspace/dsa-final-4rjqdZ/tests/ut/kv_offload /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_config.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_metadata.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_data_plane.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_transport.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_memory.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_worker.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_worker_adapter.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_prefill_worker_adapter.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_rendezvous.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_decode_runtime.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_lifecycle.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_scheduler.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_connector.py -q
-```
+排除这一已知baseline-failing文件后的broad regression：
 
 ```text
-355 passed in 17.14s
+221 passed, 14 warnings
 ```
 
-## Default V1 Regression
+因此五项不能记录为replacement regression，也不能把完整root描述为全绿。
 
-该命令在最终 Phase B 后运行，验证 flag=false 时普通 metadata、scheduler、worker、transfer 和 completion path。
+## Static Results
 
-```bash
-kubectl exec -n liangjiahao vllm-ascend-ut -- env PYTHONPATH=/workspace/dsa-final-4rjqdZ PYTHONDONTWRITEBYTECODE=1 VLLM_PLUGINS= python3 -m pytest -p no:cacheprovider --confcutdir=/workspace/dsa-final-4rjqdZ/tests/ut/kv_offload /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_connector.py -q
-```
+- Replacement diff中的7个Python文件bytecode compile通过，cache写入临时目录。
+- `git diff --check 0d6dd0d26..7401ae79c`通过。
+- `ruff==0.14.0`当前7文件为3项，HEAD baseline为5项；replacement delta没有新增lint failure。
+- Current与HEAD baseline都有同样5个文件未通过`ruff format --check`，因此不声明full diff format-clean。
+- 验证产生的5个ignored CPython 3.9 `.pyc`已按精确路径清理，没有递归删除用户目录。
 
-```text
-93 passed, 14 warnings in 19.31s
-```
+## Evidence Boundary
 
-14 条 warning 均来自 `torch.jit.script_method` deprecation，不是 DSA failure。
+当前可以声明Python contract、scheduler/worker state transition、default V1 isolation和fake transfer boundary已有static/CPU/mock evidence。
 
-## Standalone Scheduler/Connector Rerun
-
-```bash
-kubectl exec -n liangjiahao vllm-ascend-ut -- env PYTHONPATH=/workspace/dsa-final-4rjqdZ PYTHONDONTWRITEBYTECODE=1 VLLM_PLUGINS= python3 -m pytest -p no:cacheprovider --confcutdir=/workspace/dsa-final-4rjqdZ/tests/ut/kv_offload /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_scheduler.py /workspace/dsa-final-4rjqdZ/tests/ut/kv_offload/test_mooncake_dsa_connector.py -q
-```
-
-```text
-43 passed in 15.27s
-```
-
-## 初始失败与修复
-
-| Scope | 初始结果 | 原因 | 修复与最终状态 |
-| --- | --- | --- | --- |
-| Data-plane collection | collection error | CPU-only Pod 导入真实 `torch_npu`，缺少 `libascend_hal.so` | 增加 test-local CPU import guard；纳入 Phase A/B 全绿 rerun |
-| Worker final `--confcutdir` run | collection error | 同上，import chain 激活 Ascend plugin | 在对应 test module 隔离 plugin/`torch_npu` import；最终全绿 |
-| Config/central focused collection | collection error | 同上，locked/source import chain进入真实 `torch_npu` | 使用 test-local guard 和 `VLLM_PLUGINS=`；最终完整 Phase A/B 全绿 |
-| Central focused assertion | `1 failed, 122 passed` | `packed_main_indexer_scale` 已正确 fail closed，但 test regex 未接受实际错误文本 | 修正 test oracle；最终 focused 与完整 matrix 全绿 |
-| Ordinary V1 collection | collection error | 普通 test module 在 CPU-only Pod 导入真实 `torch_npu` | 增加 test-local import guard；最终 `93 passed` |
-| Standalone scheduler collection | collection error | scheduler test 单独运行时触发真实 `torch_npu`；完整 matrix 曾因 config test 先安装 guard 而掩盖顺序依赖 | scheduler test 增加自己的 test-local guard；standalone `43 passed`，完整 Phase B 再次全绿 |
-
-这些 guard 只存在于 tests，不改变 production import 或 NPU runtime 行为。`PACKED_MAIN_INDEXER_SCALE` 保持 production fail closed，因为首版不能在不 split/reformat 的条件下把 packed Main 映射为独立 Decode Host K/V。
-
-## 结论边界
-
-本轮可以声明：
-
-- production source 已实现并形成 commit `f826ea3f3`；
-- static gates passed；
-- Phase A passed；
-- Phase B passed；
-- default V1 regression passed；
-- `CPU/mock validated`。
-
-本轮不能声明：
-
-- locked vLLM Python tree 已在 Pod 直接执行；
-- positional ABI 提供跨 P/D semantic compatibility proof；
-- NPU runtime、真实 Mooncake D2D/D2RH、fused D2H correctness 或 performance 已验证；
-- 8 个 NPU mandatory cases 已执行。
-
-NPU runtime 的唯一当前权威状态是 [NPU E2E test plan](npu-e2e-test-plan.md) 中的 `planned / not run`。
-
-## Cleanup
-
-- 已精确删除 `liangjiahao/vllm-ascend-ut` 中的 `/workspace/dsa-final-4rjqdZ`；删除后路径不存在。
-- 长期 CPU-only UT Pod 未删除，清理后状态为 `Running/Ready`。
-- 本轮未创建 serving Deployment、ConfigMap、Mooncake service/session 或 NPU workload；NPU plan 的 final cleanup 尚未执行，仍属于 `planned / not run`。
+当前不能声明真实multi-node routing、Mooncake D2D/D2RH、NPU-addressable Host registration、fused kernel、cache contents、performance或八个NPU cases已验证。它们继续保持`planned / not run`；见 [NPU E2E test plan](npu-e2e-test-plan.md)。

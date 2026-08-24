@@ -25,6 +25,6 @@
 
 ## Answer
 
-`mooncake_dsa_scheduler.py` 分离 lifetime reservation 与 execution epoch，支持 preemption rebind、Main reuse proof/fallback、cancel-pending 和 ordinary all-worker ack 后 release-once。只读 `DsaPreemptionEvidence` 记录 full replay token 数、复用 Main token 数、按真实 Main `page_size_bytes` 计算的 skipped D2H bytes，以及从 preemption 到 exact `REPLAY_READY` 的 monotonic recovery duration。`mooncake_dsa_worker.py`、`mooncake_dsa_worker_adapter.py` 与 `mooncake_dsa_decode_runtime.py` 实现 drain、stale/duplicate guard、DONE-before-finished ordering 和 worker-local once guard；`QUIESCE` 不产生 typed result。
+`mooncake_connector.py` 中的 scheduler-authored live-reservation snapshot分离Main lifetime与execution epoch，支持real Scheduler preemption后的新Indexer ownership、stable Main reservation、continuity fallback和release-once。Exact TP后只写一条structured replay event；`skipped_d2h_bytes`来自各TP fused-D2H descriptor bytes-per-token事实，而不是Main page storage bytes。
 
-Preemption/cancellation 的所有 lifecycle timing、notification failure、aggregation、release ordering 与幂等性均在 Phase B 中通过，详见 [验证报告](../cpu-mock-validation-report.md)。NPU 恢复耗时等 runtime 指标仍待 NPU case 实测，不由 CPU/mock 结果推断。
+Worker删除generic `pending_command`，对overlapping newer non-`QUIESCE` command fail closed，只保留`pending_quiesce`。Narrow per-request synchronization原子维护terminal intent与completion-once，ordinary ack改用atomic queue drain，保证DONE-before-finished且不丢ack。Real Scheduler preemption、suffix-only D2H、cancellation交错和once semantics均由deterministic CPU/mock tests覆盖；NPU恢复耗时与真实kernel仍为`planned / not run`，详见 [验证报告](../cpu-mock-validation-report.md)。

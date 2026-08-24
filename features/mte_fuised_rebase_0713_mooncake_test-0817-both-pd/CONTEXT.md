@@ -88,6 +88,10 @@ _避免使用_: `count >= D_TP`、全局 DP coverage、任一 TP 完成即 reque
 分配给同一个 Decode TP 的连续 Prefill TP replica 集合，其中首个 Prefill TP 是该组唯一的 payload source。
 _避免使用_: 多 shard source group、all-P payload group
 
+**Prefill rank endpoint**:
+一个 Prefill TP rank 对应的 concrete `(host, handshake port, engine identity)`，用于选择同一个 positional handshake session；它只描述路由，不证明该 rank 持有完整 Main/Indexer replica。
+_避免使用_: Scalar base endpoint、TP leader replica proof、semantic tensor map
+
 **Partial block**:
 请求末尾只包含部分有效 token 的最后一个物理 cache block；其有效边界来自 request token 状态，而不是缩短后的物理 block。
 _避免使用_: Partial-byte block、自动清零尾块

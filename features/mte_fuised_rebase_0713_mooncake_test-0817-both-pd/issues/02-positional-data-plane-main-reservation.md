@@ -22,6 +22,6 @@
 
 ## Answer
 
-`mooncake_dsa_data_plane.py`、`mooncake_dsa_memory.py`、`mooncake_dsa_decode_worker.py` 和 `mooncake_dsa_prefill_worker_adapter.py` 实现 positional source/destination、late SFA construction、runner-owned Host Main binding 与 registration/capacity gate。`PACKED_MAIN_INDEXER_SCALE` 因不能无 split/reformat 映射到独立 Decode Host K/V 而显式 fail closed。
+Replacement commit `7401ae79c` 直接在 `mooncake_connector.py` 中复用普通 V1 sender/receiver、positional handshake 和 SFA worker binding。Decode scheduler 把 base endpoint 与 multi-node mapping 投影为 immutable Prefill-rank endpoint tuple；worker 按 fixed leader 选择 concrete session。Indexer HBM、per-TP Swapped Main registration、bound prefix 和 capacity checks 都留在现有 connector/SFA seams，unsupported packed layout继续 fail closed。
 
-`mooncake_dsa_scheduler.py` 实现 lifetime reservation、bound/confirmed/future 边界、per-step HOL admission 和 release-once。对应 data-plane、memory、scheduler 与 adapter focused tests 均已包含在 [CPU/mock validation report](../cpu-mock-validation-report.md) 的 Phase A/B matrix。
+Private SFA scheduler subclass使用现有 `CPUBlockManager` 建立 lifetime reservation、HOL admission和release-once；reservation按 `min(max_model_len, prompt + max_tokens)` 截断。`sfa_pd_cpu_offload/scheduler.py` 只增加真实 Host block capacity参数化，没有新 reservation manager。对应 endpoint、capacity、HOL、registration和release tests见 [replacement validation report](../cpu-mock-validation-report.md)。

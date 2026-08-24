@@ -23,6 +23,6 @@
 
 ## Answer
 
-Phase A、Phase B 与 DSA 后普通 V1 regression 已在规定的 CPU-only UT Pod 完成，最终分别为 `306 passed in 16.65s`、`355 passed in 17.14s` 和 `93 passed, 14 warnings in 19.31s`，因此状态为 `CPU/mock validated`。Source/Pod identity、完整命令、初始 collection failures、修复和最终 rerun 均保存在 [CPU/mock validation report](../cpu-mock-validation-report.md)。
+Replacement checkout已在`liangjiahao/vllm-ascend-ut` CPU-only Pod完成focused与broad regression：DSA/SFA group `47 passed`，完整connector/default-V1 target `111 passed`，排除一个已知baseline-broken测试文件后的broad root `221 passed`。完整root为`241 passed / 5 failed`；五项均是未修改`test_mooncake_to_dram_asymmetric_push.py`缺少import的pre-existing defect。Static compile与`git diff --check`通过，当前delta没有新增ruff failure。证据与边界见 [CPU/mock validation report](../cpu-mock-validation-report.md)。
 
 [NPU E2E test plan](../npu-e2e-test-plan.md) 提供 preflight、oracle、8 个 mandatory case、证据 schema 和 cleanup。未执行 NPU workload；8 个 case 全部保持 `planned / not run`，不得据此声明 `NPU runtime validated`。

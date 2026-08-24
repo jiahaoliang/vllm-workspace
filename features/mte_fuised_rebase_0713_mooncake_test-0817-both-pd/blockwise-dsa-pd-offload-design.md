@@ -2,14 +2,14 @@
 
 状态：设计决策与 issue 01-07 已闭环；CPU/mock validated；NPU planned / not run
 
-本文解释 [spec.md](spec.md) 中交付合同背后的技术设计、决策依据和失败边界。它是实现参考，不替代 accepted ADR、spec 或 implementation issue，也不表示功能已经实现或已经通过 runtime 验证。
+本文解释 [spec.md](spec.md) 中交付合同背后的技术设计、决策依据和失败边界。它是实现参考，不替代 accepted ADR、spec、implementation issue 或独立验证证据。
 
 ## 文档关系与当前状态
 
-- [spec.md](spec.md) 是交付与验收合同，当前 production 实现为 vLLM-Ascend commit `f826ea3f3`，CPU/mock 已验收。
+- [spec.md](spec.md) 是交付与验收合同，当前 production 实现为已发布的 vLLM-Ascend replacement commit `7401ae79c`，CPU/mock evidence见独立验证报告。
 - [docs/adr/](docs/adr/) 保存架构决策及其取代关系。ADR 0003 已被 ADR 0022 取代，ADR 0007 已被 ADR 0008 取代，ADR 0017 的 handshake 部分已被 ADR 0022 取代；其余在本设计中引用的决策均按各 ADR 当前状态解释。
 - Implementation issues 是执行状态的权威来源，线性 blocking chain [01](issues/01-blockwise-dsa-opt-in-control-plane.md) -> [02](issues/02-positional-data-plane-main-reservation.md) -> [03](issues/03-phase-a-request-lifecycle.md) -> [04](issues/04-exact-tp-lifecycle-fused-d2h.md) -> [05](issues/05-all-tp-transfer-failure-recovery.md) -> [06](issues/06-preemption-cancellation-ownership-recovery.md) -> [07](issues/07-phase-b-validation-npu-plan.md) 已全部 `resolved`。
-- Production code、Phase A、Phase B 和 DSA 后普通 V1 regression 已完成，证据见 [CPU/mock validation report](cpu-mock-validation-report.md)。NPU runtime 未执行，8 个 mandatory case 必须保持 `planned / not run`，直到未来保存真实运行证据。
+- Replacement production code、focused DSA/SFA、public Scheduler lifecycle、完整 connector/default V1 和 broad CPU/mock regression已完成，证据见 [CPU/mock validation report](cpu-mock-validation-report.md)。完整CPU root仍有5个未修改baseline测试的缺失import failure。NPU runtime未执行，8个mandatory case必须保持`planned / not run`，直到未来保存真实运行证据。
 
 若文档之间出现冲突，先按 accepted/superseding ADR 核对具体架构决策，再修正 spec 的交付合同和受影响 issues；本 design 只负责同步解释，不能单独改变实现范围。
 
@@ -367,4 +367,4 @@ CPU/mock unit tests 必须在 `liangjiahao` namespace 的专用长期运行 CPU-
 
 当前架构决策已闭环。Metadata type boundary、per-request envelope、exact step fields、action/result enums、aggregation schema、positional handshake ABI、Phase A/Phase B CPU/mock matrix 和 NPU 测试计划成功标准均已确定。
 
-Issue 01-07 已按 blocking chain 完成，当前 production tree 为 vLLM-Ascend commit `f826ea3f3`，Phase A、Phase B 与 default V1 regression 全绿。下一阶段只在满足 [NPU E2E test plan](npu-e2e-test-plan.md) preflight 后执行真实 runtime cases；在此之前不产生或推断 NPU 结果。
+Issue 01-07 已按 replacement architecture 重新闭环，当前 production tree 为已发布的 vLLM-Ascend commit `7401ae79c`。Focused DSA/SFA、connector/default V1 和排除已知baseline-broken文件后的broad CPU/mock regression全绿；完整CPU root明确保留`241 passed / 5 pre-existing failures`。下一阶段只在满足 [NPU E2E test plan](npu-e2e-test-plan.md) preflight 后执行真实runtime cases；在此之前不产生或推断NPU结果。

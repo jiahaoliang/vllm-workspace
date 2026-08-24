@@ -14,3 +14,11 @@
 - Attempted to push vLLM-Ascend to the configured personal GitCode origin; push failed because no GitCode credential is available in this environment. No remote or credential configuration was changed.
 - Ran `./scripts/lock-repos.sh`; it failed before writing because the existing resolver cannot map `feature/<name>` to `features/<name>`. Refreshed `workspace.lock.json` and `repo-state.md` manually from exact repository identities.
 - Deleted the exact UT temporary directory `/workspace/dsa-final-4rjqdZ`; retained `liangjiahao/vllm-ascend-ut` in `Running/Ready` state.
+
+## 2026-08-24
+
+- Superseded `f826ea3f` as the production candidate and retained it only as behavior-reference evidence.
+- Reimplemented the feature from clean base `0d6dd0d26` on `feature/blockwise-dsa-mooncake-v1-reimplementation`, using existing `MooncakeConnectorV1`, one typed metadata module and a thin SFA scheduler extension.
+- Completed white-box ordering corrections and published signed-off source HEAD `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` to the personal GitCode origin; live `ls-remote` verification matched the exact SHA.
+- Recorded final static/CPU-mock evidence: focused DSA/SFA `47 passed`, connector/default V1 `111 passed`, broad regression `221 passed`, and full CPU root `241 passed / 5 pre-existing failures`.
+- Kept real multi-node and NPU runtime evidence at `planned / not run`.

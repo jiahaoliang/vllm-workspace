@@ -22,6 +22,6 @@
 
 ## Answer
 
-`mooncake_dsa_transport.py`、`mooncake_dsa_rendezvous.py`、`mooncake_dsa_decode_runtime.py` 和 `mooncake_dsa_worker.py` 打通 fixed-leader routing、destination handshake、Indexer-before-Main 同步传输、typed terminal result、DONE notification 与 replay transition。Python 层每 phase 只调用一次 transport，不增加 outer retry 或 source TTL gate。
+Replacement 在 `KVCacheRecvingThread` 的既有 request queue/per-peer serialization 中增加 typed DSA task branch：worker选择 fixed-leader endpoint，先执行一次同步 Indexer D2D，成功后再执行一次 Main D2RH，并通过 `mooncake_dsa_metadata.py` 返回 phase-aware terminal result。GET_META、cache/session、transfer和`DONE_RECVING_MSG`复用同一个 selected endpoint；没有新增 transport、rendezvous或runtime module，也没有 Python outer retry或source TTL gate。
 
-最终 Phase A 在 `liangjiahao/vllm-ascend-ut` 通过 `306 passed in 16.65s`。该阶段单独只构成 `Phase A passed`；整体 `CPU/mock validated` 结论来自 Phase B 与普通 V1 regression 也通过，详见 [验证报告](../cpu-mock-validation-report.md)。
+最终 replacement focused DSA/SFA group为 `47 passed`，完整 connector/default-V1 target为 `111 passed`。它们构成 CPU/mock lifecycle evidence，不代表真实 multi-node/NPU transfer；完整边界见 [验证报告](../cpu-mock-validation-report.md)。

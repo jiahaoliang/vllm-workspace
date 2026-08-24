@@ -21,6 +21,6 @@
 
 ## Answer
 
-`mooncake_dsa_scheduler.py` 在完整 receive terminal coverage 后统一解释 mixed outcomes，保留 reservation identity、将 all-TP Main validity 清零并发布新 `PREPARE_REPLAY`；exact `REPLAY_READY` 后才把请求从 token 0 恢复。`mooncake_dsa_worker.py`/`mooncake_dsa_decode_runtime.py` retire 旧 operation、拒绝 stale generation，并且不增加 watchdog、connector retry 或 source TTL check。
+`mooncake_connector.py` 中的 private Decode scheduler在完整 receive terminal coverage后统一解释mixed outcomes，保留Main reservation identity、将all-TP Main validity清零并发布`PREPARE_REPLAY`。Exact `REPLAY_READY`后，state-qualified admission返回`(0, False)`，让真实vLLM `Scheduler`从token 0进入local full-sequence forward。Worker按accepted reservation snapshot retire旧operation并拒绝stale/future identity；没有新增watchdog、connector retry或source TTL check。
 
-任一 TP failure、terminal barrier、all-TP reset、identity preservation 与 full rewrite 均由 Phase B focused tests 覆盖，证据见 [验证报告](../cpu-mock-validation-report.md)。
+`a2/test_remote_prefill_lifecycle.py` 使用real `vllm.v1.core.sched.Scheduler`证明partial-TP barrier、exact replay-ready、token-0 public `update_from_output()`和完整rewrite；private connector tests保留worker-local与negative boundaries。证据见 [验证报告](../cpu-mock-validation-report.md)。

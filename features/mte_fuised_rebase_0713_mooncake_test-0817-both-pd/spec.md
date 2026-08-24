@@ -18,6 +18,8 @@ Prefill 保持普通 `MooncakeConnectorScheduler` 和 request-finish metadata fl
 
 Decode 使用继承现有 SFA scheduler 的 blockwise scheduler。它在请求 admission 前为请求的最大可能序列长度建立 Main lifetime reservation，分配当前 execution epoch 的 Indexer HBM ownership，并通过独立的强类型 DSA step metadata 向 worker 发布 remote source、current destination binding 和 lifecycle command。
 
+Decode scheduler 还把普通 V1 的 base endpoint 与 `remote_multi_nodes_meta_mapping` 一次性投影为按 Prefill rank 索引的完整 immutable endpoint tuple。Decode TP worker 按 fixed leader rank 只选择一个 concrete `(host, handshake port, engine identity)`；GET_META、metadata cache、Mooncake session、transfer 和 `DONE_RECVING_MSG` 始终使用该 endpoint。非空 mapping 必须完整覆盖当前 routed Prefill DP replica，partial 或非法 mapping 在 reservation/transfer 前 fail closed。
+
 每个 Decode TP worker 注册自己的 Indexer HBM 与 per-TP local Swapped Main pool。一次 `RECEIVE_REMOTE` command 在 worker 内先同步执行 Indexer D2D；只有 Indexer 成功才启动 Main D2RH。两条链路都成功后，该 TP 才产生 `RECEIVE_COMPLETE`。任一同步 transfer 最终失败时，worker 报告带明确 phase 的 `TRANSFER_FAILED`，而不是把局部成功伪装成 cache hit。
 
 Typed worker result 使用 request、execution epoch、command sequence 和 local TP rank 作为 identity。Worker metadata 只合并同一个 engine step 的事实，Decode scheduler 跨 step 累积，并仅在当前 routed Decode DP replica 的精确 TP rank coverage 完整后推进 receive、fused D2H 或 replay lifecycle。
@@ -112,7 +114,7 @@ P/D worker handshake 沿用穿刺 positional ABI，不增加 semantic role、pro
 17. Indexer final failure 不启动 local Main、不建立 Main validity，并产生 `TRANSFER_FAILED(INDEXER_D2D)`。Main final failure产生 `TRANSFER_FAILED(MAIN_D2RH)`。两条链路成功才产生 `RECEIVE_COMPLETE`。
 18. 每个 transfer phase 在 Python connector 层只调用一次同步 Mooncake transfer，仅依赖 Mooncake binding internal retry，不增加 outer attempts、backoff 或 retry 配置。
 19. Decode scheduler-to-worker 使用独立 DSA metadata family。Per-request envelope 包含顶层 request identity，以及嵌套的 remote source、destination ownership 和 lifecycle command。
-20. Remote source描述 remote endpoint、remote request和 semantic Indexer/Main block IDs，不携带 raw address、TTL、lease 或 generation。Raw address由 positional handshake 与 local block mapping解析。
+20. Remote source描述 remote request、按 Prefill rank 索引的完整 immutable concrete endpoint tuple和 semantic Indexer/Main block IDs，不携带 scalar base endpoint、raw address、TTL、lease 或 generation。Decode scheduler使用普通 V1共用的 private pure resolver把base endpoint与multi-node mapping一次性投影为tuple；worker按fixed leader rank选择一个endpoint，GET_META、metadata cache、Mooncake session、transfer和DONE通知共用该选择。非空mapping必须完整覆盖当前routed Prefill DP replica，否则fail closed。Raw address由selected positional handshake与local block mapping解析。
 21. Destination ownership 描述 stable Main reservation identity/capacity、current bound Main Host prefix 和 current execution epoch 的 Indexer HBM IDs。Scheduler 是完整 future reservation block list 的唯一权威。
 22. Lifecycle command携带 execution epoch、严格递增 command sequence、action、已有 token state、preserved Main boundary 和当前 fused D2H range。
 23. Lifecycle actions固定为 `RECEIVE_REMOTE`、`FUSED_D2H`、`PREPARE_REPLAY` 和 `QUIESCE`。Indexer/Main是 receive command 内部 phases，不是 scheduler actions。
@@ -141,7 +143,7 @@ P/D worker handshake 沿用穿刺 positional ABI，不增加 semantic role、pro
 3. 主 seam 同时覆盖opt-in mode和default V1 isolation，避免只证明DSA路径能跑而漏掉普通connector回归。
 4. 第一个支持 seam 是DSA metadata contract。直接验证immutable envelope、集中validator、typed action/result matrix、serialization-safe values、same-step aggregate和cross-step exact TP accumulation；cancellation ordinary completion单独验证。
 5. 第二个支持 seam 是SFA memory binding/data-plane adapter。通过现有registration、runner Host Main binding和fused-save接口，使用fake tensors和addresses验证Indexer HBM、Main Host、positional mapping、bound prefix和D2H range。
-6. Phase A quick validation覆盖mode wiring、startup constraints、default isolation、positional local checks、leader/block mapping、partial physical block、single-request Indexer-to-Main ordering、Indexer/Main failure、最小receive/replay/release-once和focused static checks。
+6. Phase A quick validation覆盖mode wiring、startup constraints、default isolation、positional local checks、single-node与multi-node typed endpoint projection、P TP8到D TP2的fixed leader rank 0/4命中不同host/engine/port、partial/invalid mapping fail-closed、leader/block mapping、partial physical block、single-request Indexer-to-Main ordering、Indexer/Main failure、最小receive/replay/release-once和focused static checks。
 7. Phase A只是快速反馈门禁。Phase A失败时先修复基本路径；Phase A通过不能标记`CPU/mock validated`，也不能作为跳过Phase B的release waiver。
 8. Phase B boundary validation覆盖full lifetime reservation、HOL admission、preemption和Indexer rebind、preserved Main D2H suppression、cancellation drain-and-ack、`DONE_RECVING_MSG` ordering、ordinary all-worker completion、all-TP failure replay、duplicate/conflict/stale/future/missing typed result、multi-request interleaving和default V1 regression。
 9. Phase B包含negative contract tests：不增加outer retry、不增加source TTL check、不对unquiesced operation伪造completion、不宣称positional handshake已证明P/D compatibility。

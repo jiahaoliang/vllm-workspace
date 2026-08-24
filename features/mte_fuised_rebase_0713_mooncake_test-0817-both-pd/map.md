@@ -4,8 +4,9 @@
 
 - Delivery contract: [spec.md](spec.md)
 - Architecture: [blockwise-dsa-pd-offload-design.md](blockwise-dsa-pd-offload-design.md) and [accepted ADRs](docs/adr/)
-- Source commit: vLLM-Ascend `f826ea3f354f87cdf95895addbdaaad6ca92dd7c`
-- Validation: [CPU/mock validated](cpu-mock-validation-report.md); NPU `planned / not run`
+- Source commit: vLLM-Ascend `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` on `feature/blockwise-dsa-mooncake-v1-reimplementation`
+- Validation: [replacement CPU/mock evidence](cpu-mock-validation-report.md); NPU `planned / not run`
+- Replacement history: [durable goal](reimplementation-goal.md) and its approved design/closure/white-box amendments
 
 ## Decisions-so-far
 
@@ -19,7 +20,7 @@
 
 ## Fog
 
-- GitCode HTTPS credential 不可用，vLLM-Ascend commit 尚未 push；新 lock 暂不可跨机器 restore。
-- `./scripts/lock-repos.sh` 当前不能把 control branch `feature/<name>` 映射到 `features/<name>`；本轮只记录失败并手工刷新 lock，未在 feature branch 修改公共脚本。
+- GitCode replacement branch 已发布并实时核对为 `7401ae79c`；`workspace.lock.json` 已改为该 fetchable identity。
+- Replacement source 位于独立 worktree，而 lock 的标准恢复路径为 `repos/vllm-ascend`；本轮手工刷新 lock，未移动旧 behavior-reference checkout，也未修改公共脚本。
 - Positional ABI 不提供跨 P/D semantic compatibility proof；image/configuration/layout/leader replica 必须由 deployment preflight 保证。
 - NPU correctness、真实 transfer、fused D2H 和 performance 均未运行，不从 CPU/mock 结果推断。

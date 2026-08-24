@@ -21,6 +21,6 @@
 
 ## Answer
 
-已在 vLLM-Ascend commit `f826ea3f354f87cdf95895addbdaaad6ca92dd7c` 中完成。`mooncake_dsa_config.py`、`mooncake_dsa_metadata.py` 和 `mooncake_dsa_lifecycle.py` 定义并校验 opt-in configuration、immutable command/result contract 与合法 matrix；`mooncake_connector.py` 只在 flag 开启时构造 DSA scheduler/worker，并在普通与 DSA metadata 边界 fail closed。
+已在 vLLM-Ascend replacement commit `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` 中完成。`mooncake_connector.py` 在既有 `MooncakeConnectorV1` public hooks 内实现 opt-in wiring，并使用 private `_MooncakeDsaDecodeScheduler(SFAPDCpuOffloadScheduler)` 管理 lifecycle；唯一新增的 production module `mooncake_dsa_metadata.py` 定义 immutable command/result contract、合法 matrix 和 same-step aggregation。未引入 standalone config、lifecycle、scheduler 或 worker subsystem。
 
-Default V1 isolation、startup constraints、serialization 和 aggregation 已由 `test_mooncake_dsa_config.py`、`test_mooncake_dsa_metadata.py`、`test_mooncake_dsa_connector.py` 及普通 `test_mooncake_connector.py` 覆盖。完整证据见 [CPU/mock validation report](../cpu-mock-validation-report.md)。
+Default V1 isolation、startup/async constraints、serialization、snapshot validation 和 aggregation 由 `test_mooncake_connector.py` 与 `test_mooncake_dsa_metadata.py` 覆盖。完整 replacement evidence 见 [CPU/mock validation report](../cpu-mock-validation-report.md)。

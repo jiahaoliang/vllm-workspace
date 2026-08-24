@@ -15,12 +15,17 @@ class DsaStepRequest:
     lifecycle: LifecycleCommand
 
 
-@dataclass(frozen=True)
-class RemoteSource:
-    remote_engine_id: str
-    remote_request_id: str
+@dataclass(frozen=True, slots=True)
+class RemoteEndpoint:
     remote_host: str
     remote_port: int
+    remote_engine_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class RemoteSource:
+    remote_request_id: str
+    endpoints_by_prefill_rank: tuple[RemoteEndpoint, ...]
     indexer_block_ids: tuple[int, ...]
     main_block_ids: tuple[int, ...]
 
@@ -59,7 +64,7 @@ class LifecycleCommand:
 
 普通 V1 的 request metadata 每次包含 local/remote block IDs、remote engine/request/host/port、P TP/PCP/DCP topology、remote block size、prompt block count 和 external/computed token 数。它通过 `do_remote_prefill` gate 对每个 request 只启动一次 receive，因此不需要 execution epoch、per-epoch command sequence 或跨 preemption destination reservation。
 
-Blockwise DSA 继续从普通 V1 `kv_transfer_params` 读取 remote rendezvous/source input，但 Decode scheduler 必须先把它解析为本 ADR 的 typed fields。Worker 不能直接消费开放的 `kv_transfer_params` dict。
+Blockwise DSA 继续从普通 V1 `kv_transfer_params` 读取 remote rendezvous/source input，但 Decode scheduler 必须先把 base endpoint 与 `remote_multi_nodes_meta_mapping` 解析为本 ADR 的完整、concrete `endpoints_by_prefill_rank` tuple。普通 V1 与 DSA projection 共用 `mooncake_connector.py` 内的 private pure endpoint resolver。Worker 不能直接消费开放的 `kv_transfer_params` dict。
 
 ## 考虑过的方案
 
@@ -71,10 +76,12 @@ Blockwise DSA 继续从普通 V1 `kv_transfer_params` 读取 remote rendezvous/s
 
 `RemoteSource` 只在 action 需要读取 Prefill source 时出现：
 
-- `remote_engine_id`、`remote_host` 和 `remote_port` 必须命中一个已经 ready 的 DSA handshake session；
+- `endpoints_by_prefill_rank[prefill_rank]` 是该 Prefill rank 的 concrete `RemoteEndpoint`，其 host、handshake port 和 engine identity 必须共同命中一个已经 ready 的 DSA handshake session；
+- Decode scheduler 在 reservation 前一次性把普通 V1 base endpoint 与 `remote_multi_nodes_meta_mapping` normalize 为完整 tuple。Mapping 为空时按 ordinary V1 single-node fallback materialize 每个 rank；mapping 非空时必须覆盖当前 routed Prefill DP replica 的完整 expected rank set，不能对 partial mapping 静默 fallback；
+- Decode worker 按固定公式 `leader_rank = decode_tp_rank * (P_TP / D_TP)` 选择 tuple 中唯一 endpoint。GET_META、remote metadata cache、Mooncake session、transfer 和 `DONE_RECVING_MSG` 必须使用同一个 selected endpoint；
 - `remote_request_id` 是 Prefill source ownership 使用的 request identity，不假定与 Decode local `request_id` 相同；
 - `indexer_block_ids` 和 `main_block_ids` 在 Decode step metadata 内继续使用 semantic names；Main K/V 共用 Main block list，可选 Indexer scale 与 Indexer 共用 Indexer block list。按照 ADR 0022，从这些 block IDs 到 remote/local layer address arrays 的解析使用跨端 positional ABI；
-- source TP leader 和 P TP/PCP/DCP 从 local configuration 与普通 V1 rendezvous 计算，multi-node rank endpoint 命中 positional handshake session；block size、page ratio 和 tensor layout compatibility 必须满足文档化部署前置条件，不在每个 request 重复，也不由本 feature 的部署代码校验；
+- source TP leader 和 P TP/PCP/DCP 从 local configuration 与普通 V1 rendezvous 计算；Prefill rank endpoint 只确定 concrete handshake route，不证明 leader 持有完整 replica。Block size、page ratio、leader replica 和 tensor layout compatibility 必须满足文档化部署前置条件，不在每个 request 重复，也不由本 feature 的部署代码校验；
 - 不携带 raw address、source generation、source expiry、remaining TTL 或 launch grant。
 
 ## DestinationOwnership
@@ -105,7 +112,9 @@ Envelope factory/validator 至少执行以下检查：
 
 - `request_id` 非空，epoch/sequence 和所有 token/count fields 非负；
 - 需要 Prefill read 的 action 必须有 `RemoteSource`；不读取 Prefill 的 replay/cancel command 不能携带可启动 remote transfer 的 source；
-- remote endpoint 必须命中已经取得 positional layer/address arrays 的 handshake session；connector 不据此宣称已验证 remote mode、role、topology 或 tensor layout compatibility；
+- endpoint tuple 非空且长度等于 configured `P_TP`；每个 endpoint 的 host/engine identity 非空，port 是 `1..65535` 的非-bool integer；computed leader rank 必须在 tuple 范围内；
+- 非空 multi-node mapping 必须覆盖当前 routed Prefill DP replica 的 expected Prefill rank set；partial、非法 key/value、非法 port 或缺 leader在 reservation/transfer 前 fail closed；
+- selected endpoint 必须命中已经取得 positional layer/address arrays 的 handshake session，GET_META 返回的 engine identity 必须一致；connector 不据此宣称已验证 remote mode、role、topology、leader replica 或 tensor layout compatibility；
 - semantic source block lists 与现有 token state、Main block size 和 Indexer page ratio 能够相互覆盖；partial block 仍按完整 block/page 传输；
 - reservation identity 未释放，capacity 与 scheduler tracker 一致，bound Host IDs 是其有序 prefix、非零、无重复且不超过 capacity；
 - Indexer IDs 属于当前 epoch；新 epoch 不得沿用旧 Indexer binding；
@@ -121,7 +130,7 @@ Envelope factory/validator 至少执行以下检查：
 - Scheduler 独占完整 Main reservation block list 和 release ownership；worker 不能释放 reservation，也不需要接收 future reserved block IDs。
 - Worker 只绑定当前 command 可访问的 Main prefix。新 block 在 sequence 增长时由 scheduler append 到 bound prefix，尚未 bound 的 future suffix 不能被寻址或写入。
 - Worker-to-scheduler typed result identity 至少包含 `request_id`、`execution_epoch`、`command_seq` 和 local TP rank；exact result enum 由 ADR 0020 确定，exact TP coverage 和跨 step accumulation 由 [ADR 0021](0021-use-exact-tp-coverage-and-cross-step-result-accumulation.md) 确定。Cancellation 的普通 `finished_recving` ack 不属于该 typed result schema。
-- Static topology/layout 不在 per-request metadata 重复；remote engine/host/port 解析 source endpoint 后使用 ADR 0022 的 positional handshake arrays，P/D layout compatibility 仅作为文档化部署前置条件。
+- Static topology/layout 不在 per-request metadata 重复；rank-indexed concrete endpoint tuple 选择 source handshake session 后使用 ADR 0022 的 positional handshake arrays，P/D layout compatibility 与 leader replica coverage 仅作为文档化部署前置条件。
 - 普通 V1 metadata 和非 DSA path 保持不变。
 
 ## 预计实现影响
