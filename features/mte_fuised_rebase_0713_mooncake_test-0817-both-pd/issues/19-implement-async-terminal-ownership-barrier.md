@@ -10,7 +10,7 @@
 
 **Blocked by:** 18 — 实现 non-gating D2H plan/progress vertical slice.
 
-**Status:** open
+**Status:** resolved
 
 ## Expected source scope
 
@@ -20,13 +20,13 @@
 
 ## Acceptance
 
-- [ ] Any finish reason after Main admission enters one reason-agnostic terminal state, freezes issued/confirmed validity and prevents new receive/replay/D2H publication.
-- [ ] Scheduler can deliver a metadata-only/no-forward `QUIESCE` batch after already queued work without modifying upstream vLLM core.
-- [ ] Worker treats `QUIESCE` as a FIFO tail marker, drains all current/old epoch destination access, clears request binding and sends best-effort `DONE_RECVING_MSG` before publishing ordinary completion once.
-- [ ] Scheduler releases Main reservation exactly once only after ordinary all-worker completion; delayed NPU blocks remain owned until the existing core completion order releases them.
-- [ ] Late legal D2H progress after terminal intent can retire issued records but cannot advance reusable validity or substitute for Quiesced proof.
-- [ ] Failure to deliver/complete `QUIESCE` keeps ownership isolated and does not add watchdog、reliable cancel、fatal latch、timeout completion或automatic restart。
-- [ ] The only new mandatory runtime test is normal finish: queued work -> `QUIESCE` -> ordinary all-worker completion -> release-once. Preemption、abort与other terminal reasons remain“未测试”。
+- [x] Any finish reason after Main admission enters one reason-agnostic terminal state, freezes issued/confirmed validity and prevents new receive/replay/D2H publication.
+- [x] Scheduler can deliver a metadata-only/no-forward `QUIESCE` batch after already queued work without modifying upstream vLLM core.
+- [x] Worker treats `QUIESCE` as a FIFO tail marker, drains all current/old epoch destination access, clears request binding and sends best-effort `DONE_RECVING_MSG` before publishing ordinary completion once.
+- [x] Scheduler releases Main reservation exactly once only after ordinary all-worker completion; delayed NPU blocks remain owned until the existing core completion order releases them.
+- [x] Late legal D2H progress after terminal intent can retire issued records but cannot advance reusable validity or substitute for Quiesced proof.
+- [x] Failure to deliver/complete `QUIESCE` keeps ownership isolated and does not add watchdog、reliable cancel、fatal latch、timeout completion或automatic restart。
+- [x] The only new mandatory runtime test is normal finish: queued work -> `QUIESCE` -> ordinary all-worker completion -> release-once. Preemption、abort与other terminal reasons remain“未测试”。
 
 ## Evidence boundary
 
@@ -35,3 +35,21 @@ Passing the normal-finish test does not validate abort, cancellation races, D2H 
 ## Stop and review
 
 Stop before adding typed `QUIESCED`, modifying upstream core completion semantics, adding a non-FIFO executor contract, or introducing forced release for unquiesced operations.
+
+## Answer
+
+Implemented and published as signed-off source commits `2fc7037402979ab4a9036c790ba276a4722aebea` and
+`8f7c17f9f8490b001107e498b3db297c91f81531`. The final GitCode branch ref was verified at
+`8f7c17f9f8490b001107e498b3db297c91f81531`, and the source worktree was clean.
+
+CPU/mock validation ran in the CPU-only `liangjiahao/vllm-ascend-ut` Pod: metadata plus connector
+targets were `140 passed`, and the complete remote-prefill lifecycle file was `6 passed` in an
+independent pytest process. The focused red-green cases covered normal finish, terminal late-progress
+retirement, both `wait_for_save() -> QUIESCE` and `QUIESCE -> wait_for_save()` orderings, ordinary
+completion once, and release-once. `py_compile`, `git diff --check`, `ruff format --check`, and
+diff-relevant `ruff check` passed. Independent two-axis rereview found no blocking ticket 19 finding.
+
+Preemption-pending latest-epoch `QUIESCE` and late rebind terminal dominance belong to ticket 20 and
+remain pending there. Abort and other terminal runtime reasons are untested. Real Mooncake, NPU,
+fused kernel, graph capture, serving, and nondefault executor lifecycle remain `planned / not run` or
+untested as specified.
