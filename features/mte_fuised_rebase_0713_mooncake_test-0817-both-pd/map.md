@@ -37,6 +37,7 @@
 - [定义 async executor compatibility boundary](issues/17-define-async-executor-compatibility-boundary.md): 只验证default `MultiprocExecutor` + default `AsyncScheduler`；其他组合允许启动、warning为未测试，且不由topology或upstream capability自动升级。
 - [定义 async validation、failure 与 compatibility matrix](issues/15-define-async-validation-failure-matrix.md): 初版只以GitCode reporter的default-executor、depth-2单请求happy path作为CPU/mock gate；完整failure/lifecycle、其他topology与非默认组合保持未测试。
 - [定义 ADR/spec supersession 与 implementation ticket chain](issues/16-define-doc-supersession-implementation-chain.md): Canonical spec已升级并保留sync历史evidence；旧ADR/amendment使用forward pointer记录async supersession，后续拆为五张需独立授权的implementation/test tickets。
+- [实现 non-gating D2H plan/progress vertical slice](issues/18-implement-non-gating-d2h-plan-progress.md): 已发布step-local plan/progress、issued/confirmed ledger与persistent worker Main binding；focused static和CPU/mock通过，terminal/preemption与真实runtime evidence未扩大。
 
 ## Not yet specified
 
