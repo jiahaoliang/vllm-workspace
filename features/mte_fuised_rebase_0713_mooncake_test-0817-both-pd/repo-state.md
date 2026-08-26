@@ -1,11 +1,11 @@
 # mte_fuised_rebase_0713_mooncake_test-0817-both-pd Repo State
 
-Captured At: 2026-08-27T01:17:34+08:00
+Captured At: 2026-08-27T01:59:59+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
 | vllm | `repos/vllm` | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` | false | upstream vLLM baseline |
-| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `8f7c17f9f8490b001107e498b3db297c91f81531` | false | lock source; restores to `repos/vllm-ascend` |
+| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `4fbd759c7cd2806ee55410c6e1e695aebf5ed8f5` | false | lock source; restores to `repos/vllm-ascend` |
 | Mooncake | `repos/Mooncake` | `tag:v0.3.12.post1` | `6041a609a8c3af35e778f70db344f145c2914980` | false | dependency reading and validation |
 
 ## Validation State
@@ -17,12 +17,14 @@ Captured At: 2026-08-27T01:17:34+08:00
 - Ticket 18 does not validate terminal ownership, preemption, real Mooncake, fused kernel, graph capture, serving, or NPU runtime.
 - Ticket 19 added the async normal-finish terminal barrier. CPU/mock connector/metadata targets were `140 passed` and the A2 lifecycle file was `6 passed`; independent rereview had no blocking ticket 19 finding.
 - Ticket 19 does not validate preemption, abort, other terminal reasons, real Mooncake, fused kernel, graph capture, serving, or NPU runtime.
+- Ticket 20 added the async preemption replay barrier. Focused CPU/mock connector/metadata targets were `145 passed`, A2 lifecycle was `6 passed`, and broad kv_offload excluding the known baseline-broken file was `228 passed`; independent rereview had no blocking finding.
+- Ticket 20 focused evidence does not expand the canonical Preemption runtime claim, which remains “未测试”.
 - NPU runtime remains `planned / not run`; see [NPU E2E test plan](npu-e2e-test-plan.md).
 
 ## Publish State
 
-- The replacement through ticket 19 range `0d6dd0d26..8f7c17f9` is signed off and published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
-- `git ls-remote origin refs/heads/feature/blockwise-dsa-mooncake-v1-reimplementation` was verified for the ticket 19 publication and returned exactly `8f7c17f9f8490b001107e498b3db297c91f81531`.
+- The replacement through ticket 20 range `0d6dd0d26..4fbd759c` is signed off and published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
+- `git ls-remote origin refs/heads/feature/blockwise-dsa-mooncake-v1-reimplementation` was verified for the ticket 20 publication and returned exactly `4fbd759c7cd2806ee55410c6e1e695aebf5ed8f5`.
 - Cross-machine restore is available from the branch and commit recorded in `workspace.lock.json`.
 
 ## Lock Refresh Note
