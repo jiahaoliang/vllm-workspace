@@ -1,6 +1,8 @@
 # Transfer 最终失败后由 Decode replay
 
-状态：已接受
+状态：已接受；async delta继续沿用
+
+后续关系：Initial Indexer/Main transfer failure仍进入same-epoch、preserved Main为0的`PREPARE_REPLAY`。Async preemption使用不同的epoch cut与rebind barrier，见ADR 0026；两者不改变本ADR的transfer-failure recovery。
 
 Blockwise DSA PD offload 的 Indexer D2D 或 Main D2RH 同步 transfer 最终失败后，整个 request 转入 D-side full-sequence replay，而不是通过当前不支持双 KV group 的 `invalid_block_ids` 路径终止单个 request。每个 phase 只发起一次 connector-level transfer 调用，并按 ADR 0014 仅依赖 Mooncake binding 的 internal retry；binding 最终返回失败时进入 replay。按 ADR 0015，首版不在调用前检查 Prefill source TTL 或 ownership。该选择保持“不修改 upstream vLLM core”的边界，并以异常路径的计算成本换取 request-local recovery。
 

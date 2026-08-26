@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "case_id": "NPU-01",
+      "status": "planned / not run",
+      "summary": "Happy path and a full-physical partial block.",
+      "manifest": "manifests/NPU-01.json",
+      "target_service": "decode",
+      "request_ids": ["partial-1"],
+      "required_cases": [],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "lifecycle_probe", "leader_replica_evidence", "memory_placement_probe", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-01"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["partial-1"], "max_concurrency": 1}],
+        "faults": [],
+        "barriers": [],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Baseline output token IDs and finish reason.", "Source/destination checksums for first, middle, and last layer Main K/V and Indexer roles.", "Whole physical checksum for the partial tail with token-state validity."],
+      "success_criteria": ["Each Decode TP reads only fixed leaders 0 or 4 in the explicitly routed Prefill DP.", "Indexer terminal success precedes one Main submission per worker.", "Exact TP RECEIVE_COMPLETE precedes cache-hit visibility.", "Output and cache oracles match baseline."],
+      "failure_evidence": ["Non-leader payload, phase overlap/reversal, missing TP result, unexpected retry, placement mismatch, or oracle mismatch."],
+      "cleanup": ["Collect Job, Pod, event, lifecycle, session, and NPU evidence.", "Run exact session cleanup for this RUN_ID/case.", "Delete only the rendered NPU-01 Job and ConfigMap, then prove resource counters returned to the pre-case baseline."]
+    },
+    {
+      "case_id": "NPU-02",
+      "status": "planned / not run",
+      "summary": "Multi-block receive, sustained Decode, and fused D2H validity.",
+      "manifest": "manifests/NPU-02.json",
+      "target_service": "decode",
+      "request_ids": ["multiblock-1", "decode-grow-1"],
+      "required_cases": ["NPU-01"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "lifecycle_probe", "fused_d2h_probe", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-02"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["multiblock-1", "decode-grow-1"], "max_concurrency": 2}],
+        "faults": [],
+        "barriers": [{"name": "fused-d2h-boundary", "target": "request:decode-grow-1", "release_condition": "confirmed-prefix-snapshot-captured"}],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Baseline outputs for both fixtures.", "Per-block cache checksums at selected layers.", "FUSED_D2H range, destination, and confirmed-prefix snapshots before and after D2H_COMPLETE."],
+      "success_criteria": ["No block range gap or overlap and partial tails use full physical lengths.", "D2H starts at the confirmed boundary and exact TP D2H_COMPLETE advances validity monotonically.", "Output and cache oracles match baseline."],
+      "failure_evidence": ["Block mapping gap/overlap, stale command acceptance, validity regression/overflow, non-fail-fast D2H failure, or oracle mismatch."],
+      "cleanup": ["Wait for every reachable fused operation terminal state.", "Run exact session cleanup and delete only NPU-02 Job/ConfigMap.", "Do not synthesize completion for an unquiesced operation."]
+    },
+    {
+      "case_id": "NPU-03",
+      "status": "planned / not run",
+      "summary": "Concurrency, request-lifetime reservation pressure, and per-step HOL admission.",
+      "manifest": "manifests/NPU-03.json",
+      "target_service": "decode",
+      "request_ids": ["pressure-old", "pressure-head", "pressure-young"],
+      "required_cases": ["NPU-02"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "reservation_probe", "admission_barrier", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-03"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["pressure-old", "pressure-head", "pressure-young"], "max_concurrency": 3}],
+        "faults": [],
+        "barriers": [{"name": "hol-capacity-miss", "target": "admission:pressure-head", "release_condition": "next-scheduler-step"}],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Baseline output/cache results for all three requests.", "Step-indexed reservation ledger and scheduler/worker ownership timeline."],
+      "success_criteria": ["Old holds capacity, head misses, and young is gated for that step even when it would fit.", "No partial ownership, oversubscription, cross-request write, or duplicate release.", "The next step retries in original order and all final oracles match."],
+      "failure_evidence": ["HOL bypass, oversubscription, ownership leak, early/duplicate release, cross-request write, no progress, or oracle mismatch."],
+      "cleanup": ["Release the admission barrier before cleanup.", "Terminate all case requests and run exact session cleanup.", "Delete only NPU-03 Job/ConfigMap and prove reservation/delayed-block counters return exactly to baseline."]
+    },
+    {
+      "case_id": "NPU-04",
+      "status": "planned / not run",
+      "summary": "Indexer-before-Main ordering with request/TP/phase-specific final failures.",
+      "manifest": "manifests/NPU-04.json",
+      "target_service": "decode",
+      "request_ids": ["failure-1"],
+      "required_cases": ["NPU-01"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "lifecycle_probe", "phase_fault", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-04"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["failure-1"], "max_concurrency": 1}],
+        "faults": [
+          {"name": "indexer-final-failure", "request_id": "failure-1", "decode_tp_rank": 0, "phase": "INDEXER_D2D", "occurrence": 1, "outcome": "FINAL_FAILURE"},
+          {"name": "main-final-failure", "request_id": "failure-1", "decode_tp_rank": 0, "phase": "MAIN_D2RH", "occurrence": 1, "outcome": "FINAL_FAILURE"}
+        ],
+        "barriers": [],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Separate clean subruns for INDEXER_D2D and MAIN_D2RH final failure.", "Baseline output/cache oracle, phase timeline, and Main checksum before/after each subrun."],
+      "success_criteria": ["Indexer final failure never submits Main and emits TRANSFER_FAILED(INDEXER_D2D).", "Main final failure emits TRANSFER_FAILED(MAIN_D2RH) and never RECEIVE_COMPLETE.", "No connector outer retry and no local success is promoted to a cache hit."],
+      "failure_evidence": ["Main after Indexer failure, wrong phase, RECEIVE_COMPLETE, unbounded retry, untracked write, fault miss, or oracle mismatch."],
+      "cleanup": ["Disable and prove removal of the exact fault rule after each subrun.", "Run exact session cleanup and delete only NPU-04 Job/ConfigMap.", "A missing phase fault capability keeps this case planned/not run; Pod kill is not a substitute."]
+    },
+    {
+      "case_id": "NPU-05",
+      "status": "planned / not run",
+      "summary": "Exact TP terminal barrier and all-TP full replay.",
+      "manifest": "manifests/NPU-05.json",
+      "target_service": "decode",
+      "request_ids": ["failure-1"],
+      "required_cases": ["NPU-04"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "lifecycle_probe", "phase_fault", "tp_terminal_barrier", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-05"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["failure-1"], "max_concurrency": 1}],
+        "faults": [{"name": "main-final-failure", "request_id": "failure-1", "decode_tp_rank": 0, "phase": "MAIN_D2RH", "occurrence": 1, "outcome": "FINAL_FAILURE"}],
+        "barriers": [{"name": "delay-terminal-tp1", "target": "decode-tp:1", "release_condition": "decode-tp:0-terminal-observed"}],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Baseline full-sequence output/cache result.", "Every command/epoch/TP result, preserved_main_tokens value, and replay block trace."],
+      "success_criteria": ["A missing TP remains pending without replay.", "After exact terminal coverage every TP receives PREPARE_REPLAY, reports REPLAY_READY, and has zero preserved Main validity.", "Decode replays from token zero and rewrites complete Indexer/Main with matching final oracles."],
+      "failure_evidence": ["Early replay, inferred missing rank, stale/conflicting result changing ownership, retained Main validity, suffix-only replay, or oracle mismatch."],
+      "cleanup": ["Release the TP barrier and phase fault even after failure.", "Collect every reachable terminal result, run exact session cleanup, and delete only NPU-05 Job/ConfigMap.", "Prove all TP replay state, reservations, and sessions returned to baseline."]
+    },
+    {
+      "case_id": "NPU-06",
+      "status": "planned / not run",
+      "summary": "Preemption epoch rebind and confirmed Main reuse.",
+      "manifest": "manifests/NPU-06.json",
+      "target_service": "decode",
+      "request_ids": ["preempt-1"],
+      "required_cases": ["NPU-02"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "lifecycle_probe", "fused_d2h_probe", "preemption_control", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-06"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["preempt-1"], "max_concurrency": 1}],
+        "faults": [],
+        "barriers": [{"name": "confirmed-main-prefix", "target": "request:preempt-1", "release_condition": "confirmed-main-tokens-equals-16"}],
+        "preemptions": [{"request_id": "preempt-1", "trigger_after_confirmed_main_tokens": 16, "expected_new_epoch_delta": 1}],
+        "cancellations": [],
+        "phase_transitions": []
+      },
+      "oracles": ["Baseline output.", "Preemption-boundary Main checksum, old/new epoch, Indexer IDs, reservation identity, replay trace, D2H ranges, and DsaPreemptionEvidence."],
+      "success_criteria": ["Old epoch retires, Indexer rebinds, and Main reservation identity/capacity remains stable.", "Proven Main prefix is not D2H-written twice; stale old-epoch results cannot restore ownership.", "Evidence fields and final output/cache oracles match."],
+      "failure_evidence": ["Old Indexer reuse, Main reservation replacement/release, duplicate confirmed-prefix write, wrong preserved boundary, stale acceptance, or oracle mismatch."],
+      "cleanup": ["Allow old/new epoch operations to reach terminal state.", "Run exact session cleanup and delete only NPU-06 Job/ConfigMap.", "Prove one Main release and removal of both epoch trackers."]
+    },
+    {
+      "case_id": "NPU-07",
+      "status": "planned / not run",
+      "summary": "Cancellation drain-and-ack during receive and fused D2H.",
+      "manifest": "manifests/NPU-07.json",
+      "target_service": "decode",
+      "request_ids": ["cancel-1"],
+      "required_cases": ["NPU-01"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "cache_probe", "lifecycle_probe", "cancellation_control", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-07"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["cancel-1"], "max_concurrency": 1}],
+        "faults": [],
+        "barriers": [],
+        "preemptions": [],
+        "cancellations": [
+          {"name": "cancel-receive", "request_id": "cancel-1", "phase": "RECEIVE_REMOTE", "occurrence": 1, "trigger": "after-start-before-terminal"},
+          {"name": "cancel-fused-d2h", "request_id": "cancel-1", "phase": "FUSED_D2H", "occurrence": 1, "trigger": "after-start-before-terminal"}
+        ],
+        "phase_transitions": []
+      },
+      "oracles": ["Receive and fused-D2H cancellation subruns.", "Quiesced, DONE_RECVING_MSG attempt, ordinary finished_recving, delayed-block release, and address ownership timeline."],
+      "success_criteria": ["No new command starts after cancellation and unquiesced ownership remains isolated.", "Each worker attempts source notification before one ordinary ack; all-worker completion precedes release-once.", "Duplicate cancellation and late completion are no-ops with no late write."],
+      "failure_evidence": ["Early reuse/release, new operation, notification/ack inversion, duplicate ack, partial-worker cleanup, late write, or resource leak."],
+      "cleanup": ["Release every cancellation barrier and wait for actual drain.", "Run exact session cleanup and delete only NPU-07 Job/ConfigMap.", "Prove source notification, Main/Indexer ownership, delayed blocks, and worker command state returned to baseline."]
+    },
+    {
+      "case_id": "NPU-08",
+      "status": "planned / not run",
+      "summary": "Default MooncakeConnectorV1 isolation with dsa_pd_offload=false.",
+      "manifest": "manifests/NPU-08.json",
+      "target_service": "default-v1-decode",
+      "request_ids": ["v1-1"],
+      "required_cases": ["NPU-01", "NPU-02", "NPU-03", "NPU-04", "NPU-05", "NPU-06", "NPU-07"],
+      "required_capabilities": ["case_client", "tokenizer_roundtrip", "output_oracle", "cache_probe", "default_v1_probe", "session_cleanup", "resource_inventory"],
+      "command": ["scripts/run-case.sh", "RUN_DIR", "NPU-08"],
+      "controls": {
+        "waves": [{"sequence": 0, "request_ids": ["v1-1"], "max_concurrency": 1}],
+        "faults": [],
+        "barriers": [],
+        "preemptions": [],
+        "cancellations": [],
+        "phase_transitions": [{"from_manifest": "manifests/dsa-pd.json", "cleanup_manifest": "manifests/dsa-pd.json", "to_manifest": "manifests/default-v1-pd.json"}]
+      },
+      "oracles": ["Non-PD baseline output.", "Ordinary V1 source/destination checksum at selected layers/blocks and connector-type trace."],
+      "success_criteria": ["Only ordinary V1 metadata, scheduler, transfer, and completion paths are observed.", "No DSA envelope, Swapped Main lifetime reservation, split Indexer/Main phase, or DSA typed result exists.", "Output/cache oracles match and no resource leaks remain."],
+      "failure_evidence": ["Any DSA-only state/allocation, ordinary metadata/transfer regression, unexpected retry, oracle mismatch, or resource leak."],
+      "cleanup": ["Run exact default-V1 session cleanup.", "Delete only NPU-08 Job/ConfigMap, then delete the exact rendered default-V1 manifest.", "Prove all run-owned V1 Pods and NPU allocations are released."]
+    }
+  ]
+}

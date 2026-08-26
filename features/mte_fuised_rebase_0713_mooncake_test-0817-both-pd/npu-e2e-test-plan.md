@@ -8,6 +8,7 @@
 - Static、CPU/mock 与 NPU runtime evidence 必须分别报告。只有全部 mandatory case 实际通过、证据归档且 cleanup audit 通过后，才能声明 `NPU runtime validated`。
 - 本计划中的 preflight 是测试执行 gate，不是 connector handshake，也不代表已经实现 production deployment admission gate。
 - 当前 handshake 是 positional ABI；connector 不验证 P/D 间的 dtype、shape、memory kind、tuple role、leader coverage 或 layout compatibility。即使 transfer status 成功，错误配对仍可能 silent corruption。
+- Versioned harness 位于 [npu-e2e/](npu-e2e/README.md)。它已通过 repository-local static/offline synthetic validation；这不改变 NPU runtime 的 `planned / not run` 状态。
 
 ## 范围与首个拓扑
 
@@ -38,12 +39,13 @@ Mandatory runtime scope：
 
 ```bash
 export NS=liangjiahao
+export HARNESS=features/mte_fuised_rebase_0713_mooncake_test-0817-both-pd/npu-e2e
 export RUN_ID=dsa-npu-YYYYMMDDTHHMMSS
 export RUN_DIR=/absolute/artifact/root/${RUN_ID}
-export BASELINE_MANIFEST=${RUN_DIR}/manifests/baseline.yaml
-export BASELINE_JOB_MANIFEST=${RUN_DIR}/manifests/baseline-oracle.yaml
-export PD_MANIFEST=${RUN_DIR}/manifests/dsa-pd.yaml
-export V1_MANIFEST=${RUN_DIR}/manifests/default-v1-pd.yaml
+export BASELINE_MANIFEST=${RUN_DIR}/manifests/baseline.json
+export BASELINE_JOB_MANIFEST=${RUN_DIR}/manifests/baseline-oracle.json
+export PD_MANIFEST=${RUN_DIR}/manifests/dsa-pd.json
+export V1_MANIFEST=${RUN_DIR}/manifests/default-v1-pd.json
 export REQUESTS=${RUN_DIR}/fixtures/requests.jsonl
 export RUN_CONFIG=${RUN_DIR}/run-config.json
 test "${NS}" = liangjiahao
@@ -54,29 +56,23 @@ install -d "${RUN_DIR}/preflight" "${RUN_DIR}/baseline"
 所有对象必须带 labels `app.kubernetes.io/managed-by=dsa-npu-e2e` 和 `test-run=${RUN_ID}`。名称固定为：
 
 - `Deployment/${RUN_ID}-baseline`、`Service/${RUN_ID}-baseline`；
-- baseline 采集使用 `Job/${RUN_ID}-baseline-oracle`、`ConfigMap/${RUN_ID}-baseline-oracle`；
-- `Deployment/${RUN_ID}-prefill`、`Service/${RUN_ID}-prefill`；
-- `Deployment/${RUN_ID}-decode`、`Service/${RUN_ID}-decode`；
-- `Deployment/${RUN_ID}-v1-prefill`、`Service/${RUN_ID}-v1-prefill`；
-- `Deployment/${RUN_ID}-v1-decode`、`Service/${RUN_ID}-v1-decode`；
-- 每个 case 的 `Job/${RUN_ID}-${CASE_ID}` 与 `ConfigMap/${RUN_ID}-${CASE_ID}`。
+- baseline 采集使用 `Job/${RUN_ID}-baseline`、`ConfigMap/${RUN_ID}-baseline`；
+- 每个 Prefill DP rank 使用 `Deployment/Service/${RUN_ID}-prefill-dp<RANK>`，并提供 aggregate `Service/${RUN_ID}-prefill`；
+- 每个 Decode DP rank 使用 `Deployment/Service/${RUN_ID}-decode-dp<RANK>`，并提供 aggregate `Service/${RUN_ID}-decode`；
+- default V1 同样使用 per-DP `v1-prefill-dp<RANK>`、`v1-decode-dp<RANK>` 和 aggregate Services；
+- 每个 case 的 `Job/ConfigMap/${RUN_ID}-<case-id-lower>`，例如 `${RUN_ID}-npu-01`。
 
-`run-config.json` 至少保存 kube context、node、NPU resource requests、P/D image digest、vLLM/vLLM-Ascend/Mooncake revisions、model/tokenizer revision、全部 serving flags、cache dtype、block size、positional ABI fingerprint、fixture SHA256、fault/probe mechanism、Mooncake session cleanup command和数值 oracle tolerance。变更任一字段都产生新的 `RUN_ID`，不能复用旧 baseline。
+`run-config.json` 至少保存 kube context、node、NPU resource requests、P/D image digest、vLLM/vLLM-Ascend/Mooncake revisions、model/tokenizer revision、全部 serving flags、cache dtype、block size、positional ABI fingerprint、fixture/catalog SHA256、fault/probe capability evidence、Mooncake session cleanup command和数值 oracle tolerance。PASS capability 必须使用 artifact_root 下 capability 专属的 structured evidence document，绑定同一 RUN_ID 和 exact assertion IDs，为每个 assertion 提供不跨 capability 复用的 artifact 并逐项校验 SHA256；`output_oracle` 必须显式证明 baseline capture/identity/allocation release。变更任一字段都产生新的 `RUN_ID`，不能复用旧 baseline。resolved config 用 `npu-e2e/scripts/render.sh` 生成 run directory；模板中的 REQUIRED/UNKNOWN 不能被当作已满足。
 
 ## Mandatory Preflight Gate
 
-Preflight 的每项结果写入 `${RUN_DIR}/preflight/` 和 `preflight.json`。任一项为 `FAIL` 或 `UNKNOWN` 时，不 apply serving manifest、不发流量，对应 case 保持 `planned / not run` 并记录原因。
+Preflight 的每项结果写入 `${RUN_DIR}/preflight/` 和 `preflight.json`。先运行 `scripts/preflight.sh --offline ${RUN_DIR}` 验证本地 frozen 工件；offline 固定返回 UNKNOWN/exit 2 且不调用 kubectl。执行前再运行 `scripts/preflight.sh --live ${RUN_DIR}`；live 仅做 read-only cluster identity/capacity 查询和 server-side dry-run。runner 自行重算 live preflight，不信任调用者提供的 PASS 文件，并只接受 generated_at/epoch 一致且 10 分钟内生成的 result。任一 latest cleanup FAIL 或 unverifiable 时，全局 gate 阻断后续 case。common gate 或 case gate 不是 PASS 时，不发流量，对应 case 保持 `planned / not run`。
 
 ### 1. Context、namespace 与 manifest
 
 ```bash
-kubectl config current-context | tee "${RUN_DIR}/preflight/kube-context.txt"
-kubectl get namespace "${NS}" -o yaml > "${RUN_DIR}/preflight/namespace.yaml"
-kubectl apply --dry-run=server -n "${NS}" -f "${BASELINE_MANIFEST}" -o yaml > "${RUN_DIR}/preflight/baseline-rendered.yaml"
-kubectl apply --dry-run=server -n "${NS}" -f "${BASELINE_JOB_MANIFEST}" -o yaml > "${RUN_DIR}/preflight/baseline-oracle-rendered.yaml"
-kubectl apply --dry-run=server -n "${NS}" -f "${PD_MANIFEST}" -o yaml > "${RUN_DIR}/preflight/dsa-pd-rendered.yaml"
-kubectl apply --dry-run=server -n "${NS}" -f "${V1_MANIFEST}" -o yaml > "${RUN_DIR}/preflight/default-v1-rendered.yaml"
-sha256sum "${RUN_DIR}"/preflight/*-rendered.yaml "${REQUESTS}" "${RUN_CONFIG}" > "${RUN_DIR}/preflight/input-sha256.txt"
+bash "${HARNESS}/scripts/preflight.sh" --live "${RUN_DIR}"
+jq '{overall_status, checks, cases}' "${RUN_DIR}/preflight/preflight.json"
 ```
 
 人工复核 current context、`liangjiahao`、精确对象名、node affinity、P/D resource requests 和 cleanup target。不得删除 namespace。
@@ -165,42 +161,42 @@ Baseline 与 DSA P/D 顺序占用 NPU，不要求同时驻留。先采集 baseli
 kubectl apply -n "${NS}" -f "${BASELINE_MANIFEST}"
 kubectl rollout status -n "${NS}" "deployment/${RUN_ID}-baseline" --timeout=30m
 kubectl apply -n "${NS}" -f "${BASELINE_JOB_MANIFEST}"
-kubectl wait -n "${NS}" --for=condition=complete --timeout=30m "job/${RUN_ID}-baseline-oracle"
-kubectl logs -n "${NS}" "job/${RUN_ID}-baseline-oracle" --all-containers > "${RUN_DIR}/baseline/client.log"
+kubectl wait -n "${NS}" --for=condition=complete --timeout=30m "job/${RUN_ID}-baseline"
+kubectl logs -n "${NS}" "job/${RUN_ID}-baseline" --all-containers > "${RUN_DIR}/baseline/client.log"
 kubectl delete -n "${NS}" -f "${BASELINE_JOB_MANIFEST}" --ignore-not-found
 kubectl delete -n "${NS}" -f "${BASELINE_MANIFEST}" --ignore-not-found
 kubectl wait -n "${NS}" --for=delete pod -l "test-run=${RUN_ID},test-role=baseline" --timeout=10m
 kubectl apply -n "${NS}" -f "${PD_MANIFEST}"
-kubectl rollout status -n "${NS}" "deployment/${RUN_ID}-prefill" --timeout=30m
-kubectl rollout status -n "${NS}" "deployment/${RUN_ID}-decode" --timeout=30m
+for rank in $(seq 0 $(($(jq -r '.topology.prefill_dp' "${RUN_CONFIG}") - 1))); do
+  kubectl rollout status -n "${NS}" "deployment/${RUN_ID}-prefill-dp${rank}" --timeout=30m
+done
+for rank in $(seq 0 $(($(jq -r '.topology.decode_dp' "${RUN_CONFIG}") - 1))); do
+  kubectl rollout status -n "${NS}" "deployment/${RUN_ID}-decode-dp${rank}" --timeout=30m
+done
 ```
 
 Baseline 删除后和 DSA P/D 启动后都重新归档 node resource requests 与 device-plugin allocation。任一 baseline artifact 不完整或 allocation 未释放时，不启动 DSA P/D。
 
 ## 公共执行与证据模板
 
-每个 `${CASE_ID}` 的 rendered manifest 只能创建该 case 的 ConfigMap/Job；Job 在 `liangjiahao` 内访问 service，不依赖 port-forward。命令统一为：
+每个 `${CASE_ID}` 的 rendered manifest 只能创建该 case 的 ConfigMap/Job；Job 在 `liangjiahao` 内访问 service，不依赖 port-forward。先重跑 live preflight 使 prerequisite result 生效，再使用 fail-closed runner：
 
 ```bash
 export CASE_ID=NPU-XX
-export CASE_MANIFEST=${RUN_DIR}/manifests/${CASE_ID}.yaml
-kubectl apply --dry-run=server -n "${NS}" -f "${CASE_MANIFEST}" -o yaml > "${RUN_DIR}/${CASE_ID}/manifest-rendered.yaml"
-kubectl apply -n "${NS}" -f "${CASE_MANIFEST}"
-kubectl wait -n "${NS}" --for=condition=complete --timeout=30m "job/${RUN_ID}-${CASE_ID}"
-kubectl logs -n "${NS}" "job/${RUN_ID}-${CASE_ID}" --all-containers > "${RUN_DIR}/${CASE_ID}/client.log"
-kubectl get pod -n "${NS}" -l "test-run=${RUN_ID}" -o yaml > "${RUN_DIR}/${CASE_ID}/pods.yaml"
-kubectl get events -n "${NS}" --sort-by=.metadata.creationTimestamp > "${RUN_DIR}/${CASE_ID}/events.txt"
+bash "${HARNESS}/scripts/preflight.sh" --live "${RUN_DIR}"
+bash "${HARNESS}/scripts/run-case.sh" "${RUN_DIR}" "${CASE_ID}"
 ```
 
-每个 case 另外保存起止时间、P/D log offsets、Mooncake session/transfer IDs、每个 Decode TP 的 command/result timeline、reservation/Indexer/Main ownership snapshot、NPU allocation 和 oracle JSON。Job timeout、crash 或缺失 rank result是失败证据，不得通过无限增加 timeout 改写结果。
+runner 先证明同名 case 对象不存在，再逐对象 create ConfigMap/Job 并记录 API server 返回的 UID；它在 `${RUN_DIR}/results/${CASE_ID}/attempt-*/` 保存起止时间、client/P/D logs、Job、Pods、events、结构化 result、cleanup record 和 recursive artifact checksums。client 的 `DSA_NPU_RESULT=<json>` 缺失、多行、identity 不符、oracle/criterion 不完整，或每个 kind/index 独占的 `DSA_NPU_ARTIFACT=<json>` 缺失/hash 不匹配时为 INVALID/FAIL，绝不判 PASS。Job timeout、crash 或缺失 rank result是失败证据，不得通过无限增加 timeout 改写结果。
 
-每个 case 结束后先收证，再执行精确清理：取消未结束请求、等待 worker quiesce、按 `run-config.json` 中已解析的命令清理该 case 的 Mooncake sessions，复位 fault/barrier，确认 reservation、delayed NPU blocks、command state 与 tracker 回到 case 前基线，然后仅删除：
+每个 case 结束后先收证，再执行精确清理：取消未结束请求、等待 worker quiesce、按 `run-config.json` 中已解析的命令清理该 case 的 Mooncake sessions，复位 fault/barrier，确认 reservation、delayed NPU blocks、command state、tracker 与 NPU requests 回到 case 前基线。cleanup command 必须输出可校验的 session inventory 与 resource delta artifacts，不能只自报 boolean。runner 在删除前重新核对 created UID 与 `managed-by`/run/case labels；不匹配时拒绝删除并判 cleanup FAIL。人工核查目标为：
 
 ```bash
 kubectl config current-context
 kubectl get namespace "${NS}"
-kubectl get -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE_ID}"
-kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE_ID}" --ignore-not-found
+CASE_OBJECT="${RUN_ID}-$(printf '%s' "${CASE_ID}" | tr '[:upper:]' '[:lower:]')"
+kubectl get -n "${NS}" "job/${CASE_OBJECT}" "configmap/${CASE_OBJECT}"
+kubectl delete -n "${NS}" "job/${CASE_OBJECT}" "configmap/${CASE_OBJECT}" --ignore-not-found
 ```
 
 若 cleanup 未通过，停止后续 case，保留服务与证据用于受控诊断，并将 run 标记为未完成。
@@ -223,7 +219,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：完整 preflight PASS；baseline 的 `partial-1` 已归档；cache probe 能覆盖 leaders 0/4 和所有 Decode TP。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-01.yaml`；只发送固定 `partial-1`，单并发，禁止 transport fault。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-01.json`；只发送固定 `partial-1`，单并发，禁止 transport fault。
 - Oracle：baseline output；首/中/末层 Main K/V、Indexer 和 optional scale 的 source/destination oracle；partial tail 按完整 physical block checksum。
 - 成功条件：每个 Decode TP 只从自己的 fixed leader 拉取；Indexer D2D terminal success 后才开始 Main D2RH；每 phase 在 connector 边界各提交一次；Main 落在 per-TP Swapped Host pool、Indexer 落在该 TP HBM；exact TP `RECEIVE_COMPLETE` 后才可见 cache hit。
 - 失败证据：任一非 leader payload、phase 逆序/重叠、地址越界、缺 rank、checksum mismatch、output mismatch、reservation 泄漏或 unexpected retry。
@@ -234,7 +230,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-01 PASS；baseline 的 `multiblock-1`、`decode-grow-1` 已归档；fused D2H range/validity probe 可用。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-02.yaml`；顺序执行两个固定请求，随后以相同输入执行 manifest 中冻结的低并发持续 Decode wave。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-02.json`；顺序执行两个固定请求，随后以相同输入执行 manifest 中冻结的低并发持续 Decode wave。
 - Oracle：baseline output；每个 transfer block 的选定 layer oracle；每次 `FUSED_D2H` 前后 Main destination 与 confirmed valid prefix 的等价 tensor oracle。
 - 成功条件：多 block address/range 无重叠或遗漏；partial tail 仍传完整 physical block；fused D2H 只写 command-bound Main prefix，`D2H_COMPLETE` 单调推进 validity；所有 TP 的 output/cache oracle一致。
 - 失败证据：block mapping 缺口/覆盖、stale epoch/command 被接受、validity 越界或倒退、D2H failure 未 fail fast、output/cache mismatch。
@@ -245,7 +241,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-02 PASS；已记录每 TP usable Host blocks；driver 能以 barrier 固定 admission/release 顺序。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-03.yaml`；按 fixture 顺序提交 `pressure-old`、`pressure-head`、`pressure-young`，其冻结 reservation blocks 使 old 持有容量、head 首先 capacity miss、young 即使可装入也在本 step 不尝试；另执行固定并发 wave。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-03.json`；按 fixture 顺序提交 `pressure-old`、`pressure-head`、`pressure-young`，其冻结 reservation blocks 使 old 持有容量、head 首先 capacity miss、young 即使可装入也在本 step 不尝试；另执行固定并发 wave。
 - Oracle：三条请求各自 baseline output/cache oracle；逐 step reservation ledger 与 scheduler/worker ownership timeline。
 - 成功条件：reservation 在 receive 前一次性覆盖 prompt+最大输出；capacity miss 不产生 partial ownership；本 step HOL 阻止 younger reservation，下一 step 按原顺序重试；请求间 Host/Indexer ownership 隔离；每个 terminal path release-once。
 - 失败证据：bypass HOL、超卖、等待期间 ownership 泄漏、重复/提前 release、request 交叉写、持续无进展或 output/cache mismatch。
@@ -256,7 +252,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-01 PASS；可控 hook 能只命中 `failure-1` 的指定 Decode TP、phase 和 occurrence，并能区分 Mooncake internal retry 与 connector outer retry。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-04.yaml` 包含两个独立 subrun：A 在 `INDEXER_D2D` 注入 final failure；B 允许 Indexer success 后在 `MAIN_D2RH` 注入 final failure。每个 subrun 前恢复干净 request/session state。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-04.json` 包含两个独立 subrun：A 在 `INDEXER_D2D` 注入 final failure；B 允许 Indexer success 后在 `MAIN_D2RH` 注入 final failure。每个 subrun 前恢复干净 request/session state。
 - Oracle：每个 subrun 的 baseline output/cache oracle；phase submit/terminal timeline；Main destination before/after checksum。
 - 成功条件：A 不提交 Main 且产生 `TRANSFER_FAILED(INDEXER_D2D)`；B 不产生 `RECEIVE_COMPLETE` 且产生 `TRANSFER_FAILED(MAIN_D2RH)`；connector 无 outer retry；局部成功不提升为 cache hit。
 - 失败证据：Indexer final failure 后出现 Main submit、错误 phase、receive-complete、无界 retry、未跟踪写入或 output/cache mismatch。
@@ -267,7 +263,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-04 PASS；hook 能让一个 Decode TP final fail，并让其余 TP 以受控顺序返回 terminal result；可观测 cross-step rank accumulation。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-05.yaml`；`failure-1` 在一个指定 TP 注入一次 failure，延迟另一个 TP terminal result，随后解除 barrier。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-05.json`；`failure-1` 在一个指定 TP 注入一次 failure，延迟另一个 TP terminal result，随后解除 barrier。
 - Oracle：baseline full-sequence output/cache oracle；每个 `(command_id, epoch, tp_rank)` result、`preserved_main_tokens` 和 replay block trace。
 - 成功条件：缺 rank 时无限期 pending且不 replay；exact TP terminal set 完整后所有 TP 收到 `PREPARE_REPLAY`；所有 TP validity 归零且 `preserved_main_tokens=0`；Decode 从 token 0 full replay并重建 Indexer/Main；最终 output/cache 与 baseline一致。
 - 失败证据：单 TP early replay、missing rank 被当完成、stale/conflicting result 改写 ownership、任一 TP 保留 Main validity、只 replay suffix 或 oracle mismatch。
@@ -278,7 +274,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-02 PASS；可控 preemption barrier 能在 confirmed Main prefix 形成后触发 core preemption；能读取 epoch、Indexer IDs、reservation identity 和 D2H ranges。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-06.yaml`；运行固定 `preempt-1`，在 manifest 指定 token boundary 触发一次 preemption，再恢复到新 execution epoch。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-06.json`；运行固定 `preempt-1`，在 manifest 指定 token boundary 触发一次 preemption，再恢复到新 execution epoch。
 - Oracle：baseline output；preemption 前 confirmed Main prefix checksum；恢复后同一 Main reservation/prefix checksum、新 Indexer HBM ownership、replay trace 和 `DsaPreemptionEvidence`。
 - 成功条件：旧 epoch retire；Indexer IDs 重新绑定；Main lifetime reservation identity/capacity 保留；evidence 准确记录 full replay token数、复用 Main token数、按 runtime page geometry 计算的 skipped D2H bytes和 recovery duration；可证明有效的 Main prefix 不重复 D2H，Indexer 由 full-sequence compute replay重建；stale old-epoch result不恢复旧 ownership；最终 oracle一致。
 - 失败证据：复用旧 Indexer IDs、释放/更换 Main reservation、重复写 confirmed prefix、错误 preserved boundary、接受 stale result或 oracle mismatch。
@@ -289,7 +285,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-01 PASS；driver 能在 in-flight receive/fused D2H barrier 上取消 `cancel-1`；能观察 worker Quiesced、`DONE_RECVING_MSG` attempt、ordinary `finished_recving` 和 delayed-block release顺序。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-07.yaml`；分别在 receive 与 fused D2H in-flight point 执行固定 cancellation subrun，并发送 duplicate cancellation/late completion。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-07.json`；分别在 receive 与 fused D2H in-flight point 执行固定 cancellation subrun，并发送 duplicate cancellation/late completion。
 - Oracle：取消前 baseline prefix 与 cache checksum；取消后不再产生用户 output，改用 ownership/state oracle确认旧 operation没有写入复用地址。
 - 成功条件：取消后不启动新 receive/replay/D2H；unquiesced 期间 reservation保持隔离；每个 worker Quiesced 后，先对实际使用且未通知的 leader endpoint best-effort attempt一次 `DONE_RECVING_MSG`，再上报一次 ordinary `finished_recving`；all-worker completion 后按顺序 release-once Main 与 delayed NPU blocks；duplicate/late事件为no-op。
 - 失败证据：quiesce 前释放/复用地址、新 operation启动、通知顺序倒置、重复普通 ack、partial-worker early cleanup、late write或资源泄漏。`DONE_RECVING_MSG` send failure本身不是 state-machine failure，但必须有 attempt证据并记录 hard TTL fallback。
@@ -300,7 +296,7 @@ kubectl delete -n "${NS}" "job/${RUN_ID}-${CASE_ID}" "configmap/${RUN_ID}-${CASE
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-01 至 NPU-07 PASS；使用同一配对 image/overlay identity；`${V1_MANIFEST}` 显式设置 `dsa_pd_offload=false` 并使用普通 V1 支持的 topology/config。
-- Manifest/输入：先按精确名称停止并清理 DSA P/D resources，再 apply `${V1_MANIFEST}`；`${RUN_DIR}/manifests/NPU-08.yaml` 发送固定 `v1-1`。
+- Manifest/输入：先按精确名称停止并清理 DSA P/D resources，再 apply `${V1_MANIFEST}`；`${RUN_DIR}/manifests/NPU-08.json` 发送固定 `v1-1`。
 - Oracle：同一请求的 non-PD baseline output；普通 V1 KV destination 的选定 layer/block source/destination checksum或等价 tensor oracle。
 - 成功条件：实例化普通 `MooncakeConnectorV1` metadata/scheduler/transfer/completion path；不构造 DSA envelope、Swapped Main lifetime reservation、Indexer-before-Main split或DSA typed result；output/cache oracle一致。
 - 失败证据：任何 DSA-only state/分配、普通 V1 metadata/transfer regression、output/cache mismatch、unexpected retry或资源泄漏。

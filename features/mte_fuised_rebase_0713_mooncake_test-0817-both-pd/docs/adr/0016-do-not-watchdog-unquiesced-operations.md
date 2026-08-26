@@ -1,6 +1,8 @@
 # 不为 Unquiesced operation 增加 watchdog
 
-状态：已接受
+状态：已接受；async terminal与preemption barrier继续受此边界约束
+
+后续关系：ADR 0025、0026无法完成`QUIESCE`或`PREPARE_REPLAY` barrier时，不伪造completion、不释放ownership，也不新增watchdog、reliable cancel、fatal latch或automatic restart。
 
 Blockwise DSA PD offload 首版对同步 transfer 不返回、background handler 长时间无 completion 或 cancellation drain 无法产生 quiesced ack 的情况，不增加 feature-specific watchdog、thread-health poll、per-request quarantine timeout、worker fatal latch 或 Mooncake native cancel。该行为沿用普通 `MooncakeConnectorV1`：只有同步调用实际返回后，connector 才根据返回值继续 success、failure/replay 或 cleanup；调用未返回时，对应 request 和 D destination ownership 继续保持 pending/隔离。
 

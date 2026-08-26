@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vllm-ascend.local/blockwise-dsa/npu-e2e/case-catalog.schema.json",
+  "title": "Blockwise DSA mandatory NPU case catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "cases"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "cases": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "status",
+          "summary",
+          "manifest",
+          "target_service",
+          "request_ids",
+          "required_cases",
+          "required_capabilities",
+          "command",
+          "controls",
+          "oracles",
+          "success_criteria",
+          "failure_evidence",
+          "cleanup"
+        ],
+        "properties": {
+          "case_id": {"type": "string", "pattern": "^NPU-0[1-8]$"},
+          "status": {"const": "planned / not run"},
+          "summary": {"type": "string", "minLength": 1},
+          "manifest": {"type": "string", "pattern": "^manifests/NPU-0[1-8]\\.json$"},
+          "target_service": {"enum": ["decode", "default-v1-decode"]},
+          "request_ids": {"$ref": "#/$defs/nonemptyArray"},
+          "required_cases": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^NPU-0[1-8]$"}
+          },
+          "required_capabilities": {"$ref": "#/$defs/nonemptyArray"},
+          "command": {"$ref": "#/$defs/nonemptyArray"},
+          "controls": {"$ref": "#/$defs/controls"},
+          "oracles": {"$ref": "#/$defs/nonemptyArray"},
+          "success_criteria": {"$ref": "#/$defs/nonemptyArray"},
+          "failure_evidence": {"$ref": "#/$defs/nonemptyArray"},
+          "cleanup": {"$ref": "#/$defs/nonemptyArray"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonemptyArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["waves", "faults", "barriers", "preemptions", "cancellations", "phase_transitions"],
+      "properties": {
+        "waves": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sequence", "request_ids", "max_concurrency"],
+            "properties": {
+              "sequence": {"type": "integer", "minimum": 0},
+              "request_ids": {"$ref": "#/$defs/nonemptyArray"},
+              "max_concurrency": {"type": "integer", "minimum": 1}
+            }
+          }
+        },
+        "faults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "request_id", "decode_tp_rank", "phase", "occurrence", "outcome"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "request_id": {"type": "string", "minLength": 1},
+              "decode_tp_rank": {"type": "integer", "minimum": 0},
+              "phase": {"enum": ["INDEXER_D2D", "MAIN_D2RH"]},
+              "occurrence": {"type": "integer", "minimum": 1},
+              "outcome": {"const": "FINAL_FAILURE"}
+            }
+          }
+        },
+        "barriers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "target", "release_condition"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "release_condition": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "preemptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["request_id", "trigger_after_confirmed_main_tokens", "expected_new_epoch_delta"],
+            "properties": {
+              "request_id": {"type": "string", "minLength": 1},
+              "trigger_after_confirmed_main_tokens": {"type": "integer", "minimum": 1},
+              "expected_new_epoch_delta": {"const": 1}
+            }
+          }
+        },
+        "cancellations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "request_id", "phase", "occurrence", "trigger"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "request_id": {"type": "string", "minLength": 1},
+              "phase": {"enum": ["RECEIVE_REMOTE", "FUSED_D2H"]},
+              "occurrence": {"type": "integer", "minimum": 1},
+              "trigger": {"const": "after-start-before-terminal"}
+            }
+          }
+        },
+        "phase_transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from_manifest", "cleanup_manifest", "to_manifest"],
+            "properties": {
+              "from_manifest": {"type": "string", "minLength": 1},
+              "cleanup_manifest": {"type": "string", "minLength": 1},
+              "to_manifest": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -25,4 +25,4 @@
 
 Replacement checkout已在`liangjiahao/vllm-ascend-ut` CPU-only Pod完成focused与broad regression：DSA/SFA group `47 passed`，完整connector/default-V1 target `111 passed`，排除一个已知baseline-broken测试文件后的broad root `221 passed`。完整root为`241 passed / 5 failed`；五项均是未修改`test_mooncake_to_dram_asymmetric_push.py`缺少import的pre-existing defect。Static compile与`git diff --check`通过，当前delta没有新增ruff failure。证据与边界见 [CPU/mock validation report](../cpu-mock-validation-report.md)。
 
-[NPU E2E test plan](../npu-e2e-test-plan.md) 提供 preflight、oracle、8 个 mandatory case、证据 schema 和 cleanup。未执行 NPU workload；8 个 case 全部保持 `planned / not run`，不得据此声明 `NPU runtime validated`。
+[NPU E2E test plan](../npu-e2e-test-plan.md) 与 [repository-local harness](../npu-e2e/README.md) 提供 versioned config/fixture/case schema、manifest render、fail-closed preflight、单 case runner、oracle contract 和 cleanup。仅完成 static/offline synthetic validation，未执行 NPU workload；8 个 case 全部保持 `planned / not run`，不得据此声明 `NPU runtime validated`。

@@ -1,6 +1,8 @@
 # 使用精确 TP coverage 和跨 step result 累积
 
-状态：已接受
+状态：已接受；D2H typed-result aggregation部分被ADR 0024取代
+
+后续关系：Receive、transfer failure与replay继续使用command-scoped、跨step exact TP rank-set coverage。D2H progress改为model-step-local exact TP aggregation，并通过immutable issued-step ledger推进连续confirmed watermark，不再占用lifecycle command tracker。
 
 Blockwise DSA typed worker result 采用 rank-aware、command-scoped aggregation。`KVConnectorWorkerMetadata.aggregate()` 只合并同一个 engine step 内各 worker 报告的事实；Decode connector scheduler 按 `(request_id, execution_epoch, command_seq)` 跨 scheduler step 累积结果。只有当前 command 收到精确的 expected Decode TP rank coverage 后，scheduler 才能执行 receive、fused D2H 或 replay transition。Cancellation 的 Quiesced ack 是本 ADR 的显式例外：它复用普通 `finished_recving` 和 vLLM expected-worker-count aggregation，不产生 typed `QUIESCED` result。
 

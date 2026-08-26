@@ -1,6 +1,8 @@
 # Preemption 后 full compute replay 并复用 Main
 
-状态：已接受
+状态：已接受；async validity cut与replay barrier部分被ADR 0024、0026取代
+
+后续关系：Decode token-0 full compute replay、Indexer rebuild和Main reservation跨epoch保留继续有效；preserved Main不再由single-active D2H completion推导，而以preemption cut时已消费的confirmed Main watermark为准。Old-epoch late progress与new-epoch `PREPARE_REPLAY` barrier按ADR 0024、0026处理。
 
 Blockwise DSA PD offload 首版沿用 vLLM 的 preemption-recompute 控制流，但区分 compute replay 与 cache rebuild。一个已经从 Prefill 接收 KV、并在 Decode 运行的请求被 preempt 后，不再次从 Prefill 拉取旧 KV；请求恢复时由 Decode 从 token 0 本地执行 full-sequence forward replay，以重建新 HBM ownership 下的 Indexer cache。Main lifetime reservation 及 preemption 前已经确认落入 Host 的 Main KV 保持有效，replay 不重复 D2H 这段 preserved Main prefix。这里的 replay 是异常恢复路径，不是正常请求新增一个 Decode-side Prefill stage。
 

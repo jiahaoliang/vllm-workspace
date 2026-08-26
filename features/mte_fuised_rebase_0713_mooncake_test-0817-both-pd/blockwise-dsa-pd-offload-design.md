@@ -1,17 +1,17 @@
 # MooncakeConnectorV1 Blockwise DSA PD Offload 设计
 
-状态：设计决策与 issue 01-07 已闭环；CPU/mock validated；NPU planned / not run
+状态：已发布sync replacement `7401ae79c`的历史设计；既有CPU/mock evidence保留；async delta由spec与ADR 0024-0030取代；NPU planned / not run
 
-本文解释 [spec.md](spec.md) 中交付合同背后的技术设计、决策依据和失败边界。它是实现参考，不替代 accepted ADR、spec、implementation issue 或独立验证证据。
+本文解释已发布sync replacement的技术设计、决策依据和失败边界。当前async-compatible交付合同以[spec.md](spec.md)、ADR 0024-0030和新implementation tickets为准；本文不替代它们，也不把历史sync evidence升级为async evidence。
 
 ## 文档关系与当前状态
 
-- [spec.md](spec.md) 是交付与验收合同，当前 production 实现为已发布的 vLLM-Ascend replacement commit `7401ae79c`，CPU/mock evidence见独立验证报告。
-- [docs/adr/](docs/adr/) 保存架构决策及其取代关系。ADR 0003 已被 ADR 0022 取代，ADR 0007 已被 ADR 0008 取代，ADR 0017 的 handshake 部分已被 ADR 0022 取代；其余在本设计中引用的决策均按各 ADR 当前状态解释。
+- [spec.md](spec.md) 是当前交付与验收合同；production仍是已发布的sync replacement commit `7401ae79c`，其CPU/mock evidence见独立验证报告。
+- [docs/adr/](docs/adr/) 保存架构决策及其取代关系。除既有ADR 0003/0007/0017 handshake supersession外，ADR 0024-0030进一步取代本设计中的single-active `FUSED_D2H`、sync-only terminal/preemption与Phase B async completion gate。
 - Implementation issues 是执行状态的权威来源，线性 blocking chain [01](issues/01-blockwise-dsa-opt-in-control-plane.md) -> [02](issues/02-positional-data-plane-main-reservation.md) -> [03](issues/03-phase-a-request-lifecycle.md) -> [04](issues/04-exact-tp-lifecycle-fused-d2h.md) -> [05](issues/05-all-tp-transfer-failure-recovery.md) -> [06](issues/06-preemption-cancellation-ownership-recovery.md) -> [07](issues/07-phase-b-validation-npu-plan.md) 已全部 `resolved`。
 - Replacement production code、focused DSA/SFA、public Scheduler lifecycle、完整 connector/default V1 和 broad CPU/mock regression已完成，证据见 [CPU/mock validation report](cpu-mock-validation-report.md)。完整CPU root仍有5个未修改baseline测试的缺失import failure。NPU runtime未执行，8个mandatory case必须保持`planned / not run`，直到未来保存真实运行证据。
 
-若文档之间出现冲突，先按 accepted/superseding ADR 核对具体架构决策，再修正 spec 的交付合同和受影响 issues；本 design 只负责同步解释，不能单独改变实现范围。
+若本文与当前spec或accepted/superseding ADR冲突，以当前spec与ADR为准。本文作为历史sync设计不再单独改变async实现范围或validation claim。
 
 ## 目标
 

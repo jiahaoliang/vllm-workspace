@@ -1,6 +1,8 @@
 # 使用嵌套 value object 组织 DSA step request
 
-状态：已接受
+状态：已接受；decode-time D2H不再属于lifecycle envelope
+
+后续关系：Remote source、destination ownership与lifecycle command的nested request envelope继续用于receive、replay和quiesce。ADR 0027把per-model-step D2H fields移入独立`DsaD2HStepPlan`，不在该envelope中表达。
 
 Blockwise DSA 的 Decode scheduler-to-worker step metadata 对每个 request 使用一个强类型 envelope，并把 remote source、Decode destination ownership 和 per-step lifecycle command 拆成三个嵌套 value object。Request identity 保留在 envelope 顶层；具体 fields 由后续接受的 [ADR 0019](0019-use-minimal-complete-dsa-step-fields.md) 确定。
 

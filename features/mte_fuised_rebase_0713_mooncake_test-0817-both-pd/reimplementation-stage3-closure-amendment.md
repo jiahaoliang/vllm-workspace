@@ -1,7 +1,6 @@
 # Blockwise DSA Stage 3 统一收尾增量门禁
 
-状态：用户已于 2026-08-24 明确批准方案 A 与修订停审线；授权 Stage 3 source/test 收尾，
-不授权 commit、push 或 control-repo final update
+状态：已批准并用于sync replacement；async startup rejection、single-active D2H与terminal ordering条款已被ADR 0024-0030部分取代；其余历史closure evidence保留
 
 解释材料：[`reimplementation-stage3-closure-explainer.md`](reimplementation-stage3-closure-explainer.md)
 

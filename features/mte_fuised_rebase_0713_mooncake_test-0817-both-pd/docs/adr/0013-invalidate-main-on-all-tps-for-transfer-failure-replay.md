@@ -1,6 +1,8 @@
 # Transfer-failure replay 统一失效所有 TP 的 Main
 
-状态：已接受
+状态：已接受；async delta继续沿用
+
+后续关系：Transfer-failure replay仍在exact TP terminal coverage后令所有TP的preserved Main为0。ADR 0026复用该same-epoch path，并把preemption replay单独定义为new-epoch、cut-time confirmed prefix recovery。
 
 任一 Decode TP 的 Indexer/Main 同步 transfer 在 Mooncake internal retry 后最终失败、整个 request 按 ADR 0012 转入 full-sequence replay 时，所有 Decode TP 都将 `preserved_main_tokens` 置为 `0`。Main lifetime reservation 及其 block IDs 继续归原 request 所有，但此前通过远端传输落入各 local Swapped Main pool 的内容不再被视为有效；replay 在所有 TP 上从 token 0 重写完整 Main prefix。该选择用重复 D2H 换取一致、可证明的跨 TP validity 边界。
 

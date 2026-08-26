@@ -1,6 +1,8 @@
 # 使用 lifecycle action 和 terminal local result
 
-状态：已接受
+状态：已接受；`FUSED_D2H` / `D2H_COMPLETE`部分被ADR 0024、0027取代，terminal语义由ADR 0025扩展
+
+后续关系：`RECEIVE_REMOTE`、phase-aware `TRANSFER_FAILED`、`PREPARE_REPLAY` / `REPLAY_READY`与untyped ordinary terminal completion继续有效。Async lifecycle action只保留`RECEIVE_REMOTE`、`PREPARE_REPLAY`、`QUIESCE`；D2H failure仍model-step fail-fast。
 
 Blockwise DSA 的 Decode scheduler-to-worker command 使用 lifecycle-oriented `DsaAction`；Decode worker-to-scheduler metadata 对 receive、fused D2H 和 replay 使用 command-terminal `DsaLocalResultKind`，并只在初始 remote receive failure 时使用独立 `DsaTransferPhase` 标明失败发生在 Indexer D2D 还是 Main D2RH。`QUIESCE` 是例外：worker 达到 Quiesced 后复用普通 `finished_recving`，不增加 typed `QUIESCED` result。
 

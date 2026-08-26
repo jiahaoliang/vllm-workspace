@@ -1,10 +1,6 @@
 # Blockwise DSA replacement worker ordering amendment
 
-状态：用户已于 2026-08-24 明确批准 scheduler-causality invariant、删除 generic
-`pending_command`、修复 cancellation ack race并收紧 terminal transition atomicity，以及 production `1,770`、focused tests
-`1,460` 的新 stop line。授权按本文件执行 TDD source/test 修改与 CPU/mock focused
-validation；不授权 NPU validation、commit、push、lock/repo-state/issues 更新或 control-repo
-final status。
+状态：已批准并用于sync replacement；single-batch causality、async fail-closed和`FUSED_D2H` ordering条款已被ADR 0024-0027部分取代；历史修复与evidence保留，旧授权不延伸到async delta
 
 ## 1. Scope 与 supersession
 

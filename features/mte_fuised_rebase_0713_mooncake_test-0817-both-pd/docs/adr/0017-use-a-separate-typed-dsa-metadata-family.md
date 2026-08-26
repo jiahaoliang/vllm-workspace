@@ -1,6 +1,8 @@
 # 使用独立的强类型 DSA metadata family
 
-状态：已接受；handshake 部分已被 ADR 0022 取代
+状态：已接受；handshake部分被ADR 0022取代，decode-time D2H metadata部分被ADR 0024、0027取代
+
+后续关系：独立DSA metadata family与default V1 type isolation继续有效。Async contract把lifecycle request/result与step-local D2H plan/progress作为同一family中的并列value objects；D2H completion不再使用lifecycle command/result。
 
 Blockwise DSA PD offload 为 `dsa_pd_offload=true` 建立独立、强类型、按通信方向分离的 metadata family，不给普通 `MooncakeConnectorV1` 的 `ReqMeta` 或 `MooncakeConnectorMetadata` 增加 optional DSA fields，也不把现有 Mooncake metadata 和 `SFAKVOffloadConnectorMetadata` 并排塞入一个双 envelope。
 

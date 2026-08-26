@@ -1,6 +1,8 @@
 # 使用 Phase A 后 Phase B 的分阶段验证
 
-状态：已接受
+状态：已接受；async初版completion gate被ADR 0030取代
+
+后续关系：Phase A/Phase B结果继续作为已发布sync replacement的历史CPU/mock evidence。Async delta保留完整lifecycle design，但初版只以GitCode reporter default-executor、depth-2单请求happy path作为CPU/mock gate；其余matrix标记“未测试”，NPU与graph-capture保持`planned / not run`。
 
 Blockwise DSA PD offload 采用分阶段测试门禁。实现首先运行范围较小的 Phase A，快速验证 opt-in 数据面和最小 request lifecycle；Phase A 通过后必须继续扩展并运行 Phase B，覆盖已经接受的 reservation、failure、aggregation 和 cleanup 边界。Phase A 是快速迭代检查点，不是最终 CPU/mock 验收标准。
 

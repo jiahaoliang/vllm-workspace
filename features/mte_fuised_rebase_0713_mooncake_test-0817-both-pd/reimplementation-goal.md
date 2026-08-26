@@ -1,10 +1,16 @@
 # Blockwise DSA PD Offload 重实现 Goal
 
-状态：replacement source 已实现并发布；用户已授权 control-repo 收尾提交
+状态：sync replacement source已实现并发布；async delta已批准、implementation pending；旧source/test授权与stop lines不自动延伸到async delta
+
+## Async follow-up boundary
+
+本文件及其Stage 1/Stage 3/white-box amendments记录已发布sync replacement `7401ae79c`的实现与授权历史。Async-compatible contract现以[spec.md](spec.md)、ADR 0024-0030和[implementation ticket chain](issues/16-define-doc-supersession-implementation-chain.md)为准；旧文档中的async fail-closed、single-active `FUSED_D2H` / `D2H_COMPLETE`与Phase B completion gate已按各自supersession pointer收窄为历史baseline。
+
+创建async implementation tickets不授权修改`repos/*`。后续session必须单独取得source修改授权，并按新ticket的文件范围与stop-and-review条件执行；旧replacement的`1770/1500`行数stop lines、TDD allowlist和Pod验证授权不能直接复用。
 
 ## 使用方式与优先级
 
-本文件是当前 Codex goal 的唯一持久入口。Codex 在执行任何操作前必须完整读取本文件；每次 resume、context compact 或 handoff 后必须重新完整读取，不得用 conversation summary 代替本文件，也不得要求入口 prompt 重复本文件内容。
+本文件是已发布sync replacement历史的持久入口。处理该历史或开始async follow-up前仍须完整读取本文件；async follow-up还必须读取当前spec、ADR 0024-0030和被认领的implementation ticket，不得用conversation summary代替这些artifact。
 
 进入或继续 Stage 2 时，还必须完整读取已批准的
 [`reimplementation-stage1-design-gate.md`](./reimplementation-stage1-design-gate.md)。该文件是本 goal 的 normative companion，不需要在 `/goal` prompt 中另行摘要。

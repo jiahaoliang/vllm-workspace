@@ -1,6 +1,6 @@
 # Blockwise DSA PD Offload 重实现 Stage 1 Design Gate
 
-状态：用户已于 2026-08-23 明确批准；进入 Stage 2；批准时尚未修改 replacement production source
+状态：已批准并用于sync replacement；metadata D2H与validation条款已被ADR 0024、0027、0030部分取代；其余baseline contract保留
 
 ## 1. 本门禁的依据
 

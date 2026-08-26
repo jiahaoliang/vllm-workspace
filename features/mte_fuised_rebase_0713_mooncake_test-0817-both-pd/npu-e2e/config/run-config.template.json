@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "run_id": "REQUIRED-dsa-npu-run-id",
+  "namespace": "liangjiahao",
+  "artifact_root": "/absolute/artifact/root",
+  "kube_context": "REQUIRED-kube-context",
+  "target_node": "REQUIRED-target-node",
+  "images": {
+    "baseline": "REQUIRED/image@sha256:REQUIRED",
+    "prefill": "REQUIRED/image@sha256:REQUIRED",
+    "decode": "REQUIRED/image@sha256:REQUIRED",
+    "default_v1": "REQUIRED/image@sha256:REQUIRED",
+    "client": "REQUIRED/client@sha256:REQUIRED"
+  },
+  "revisions": {
+    "vllm": "REQUIRED",
+    "vllm_ascend": "REQUIRED",
+    "mooncake": "REQUIRED",
+    "cann": "REQUIRED",
+    "torch_npu": "REQUIRED"
+  },
+  "model": {
+    "model_id": "REQUIRED",
+    "model_revision": "REQUIRED",
+    "tokenizer_revision": "REQUIRED",
+    "configuration_fingerprint": "REQUIRED-sha256",
+    "cache_dtype": "REQUIRED",
+    "block_size": 16,
+    "max_model_len": 4096,
+    "sampling": {"temperature": 0, "top_p": 1, "seed": 0}
+  },
+  "topology": {
+    "prefill_tp": 8,
+    "prefill_dp": 2,
+    "decode_tp": 2,
+    "decode_dp": 8,
+    "decode_pp": 1,
+    "decode_dcp": 1,
+    "decode_pcp": 1,
+    "routes": [
+      {"decode_dp_rank": 0, "prefill_dp_rank": 0, "prefill_endpoint": "REQUIRED-prefill-dp0", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 1, "prefill_dp_rank": 0, "prefill_endpoint": "REQUIRED-prefill-dp0", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 2, "prefill_dp_rank": 0, "prefill_endpoint": "REQUIRED-prefill-dp0", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 3, "prefill_dp_rank": 0, "prefill_endpoint": "REQUIRED-prefill-dp0", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 4, "prefill_dp_rank": 1, "prefill_endpoint": "REQUIRED-prefill-dp1", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 5, "prefill_dp_rank": 1, "prefill_endpoint": "REQUIRED-prefill-dp1", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 6, "prefill_dp_rank": 1, "prefill_endpoint": "REQUIRED-prefill-dp1", "decode_tp_leaders": [0, 4]},
+      {"decode_dp_rank": 7, "prefill_dp_rank": 1, "prefill_endpoint": "REQUIRED-prefill-dp1", "decode_tp_leaders": [0, 4]}
+    ]
+  },
+  "resources": {
+    "npu_resource_name": "huawei.com/Ascend910",
+    "baseline_npu": 8,
+    "prefill_npu": 16,
+    "decode_npu": 16
+  },
+  "commands": {
+    "baseline": ["/usr/local/bin/dsa-e2e-serve-baseline", "--config", "/opt/dsa-e2e/run-config.json"],
+    "prefill": ["/usr/local/bin/dsa-e2e-serve-prefill", "--config", "/opt/dsa-e2e/run-config.json"],
+    "decode": ["/usr/local/bin/dsa-e2e-serve-decode", "--config", "/opt/dsa-e2e/run-config.json"],
+    "default_v1_prefill": ["/usr/local/bin/dsa-e2e-serve-v1-prefill", "--config", "/opt/dsa-e2e/run-config.json"],
+    "default_v1_decode": ["/usr/local/bin/dsa-e2e-serve-v1-decode", "--config", "/opt/dsa-e2e/run-config.json"],
+    "session_cleanup": ["/usr/local/bin/dsa-e2e-cleanup-sessions", "--run-id", "{RUN_ID}", "--case-id", "{CASE_ID}"]
+  },
+  "client": {
+    "command": ["/usr/local/bin/dsa-e2e-run-case"],
+    "service_port": 8000,
+    "active_deadline_seconds": 1800
+  },
+  "oracle": {"atol": 0, "rtol": 0, "cache_layers": [0, 1, 2]},
+  "identity": {
+    "positional_abi_fingerprint": "REQUIRED-sha256",
+    "fixture_sha256": "REQUIRED-sha256",
+    "case_catalog_sha256": "REQUIRED-sha256"
+  },
+  "capabilities": {
+    "case_client": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No immutable client implementation has been supplied."},
+    "tokenizer_roundtrip": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Target tokenizer validation has not run."},
+    "output_oracle": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Baseline capture implementation is not yet proven."},
+    "cache_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No approved physical cache checksum probe is present."},
+    "lifecycle_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No rank-aware lifecycle trace probe is present."},
+    "leader_replica_evidence": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Deployment owner evidence is required."},
+    "memory_placement_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Indexer/Main placement evidence is required."},
+    "fused_d2h_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No fused D2H range/validity probe is present."},
+    "reservation_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No request-lifetime reservation ledger probe is present."},
+    "admission_barrier": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No deterministic HOL admission barrier is present."},
+    "phase_fault": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No request/TP/phase/occurrence fault hook is present."},
+    "tp_terminal_barrier": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No per-TP terminal result barrier is present."},
+    "preemption_control": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No deterministic preemption control is present."},
+    "cancellation_control": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No in-flight cancellation barrier/control is present."},
+    "default_v1_probe": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "No runtime proof of default V1 isolation is present."},
+    "session_cleanup": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Exact Mooncake session cleanup implementation is required."},
+    "resource_inventory": {"status": "UNKNOWN", "evidence": "", "sha256": "", "notes": "Run-owned NPU allocation inventory is required."}
+  }
+}

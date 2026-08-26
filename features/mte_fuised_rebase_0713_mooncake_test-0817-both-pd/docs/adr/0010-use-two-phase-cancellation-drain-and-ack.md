@@ -1,6 +1,8 @@
 # Cancellation 使用两阶段 drain-and-ack
 
-状态：已接受
+状态：已接受；ADR 0025将该协议扩展到所有terminal reason
+
+后续关系：Cancellation的drain、ordinary all-worker completion、`DONE_RECVING_MSG` ordering与release-once继续有效。ADR 0025使用FIFO `QUIESCE` tail marker把同一ownership protocol扩展到normal finish、EOS、stop、length cap和abort。
 
 Blockwise DSA PD offload 对已经取得 Main lifetime reservation 的请求采用两阶段 cancellation。Scheduler 收到 cancellation 时只记录 terminal intent，并阻止该请求启动新的 receive、replay 或 D2H；Main reservation 继续归该请求所有。Worker 停止提交新任务，并等待当前 execution epoch 的 Indexer D2D、Main D2RH 或 fused D2H 不再访问该请求的 destination 后，清理 worker state，先通过现有 `DONE_RECVING_MSG` best-effort 通知相应 Prefill source，再通过普通 `finished_recving` 上报本地 quiesced。Scheduler 只会看到 vLLM `KVOutputAggregator` 汇聚后的 request completion，并在 `update_connector_output()` 中幂等归还 Main reservation，随后 vLLM core 释放延迟持有的 NPU blocks。Cancellation 不增加 typed `QUIESCED` result，首版不修改 vLLM core。
 

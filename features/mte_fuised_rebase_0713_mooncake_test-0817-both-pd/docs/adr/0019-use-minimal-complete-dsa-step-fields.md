@@ -1,6 +1,8 @@
 # 使用显式最小完备的 DSA step fields
 
-状态：已接受
+状态：已接受；D2H fields与identity部分被ADR 0024、0027取代
+
+后续关系：Remote source、reservation、bound prefix、Indexer ownership与lifecycle identity的最小字段原则继续有效。`d2h_token_start`、`d2h_token_count`不再属于`LifecycleCommand`；D2H使用独立step sequence、plan/progress schema与issued ledger。
 
 Blockwise DSA 的 Decode scheduler-to-worker request envelope 使用显式、最小完备的字段集。静态 topology、tensor layout 和 block/page geometry 属于文档化部署前置条件与 local configuration；handshake session 只提供 positional address arrays 和 endpoint mapping，不证明跨端 compatibility。完整 Main lifetime reservation block list 属于 scheduler ownership state。Per-step metadata 只携带 worker 执行当前 command、绑定 destination 和拒绝 stale state 必须知道的信息。本 feature 不实现 deployment admission controller，也不在每个 request 重复这些静态条件。
 

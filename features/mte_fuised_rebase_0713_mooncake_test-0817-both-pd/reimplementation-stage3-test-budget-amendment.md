@@ -1,8 +1,6 @@
 # Blockwise DSA Stage 3 public replay test-budget 增量门禁
 
-状态：用户已于 2026-08-24 明确批准方案 A；focused-test stop line 修订为 `1,320`；
-授权 thin replay admission 修复、public evidence 收尾与 UT Pod 验证，不授权 commit、push、
-lock/repo-state/issues 更新或 final feature status
+状态：已批准并用于sync replacement的历史test budget；async fail-closed与`FUSED_D2H` evidence条款已被ADR 0024-0030部分取代；旧授权与stop line不延伸到async delta
 
 本文件只处理
 [`reimplementation-stage3-closure-amendment.md`](./reimplementation-stage3-closure-amendment.md)

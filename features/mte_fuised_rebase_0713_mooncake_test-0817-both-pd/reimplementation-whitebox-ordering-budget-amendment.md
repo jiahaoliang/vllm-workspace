@@ -1,8 +1,6 @@
 # Blockwise DSA replacement ordering implementation budget amendment
 
-状态：用户已于 2026-08-24 明确批准方案 A；production stop line保持`1,770`，
-focused-test stop line修订为`1,500`。授权恢复现有allowlist内的必要source/test修正与
-CPU/mock验证；不授权 NPU、commit、push、lock/repo-state/issues 更新或 final feature status。
+状态：已批准并用于sync replacement的历史budget/evidence；`1770/1500` stop lines与source/test授权不延伸到async delta
 
 ## 1. 为什么再次停审
 

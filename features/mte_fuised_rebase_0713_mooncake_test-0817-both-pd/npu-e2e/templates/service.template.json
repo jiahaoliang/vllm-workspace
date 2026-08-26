@@ -1,0 +1,17 @@
+{
+  "apiVersion": "v1",
+  "kind": "Service",
+  "metadata": {
+    "name": "UNRESOLVED",
+    "namespace": "liangjiahao",
+    "labels": {
+      "app.kubernetes.io/managed-by": "dsa-npu-e2e",
+      "test-run": "UNRESOLVED",
+      "test-role": "UNRESOLVED"
+    }
+  },
+  "spec": {
+    "selector": {"test-run": "UNRESOLVED", "test-role": "UNRESOLVED"},
+    "ports": [{"name": "http", "port": 8000, "targetPort": "http"}]
+  }
+}

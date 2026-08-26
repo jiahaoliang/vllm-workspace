@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vllm-ascend.local/blockwise-dsa/npu-e2e/capability-evidence.schema.json",
+  "title": "Blockwise DSA NPU E2E capability evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "capability",
+    "status",
+    "generated_at",
+    "assertions",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "capability": {"type": "string", "minLength": 1},
+    "status": {"const": "PASS"},
+    "generated_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "assertions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "path", "sha256"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "pattern": "^/\\S+$"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

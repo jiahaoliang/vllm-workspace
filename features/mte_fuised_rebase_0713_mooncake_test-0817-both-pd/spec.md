@@ -1,192 +1,148 @@
-Status: implemented; CPU/mock validated; NPU planned / not run
+Status: sync replacement implemented and CPU/mock validated; async delta approved / implementation pending; GitCode reporter async happy path planned / not run; NPU and graph-capture planned / not run
 
 ## Problem Statement
 
-客户希望在不启用 Prefill layerwise reuse 的情况下，让 Decode 继续使用 DSA sparse KV offload。当前穿刺实现已经打通 Indexer D2D 与 Main D2RH，但它建立在 layerwise connector、Prefill layerwise push 和穿刺式 SFA lifecycle 上，不能直接作为普通 request-level block transfer 的产品实现。
+已发布的 vLLM-Ascend replacement commit `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` 已在 `MooncakeConnectorV1` 内实现显式 opt-in 的 Blockwise DSA PD offload：Prefill 保持 request-level block pull，Decode 将 Indexer 放入 HBM、将 Main K/V 放入每个 Decode TP process 的 Swapped Main pool，并建立 Main lifetime reservation、receive/replay exact-TP completion、preemption、cancellation 与 fused D2H validity。
 
-现有 `MooncakeConnectorV1` 已经提供 Decode-initiated、request-level、blockwise 的 PD 传输，但默认路径把普通 KV group 传入 Decode HBM，不理解 DSA 的两类 destination：Indexer cache 必须进入 Decode HBM，Main KV cache 必须进入每个 Decode TP process 自己的 Swapped Main pool。它也没有 Main lifetime reservation、Indexer-before-Main failure gate、execution epoch、request-level replay、两阶段 cancellation 或 receive/replay/fused-D2H 的 rank-aware terminal result contract。
+该 replacement 的 decode-time D2H 仍是 single-active lifecycle `FUSED_D2H` command，并以跨 scheduler step 的 exact-TP `D2H_COMPLETE` 作为下一条 command 的 gate。它还在 startup 拒绝 async scheduling。GitCode Issue #1 reporter 使用 default `MultiprocExecutor`、default `AsyncScheduler` 和 `P DP2/TP8 -> D DP2/TP8`，因此旧 contract 无法覆盖 reporter 的 queued multi-batch execution。
 
-目标是在不修改 upstream vLLM core、不改变普通 `MooncakeConnectorV1` 默认行为的前提下，为 `MooncakeConnectorV1` 增加一个显式 opt-in 的 Blockwise DSA PD offload mode。该 mode 必须复用普通 V1 的 Decode-initiated block pull，迁移穿刺已经证明可行的 DSA memory placement 与 fused offload 能力，同时补齐穿刺代码没有正确处理的资源 ownership、failure、preemption、cancellation 和跨 TP completion 边界。
+目标是在不修改 upstream vLLM core、不改变普通 `MooncakeConnectorV1` 默认行为的前提下，使 `dsa_pd_offload=true` 同时支持 sync 和 async scheduling。Async scheduler 可以在前一 batch output 尚未回收时继续发布下一 step；实现必须区分已经发布的 D2H range 与已经完成并可复用的 Main range，并在 terminal/preemption 与 queued work 交错时维持 destination ownership。
 
-该能力涉及真实 NPU memory registration、D2D、D2RH 和 fused kernel，但当前环境没有足够算力部署首个目标拓扑。因此实现验证必须把 static、CPU/mock 和 NPU runtime evidence 分开，不能把 mock transfer 或未执行的计划描述成端到端通过。
+当前没有 NPU 资源。Static、CPU/mock、真实 Mooncake、NPU、fused kernel 与 graph-capture evidence 必须分开，不能把 planned 或 fake/mock 结果表述为真实 runtime 通过。
 
-## Solution
+## Current Replacement Baseline
 
-在 `MooncakeConnectorV1` 中增加由 `kv_connector_extra_config.dsa_pd_offload=true` 显式开启的 Blockwise DSA PD offload mode。关闭该配置时，普通 V1 scheduler、metadata、worker、transfer 和 completion 行为保持不变。
+- Source identity: vLLM-Ascend `7401ae79c11d6ec0033ea3ac39085379a0bb81ef`，vLLM `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665`。
+- Existing sync replacement、focused DSA/SFA、connector/default V1 与 broad CPU/mock evidence 保持有效；详见 [CPU/mock validation report](cpu-mock-validation-report.md)。
+- Existing positional ABI、fixed TP leader、per-Decode-TP Swapped Main pool、Main lifetime reservation、Indexer-before-Main receive gate、transfer-failure replay、source TTL 与 unquiesced-operation boundaries 继续有效。
+- Current source still uses lifecycle `FUSED_D2H` / `D2H_COMPLETE` and rejects async scheduling. These are baseline facts, not the target async contract.
 
-Prefill 保持普通 `MooncakeConnectorScheduler` 和 request-finish metadata flow，不分配 Decode Host blocks，不运行 SFA scheduler，也不使用 layerwise hooks。Prefill worker 在 opt-in mode 下暴露 Main K/V、Indexer 和可选 Indexer scale 的 positional source layout，并按固定 TP leader mapping 只由每个 leader 向对应 Decode TP 提供 payload。
+## Target Async Contract
 
-Decode 使用继承现有 SFA scheduler 的 blockwise scheduler。它在请求 admission 前为请求的最大可能序列长度建立 Main lifetime reservation，分配当前 execution epoch 的 Indexer HBM ownership，并通过独立的强类型 DSA step metadata 向 worker 发布 remote source、current destination binding 和 lifecycle command。
+### Mode and topology
 
-Decode scheduler 还把普通 V1 的 base endpoint 与 `remote_multi_nodes_meta_mapping` 一次性投影为按 Prefill rank 索引的完整 immutable endpoint tuple。Decode TP worker 按 fixed leader rank 只选择一个 concrete `(host, handshake port, engine identity)`；GET_META、metadata cache、Mooncake session、transfer 和 `DONE_RECVING_MSG` 始终使用该 endpoint。非空 mapping 必须完整覆盖当前 routed Prefill DP replica，partial 或非法 mapping 在 reservation/transfer 前 fail closed。
+- `kv_connector_extra_config.dsa_pd_offload=true` 显式启用该 mode；关闭时普通 V1 scheduler、metadata、worker、transfer 与 completion 行为不变。
+- Prefill 为 `kv_producer`，Decode 为 `kv_consumer`；Prefill 不启用 layerwise reuse/offload，Decode 使用 `fused_overlap` 与 Mooncake SFA backend。
+- 产品 topology 保持 `P_TP >= D_TP`、`P_TP % D_TP == 0`、Decode PP=1 和 Decode `DCP * PCP == 1`。Reporter 的 `P DP2/TP8 -> D DP2/TP8` 是初版 validation target，不是产品唯一 topology。
+- Prefill TP 按 `P_TP / D_TP` 连续分组，每组首个 rank 是对应 Decode TP 的唯一 payload source。P/D positional ABI、block/page geometry、image 与 configuration compatibility 是 deployment preconditions，不由 connector handshake 证明。
 
-每个 Decode TP worker 注册自己的 Indexer HBM 与 per-TP local Swapped Main pool。一次 `RECEIVE_REMOTE` command 在 worker 内先同步执行 Indexer D2D；只有 Indexer 成功才启动 Main D2RH。两条链路都成功后，该 TP 才产生 `RECEIVE_COMPLETE`。任一同步 transfer 最终失败时，worker 报告带明确 phase 的 `TRANSFER_FAILED`，而不是把局部成功伪装成 cache hit。
+### Reservation and initial receive
 
-Typed worker result 使用 request、execution epoch、command sequence 和 local TP rank 作为 identity。Worker metadata 只合并同一个 engine step 的事实，Decode scheduler 跨 step 累积，并仅在当前 routed Decode DP replica 的精确 TP rank coverage 完整后推进 receive、fused D2H 或 replay lifecycle。
+- 每个 Decode TP process 拥有独立 Swapped Main pool。Scheduler 在 remote admission 前为请求的最大允许 sequence length 建立 Main lifetime reservation，并独占完整 future reservation block list。
+- Worker 只看到 stable reservation identity、capacity 和当前可访问的 ordered Main bound prefix。Bound prefix 可以包含即将写入但尚未 confirmed 的 blocks，不能被解释为 valid Main boundary。
+- 一个 `RECEIVE_REMOTE` lifecycle command 在每个 Decode TP worker 内先执行 Indexer D2D，成功后才执行 Main D2RH。Indexer 或 Main final failure 使用 phase-aware `TRANSFER_FAILED`；两者成功才产生 `RECEIVE_COMPLETE`。
+- Receive、transfer failure 与 replay 继续使用 `(request_id, execution_epoch, command_seq, tp_rank)` typed result identity，以及当前 routed Decode DP replica 内的 exact TP rank-set coverage。
+- Python connector 每个 transfer phase 只调用一次同步 Mooncake transfer，只依赖 Mooncake internal retry；不增加 outer retry、source TTL check 或 launch lease。
 
-Transfer failure 后保留 Main reservation ownership，但所有 TP 的 Main validity 统一归零；所有 TP 都进入 Decode full-sequence replay。Preemption recovery 同样执行 Decode full-sequence compute replay以重建 Indexer，但在 ownership 和 validity 可证明时保留已有 Main prefix，避免重复 D2H。Cancellation 采用 drain-and-ack：每个 worker 达到 Quiesced 后先对尚未通知完成的 Prefill source best-effort 发送一次现有 `DONE_RECVING_MSG`，再上报一次普通 `finished_recving`；vLLM 汇聚 all-worker completion 后 scheduler 才释放 Main reservation和 delayed NPU blocks。普通 receive 已通知的 source 不重发，cancellation 不增加 typed `QUIESCED` result。
+### Lifecycle metadata and D2H progress
 
-P/D worker handshake 沿用穿刺 positional ABI，不增加 semantic role、protocol version、compatibility hash 或跨端 layout validation。Feature 文档规定配对部署必须满足 immutable image digest、model/configuration fingerprint、topology、tuple layout、memory placement、leader replica 一致和禁止 mixed-version rolling upgrade等 compatibility preconditions；本 feature 不实现 deployment system、manifest generator、release gate 或 admission controller。
+- Blockwise DSA 使用独立 metadata family。`DsaConnectorMetadata` 并列携带 lifecycle request envelopes 与 step-local D2H plans；普通 V1 metadata 不增加 DSA optional fields。
+- Async-compatible lifecycle actions 只有 `RECEIVE_REMOTE`、`PREPARE_REPLAY` 和 `QUIESCE`。Decode-time Main D2H 不是 lifecycle action，`FUSED_D2H` 与 `D2H_COMPLETE` 从目标 contract 删除。
+- 每个非空 `DsaD2HStepPlan` 以 request、execution epoch、request-local D2H step sequence、Main reservation、ordered bound Host prefix 和 token range形成 immutable issued fact。D2H step sequence 与 lifecycle command sequence 是独立 namespace。
+- Scheduler 维护 issued Main watermark、confirmed Main watermark 和 immutable issued-step ledger。发布 plan 时只推进 issued watermark；只有消费 current-epoch、`wait_for_save()` 后返回的 rank-aware `D2HStepProgress`，并取得本 step exact Decode TP coverage 后，才能推进 confirmed watermark。
+- Later step 可以先完成，但 confirmed watermark 不能跨越 ledger gap。Duplicate 完整 progress 幂等；conflict、future identity、非法 rank/range/reservation fail fast；old-epoch、已 confirmed 或 released progress 只观察并忽略。
+- D2H progress 不形成跨 scheduler step gate。永久 progress gap 不新增 timeout、watchdog 或推测性 completion。
 
-实现先通过 Phase A quick validation 快速打通基本功能，再扩展 Phase B boundary validation。只有两个阶段都在规定的 CPU-only UT Pod 中执行通过，才能标记 `CPU/mock validated`。当前只生成以 `P TP8/DP2 -> D TP2/DP8` 为起点的 NPU E2E 计划，所有 case 保持 `planned / not run`，直到未来真实执行。
+### Worker Main binding
+
+- Worker 为 live request 保留 persistent Main reservation、execution epoch、Main bound prefix binding 与轻量 D2H continuity state；每个 model step 按实际 batch 重建 ephemeral SFA view。
+- 没有 nonempty D2H plan 的 step 仍可以从 persistent binding 访问 preserved Main，并必须清除上一 step 的 ephemeral SFA state。
+- Worker 只有在 SFA `wait_for_save()` 成功后才返回 D2H step progress。D2H failure 继续作为 model-step exception fail fast，不伪造 progress、typed transfer failure 或 ordinary completion。
+
+### Terminal ownership
+
+- Normal finish、EOS、stop、length cap 与 abort 统一进入 reason-agnostic `Terminal-pending`。进入后不再发布新的 receive、replay 或 D2H plan，并冻结 issued/confirmed validity。
+- Scheduler 通过 metadata-only/no-forward batch 下发 `QUIESCE` tail marker。对满足 per-worker step FIFO 的 executor，该 marker 位于该 request 所有已发布 work 之后。
+- Worker 只有在 current/old epoch operation 不再访问 destination、request binding 已清理，并对实际使用且尚未通知的 Prefill source 尝试一次 best-effort `DONE_RECVING_MSG` 后，才达到 Quiesced 并上报一次 ordinary `finished_recving`。
+- Scheduler 只在 ordinary all-worker completion 到达后 release-once Main reservation；vLLM core 随后释放 delayed NPU blocks。Queued late progress 可以退休 issued record，但不推进 terminal validity，也不替代 `QUIESCE` ownership proof。
+- 无法下发或完成 `QUIESCE`、operation 不返回或 worker 无法证明 Quiesced 时，ownership 按 ADR 0016 保持隔离；不增加 watchdog、reliable cancel、fatal latch 或 automatic restart。
+
+### Preemption and replay
+
+- Scheduler 第一次观察到 active epoch preemption 时形成 epoch cut：以当时已消费的 confirmed Main watermark 快照 immutable preserved prefix `P`，封存 old-epoch ledger，并只递增一次 execution epoch。无法证明连续性时 `P=0`。
+- Cut 后的 old-epoch D2H progress 在基础校验后只观察并忽略，不能扩大 `P`。New epoch 从 issued/confirmed watermark `P` 和空 ledger 开始。
+- Core 完成 resumed request 的新 Indexer allocation/rebind 后，scheduler 下发 new-epoch `PREPARE_REPLAY`。Worker drain old-epoch operations、清理旧 binding并安装新 Indexer ownership后才返回 exact-TP `REPLAY_READY`。
+- Replay 从 token 0 重建完整 Indexer，Main D2H 跳过 `[0, P)` 并覆盖未确认 suffix。Transfer-failure replay 继续使用 same-epoch `PREPARE_REPLAY` 与 `P=0`。
+- Preemption-pending期间出现 terminal intent时，`Terminal-pending` 主导并改走 latest-epoch `QUIESCE`；late `REPLAY_READY` 不能重新放行 replay。
+
+### Compatibility classification
+
+- 首版 validation target 只有 default `MultiprocExecutor` 与 default `AsyncScheduler`。其他 executor/scheduler 组合允许启动，但 startup warning 必须列出实际类型并标记 `unverified` / “未测试”。
+- Executor classification 与 P/D topology 相互独立；upstream `supports_async_scheduling()`、class inheritance 或一次无报错运行不能自动升级 validation status。
+- `dsa_pd_offload=true` 与 speculative config 的组合允许启动，但本版不 validation、不测试，也不承诺 draft acceptance/rejection 下的 D2H/Main/replay correctness。Metadata mode/type isolation仍然有效，但不新增 speculative startup gate。
 
 ## User Stories
 
-1. 作为部署 Blockwise DSA PD offload 的工程师，我希望通过一个显式配置开启新 mode，从而让默认 `MooncakeConnectorV1` 部署不受影响。
-2. 作为普通 `MooncakeConnectorV1` 用户，我希望配置关闭时继续使用原有 metadata、scheduler、worker 和 completion path，从而避免 DSA 改动造成行为回归。
-3. 作为 Prefill operator，我希望继续使用普通 request-level block transfer，从而不需要部署 Prefill layerwise reuse 或 layerwise push。
-4. 作为 Prefill scheduler，我希望不持有 Decode Host block IDs，从而保持 P/D destination ownership 的职责边界。
-5. 作为 Prefill worker，我希望按 positional tensor ABI 暴露 Main、Indexer 和可选 scale 的 registered layout，从而让 Decode 可以复用 Mooncake endpoint routing 拉取数据。
-6. 作为部署工程师，我希望 feature 文档列出流量进入前应核对的 P/D immutable image digest 和 configuration fingerprint，从而能在现有外部流程中阻止不兼容 positional ABI 配对。
-7. 作为发布负责人，我希望 feature 文档明确禁止 P/D mixed-version rolling upgrade，从而能在外部发布流程中避免合法地址上的错误 tensor transfer silent success。
-8. 作为部署工程师，我希望启动时拒绝非法 role 和 offload mode 组合，从而避免进程运行后才发现 unsupported configuration。
-9. 作为部署工程师，我希望启动时拒绝 `P_TP < D_TP` 或 `P_TP % D_TP != 0`，从而保证固定 TP leader mapping 有定义。
-10. 作为 Decode operator，我希望 Decode PP 必须为 1 且 `DCP * PCP == 1`，从而满足当前 scheduler 和 placement 的正确性约束。
-11. 作为拓扑规划者，我希望 `P TP8/DP2 -> D TP2/DP8` 只是测试计划起点而非产品硬编码，从而允许其他满足约束的拓扑。
-12. 作为 Decode TP worker，我希望只从自己的 fixed Prefill TP leader 拉取 payload，从而避免多个 Prefill rank 覆盖同一 destination。
-13. 作为部署工程师，我希望文档要求在部署前证明每个 leader 持有目标 Decode TP 所需的完整 Main 和 Indexer replica，从而让外部流程能够识别不支持的 sharded layout。
-14. 作为 Decode scheduler，我希望在 remote receive 前为请求建立 Main lifetime reservation，从而保证请求 admission 后不会因 Decode 增长耗尽 Host capacity。
-15. 作为 Decode scheduler，我希望按请求的 prompt 与最大输出长度计算 reservation capacity，从而只隔离请求真实可能使用的 Main blocks。
-16. 作为 Decode operator，我希望 startup 证明最大合法请求能独占装入 Swapped Main pool，从而避免启动一个永远无法 admission 的配置。
-17. 作为 Decode TP worker，我希望 scheduler block manager、runner-owned Host tensors 和 Mooncake registration range 容量一致，从而避免 block ID 越界或静默截断。
-18. 作为等待 admission 的请求，我希望 capacity 暂时不足时留在 waiting queue，从而不回退到本地 Prefill或把资源不足扩大为 engine failure。
-19. 作为队首大请求，我希望本 scheduling step 内后续 DSA 请求不能绕过我的 capacity miss，从而避免持续小请求导致 starvation。
-20. 作为 scheduler operator，我希望 head-of-line gate 在下一个 scheduling step 重新判断，从而继续遵循 vLLM 当时的 FCFS 或 priority 顺序。
-21. 作为 Decode worker，我希望 Main KV 写入当前 TP 自己的 local Swapped Main pool，从而保持 process-local ownership 和 fused offload consumption 模型。
-22. 作为 Decode worker，我希望 Indexer cache 写入当前 execution epoch 的 HBM blocks，从而让 sparse selection 使用有效的 device-resident index。
-23. 作为 remote-prefilled request，我希望 Indexer D2D 在 Main D2RH 之前完成，从而满足 ADXL memory type 分离和 Indexer hard gate。
-24. 作为 remote-prefilled request，我希望 Indexer 失败时不启动 Main，从而不浪费 Main 链路或制造不受跟踪的 partial validity。
-25. 作为 Decode scheduler，我希望只有所有 Decode TP 的 Indexer 和 Main 都成功后才接受 receive-complete，从而不把局部 TP success 当成完整 external KV。
-26. 作为短 prompt 请求，我希望最后一个 partial block 按完整物理 block 传输，从而复用现有 blockwise transfer 和 fused offload layout。
-27. 作为 Decode execution path，我希望使用已有 token state 限制 partial block 的有效范围，从而不引入第二套 `valid_token_count` 事实来源。
-28. 作为 connector maintainer，我希望 Main K/V 使用相同 P/D block geometry，Indexer 只支持正整数 page ratio，从而把首版 mapping 限定为无需 split、merge 或 reformat 的布局。
-29. 作为 connector maintainer，我希望 DSA scheduler-to-worker metadata 与普通 V1 metadata 分离，从而让非法 DSA 字段组合不会污染默认路径。
-30. 作为 Decode worker，我希望通过嵌套的 source、destination ownership 和 lifecycle command 理解当前 step，从而不再依赖含义重载的扁平字段和 `getattr()`。
-31. 作为 Decode scheduler，我希望独占完整 future Main reservation block list，从而让 worker 只能访问当前 command 已绑定的有序 Main prefix。
-32. 作为 Decode worker，我希望通过 execution epoch 和 command sequence 拒绝 stale command，从而不让旧 Indexer ownership 或已释放 Main blocks被再次访问。
-33. 作为 Decode scheduler，我希望 worker terminal result 携带 local TP rank，从而能检测重复、缺失和冲突 completion。
-34. 作为 Decode scheduler，我希望相同完整 result 的重复上报幂等，从而允许正常的消息重复而不重复推进 lifecycle。
-35. 作为 Decode scheduler，我希望冲突 result、future command 和非法 TP rank fail closed，从而避免协议损坏被 last-writer-wins 掩盖。
-36. 作为 Decode scheduler，我希望 stale result 被记录并忽略，从而不恢复旧 ownership 或重复释放 reservation。
-37. 作为 Decode scheduler，我希望缺失 TP result 时保持 request pending，从而不通过 timeout 或匿名计数推测 completion。
-38. 作为发生 transfer failure 的请求，我希望在所有 TP terminal coverage 完整后进入 replay，从而避免 replay 与其他 TP 尚未结束的 DMA竞争。
-39. 作为发生 transfer failure 的请求，我希望保留 Main reservation IDs 但把所有 TP 的 Main validity 归零，从而让 full replay确定性覆盖旧内容。
-40. 作为发生 transfer failure 的请求，我希望只依赖 Mooncake internal retry，从而避免 binding retry 与 connector retry 形成乘法式嵌套提交。
-41. 作为被 preempt 的请求，我希望保留 Main lifetime reservation，从而不让 preemption 破坏已经隔离的 Host capacity。
-42. 作为被 preempt 的请求，我希望恢复时取得新的 Indexer HBM ownership，从而不使用已经由 vLLM core 释放的旧 blocks。
-43. 作为被 preempt 的请求，我希望 Decode full-sequence replay 重建 Indexer，并复用可证明有效的 Main prefix，从而避免重复 Main D2H。
-44. 作为性能工程师，我希望记录 replay token 数、复用 Main token 数和跳过的 D2H bytes，从而量化 full-sequence replay 的性能代价。
-45. 作为被取消的请求，我希望 cancellation 后不再启动新的 receive、replay 或 fused D2H，从而限制取消后的额外资源访问。
-46. 作为被取消的请求，我希望 worker quiesced 前 reservation 保持隔离，从而避免旧 operation 写入已分配给新请求的地址。
-47. 作为 Decode scheduler，我希望每个 worker 仅在 Quiesced 后尝试 Prefill source-release notification并上报一次普通 `finished_recving`，且只在 all-worker completion 后 release-once，从而让重复 ack 和 late completion 不造成 double free。
-48. 作为运行中的 Decode 请求，我希望 fused D2H success 推进 confirmed Main valid prefix，从而让后续 preemption recovery 能证明可复用范围。
-49. 作为运行中的 Decode 请求，我希望 fused D2H failure 首版继续 fail fast，从而不通过不合法的 `finished_recving` channel 伪造 request-local recovery。
-50. 作为 source lifetime 的维护者，我希望首版沿用普通 V1 的 Prefill hard TTL，从而不增加 launch grant、lease refresh 或跨节点时钟协议。
-51. 作为系统 operator，我希望明确知道 TTL overrun 可能读取已复用地址并 silent success，从而不把 transport success 当作内容正确性证明。
-52. 作为卡在同步 operation 中的请求，我希望 destination ownership 保持隔离，从而不在无法证明 quiesced 时被强制释放和复用。
-53. 作为系统 operator，我希望首版不增加 feature-specific watchdog，并依赖 operation 返回、已有 process failure 或外部重启恢复，从而保持实现范围明确。
-54. 作为测试工程师，我希望先运行 Phase A quick validation，从而尽早发现 mode wiring、mapping、ordering 和基本 lifecycle 错误。
-55. 作为测试工程师，我希望 Phase A 通过后继续运行 Phase B boundary validation，从而验证 reservation、failure、preemption、cancellation 和 aggregation 边界。
-56. 作为 reviewer，我希望只有 Phase A 与 Phase B 都通过时才标记 `CPU/mock validated`，从而不把 quick validation 冒充完整验收。
-57. 作为 NPU 验证工程师，我希望获得以 `P TP8/DP2 -> D TP2/DP8` 为起点的可执行计划，从而在具备资源后验证真实 memory registration 和 transfer。
-58. 作为 reviewer，我希望未执行的 NPU case 明确标记 `planned / not run`，从而不把测试计划描述为 runtime evidence。
-59. 作为 NPU 验证工程师，我希望 correctness oracle 同时包含 baseline output 和选定 cache checksum 或等价 tensor oracle，从而降低最终文本掩盖 cache 错位的风险。
-60. 作为测试 workload owner，我希望每个 NPU case 都包含 cleanup，从而释放 Pod、Mooncake session 和 NPU allocation，并保留可复核证据。
+1. 作为 default V1 用户，我希望关闭 `dsa_pd_offload` 时现有 Mooncake behavior 不变。
+2. 作为 async Decode scheduler，我希望连续发布多个 model steps，而不等待前一步 D2H progress。
+3. 作为 Main validity owner，我希望 issued range 与 confirmed range 分离，从而不把 queued work 当作完成事实。
+4. 作为 Decode worker，我希望每 step 重建 SFA view，同时跨 step 保留同一 reservation 的 Main binding。
+5. 作为 scheduler，我希望只消费 `wait_for_save()` 后的 exact-TP progress，从而推进连续 confirmed watermark。
+6. 作为 terminal request，我希望 `QUIESCE` 排在既有 queued work 之后，并只在 all-worker Quiesced 后释放 destination。
+7. 作为 preempted request，我希望 cut 后晚到的 old-epoch progress不能扩大 preserved Main prefix。
+8. 作为 replay owner，我希望 `PREPARE_REPLAY` 建立 drain/rebind barrier，再开始 token-0 replay。
+9. 作为 operator，我希望非默认 executor/scheduler 能启动但明确显示“未测试”，而不是被误报为已支持。
+10. 作为 reviewer，我希望 speculative 组合不被当前版本拒绝，但也不被写成已验证。
+11. 作为 reporter regression owner，我希望 `P DP2/TP8 -> D DP2/TP8` 的 default async 单请求 happy path 有一个最小、可复核的 CPU/mock gate。
+12. 作为 NPU validation owner，我希望未运行的真实 transfer、fused kernel 与 graph-capture case保持 `planned / not run`。
 
 ## Implementation Decisions
 
-1. 新能力是 `MooncakeConnectorV1` 内的显式 opt-in mode，不增加新的公开 connector。配置关闭时不得构造或接受 DSA lifecycle metadata。
-2. 首版只支持 Prefill `kv_producer`、Decode `kv_consumer` 的 PD disaggregation；Prefill 不启用 offload，Decode 使用 `fused_overlap` 和 Mooncake SFA backend。
-3. Prefill scheduler 继续普通 `MooncakeConnectorScheduler`。Decode 使用继承现有 SFA CPU-offload scheduler 的 blockwise scheduler，负责 Main reservation、Indexer ownership、lifecycle command 和 cleanup。
-4. Prefill worker 与 Decode worker 保留普通 V1 endpoint routing，但 DSA tensor layout 使用 layer-keyed positional arrays。Wire contract 不携带 semantic role、dtype、shape、memory kind、protocol version 或 compatibility hash。
-5. Feature 文档规定 P/D immutable image digest、dependency revisions、model/configuration fingerprint、tuple ABI、memory placement、topology和 leader replica compatibility preconditions。Connector 只检查本进程可以证明的结构、容量和 registration 事实；production deployment gate 的实现与选择不在本 feature 范围内。
-6. 产品拓扑要求 `P_TP >= D_TP`、`P_TP % D_TP == 0`、Decode PP=1 和 Decode `DCP * PCP == 1`。`P TP8/DP2 -> D TP2/DP8` 只是测试计划起点。
-7. Prefill TP 按 `P_TP / D_TP` 连续分组，每组第一个 rank 是对应 Decode TP 的唯一 payload source。Indexer、可选 scale、Main K 和 Main V 共用该 leader。
-8. 首版不支持 multi-P shard assembly。Leader 必须持有完整 replica；该事实是文档化部署前置条件，不由 handshake 证明，也不由本 feature 实现跨 deployment 校验。
-9. Main K/V 的 P/D block geometry 必须相同。Indexer 只支持一个 Decode page 容纳正整数个 Prefill page；不支持非整数 ratio、反向 ratio 或 Main block split/merge/reformat。
-10. Partial Main block 和 Indexer page 按完整物理长度传输。有效 token 范围来自现有 request token state，不新增 `valid_token_count` 或另一套 transfer range。
-11. 每个 Decode TP process 拥有独立 Swapped Main pool并注册自己的 Main destination。Block ID 0 保留，scheduler capacity、runner Host tensor capacity 和 Mooncake registered range 必须一致。
-12. Startup 必须证明一个 `max_model_len` 请求能够装入每个 TP 的可用 Swapped Main pool；不满足时 fail closed，而不是启动后永久等待。
-13. Main reservation 按请求可能达到的最大序列长度一次性建立，分为 active prefix 和 future reserved suffix。Worker 只看到 stable reservation identity、总 capacity 和当前 command 已绑定的有序 Host prefix。
-14. Reservation capacity 暂时不足时返回 waiting 结果，不分配 destination、不启动 transfer、不触发本地 Prefill。首版不增加 connector-local admission timeout。
-15. Admission 使用 per-scheduling-step head-of-line gate。当前 step 首个 capacity miss 后，后续 DSA remote-prefill 请求本 step 不再尝试 reservation；下一 step 按 vLLM 当前顺序重新判断。
-16. Decode-initiated pull 保持 request-level blockwise。一个 worker 的 `RECEIVE_REMOTE` command 内先执行 Indexer D2D，成功后再执行 Main D2RH，不增加两次 scheduler round 或跨 TP phase barrier。
-17. Indexer final failure 不启动 local Main、不建立 Main validity，并产生 `TRANSFER_FAILED(INDEXER_D2D)`。Main final failure产生 `TRANSFER_FAILED(MAIN_D2RH)`。两条链路成功才产生 `RECEIVE_COMPLETE`。
-18. 每个 transfer phase 在 Python connector 层只调用一次同步 Mooncake transfer，仅依赖 Mooncake binding internal retry，不增加 outer attempts、backoff 或 retry 配置。
-19. Decode scheduler-to-worker 使用独立 DSA metadata family。Per-request envelope 包含顶层 request identity，以及嵌套的 remote source、destination ownership 和 lifecycle command。
-20. Remote source描述 remote request、按 Prefill rank 索引的完整 immutable concrete endpoint tuple和 semantic Indexer/Main block IDs，不携带 scalar base endpoint、raw address、TTL、lease 或 generation。Decode scheduler使用普通 V1共用的 private pure resolver把base endpoint与multi-node mapping一次性投影为tuple；worker按fixed leader rank选择一个endpoint，GET_META、metadata cache、Mooncake session、transfer和DONE通知共用该选择。非空mapping必须完整覆盖当前routed Prefill DP replica，否则fail closed。Raw address由selected positional handshake与local block mapping解析。
-21. Destination ownership 描述 stable Main reservation identity/capacity、current bound Main Host prefix 和 current execution epoch 的 Indexer HBM IDs。Scheduler 是完整 future reservation block list 的唯一权威。
-22. Lifecycle command携带 execution epoch、严格递增 command sequence、action、已有 token state、preserved Main boundary 和当前 fused D2H range。
-23. Lifecycle actions固定为 `RECEIVE_REMOTE`、`FUSED_D2H`、`PREPARE_REPLAY` 和 `QUIESCE`。Indexer/Main是 receive command 内部 phases，不是 scheduler actions。
-24. Typed terminal local results固定为 `RECEIVE_COMPLETE`、`D2H_COMPLETE`、`REPLAY_READY` 和带 failure phase 的 `TRANSFER_FAILED`；`QUIESCE` 不产生 typed result。
-25. Typed result identity 是 request、execution epoch、command sequence 和 TP rank。相同 identity 的相同完整 result 幂等；冲突 result fail closed。
-26. Worker metadata 只合并同一个 engine step 的 rank-aware typed facts。Decode scheduler 按 command identity 跨 step 累积，并要求当前 routed Decode DP replica 的 exact TP rank set；该 contract 不用于 cancellation ack。
-27. Stale typed result记录并忽略；future result、非法 rank、action/result mismatch 和冲突 duplicate fail closed；缺失 rank无限期 pending，不增加 completion timeout。
-28. Receive/replay 路径中，scheduler 在 vLLM core 消费 `finished_recving` 之前先解释 typed worker result。Cancellation 是显式例外：worker-local epoch/duplicate guard 后复用普通 `finished_recving`，由 vLLM expected-worker-count aggregation 汇聚。
-29. Transfer final failure 后等待当前 command 的全部 TP terminal results，然后向所有 TP 下发 `PREPARE_REPLAY`。Main reservation保留，但所有 TP 的 `preserved_main_tokens` 统一为 0。
-30. Transfer-failure replay 从 token 0 执行 full-sequence forward，重建完整 Indexer 并重写完整 Main。局部成功 TP 不能复用远端 Main。
-31. Preemption retire 当前 execution epoch并重新绑定 core 新分配的 Indexer HBM IDs。Main reservation跨 epoch 保留；可证明有效的 Main prefix在 compute replay 中不重复 D2H。
-32. 无法证明 Main ownership、layout和validity 连续时，preemption replay同样把preserved boundary降为0并保守重写 Main。
-33. Cancellation 采用两阶段 drain-and-ack。Admission 前可以立即结束；admission 后进入 cancel-pending，禁止新任务并保留 ownership，直到每个 worker达到 Quiesced。Quiesced 是 worker-local safety state，不是 typed result。
-34. 每个 worker达到 Quiesced 后，先对实际使用且尚未通知完成的 Prefill leader endpoint best-effort 发送一次现有 `DONE_RECVING_MSG`，再一次性上报普通 `finished_recving`；普通 receive 已通知的 endpoint 不重发。Aggregated all-worker completion 后 scheduler release-once Main reservation，并通过现有 delayed-block completion顺序让 core释放 NPU blocks；重复取消、ack和late completion均为no-op。
-35. Fused D2H success产生 `D2H_COMPLETE`并推进 confirmed Main prefix。Fused D2H failure首版保持 worker/engine fail-fast，不伪造request-level connector recovery。
-36. Transfer前检查local cancellation、execution epoch和destination ownership，但不检查 Prefill source age、remaining TTL或ownership。
-37. 首版沿用普通 V1的Prefill source hard TTL，并复用 `DONE_RECVING_MSG` 做 best-effort completion-based early release；通知失败由 hard TTL 兜底，不增加 launch grant、lease refresh、generation或clock-skew contract。
-38. 对不返回或无法证明quiesced的operation，request和destination保持pending/隔离。不增加watchdog、fatal latch、reliable native cancel或timeout后强制释放。
-39. 不修改 upstream vLLM core。实现对 typed receive/replay/fused-D2H result复用`KVConnectorWorkerMetadata.aggregate()`，对 cancellation复用`KVConnectorOutput.finished_recving`和core已有的completion顺序。
-40. 穿刺 connector只作为positional layout、memory registration、transfer ordering和SFA lifecycle的参考，不作为目标protocol，也不整体复制其状态管理。
+1. 不增加新的 public connector，不修改 upstream vLLM core。
+2. Stable positional ABI、leader mapping、Main reservation、receive ordering、transfer-failure replay、source TTL 与 unquiesced-operation contracts保持不变。
+3. 删除 lifecycle `FUSED_D2H` 与 typed `D2H_COMPLETE`；receive/failure/replay typed results继续保留。
+4. D2H plan/progress与 lifecycle request/result属于同一 Blockwise DSA metadata family，但使用独立 value objects、identity namespace与aggregation规则。
+5. Scheduler 是 issued/confirmed ledger、Main validity与reservation release的唯一权威；worker不能根据 bound prefix或scheduled token count推测 validity。
+6. Terminal completion复用ordinary `finished_recving`，不增加 typed `QUIESCED`。
+7. Preemption reuse只基于epoch cut前已消费的confirmed prefix，不基于late progress、issued watermark或block ID数值变化。
+8. D2H failure继续model-step fail-fast；不实现running-request request-local recovery。
+9. 非默认executor/scheduler和speculative组合允许启动但保持unverified；不增加validation-based admission controller。
+10. ADR 0016边界保持：不增加watchdog、reliable cancel、fatal latch或automatic restart contract。
 
-## Testing Decisions
+## Validation Evidence
 
-1. 测试优先验证跨组件可观察行为和ownership transition，不把private helper调用顺序当作主要正确性oracle。Mock只放在Mooncake transport、tensor/address、memory pool和vLLM scheduling artifacts等外部边界。
-2. 主测试 seam 是 `MooncakeConnectorV1` public connector lifecycle。进程内 harness 从matched-token/admission开始，经过allocation、metadata、worker receive、worker result、scheduler output consumption和request finish，覆盖一个完整request lifecycle。
-3. 主 seam 同时覆盖opt-in mode和default V1 isolation，避免只证明DSA路径能跑而漏掉普通connector回归。
-4. 第一个支持 seam 是DSA metadata contract。直接验证immutable envelope、集中validator、typed action/result matrix、serialization-safe values、same-step aggregate和cross-step exact TP accumulation；cancellation ordinary completion单独验证。
-5. 第二个支持 seam 是SFA memory binding/data-plane adapter。通过现有registration、runner Host Main binding和fused-save接口，使用fake tensors和addresses验证Indexer HBM、Main Host、positional mapping、bound prefix和D2H range。
-6. Phase A quick validation覆盖mode wiring、startup constraints、default isolation、positional local checks、single-node与multi-node typed endpoint projection、P TP8到D TP2的fixed leader rank 0/4命中不同host/engine/port、partial/invalid mapping fail-closed、leader/block mapping、partial physical block、single-request Indexer-to-Main ordering、Indexer/Main failure、最小receive/replay/release-once和focused static checks。
-7. Phase A只是快速反馈门禁。Phase A失败时先修复基本路径；Phase A通过不能标记`CPU/mock validated`，也不能作为跳过Phase B的release waiver。
-8. Phase B boundary validation覆盖full lifetime reservation、HOL admission、preemption和Indexer rebind、preserved Main D2H suppression、cancellation drain-and-ack、`DONE_RECVING_MSG` ordering、ordinary all-worker completion、all-TP failure replay、duplicate/conflict/stale/future/missing typed result、multi-request interleaving和default V1 regression。
-9. Phase B包含negative contract tests：不增加outer retry、不增加source TTL check、不对unquiesced operation伪造completion、不宣称positional handshake已证明P/D compatibility。
-10. Phase A和Phase B必须在`liangjiahao` namespace的专用长期运行CPU-only UT Pod执行。同步当前checkout时使用tar加显式namespace的`kubectl exec`，不使用hostPath、不复用serving Pod、不申请NPU。
-11. 每次CPU/mock运行记录source branch、commit和dirty状态；pytest命令显式列出targets并禁用bytecode和pytest cache。Phase A与Phase B分别报告命令、结果、修复和最终rerun。
-12. 普通Mooncake tests提供scheduler hooks、block mapping、TP/CP/PP split、transport success/failure和default completion的prior art。
-13. 穿刺Mooncake-to-DRAM tests提供positional address、D2D/D2RH SG list分离、Indexer page packing和TP port mapping的prior art，但其failure continuation不是目标行为。
-14. 现有SFA scheduler和single-rank worker tests提供fused offload block allocation、Host binding、Indexer address和D2H range的prior art。
-15. NPU E2E当前只生成计划。首个拓扑是`P TP8/DP2 -> D TP2/DP8`，但计划不得把它硬编码为产品唯一拓扑。
-16. NPU plan包含按文档化 compatibility preconditions执行的deployment preflight、happy path、partial和multi-block、并发和reservation pressure、preemption、cancellation、ordering/failure injection、default V1 isolation与cleanup；该计划不实现 production deployment system。
-17. NPU correctness oracle同时使用固定prompt的baseline output比较与选定layer/block的checksum或等价tensor oracle，不能只靠最终文本判断cache placement。
-18. 每个NPU case记录prerequisite、image/config identity、命令或manifest、输入、oracle、成功条件、失败证据和cleanup。未运行case统一标记`planned / not run`。
-19. Static、CPU/mock和NPU runtime状态分别报告。只有未来真实执行全部mandatory NPU cases并保存证据后，才能标记`NPU runtime validated`。
+| Scope | Status | Allowed claim |
+| --- | --- | --- |
+| Published sync replacement at `7401ae79c` | existing CPU/mock evidence retained | 仅使用既有报告中的精确 sync replacement claim |
+| GitCode reporter async happy path | `planned / not run` | 通过后仅写“GitCode reporter happy path 已通过 CPU/mock validation” |
+| Preemption | 未测试 | 未测试 |
+| Abort | 未测试 | 未测试 |
+| D2H failure | 未测试 | 未测试 |
+| Late progress | 未测试 | 未测试 |
+| Adversarial metadata | 未测试 | 未测试 |
+| 多请求交错 | 未测试 | 未测试 |
+| `P TP8 -> D TP2` | 未测试 | 未测试 |
+| Speculative config | 未测试 | 未测试 |
+| 非默认 executor/scheduler lifecycle | 未测试 | 未测试 |
+| NPU、真实 Mooncake、fused kernel、graph-capture runtime | `planned / not run` | 不得声明 runtime validated |
+
+## Initial Async Completion Gate
+
+Mandatory CPU/mock gate只覆盖以下 happy path：
+
+1. Reporter topology为`P DP2/TP8 -> D DP2/TP8`，default `MultiprocExecutor`与default `AsyncScheduler`。
+2. 单请求先完成`RECEIVE_REMOTE`，然后真实`AsyncScheduler`与EngineCore queue连续发布两个Decode steps，queue depth实际达到2。
+3. Production DSA scheduler/worker connector参与；model execution、Mooncake transport、SFA kernel、NPU tensor和executor worker process使用fake/mock。
+4. 每个step的`wait_for_save()`后返回exact TP8 progress，confirmed watermark按连续range推进。
+5. Normal finish通过`QUIESCE`、ordinary all-worker completion和release-once结束。
+6. Decode DP rank 0与1分别验证，不把两个DP replica混入同一个TP aggregation。
+7. 另保留sync DSA happy-path smoke、default V1 isolation smoke与非默认executor/scheduler startup warning smoke。
+
+该gate不要求broad CPU/mock root或完整Phase B rerun。执行时按照workspace `AGENTS.md`使用`liangjiahao` namespace的CPU-only UT Pod，记录source branch、commit、dirty状态与显式test targets；当前没有NPU，不创建NPU workload。
 
 ## Out of Scope
 
-- Prefill layerwise reuse、layerwise push、layerwise save/load hooks或完整实现vLLM issue #48203。
-- 新增另一个公开Mooncake connector，或把目标实现继续建立在layerwise connector上。
-- `kv_both`、P/D colocate、Decode pipeline parallel大于1，或Decode `DCP * PCP != 1`。
-- `P_TP < D_TP`、`P_TP % D_TP != 0`、dynamic source selection、multi-P shard assembly或跨P DP replica混合tensor。
-- Main block split/merge/reformat、非整数Indexer page ratio或Prefill Indexer page大于Decode page。
-- Self-describing semantic tensor map、wire protocol version negotiation、compatibility hash或connector-side P/D layout proof。
-- 独立P/D版本升级和mixed-version rolling upgrade支持。
-- Host pool capacity multiplier、cross-process shared Main pool或独立destination-memory subsystem。
-- Work-conserving reservation bypass；它保留为完成starvation、source TTL和cleanup设计后的优化方向。
-- 修改upstream vLLM core，或复用当前只正确处理单KV group的core failure channel。
-- Connector-level retry、retry attempts/backoff配置或Mooncake native retry语义修改。
-- Prefill source launch grant、TTL检查、lease refresh、source generation或跨节点时钟协议。
-- 对unquiesced operation增加watchdog、可靠cancel、fatal latch或有限时间自动恢复保证。
-- Running request的fused D2H failure request-local recovery；首版继续fail fast。
-- Preemption后重新从Prefill拉取Indexer/Main；它保留为降低full-sequence compute replay成本的后续性能优化。
-- Property/model-based lifecycle testing；首版以deterministic Phase A/Phase B matrix为最终CPU/mock门禁。
-- 在当前环境真实部署或执行`P TP8/DP2 -> D TP2/DP8` NPU E2E。
-- 实现或选择 production deployment system、manifest generator、release gate或admission controller；本 feature只维护compatibility preconditions和测试证据要求。
+- 修改upstream vLLM core，或新增core-level running-request D2H failure/completion channel。
+- Prefill layerwise reuse、layerwise push或完整实现vLLM issue #48203。
+- 改变positional tensor ABI、TP leader mapping、Main reservation policy或default `MooncakeConnectorV1` behavior。
+- `P_TP < D_TP`、`P_TP % D_TP != 0`、Decode PP>1、Decode `DCP * PCP != 1`、multi-P shard assembly或跨P DP replica混合tensor。
+- Speculative decoding配合实现、correctness validation与support claim。
+- 非默认executor/scheduler lifecycle validation。
+- Fused D2H request-local recovery、watchdog、reliable native cancel、fatal latch或automatic restart。
+- NPU runtime执行、performance threshold、完整failure/lifecycle runtime validation、GitCode回帖或关闭external issue。
 
 ## Further Notes
 
-- 本能力是vLLM issue #48203的受限变体：Decode使用DSA offload，Prefill不使用layerwise reuse/offload。
-- 设计中的“穿刺代码”是行为与风险参考，不是目标协议。穿刺已经证明Indexer D2D、Main D2RH和Swapped Main registration可以打通，但其preemption、cancellation、failure和completion状态不能直接复制。
-- Positional ABI是明确接受的部署耦合。Feature文档只规定compatibility preconditions，不声称已实现production gate；合法地址上的tuple、dtype、memory kind、page ratio或leader coverage错配可能silent success，full-sequence replay不能保证修复这类错误。
-- Main lifetime reservation降低并发利用率，但把capacity failure移动到remote receive之前，并保证已admission请求后续增长不再动态申请Host blocks。
-- Head-of-line admission可能暂时闲置可服务小请求的capacity。未来若重新引入work-conserving bypass，必须同时提供starvation bound、source TTL和cleanup闭环。
-- Decode full-sequence replay可能显著增加preemption和failure恢复延迟。后续优先评估重新从Prefill拉取Indexer；在source lifetime、generation、rendezvous和幂等cleanup闭环前不启用。
-- Source TTL overrun和unquiesced operation是首版明确接受的residual risks，不应通过扩大CPU/mock测试结论来隐藏。
-- Phase A预计增加约350-600行focused tests并需要约2-4个工程日。Phase A和Phase B合计预计约700-1100行focused tests与5-8个工程日；这些估算不包含production实现、真实NPU运行和性能调优。
-- 发布前的spec review已确认一个主connector lifecycle seam，以及DSA metadata contract和SFA memory binding两个支持seam。
+- [Blockwise DSA Async Scheduling Wayfinder Map](map.md)记录async delta的decision history；ADR 0024-0030是当前async contract入口。
+- [MooncakeConnectorV1 Blockwise DSA PD Offload设计](blockwise-dsa-pd-offload-design.md)与reimplementation amendments记录已发布sync replacement的历史设计和evidence，不覆盖本spec的async delta。
+- 当前实现、目标contract和validation evidence是三个不同事实层。Implementation agent必须先修改source并完成规定gate，才能更新async status；仅更新文档或通过static checks不能升级claim。
