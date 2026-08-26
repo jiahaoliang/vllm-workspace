@@ -40,6 +40,7 @@
 - [实现 non-gating D2H plan/progress vertical slice](issues/18-implement-non-gating-d2h-plan-progress.md): 已发布step-local plan/progress、issued/confirmed ledger与persistent worker Main binding；focused static和CPU/mock通过，terminal/preemption与真实runtime evidence未扩大。
 - [实现 async terminal ownership barrier](issues/19-implement-async-terminal-ownership-barrier.md): 已发布normal-finish `QUIESCE` tail marker、ordinary all-worker completion与release-once；preemption交错留给ticket 20，abort与真实runtime未测试。
 - [实现 async preemption replay barrier](issues/20-implement-async-preemption-replay-barrier.md): 已发布cut-time confirmed prefix、old-D2H drain/rebind barrier与terminal dominance；focused CPU/mock通过但Preemption runtime claim仍为未测试。
+- [实现 async compatibility warning与unverified startup policy](issues/21-implement-async-compatibility-warning-policy.md): default `MultiprocExecutor` + `AsyncScheduler`无unverified warning；其他组合继续启动并明确标记未测试，未增加speculative correctness逻辑。
 
 ## Not yet specified
 
