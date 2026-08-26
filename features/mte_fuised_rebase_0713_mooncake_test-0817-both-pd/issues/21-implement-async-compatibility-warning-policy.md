@@ -38,6 +38,13 @@ Stop before building speculative reconciliation, adding executor-specific lifecy
 Implemented and published as signed-off source commit `60e50b036abdfa96575f6cc08281535ea0012351`.
 The GitCode branch ref was live-verified at the same SHA, and the source worktree was clean.
 
+Ticket 22's real `MultiprocExecutor` startup gate later exposed a missing DSA Decode worker-handshake
+setter. The ticket 21 owner fixed that startup defect in signed-off commit
+`ffbafcc1e13c3c412918135e3cfbedc15a15ae6d`: DSA Decode accepts and ignores local Decode-worker
+handshake metadata, while request positional metadata remains the Prefill endpoint source and the
+Prefill/default V1 aggregation path is unchanged. The focused regression was `1 passed`, the complete
+connector target was `124 passed`, and an independent two-axis review reported zero findings.
+
 The CPU-only `liangjiahao/vllm-ascend-ut` Pod produced the expected focused red (`2 failed`) against
 the old startup behavior and green (`2 passed`) after implementation. The complete connector target
 was `123 passed`. Python compile, `git diff --check`, and `git show --check` passed; `ruff` was not

@@ -1,11 +1,11 @@
 # mte_fuised_rebase_0713_mooncake_test-0817-both-pd Repo State
 
-Captured At: 2026-08-27T02:18:33+08:00
+Captured At: 2026-08-27T03:42:15+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
 | vllm | `repos/vllm` | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` | false | upstream vLLM baseline |
-| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `60e50b036abdfa96575f6cc08281535ea0012351` | false | lock source; restores to `repos/vllm-ascend` |
+| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `e61dacccc27ee965410c60c0d8cedaf38d66ccc6` | false | lock source; restores to `repos/vllm-ascend` |
 | Mooncake | `repos/Mooncake` | `tag:v0.3.12.post1` | `6041a609a8c3af35e778f70db344f145c2914980` | false | dependency reading and validation |
 
 ## Validation State
@@ -20,13 +20,16 @@ Captured At: 2026-08-27T02:18:33+08:00
 - Ticket 20 added the async preemption replay barrier. Focused CPU/mock connector/metadata targets were `145 passed`, A2 lifecycle was `6 passed`, and broad kv_offload excluding the known baseline-broken file was `228 passed`; independent rereview had no blocking finding.
 - Ticket 20 focused evidence does not expand the canonical Preemption runtime claim, which remains “未测试”.
 - Ticket 21 added async compatibility classification. Focused startup smoke was `2 passed` and the complete connector target was `123 passed`; independent review found no blocking issue.
+- Ticket 21 follow-up `ffbafcc1` fixed real `MultiprocExecutor` DSA Decode handshake startup; the complete connector target was `124 passed`, and independent two-axis review reported zero findings.
 - Nondefault executor/scheduler lifecycle and speculative configuration remain untested.
+- Ticket 22's mandatory CPU/mock gate passed at `e61daccc`: supervisor reran five explicit targets in `liangjiahao/vllm-ascend-ut` and obtained `5 passed, 14 warnings in 1.82s`. The host and Pod test-file SHA256 matched, and final independent review had no Spec finding or blocking issue.
+- Allowed claim: `GitCode reporter happy path 已通过 CPU/mock validation`.
 - NPU runtime remains `planned / not run`; see [NPU E2E test plan](npu-e2e-test-plan.md).
 
 ## Publish State
 
-- The replacement through ticket 21 range `0d6dd0d26..60e50b03` is signed off and published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
-- `git ls-remote origin refs/heads/feature/blockwise-dsa-mooncake-v1-reimplementation` was verified for the ticket 21 publication and returned exactly `60e50b036abdfa96575f6cc08281535ea0012351`.
+- The replacement through ticket 22 range `0d6dd0d26..e61daccc` is signed off and published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
+- `git ls-remote origin refs/heads/feature/blockwise-dsa-mooncake-v1-reimplementation` was verified for the final publication and returned exactly `e61dacccc27ee965410c60c0d8cedaf38d66ccc6`.
 - Cross-machine restore is available from the branch and commit recorded in `workspace.lock.json`.
 
 ## Lock Refresh Note

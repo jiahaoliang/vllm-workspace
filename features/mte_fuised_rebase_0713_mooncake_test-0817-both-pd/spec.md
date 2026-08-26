@@ -1,4 +1,4 @@
-Status: sync replacement implemented and CPU/mock validated; async delta approved / implementation pending; GitCode reporter async happy path planned / not run; NPU and graph-capture planned / not run
+Status: sync replacement implemented and CPU/mock validated; async delta implemented; GitCode reporter happy path 已通过 CPU/mock validation; NPU and graph-capture planned / not run
 
 ## Problem Statement
 
@@ -104,7 +104,7 @@ Status: sync replacement implemented and CPU/mock validated; async delta approve
 | Scope | Status | Allowed claim |
 | --- | --- | --- |
 | Published sync replacement at `7401ae79c` | existing CPU/mock evidence retained | 仅使用既有报告中的精确 sync replacement claim |
-| GitCode reporter async happy path | `planned / not run` | 通过后仅写“GitCode reporter happy path 已通过 CPU/mock validation” |
+| GitCode reporter async happy path | `PASS` | GitCode reporter happy path 已通过 CPU/mock validation |
 | Preemption | 未测试 | 未测试 |
 | Abort | 未测试 | 未测试 |
 | D2H failure | 未测试 | 未测试 |
