@@ -45,9 +45,16 @@
 
 ## Not yet specified
 
+## Active implementation
+
+- [实现 Prefill DCP source shard assembly](issues/23-implement-prefill-dcp-source-shard-assembly.md):
+  已在 vLLM-Ascend `117637d20` 基线上认领实施；durable tracker 记录逐阶段实现、验证、review、
+  source commit 与 control-repo 恢复状态。真实 Mooncake/NPU 保持 `planned / not run`。
+
 ## Out of scope
 
-- 修改或提交 vLLM-Ascend production source、运行 source tests、刷新 `workspace.lock.json` 或发布新 replacement commit。
+- 本 Wayfinder planning 阶段本身不修改或提交 vLLM-Ascend production source；该历史边界已由
+  [issue 23](issues/23-implement-prefill-dcp-source-shard-assembly.md) 的显式实施授权向前推进。
 - 修改 upstream vLLM core，或新增 core-level running-request D2H failure/completion channel。
 - Blockwise DSA与speculative decoding的配合实现、correctness validation和support claim；配置组合允许启动，但本版保持out of scope / unverified。
 - Fused D2H request-local recovery、feature watchdog、reliable native cancel、fatal latch 或自动 restart contract。

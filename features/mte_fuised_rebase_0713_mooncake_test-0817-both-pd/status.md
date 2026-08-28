@@ -1,6 +1,6 @@
 # Blockwise DSA PD Offload Status
 
-Updated At: 2026-08-28
+Updated At: 2026-08-29
 
 | Area | Status | Evidence |
 | --- | --- | --- |
@@ -14,6 +14,7 @@ Updated At: 2026-08-28
 | Full CPU/mock root | baseline exceptions | `241 passed / 5 pre-existing failures` |
 | Async contract | approved | [Canonical spec](spec.md) and ADR 0024-0030 |
 | Async production implementation and E2E closure | committed and published | vLLM-Ascend `117637d205603b0c1e43aa0ea3e141de926ff3b1` |
+| Prefill DCP source shard assembly | implementation claimed | [Issue 23 durable tracker](issues/23-implement-prefill-dcp-source-shard-assembly.md) |
 | GitCode reporter async happy path | `PASS` | [CPU/mock validation report](async-happy-path-validation-report.md) |
 | Full async failure/lifecycle matrix | 未测试 | 未测试 |
 | Graph-capture runtime | `planned / not run` | No runtime evidence |
