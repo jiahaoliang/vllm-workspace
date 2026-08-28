@@ -12,21 +12,35 @@
 
 ## 范围与首个拓扑
 
-首个执行拓扑为 `P TP8/DP2 -> D TP2/DP8`。它只是第一组验证输入，不是产品唯一拓扑。后续拓扑只要重新执行完整 preflight 和全部 mandatory case，并满足以下约束，即可使用本计划：
+首个执行拓扑为 `P TP8/DP2 -> D TP2/DP8`。它只是第一组验证输入，不是产品唯一拓扑。Prefill DCP source shard assembly 增加DCP1兼容、DCP2、DCP4和shared-source-group四组配置；每组都必须使用新RUN_ID重新执行完整preflight与适用mandatory cases：
 
 - `P_TP >= D_TP` 且 `P_TP % D_TP == 0`；
-- Decode PP=1，Decode `DCP * PCP == 1`；
-- 每个 Prefill TP group 是连续的，group size 为 `P_TP / D_TP`；
-- 每组首 rank 是对应 Decode TP 的唯一 payload source；
-- fixed leader 必须拥有目标 Decode TP 所需的完整 Main K/V、Indexer 和可选 Indexer scale replica。
+- Prefill `PCP=1`，`P_DCP`为正整数且整除`P_TP`；Decode PP=1，Decode `DCP * PCP == 1`；
+- 对Decode TP rank `j`，Main source group使用`group_count=P_TP/P_DCP`与
+  `group_index=floor(j*group_count/D_TP)`选择连续`P_DCP`个Prefill ranks；
+- 每组首 rank 是Indexer与可选scale的fixed replica leader；Main K/V必须由该组exact rank-local shards
+  按`cp_kv_cache_interleave_size`拼装，不能要求leader持有完整Main replica；
+- `P_DCP=1`必须产生原fixed-leader结果。Shared-source配置必须让至少两个Decode TP选择同一Prefill
+  DCP group，并验证source release fanout。
 
-在首个拓扑中，每个 Prefill DP replica 的 TP group 为 `[0,1,2,3]` 与 `[4,5,6,7]`，fixed leaders 分别为 rank 0 和 rank 4。Decode DP 到 Prefill endpoint 的 routing 必须由 rendered manifest 明确记录，不能从 DP 数量猜测。
+首轮DCP matrix至少包含：
+
+| Variant | Topology | Expected Main source groups |
+| --- | --- | --- |
+| DCP1 compatibility | `P TP8/DCP1 -> D TP2/DCP1` | D0=`[0]`, D1=`[4]` |
+| DCP2 assembly | `P TP8/DCP2 -> D TP2/DCP1` | D0=`[0,1]`, D1=`[4,5]` |
+| DCP4 assembly | `P TP8/DCP4 -> D TP2/DCP1` | D0=`[0,1,2,3]`, D1=`[4,5,6,7]` |
+| shared source group | `P TP4/DCP2 -> D TP4/DCP1` | D0/D1=`[0,1]`, D2/D3=`[2,3]` |
+
+每个 Prefill DP replica内的Decode DP到Prefill endpoint routing必须由rendered manifest明确记录，不能从
+DP数量猜测。DCP2/DCP4与shared-source variant都必须记录每次Indexer/Main Mooncake session、Prefill rank
+顺序和每个source endpoint的`DONE_RECVING_MSG` fanout。
 
 Mandatory runtime scope：
 
-1. happy path 与 partial physical block；
+1. DCP1/DCP2/DCP4 happy path、partial physical block与prefix-cache hit/miss；
 2. multi-block 与持续 Decode/fused D2H；
-3. concurrency、request-lifetime reservation pressure 与 HOL admission；
+3. 多请求concurrency、shared-source fanout、request-lifetime reservation pressure与HOL admission；
 4. Indexer-before-Main ordering 和分 phase failure injection；
 5. exact TP terminal barrier 与 all-TP full replay；
 6. preemption epoch rebind 与 confirmed Main prefix reuse；
@@ -122,8 +136,11 @@ layer_metadata[layer_name]
 
 ### 4. Topology、leader replica 与 memory placement
 
-- 从每个 Prefill DP replica 采集 TP rank/group/leader mapping，证明首个拓扑只由 ranks 0、4 发 payload；非 leader 不得提交重叠 payload。
-- 用 deployment owner 提供的 replica evidence 证明每个 leader 拥有对应 Decode TP 的完整 Main/Indexer/scale 内容。若只能证明 shard，测试不运行。
+- 从每个Prefill DP replica采集TP/DCP rank、source group与leader mapping。证明Indexer只由每组首rank
+  提交，Main只由所选group内拥有对应token range的ranks提交，且destination没有重叠或缺口。
+- 用deployment owner提供的placement evidence证明每个group leader拥有完整Indexer/scale replica，
+  并证明每个Main rank-local shard与`cp_kv_cache_interleave_size`一致。DCP1额外证明leader拥有完整Main；
+  DCP2/DCP4不得用完整leader replica替代shard assembly。
 - 每个 Decode TP 独立报告 Indexer destination 为该 TP HBM，Main destination 为该 TP 的 NPU-addressable Swapped Host pool；不同 Decode TP 不共享 Main pool ownership。
 - Decode Swapped Main block ID 0 保留。对每个 TP 验证 scheduler capacity、Host tensor capacity、registered range 一致，并满足 `usable_blocks >= ceil(max_model_len / block_size)`。
 - 保存 Mooncake Transfer Engine/Store endpoint、registered range、session ID 与 cleanup 方法。registration 或 endpoint readiness 不完整时不发流量。
@@ -142,6 +159,9 @@ layer_metadata[layer_name]
 
 - `partial-1`：prompt token 数小于一个 block，最后 block 为 partial；
 - `multiblock-1`：prompt 跨至少三个完整 block 且有 partial tail；
+- `prefix-base-1`与`prefix-hit-1`：共享冻结prefix、不同suffix，用于证明prefix cache hit不会改变
+  DCP Main placement，且cache-content/output oracle仍与baseline一致；
+- `prefix-miss-1`：与prefix fixture只差一个冻结token，用于证明错误prefix不会误命中；
 - `decode-grow-1`：生成长度跨至少两个新 block；
 - `pressure-old`、`pressure-head`、`pressure-young`：reservation block 数可制造一次确定的 HOL capacity miss；
 - `failure-1`、`preempt-1`、`cancel-1`、`v1-1`：各 lifecycle case 的独立 request ID。
@@ -214,15 +234,22 @@ kubectl delete -n "${NS}" "job/${CASE_OBJECT}" "configmap/${CASE_OBJECT}" --igno
 | NPU-07 | Cancellation drain-and-ack | `planned / not run` |
 | NPU-08 | Default V1 isolation | `planned / not run` |
 
-### NPU-01 — Happy path 与 partial physical block
+### NPU-01 — DCP Main Assembly、Partial Block 与 Prefix Cache
 
 **Status:** `planned / not run`
 
-- Prerequisite：完整 preflight PASS；baseline 的 `partial-1` 已归档；cache probe 能覆盖 leaders 0/4 和所有 Decode TP。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-01.json`；只发送固定 `partial-1`，单并发，禁止 transport fault。
-- Oracle：baseline output；首/中/末层 Main K/V、Indexer 和 optional scale 的 source/destination oracle；partial tail 按完整 physical block checksum。
-- 成功条件：每个 Decode TP 只从自己的 fixed leader 拉取；Indexer D2D terminal success 后才开始 Main D2RH；每 phase 在 connector 边界各提交一次；Main 落在 per-TP Swapped Host pool、Indexer 落在该 TP HBM；exact TP `RECEIVE_COMPLETE` 后才可见 cache hit。
-- 失败证据：任一非 leader payload、phase 逆序/重叠、地址越界、缺 rank、checksum mismatch、output mismatch、reservation 泄漏或 unexpected retry。
+- Prerequisite：完整preflight PASS；DCP1/DCP2/DCP4各自baseline与`partial-1`、`prefix-base-1`、
+  `prefix-hit-1`、`prefix-miss-1`已归档；cache probe覆盖所有selected source ranks与Decode TP。
+- Manifest/输入：每个DCP variant使用独立`${RUN_DIR}/manifests/NPU-01-<variant>.json`；先发送
+  `partial-1`，再顺序发送prefix base/hit/miss fixtures，单并发，禁止transport fault。
+- Oracle：baseline output；首/中/末层Main K/V、Indexer和optional scale的source/destination oracle；
+  每个DCP rank按global token projection验证，partial tail按完整physical block checksum；prefix hit/miss保存
+  cache decision、source checksum、destination checksum与output token IDs。
+- 成功条件：Indexer只从group leader拉取一次；Main按Prefill rank顺序从exact DCP shards拉取，每个
+  destination byte只写一次且完整覆盖bound blocks；空shard不提交transfer；全部Main成功后才产生一个
+  `RECEIVE_COMPLETE`。DCP1与旧mapping一致，prefix hit/miss均保持cache-content/output oracle。
+- 失败证据：Indexer multi-source、Main错误rank/order、phase逆序、destination重叠/缺口/越界、partial
+  physical block缩短、错误prefix命中、checksum/output mismatch、reservation泄漏或unexpected retry。
 - Cleanup：执行公共收证/清理；确认 ordinary completion 对实际使用 endpoint 的 `DONE_RECVING_MSG` 状态、Main reservation release-once、NPU blocks 与 Mooncake session 回到基线。
 
 ### NPU-02 — Multi-block、持续 Decode 与 fused D2H
@@ -241,9 +268,13 @@ kubectl delete -n "${NS}" "job/${CASE_OBJECT}" "configmap/${CASE_OBJECT}" --igno
 **Status:** `planned / not run`
 
 - Prerequisite：NPU-02 PASS；已记录每 TP usable Host blocks；driver 能以 barrier 固定 admission/release 顺序。
-- Manifest/输入：`${RUN_DIR}/manifests/NPU-03.json`；按 fixture 顺序提交 `pressure-old`、`pressure-head`、`pressure-young`，其冻结 reservation blocks 使 old 持有容量、head 首先 capacity miss、young 即使可装入也在本 step 不尝试；另执行固定并发 wave。
+- Manifest/输入：`${RUN_DIR}/manifests/NPU-03.json`；在shared-source-group variant中先并发发送至少
+  四个普通请求并证明两个Decode TP共享一个Prefill DCP group，再按fixture顺序提交`pressure-old`、
+  `pressure-head`、`pressure-young`；另执行冻结的multi-request wave。
 - Oracle：三条请求各自 baseline output/cache oracle；逐 step reservation ledger 与 scheduler/worker ownership timeline。
-- 成功条件：reservation 在 receive 前一次性覆盖 prompt+最大输出；capacity miss 不产生 partial ownership；本 step HOL 阻止 younger reservation，下一 step 按原顺序重试；请求间 Host/Indexer ownership 隔离；每个 terminal path release-once。
+- 成功条件：reservation在receive前一次性覆盖prompt+最大输出；capacity miss不产生partial ownership；
+  本step HOL阻止younger reservation，下一step按原顺序重试；请求间Host/Indexer ownership隔离；共享
+  source group等待精确Decode fanout，每个Decode worker对全部planned endpoints各release-once。
 - 失败证据：bypass HOL、超卖、等待期间 ownership 泄漏、重复/提前 release、request 交叉写、持续无进展或 output/cache mismatch。
 - Cleanup：driver 释放 barrier 并结束所有请求；执行公共收证/清理；usable reservation、delayed blocks、trackers 必须精确回到 case 前计数。
 
@@ -287,7 +318,10 @@ kubectl delete -n "${NS}" "job/${CASE_OBJECT}" "configmap/${CASE_OBJECT}" --igno
 - Prerequisite：NPU-01 PASS；driver 能在 in-flight receive/fused D2H barrier 上取消 `cancel-1`；能观察 worker Quiesced、`DONE_RECVING_MSG` attempt、ordinary `finished_recving` 和 delayed-block release顺序。
 - Manifest/输入：`${RUN_DIR}/manifests/NPU-07.json`；分别在 receive 与 fused D2H in-flight point 执行固定 cancellation subrun，并发送 duplicate cancellation/late completion。
 - Oracle：取消前 baseline prefix 与 cache checksum；取消后不再产生用户 output，改用 ownership/state oracle确认旧 operation没有写入复用地址。
-- 成功条件：取消后不启动新 receive/replay/D2H；unquiesced 期间 reservation保持隔离；每个 worker Quiesced 后，先对实际使用且未通知的 leader endpoint best-effort attempt一次 `DONE_RECVING_MSG`，再上报一次 ordinary `finished_recving`；all-worker completion 后按顺序 release-once Main 与 delayed NPU blocks；duplicate/late事件为no-op。
+- 成功条件：取消后不启动新receive/replay/D2H；unquiesced期间reservation保持隔离；每个worker
+  Quiesced后，先对全部planned source endpoints各best-effort attempt一次`DONE_RECVING_MSG`，再上报一次
+  ordinary `finished_recving`；shared source group按精确fanout释放；all-worker completion后按顺序
+  release-once Main与delayed NPU blocks；duplicate/late事件为no-op。
 - 失败证据：quiesce 前释放/复用地址、新 operation启动、通知顺序倒置、重复普通 ack、partial-worker early cleanup、late write或资源泄漏。`DONE_RECVING_MSG` send failure本身不是 state-machine failure，但必须有 attempt证据并记录 hard TTL fallback。
 - Cleanup：解除所有 barrier并等待实际 operation drain；执行公共收证/清理；额外确认 source notification/session、Main reservation、Indexer blocks、delayed blocks和worker command state回到基线。
 

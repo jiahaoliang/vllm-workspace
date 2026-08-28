@@ -11,7 +11,7 @@ Decode 保持 `DCP=1`、`PCP=1`、`PP=1`。Main 从 exact Prefill DCP source gro
 
 **Blocked by:** None.
 
-**Status:** claimed
+**Status:** resolved
 
 ## Fixed baseline
 
@@ -38,73 +38,77 @@ Decode 保持 `DCP=1`、`PCP=1`、`PP=1`。Main 从 exact Prefill DCP source gro
 
 ## Implementation checklist
 
-- [ ] Add immutable `MainSourceSharding(dcp_size, block_size, interleave_size)` to typed DSA
+- [x] Add immutable `MainSourceSharding(dcp_size, block_size, interleave_size)` to typed DSA
   metadata and make `RemoteSource.main_sharding` optional; `None` preserves the complete-leader path.
-- [ ] Publish `remote_cp_kv_cache_interleave_size` from Prefill and validate PCP/DCP/TP plus
+- [x] Publish `remote_cp_kv_cache_interleave_size` from Prefill and validate PCP/DCP/TP plus
   block/interleave geometry during Decode admission.
-- [ ] Add a private pure source-plan module for source-group selection and rank-local Main token to
+- [x] Add a private pure source-plan module for source-group selection and rank-local Main token to
   Decode-global destination range planning.
-- [ ] Validate source capacity and exact destination coverage before the first Main write: no overlap,
+- [x] Validate source capacity and exact destination coverage before the first Main write: no overlap,
   gap, or out-of-bounds range; retain full physical transfer for a partial tail block.
-- [ ] Build an immutable receive route before enqueue. Resolve and validate every endpoint before
+- [x] Build an immutable receive route before enqueue. Resolve and validate every endpoint before
   transfer; execute one leader Indexer D2D, then Main D2RH shards in Prefill-rank order, then emit one
   `RECEIVE_COMPLETE`.
-- [ ] Preserve `TRANSFER_FAILED/INDEXER_D2D` and `TRANSFER_FAILED/MAIN_D2RH` classification without
+- [x] Preserve `TRANSFER_FAILED/INDEXER_D2D` and `TRANSFER_FAILED/MAIN_D2RH` classification without
   adding connector retry.
-- [ ] Acquire stable-sorted per-endpoint locks for the whole multi-source set.
-- [ ] Retain only selected Prefill source ranks, compute shared-group fanout through existing
+- [x] Acquire stable-sorted per-endpoint locks for the whole multi-source set.
+- [x] Retain only selected Prefill source ranks, compute shared-group fanout through existing
   `remote_port_send_num`, and attempt one `DONE_RECVING_MSG` per planned endpoint in every terminal
   path, including failure and cancellation.
-- [ ] Keep ordinary `dsa_pd_offload=false`, DSA DCP1, exact Decode-TP completion, async scheduling,
+- [x] Keep ordinary `dsa_pd_offload=false`, DSA DCP1, exact Decode-TP completion, async scheduling,
   replay, preemption, QUIESCE, and terminal release behavior unchanged.
 
 ## TDD and validation checklist
 
-- [ ] Pure planner red-green: DCP1 legacy, DCP2/DCP4, shared source group, invalid TP/DCP geometry,
+- [x] Pure planner red-green: DCP1 legacy, DCP2/DCP4, shared source group, invalid TP/DCP geometry,
   interleave 1/block-size, asymmetric block sizes, and partial tail.
-- [ ] Coverage red-green: each destination byte written once; exact union of bound Main blocks;
+- [x] Coverage red-green: each destination byte written once; exact union of bound Main blocks;
   insufficient source capacity, overlap, gap, and out-of-range fail before transfer.
-- [ ] Receiver red-green: Indexer before Main, rank-ordered endpoint sessions, middle/final Main shard
+- [x] Receiver red-green: Indexer before Main, rank-ordered endpoint sessions, middle/final Main shard
   failure classification, and no `RECEIVE_COMPLETE` after any failure.
-- [ ] Ownership red-green: selected-rank retention, shared-group fanout, and all-endpoint release on
+- [x] Ownership red-green: selected-rank retention, shared-group fanout, and all-endpoint release on
   success/failure/cancellation.
-- [ ] Lifecycle/isolation regressions: exact TP, async scheduling, replay, preemption, QUIESCE,
+- [x] Lifecycle/isolation regressions: exact TP, async scheduling, replay, preemption, QUIESCE,
   ordinary V1, DSA DCP1 fixed leader, and positional registration.
-- [ ] Run focused single-file tests and type/static checks throughout implementation.
-- [ ] In the CPU-only long-running `liangjiahao/vllm-ascend-ut` Pod, tar-sync the exact checkout and
+- [x] Run focused single-file tests and type/static checks throughout implementation.
+- [x] In the CPU-only long-running `liangjiahao/vllm-ascend-ut` Pod, tar-sync the exact checkout and
   explicitly run metadata, source planner, connector, and focused DSA/SFA targets with bytecode and
   pytest cache disabled.
-- [ ] Run the full applicable CPU/mock suite once at the end and record baseline exclusions exactly.
-- [ ] Run independent Standards and Spec review through `code-review`; resolve all blocking findings.
+- [x] Run the full applicable CPU/mock suite once at the end and record baseline exclusions exactly.
+- [x] Run independent Standards and Spec review through `code-review`; resolve all blocking code/spec
+  findings. The repository NPU merge-readiness evidence gap remains explicitly unfulfilled.
 - [ ] Real Mooncake/NPU DCP2/DCP4, partial block, prefix cache, concurrency, cache-content, and output
   oracle remain `planned / not run` until actually executed.
 
 ## Documentation and publication checklist
 
-- [ ] Add a new ADR that partially supersedes ADR 0004: fixed leader remains for Indexer; Main uses
+- [x] Add a new ADR that partially supersedes ADR 0004: fixed leader remains for Indexer; Main uses
   exact Prefill DCP shard assembly.
-- [ ] Update the spec to remove the old multi-P shard exclusion and one-Mooncake-call-per-phase
+- [x] Update the spec to remove the old multi-P shard exclusion and one-Mooncake-call-per-phase
   constraint while preserving positional ABI and deployment preconditions.
-- [ ] Update the NPU validation plan with DCP2/DCP4 and the required cache-content/output oracles.
-- [ ] Commit source changes on the current vLLM-Ascend feature branch.
-- [ ] Refresh `workspace.lock.json` with `./scripts/lock-repos.sh`, update `repo-state.md`, this ticket,
+- [x] Update the NPU validation plan with DCP2/DCP4 and the required cache-content/output oracles.
+- [x] Commit and publish source changes on the current vLLM-Ascend feature branch at `6d0ca14d2`.
+- [x] Refresh `workspace.lock.json` with script-equivalent exact repo checks after
+  `./scripts/lock-repos.sh` rejected the historical slash-containing branch mapping; update
+  `repo-state.md`, this ticket,
   `status.md`, and `map.md`, then commit control-repo records with an explicit staging allowlist.
-- [ ] Preserve unrelated `deployment_yaml/` and do not include `repos/*` source in the control commit.
+- [x] Preserve unrelated `deployment_yaml/` and do not include `repos/*` source in the control commit.
 
 ## Evidence ledger
 
 | Evidence | Status | Result / pointer |
 | --- | --- | --- |
 | Initial identity and dirty-state check | PASS | Recorded above; checked 2026-08-29 |
-| Planner focused CPU/mock | pending | Not run |
-| Connector/metadata focused CPU/mock | pending | Not run |
-| Full applicable CPU/mock | pending | Not run |
-| Static/type checks | pending | Not run |
-| Independent code review | pending | Not run |
+| Planner focused CPU/mock | PASS | Included in final `263 passed, 14 warnings` CPU/mock root |
+| Connector/metadata focused CPU/mock | PASS | Complete connector `138 passed, 14 warnings`; focused iterations also passed |
+| Full applicable CPU/mock | PASS | `263 passed, 14 warnings`; excluded NPU `a2/`, known baseline-broken asymmetric-push, and ran async target separately |
+| Async happy-path isolation | PASS | Standalone `1 passed, 14 warnings`; combined collection has known module identity pollution |
+| Static/type checks | PASS with tool boundary | Six files `py_compile` and both repo `git diff --check` passed; `ruff` unavailable on Host/Pod |
+| Independent code review | PASS with runtime gap | Spec: no blocking finding; Standards code findings fixed and delta review clean; real NPU remains missing |
 | Real Mooncake | `planned / not run` | No runtime claim |
 | NPU serving/correctness/performance | `planned / not run` | No runtime claim |
-| Source commit | pending | Not committed |
-| Control repo state commit | pending | Not committed |
+| Source commit | PASS | `6d0ca14d2b5b82bcfc466ab1dad1a2a471a10bc2`, pushed and remote SHA verified |
+| Control repo state commit | PASS | The control commit containing this resolved tracker and refreshed lock/state |
 
 ## Resume protocol
 
@@ -125,7 +129,16 @@ After interruption or compaction:
 
 - 2026-08-29: Claimed implementation ticket and persisted the user-approved plan before production
   edits. Verified the initial control/source identities and dirty-state boundaries.
+- 2026-08-29: Implemented typed sharding metadata, pure DCP source planning, multi-endpoint receive,
+  stable locks, selected-rank retention and shared fanout. Fixed cancellation and empty-shard
+  boundaries found during TDD; added DCP4 middle/final failure, metadata-before-write and release tests.
+- 2026-08-29: CPU-only Pod gate passed (`263 passed` broad applicable root plus standalone async
+  happy path), static checks passed, and two-axis review closed all code/spec findings. Source commit
+  `6d0ca14d2` was pushed and verified. Real Mooncake/NPU validation was not run.
 
 ## Answer
 
-Pending implementation and validation.
+Implemented and published at vLLM-Ascend `6d0ca14d2`. CPU/mock and static gates passed; ordinary V1
+and DCP1 compatibility remain covered. Real Mooncake/NPU DCP2/DCP4, partial-block, prefix-cache,
+multi-request and cache-content/output-oracle validation remains `planned / not run` and is the
+remaining merge-readiness evidence gap.

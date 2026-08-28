@@ -1,4 +1,6 @@
-Status: sync replacement and async delta implemented; GitCode reporter happy path 已通过 CPU/mock validation; bounded glm-5.1/glm5.2 NPU E2E passed at `117637d20`; graph-capture and full runtime matrix unverified
+Status: sync replacement、async delta与Prefill DCP Main shard assembly已实现；DCP source implementation
+published at `6d0ca14d2` and passed CPU/mock validation; real Mooncake/NPU DCP2/DCP4、graph-capture and
+full runtime matrix remain unverified
 
 ## Problem Statement
 
@@ -16,7 +18,7 @@ Status: sync replacement and async delta implemented; GitCode reporter happy pat
 
 - Source identity: vLLM-Ascend `7401ae79c11d6ec0033ea3ac39085379a0bb81ef`，vLLM `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665`。
 - Existing sync replacement、focused DSA/SFA、connector/default V1 与 broad CPU/mock evidence 保持有效；详见 [CPU/mock validation report](cpu-mock-validation-report.md)。
-- Existing positional ABI、fixed TP leader、per-Decode-TP Swapped Main pool、Main lifetime reservation、Indexer-before-Main receive gate、transfer-failure replay、source TTL 与 unquiesced-operation boundaries 继续有效。
+- Existing positional ABI、per-Decode-TP Swapped Main pool、Main lifetime reservation、Indexer-before-Main receive gate、transfer-failure replay、source TTL 与 unquiesced-operation boundaries 继续有效。Fixed TP leader 是 `DCP=1` 的完整 source，也是 `DCP>1` 的 Indexer replica source；Main 的 `DCP>1` mapping 由 ADR 0031 取代。
 - Current source still uses lifecycle `FUSED_D2H` / `D2H_COMPLETE` and rejects async scheduling. These are baseline facts, not the target async contract.
 
 ## Target Async Contract
@@ -25,16 +27,17 @@ Status: sync replacement and async delta implemented; GitCode reporter happy pat
 
 - `kv_connector_extra_config.dsa_pd_offload=true` 显式启用该 mode；关闭时普通 V1 scheduler、metadata、worker、transfer 与 completion 行为不变。
 - Prefill 为 `kv_producer`，Decode 为 `kv_consumer`；Prefill 不启用 layerwise reuse/offload，Decode 使用 `fused_overlap` 与 Mooncake SFA backend。
-- 产品 topology 保持 `P_TP >= D_TP`、`P_TP % D_TP == 0`、Decode PP=1 和 Decode `DCP * PCP == 1`。Reporter 的 `P DP2/TP8 -> D DP2/TP8` 是初版 validation target，不是产品唯一 topology。
-- Prefill TP 按 `P_TP / D_TP` 连续分组，每组首个 rank 是对应 Decode TP 的唯一 payload source。P/D positional ABI、block/page geometry、image 与 configuration compatibility 是 deployment preconditions，不由 connector handshake 证明。
+- 产品 topology 保持 `P_TP >= D_TP`、`P_TP % D_TP == 0`、Decode PP=1 和 Decode `DCP * PCP == 1`。Prefill 要求 `PCP=1`，`P_DCP` 为正整数且整除 `P_TP`。Reporter 的 `P DP2/TP8 -> D DP2/TP8` 是初版 async validation target，不是产品唯一 topology。
+- 对 Decode TP rank `j`，`group_count = P_TP / P_DCP`，`group_index = floor(j * group_count / D_TP)`；Main sources 是该组连续 `P_DCP` 个 ranks，Indexer 只来自组首 fixed replica leader。多个 Decode TP 可以共享同一组，`P_DCP=1` 退化为原 fixed-leader mapping。
+- P/D positional ABI、block/page geometry、image 与 configuration compatibility 是 deployment preconditions，不由 connector handshake 证明。Main sharding metadata只携带DCP、source block与interleave geometry，不携带tensor semantic或地址。
 
 ### Reservation and initial receive
 
 - 每个 Decode TP process 拥有独立 Swapped Main pool。Scheduler 在 remote admission 前为请求的最大允许 sequence length 建立 Main lifetime reservation，并独占完整 future reservation block list。
 - Worker 只看到 stable reservation identity、capacity 和当前可访问的 ordered Main bound prefix。Bound prefix 可以包含即将写入但尚未 confirmed 的 blocks，不能被解释为 valid Main boundary。
-- 一个 `RECEIVE_REMOTE` lifecycle command 在每个 Decode TP worker 内先执行 Indexer D2D，成功后才执行 Main D2RH。Indexer 或 Main final failure 使用 phase-aware `TRANSFER_FAILED`；两者成功才产生 `RECEIVE_COMPLETE`。
+- 一个 `RECEIVE_REMOTE` lifecycle command 在每个 Decode TP worker 内先取得全部planned endpoint metadata并验证完整Main source plan，再执行一次leader Indexer D2D，成功后按Prefill rank顺序执行每个非空Main D2RH shard。Indexer 或任一Main shard final failure使用phase-aware `TRANSFER_FAILED`；全部成功才产生一个`RECEIVE_COMPLETE`。
 - Receive、transfer failure 与 replay 继续使用 `(request_id, execution_epoch, command_seq, tp_rank)` typed result identity，以及当前 routed Decode DP replica 内的 exact TP rank-set coverage。
-- Python connector 每个 transfer phase 只调用一次同步 Mooncake transfer，只依赖 Mooncake internal retry；不增加 outer retry、source TTL check 或 launch lease。
+- Python connector 对Indexer只调用一次同步Mooncake transfer，对每个非空Main source shard各调用一次；只依赖Mooncake internal retry，不增加outer retry、source TTL check或launch lease。
 
 ### Lifecycle metadata and D2H progress
 
@@ -91,7 +94,7 @@ Status: sync replacement and async delta implemented; GitCode reporter happy pat
 ## Implementation Decisions
 
 1. 不增加新的 public connector，不修改 upstream vLLM core。
-2. Stable positional ABI、leader mapping、Main reservation、receive ordering、transfer-failure replay、source TTL 与 unquiesced-operation contracts保持不变。
+2. Stable positional ABI、Indexer fixed-leader mapping、Main reservation、receive ordering、transfer-failure replay、source TTL 与 unquiesced-operation contracts保持不变；Prefill `DCP>1` 的Main改为exact source shard assembly。
 3. 删除 lifecycle `FUSED_D2H` 与 typed `D2H_COMPLETE`；receive/failure/replay typed results继续保留。
 4. D2H plan/progress与 lifecycle request/result属于同一 Blockwise DSA metadata family，但使用独立 value objects、identity namespace与aggregation规则。
 5. Scheduler 是 issued/confirmed ledger、Main validity与reservation release的唯一权威；worker不能根据 bound prefix或scheduled token count推测 validity。
@@ -107,6 +110,7 @@ Status: sync replacement and async delta implemented; GitCode reporter happy pat
 | --- | --- | --- |
 | Published sync replacement at `7401ae79c` | existing CPU/mock evidence retained | 仅使用既有报告中的精确 sync replacement claim |
 | GitCode reporter async happy path | `PASS` | GitCode reporter happy path 已通过 CPU/mock validation |
+| Prefill DCP source planner/connector | `PASS` | vLLM-Ascend `6d0ca14d2`; applicable CPU/mock root `263 passed` and standalone async target `1 passed` |
 | Preemption | 未测试 | 未测试 |
 | Abort | 未测试 | 未测试 |
 | D2H failure | 未测试 | 未测试 |
@@ -116,7 +120,8 @@ Status: sync replacement and async delta implemented; GitCode reporter happy pat
 | `P TP8 -> D TP2` | 未测试 | 未测试 |
 | Speculative config | 未测试 | 未测试 |
 | 非默认 executor/scheduler lifecycle | 未测试 | 未测试 |
-| NPU、真实 Mooncake、fused kernel、graph-capture runtime | `planned / not run` | 不得声明 runtime validated |
+| Prefill DCP2/DCP4真实Mooncake/NPU、partial block、prefix cache、multi-request与cache/output oracle | `planned / not run` | 不得声明 runtime validated |
+| Fused kernel、graph-capture与其余runtime matrix | 未完整对账 | 既有bounded E2E不证明完整plan |
 
 ## Initial Async Completion Gate
 
@@ -136,8 +141,8 @@ Mandatory CPU/mock gate只覆盖以下 happy path：
 
 - 修改upstream vLLM core，或新增core-level running-request D2H failure/completion channel。
 - Prefill layerwise reuse、layerwise push或完整实现vLLM issue #48203。
-- 改变positional tensor ABI、TP leader mapping、Main reservation policy或default `MooncakeConnectorV1` behavior。
-- `P_TP < D_TP`、`P_TP % D_TP != 0`、Decode PP>1、Decode `DCP * PCP != 1`、multi-P shard assembly或跨P DP replica混合tensor。
+- 改变positional tensor ABI、Indexer fixed-leader mapping、Main reservation policy或default `MooncakeConnectorV1` behavior。
+- `P_TP < D_TP`、`P_TP % D_TP != 0`、`P_DCP`不整除`P_TP`、Prefill PCP>1、Decode PP>1、Decode `DCP * PCP != 1`或跨P DP replica混合tensor。
 - Speculative decoding配合实现、correctness validation与support claim。
 - 非默认executor/scheduler lifecycle validation。
 - Fused D2H request-local recovery、watchdog、reliable native cancel、fatal latch或automatic restart。
@@ -146,5 +151,5 @@ Mandatory CPU/mock gate只覆盖以下 happy path：
 ## Further Notes
 
 - [Blockwise DSA Async Scheduling Wayfinder Map](map.md)记录async delta的decision history；ADR 0024-0030是当前async contract入口。
-- [MooncakeConnectorV1 Blockwise DSA PD Offload设计](blockwise-dsa-pd-offload-design.md)与reimplementation amendments记录已发布sync replacement的历史设计和evidence，不覆盖本spec的async delta。
+- [MooncakeConnectorV1 Blockwise DSA PD Offload设计](blockwise-dsa-pd-offload-design.md)与reimplementation amendments记录已发布sync replacement的历史设计和evidence；ADR 0031记录后续Prefill DCP source shard assembly delta。
 - 当前实现、目标contract和validation evidence是三个不同事实层。Implementation agent必须先修改source并完成规定gate，才能更新async status；仅更新文档或通过static checks不能升级claim。

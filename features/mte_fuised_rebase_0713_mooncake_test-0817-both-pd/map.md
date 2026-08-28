@@ -42,14 +42,16 @@
 - [实现 async preemption replay barrier](issues/20-implement-async-preemption-replay-barrier.md): 已发布cut-time confirmed prefix、old-D2H drain/rebind barrier与terminal dominance；focused CPU/mock通过但Preemption runtime claim仍为未测试。
 - [实现 async compatibility warning与unverified startup policy](issues/21-implement-async-compatibility-warning-policy.md): default `MultiprocExecutor` + `AsyncScheduler`无unverified warning；其他组合继续启动并明确标记未测试，未增加speculative correctness逻辑。
 - [验证 GitCode reporter async happy path](issues/22-validate-gitcode-reporter-async-happy-path.md): 真实`AsyncScheduler`、EngineCore depth-2 queue与`MultiprocExecutor` driver的CPU/mock gate通过；最终claim仅限GitCode reporter happy path，真实runtime仍未运行。
+- [实现 Prefill DCP source shard assembly](issues/23-implement-prefill-dcp-source-shard-assembly.md): 已在
+  vLLM-Ascend `6d0ca14d2` 发布exact Prefill DCP Main shard assembly、fixed-leader Indexer、shared
+  fanout与multi-endpoint release；applicable CPU/mock root为`263 passed`，真实Mooncake/NPU DCP2/DCP4
+  matrix保持`planned / not run`。
 
 ## Not yet specified
 
 ## Active implementation
 
-- [实现 Prefill DCP source shard assembly](issues/23-implement-prefill-dcp-source-shard-assembly.md):
-  已在 vLLM-Ascend `117637d20` 基线上认领实施；durable tracker 记录逐阶段实现、验证、review、
-  source commit 与 control-repo 恢复状态。真实 Mooncake/NPU 保持 `planned / not run`。
+None.
 
 ## Out of scope
 
@@ -59,4 +61,4 @@
 - Blockwise DSA与speculative decoding的配合实现、correctness validation和support claim；配置组合允许启动，但本版保持out of scope / unverified。
 - Fused D2H request-local recovery、feature watchdog、reliable native cancel、fatal latch 或自动 restart contract。
 - NPU runtime、performance threshold、完整 Lifecycle runtime validation、GitCode 回帖或关闭 external issue。
-- 改变 positional tensor ABI、TP leader mapping、Main reservation policy或 default `MooncakeConnectorV1` behavior。
+- 改变 positional tensor ABI、Indexer fixed-leader mapping、Main reservation policy或 default `MooncakeConnectorV1` behavior。

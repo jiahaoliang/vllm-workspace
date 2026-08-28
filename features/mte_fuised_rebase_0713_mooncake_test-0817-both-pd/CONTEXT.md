@@ -116,9 +116,11 @@ _避免使用_: `D2H_COMPLETE` lifecycle result、anonymous completion、issued 
 Scheduler 已消费 current-epoch D2H step progress、并能证明从既有 Main-valid boundary 起连续完成的最大 token boundary。Issued 但未 confirmed 的 range 不能用于 preemption Main-prefix reuse。
 _避免使用_: Issued Main watermark、scheduled token count、乐观 `num_computed_tokens`
 
-**TP leader group**:
-分配给同一个 Decode TP 的连续 Prefill TP replica 集合，其中首个 Prefill TP 是该组唯一的 payload source。
-_避免使用_: 多 shard source group、all-P payload group
+**Prefill DCP source group**:
+分配给一个 Decode TP 的连续 `P_DCP` 个 Prefill TP ranks。Main由该组的exact rank-local shards拼装；
+组首 rank仍是Indexer与可选scale的fixed replica leader。多个Decode TP可以共享同一source group，
+`P_DCP=1` 时退化为原fixed-leader mapping。
+_避免使用_: all-P payload group、Indexer multi-source、跨P DP tensor group
 
 **Prefill rank endpoint**:
 一个 Prefill TP rank 对应的 concrete `(host, handshake port, engine identity)`，用于选择同一个 positional handshake session；它只描述路由，不证明该 rank 持有完整 Main/Indexer replica。
@@ -173,7 +175,7 @@ _避免使用_: Terminal ownership barrier、epoch increment 即安全、drain �
 _避免使用_: typed `QUIESCED`、已调用 cancel API、receive-complete
 
 **Prefill source-release notification**:
-Decode worker 在不再读取某个尚未通知完成的 Prefill source 后发送的一次性 best-effort release 通知，用于让 Prefill 在 hard TTL 前回收 source ownership；它与 Decode 本地 `finished_recving` ack 是不同通道。
+Decode worker 在不再读取某个尚未通知完成的 Prefill source endpoint 后发送的一次性 best-effort release 通知，用于让 Prefill 在 hard TTL 前回收 source ownership。一个request可以计划多个source endpoints，并对每个endpoint各通知一次；它与 Decode 本地 `finished_recving` ack 是不同通道。
 _避免使用_: 把 `finished_recving` 发送给 Prefill、cancellation reason message、可靠 lease release
 
 **Unquiesced operation**:
