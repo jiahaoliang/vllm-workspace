@@ -5,7 +5,9 @@
     "vllm": {
       "path": "repos/vllm",
       "remotes": {
-        "origin": "https://github.com/vllm-project/vllm.git"
+        "origin": "https://github.com/jiahaoliang/vllm.git",
+        "collaborator": "https://github.com/zhangsicheng5/vllm.git",
+        "upstream": "https://github.com/vllm-project/vllm.git"
       },
       "branch": "feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd",
       "commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",

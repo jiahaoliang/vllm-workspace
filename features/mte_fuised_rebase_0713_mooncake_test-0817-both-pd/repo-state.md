@@ -1,11 +1,11 @@
 # mte_fuised_rebase_0713_mooncake_test-0817-both-pd Repo State
 
-Captured At: 2026-08-28T17:44:10+08:00
+Captured At: 2026-08-29T00:21:53+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
 | vllm | `repos/vllm` | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` | false | upstream vLLM baseline |
-| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `117637d205603b0c1e43aa0ea3e141de926ff3b1` | false | lock source; restores to `repos/vllm-ascend` |
+| vllm-ascend | `repos/vllm-ascend` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `117637d205603b0c1e43aa0ea3e141de926ff3b1` | false | Blockwise DSA MooncakeV1 replacement source |
 | Mooncake | `repos/Mooncake` | `tag:v0.3.12.post1` | `6041a609a8c3af35e778f70db344f145c2914980` | false | dependency reading and validation |
 
 ## Validation State
@@ -30,9 +30,9 @@ Captured At: 2026-08-28T17:44:10+08:00
 ## Publish State
 
 - The replacement through ticket 22 remains at `e61daccc`; the subsequent E2E closure and analysis range `e61daccc..117637d20` is published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
-- A live fetch on 2026-08-28 advanced `origin/feature/blockwise-dsa-mooncake-v1-reimplementation` to exactly `117637d205603b0c1e43aa0ea3e141de926ff3b1`; the local replacement worktree was fast-forwarded and is `0 ahead / 0 behind` with a clean tracked tree.
+- A live fetch on 2026-08-29 confirmed `origin/feature/blockwise-dsa-mooncake-v1-reimplementation` at exactly `117637d205603b0c1e43aa0ea3e141de926ff3b1`; the canonical checkout at `repos/vllm-ascend` is `0 ahead / 0 behind` with a clean tracked tree.
 - Cross-machine restore is available from the branch and commit recorded in `workspace.lock.json`.
 
 ## Lock Refresh Note
 
-The source was implemented in a separate non-destructive worktree, while the standard restore destination remains `repos/vllm-ascend`. `workspace.lock.json` and this file were therefore refreshed manually with the published branch and exact commit. The existing canonical checkout at `repos/vllm-ascend` remains an old behavior-reference checkout and is not the locked replacement source. The public lock script was not changed on this feature branch.
+The source was implemented in a separate non-destructive worktree. On 2026-08-29 that clean worktree was removed and the published replacement branch was checked out at the standard `repos/vllm-ascend` path. `workspace.lock.json` and this file now match the canonical checkout's branch, exact commit and remotes. The public lock script was not changed on this feature branch.
