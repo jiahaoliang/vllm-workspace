@@ -22,3 +22,10 @@
 - Completed white-box ordering corrections and published signed-off source HEAD `7401ae79c11d6ec0033ea3ac39085379a0bb81ef` to the personal GitCode origin; live `ls-remote` verification matched the exact SHA.
 - Recorded final static/CPU-mock evidence: focused DSA/SFA `47 passed`, connector/default V1 `111 passed`, broad regression `221 passed`, and full CPU root `241 passed / 5 pre-existing failures`.
 - Kept real multi-node and NPU runtime evidence at `planned / not run`.
+
+## 2026-08-28
+
+- Fetched `origin/feature/blockwise-dsa-mooncake-v1-reimplementation` from GitCode and fast-forwarded the clean replacement worktree from `e61dacccc27ee965410c60c0d8cedaf38d66ccc6` to `117637d205603b0c1e43aa0ea3e141de926ff3b1`; local and tracking refs are `0 ahead / 0 behind`.
+- The fetched range adds runtime fixes at `59fd10b0d` plus the final `docs/BLOCKWISE_DSA_MOONCAKE_V1_E2E_ANALYSIS.md`. Branch history records passing glm-5.1/glm5.2 smoke, long-request and approximately 4k-input concurrent NPU E2E runs, followed by service shutdown and NPU release.
+- Kept the evidence boundary explicit: the referenced `experiments/20260827-blockwise-dsa-mooncake-v1/` ledger is not tracked in the fetched source tree, this workspace did not rerun NPU jobs, and the older 8-case plan has not been reconciled case by case.
+- Refreshed `workspace.lock.json`, `repo-state.md` and current feature status manually because the locked replacement source lives in a separate worktree while the standard restore destination remains `repos/vllm-ascend`.

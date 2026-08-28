@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-27T03:42:15+08:00",
+  "updated_at": "2026-08-28T17:44:10+08:00",
   "repos": {
     "vllm": {
       "path": "repos/vllm",
@@ -18,7 +18,7 @@
         "collaborator": "https://gitcode.com/shichangzhang064/vllm-ascend.git"
       },
       "branch": "feature/blockwise-dsa-mooncake-v1-reimplementation",
-      "commit": "e61dacccc27ee965410c60c0d8cedaf38d66ccc6",
+      "commit": "117637d205603b0c1e43aa0ea3e141de926ff3b1",
       "purpose": "Blockwise DSA MooncakeV1 replacement source"
     },
     "Mooncake": {

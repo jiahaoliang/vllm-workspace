@@ -1,4 +1,4 @@
-Status: sync replacement implemented and CPU/mock validated; async delta implemented; GitCode reporter happy path 已通过 CPU/mock validation; NPU and graph-capture planned / not run
+Status: sync replacement and async delta implemented; GitCode reporter happy path 已通过 CPU/mock validation; bounded glm-5.1/glm5.2 NPU E2E passed at `117637d20`; graph-capture and full runtime matrix unverified
 
 ## Problem Statement
 
@@ -9,6 +9,8 @@ Status: sync replacement implemented and CPU/mock validated; async delta impleme
 目标是在不修改 upstream vLLM core、不改变普通 `MooncakeConnectorV1` 默认行为的前提下，使 `dsa_pd_offload=true` 同时支持 sync 和 async scheduling。Async scheduler 可以在前一 batch output 尚未回收时继续发布下一 step；实现必须区分已经发布的 D2H range 与已经完成并可复用的 Main range，并在 terminal/preemption 与 queued work 交错时维持 destination ownership。
 
 当前没有 NPU 资源。Static、CPU/mock、真实 Mooncake、NPU、fused kernel 与 graph-capture evidence 必须分开，不能把 planned 或 fake/mock 结果表述为真实 runtime 通过。
+
+2026-08-28 runtime update: origin branch history records passing glm-5.1/glm5.2 smoke, long-request and approximately 4k-input concurrent NPU E2E after the fixes in `59fd10b0d`; final branch HEAD is `117637d20`. This external evidence does not retroactively expand the initial async CPU/mock gate or prove every case in the older 8-case NPU plan. The current workspace did not rerun those NPU jobs, and the referenced experiment ledger is not tracked in the fetched source tree.
 
 ## Current Replacement Baseline
 

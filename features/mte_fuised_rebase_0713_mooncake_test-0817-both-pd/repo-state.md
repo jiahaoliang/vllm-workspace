@@ -1,11 +1,11 @@
 # mte_fuised_rebase_0713_mooncake_test-0817-both-pd Repo State
 
-Captured At: 2026-08-27T03:42:15+08:00
+Captured At: 2026-08-28T17:44:10+08:00
 
 | Repo | Path | Branch | HEAD | Dirty | Lock Role |
 | --- | --- | --- | --- | --- | --- |
 | vllm | `repos/vllm` | `feature/mte_fuised_rebase_0713_mooncake_test-0817-both-pd` | `0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665` | false | upstream vLLM baseline |
-| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `e61dacccc27ee965410c60c0d8cedaf38d66ccc6` | false | lock source; restores to `repos/vllm-ascend` |
+| vllm-ascend | `repos/vllm-ascend-blockwise-dsa-reimplementation` | `feature/blockwise-dsa-mooncake-v1-reimplementation` | `117637d205603b0c1e43aa0ea3e141de926ff3b1` | false | lock source; restores to `repos/vllm-ascend` |
 | Mooncake | `repos/Mooncake` | `tag:v0.3.12.post1` | `6041a609a8c3af35e778f70db344f145c2914980` | false | dependency reading and validation |
 
 ## Validation State
@@ -24,12 +24,13 @@ Captured At: 2026-08-27T03:42:15+08:00
 - Nondefault executor/scheduler lifecycle and speculative configuration remain untested.
 - Ticket 22's mandatory CPU/mock gate passed at `e61daccc`: supervisor reran five explicit targets in `liangjiahao/vllm-ascend-ut` and obtained `5 passed, 14 warnings in 1.82s`. The host and Pod test-file SHA256 matched, and final independent review had no Spec finding or blocking issue.
 - Allowed claim: `GitCode reporter happy path 已通过 CPU/mock validation`.
-- NPU runtime remains `planned / not run`; see [NPU E2E test plan](npu-e2e-test-plan.md).
+- Origin commit `59fd10b0d` added the runtime fixes found while closing the Blockwise DSA Mooncake PD path for glm-5.1 and glm5.2. The branch history records passing short/long generation and approximately 4k-input concurrent NPU E2E runs for both models; the final analysis at `117637d20` states that services were stopped and NPU resources released.
+- This is bounded E2E evidence, not proof that every mandatory case in the older [NPU E2E test plan](npu-e2e-test-plan.md) ran. The referenced `experiments/20260827-blockwise-dsa-mooncake-v1/` ledger is not tracked in the fetched source tree, and this workspace did not rerun the NPU jobs. Graph capture, the full failure/lifecycle matrix, and any unrecorded plan cases remain unverified.
 
 ## Publish State
 
-- The replacement through ticket 22 range `0d6dd0d26..e61daccc` is signed off and published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
-- `git ls-remote origin refs/heads/feature/blockwise-dsa-mooncake-v1-reimplementation` was verified for the final publication and returned exactly `e61dacccc27ee965410c60c0d8cedaf38d66ccc6`.
+- The replacement through ticket 22 remains at `e61daccc`; the subsequent E2E closure and analysis range `e61daccc..117637d20` is published to GitCode branch `feature/blockwise-dsa-mooncake-v1-reimplementation`.
+- A live fetch on 2026-08-28 advanced `origin/feature/blockwise-dsa-mooncake-v1-reimplementation` to exactly `117637d205603b0c1e43aa0ea3e141de926ff3b1`; the local replacement worktree was fast-forwarded and is `0 ahead / 0 behind` with a clean tracked tree.
 - Cross-machine restore is available from the branch and commit recorded in `workspace.lock.json`.
 
 ## Lock Refresh Note

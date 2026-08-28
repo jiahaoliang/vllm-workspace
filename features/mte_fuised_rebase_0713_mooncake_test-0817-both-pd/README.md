@@ -2,11 +2,11 @@
 
 本 feature 为 `MooncakeConnectorV1` 增加显式 opt-in 的 Blockwise DSA PD offload mode：Prefill 保持 request-level block transfer，Decode 将 Indexer 放在 HBM、将 Main K/V 放在 per-TP local Swapped Main pool，并提供 lifetime reservation、exact TP lifecycle、failure replay、preemption、cancellation 与 fused D2H ownership contract。
 
-当前 production tree 是已发布的 vLLM-Ascend sync replacement commit `7401ae79c11d6ec0033ea3ac39085379a0bb81ef`。实现收敛为既有 `MooncakeConnectorV1`、一个 typed DSA metadata module 和 thin SFA scheduler extension，不包含旧 `60eb76e` 的 standalone DSA subsystem。
+当前 production tree 是已发布的 vLLM-Ascend commit `117637d205603b0c1e43aa0ea3e141de926ff3b1`。实现收敛为既有 `MooncakeConnectorV1`、一个 typed DSA metadata module 和 thin SFA scheduler extension，不包含旧 `60eb76e` 的 standalone DSA subsystem；`59fd10b0d` 追加了 glm-5.1/glm5.2 NPU E2E 中发现的 runtime fixes，后续提交补齐 E2E 分析。
 
-2026-08-26 已批准 async scheduling delta，目标 contract 见 [spec](spec.md) 与 ADR 0024-0030；production implementation 尚未开始。GitCode reporter async happy path为`planned / not run`，完整failure/lifecycle matrix为“未测试”。
+2026-08-26 批准的 async scheduling delta 已实现并通过 GitCode reporter CPU/mock happy-path gate，目标 contract 见 [spec](spec.md) 与 ADR 0024-0030。完整 failure/lifecycle matrix仍为“未测试”。
 
-既有sync replacement的static、focused DSA/SFA、完整connector/default V1和排除已知baseline-broken文件后的broad CPU/mock regression已通过。完整CPU/mock root为`241 passed / 5 pre-existing failures`；五项均来自未修改测试文件的缺失import。NPU与graph-capture runtime未执行，保持`planned / not run`。
+既有sync replacement的static、focused DSA/SFA、完整connector/default V1和排除已知baseline-broken文件后的broad CPU/mock regression已通过。完整CPU/mock root为`241 passed / 5 pre-existing failures`；五项均来自未修改测试文件的缺失import。Origin 分支记录的 glm-5.1/glm5.2 NPU 冒烟、长请求和约 4k 输入并发 E2E 已通过；这不等于旧 8-case plan 全部完成，且本 workspace 未重跑 NPU。Graph-capture、完整 failure/lifecycle matrix 与未记录的 plan cases 仍未验证。
 
 ## 文档入口
 
